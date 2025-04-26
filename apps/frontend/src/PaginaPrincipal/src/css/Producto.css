@@ -1,0 +1,370 @@
+html, body {
+    width: 100%;
+    height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    font-family: var(--fontLandingPage);
+}
+
+.HandPickedBody {
+    margin-top: 10rem;
+}
+
+.textoContet {
+    display: flex;
+    margin-top: 2rem;
+    margin-bottom: 15rem;
+}
+
+
+.ImagenProducto {
+    object-fit: contain;
+}
+
+.TituloCard {
+    background: #FFF;
+    padding: 15px;
+    font-family: var(--fontLandingPage);
+}
+
+.buttonFechas {
+    border: 1px solid #000;
+    border-radius: 0px;
+    color: #000;
+    background-color: #FFF;
+    font-family: var(--fontLandingPage);
+    padding-left: 25px;
+    padding-right: 25px;
+    margin: 0px;
+    font-weight: bold;
+}
+
+.buttonFechas1 {
+    border: 1px solid #000;
+    border-radius: 0px;
+    color: #FFF;
+    background-color: #000;
+    font-family: var(--fontLandingPage);
+    padding-left: 75px;
+    padding-right: 75px;
+    margin: 0px;
+    font-size: 15px;
+}
+
+.buttonFechas2 {
+    border: 1px solid #000;
+    border-radius: 0px;
+    color: #000;
+    background-color: #FFF;
+    font-family: var(--fontLandingPage);
+    margin: 0px;
+    font-weight: bold;
+}
+
+.buttonFechas:hover,
+.buttonFechas1:hover {
+    background-color: #000;
+    border: 1px solid #000;
+}
+
+.buttonFechas2:hover {
+    background-color: #FFF;
+    border: 1px solid #000;
+}
+
+
+.buttonFechas2:active {
+    background-color: #FFF;
+    border: 1px solid #000;
+}
+
+.buttonFechas:active,
+.buttonFechas1:active {
+    background-color: #000;
+    border: 1px solid #000;
+}
+
+.SubtituloFechas {
+    font-size: 10px;
+}
+
+.separatorRadio {
+    background: #000;
+}
+
+.separator {
+    background: #000;
+    width: 100%;
+    height: 1px;
+    margin-bottom: 10px;
+}
+
+.separator1 {
+    background: #000;
+    width: 100%;
+    height: 1px;
+    margin-bottom: 20px;
+}
+
+input[type="radio"]{
+    display: none;
+}
+
+label{
+    display: block;
+    cursor: pointer;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+label span{
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px 10px 10px;
+    border-radius: 31px;
+    transition: .25s ease;
+}
+
+/* label span:hover,
+input[type="radio"]:checked + span{
+    background-color: #d6d6e5; 
+    border-bottom: 1px solid #000;
+} */
+
+label span:before{
+    content: "";
+    background-color: #fff;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    margin-right: 9.5rem;
+    transition: .25s ease;
+    box-shadow:  inset 0 0 0 2px #198754;
+}
+
+input[type="radio"]:checked + span:before{
+    box-shadow: inset 0 0 0 7px #198754;
+}
+
+.LogoLikeLuzi {
+    width: 50px;
+}
+
+
+.LinkButtonVerMasH {
+    text-decoration: none;
+}
+
+.card {
+    border: 1px solid #000;
+    border-radius: 0px;
+}
+
+.card-img-top {
+    border-radius: 0px;
+}
+
+.cajaBody {
+    position: relative;
+    margin-top: 0rem;
+}
+
+.cajaTodosLosProductos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
+
+.cajaTodosLosProductos .card {
+    margin-top: 1rem;
+    margin-right: 1rem;
+    border: 1px solid #000;
+    border-radius: 0px;
+    width: 15rem
+}
+.cajaTodosLosProductos .card img{
+    border-radius: 0px;
+    height: 15rem;
+}
+
+
+/*new code*/
+/* .imageProduct {
+    width: 100%;
+    height: 100%;
+    transition: all .5s;
+}
+
+.imageProduct:hover {
+    transform: scale(1.2);
+}
+
+.cardProducts {
+    overflow: hidden;
+} */
+
+#divproducto{
+    width: 75%;
+}
+
+@media (max-width: 1920px) {
+    .cajaTodosLosProductos{
+        margin-right: 10rem;
+    }
+
+    .cajaTodosLosProductos .card {
+        width: 25rem;
+        height: 28rem;
+    }
+
+    .cajaTodosLosProductos .card img{
+        height: 20rem;
+    }
+}
+
+@media (max-width: 1600px) {
+    .cajaTodosLosProductos{
+        margin-right: 7rem;
+        margin-left: 1rem;
+    }
+
+    .cajaTodosLosProductos .card {
+        width: 20rem;
+        height: 23rem;
+    }
+
+    .cajaTodosLosProductos .card img{
+        height: 15rem;
+    }
+
+    label span::before{
+        margin-right: 6.5rem;
+    }
+}
+
+@media (max-width: 1440px) {
+    .cajaTodosLosProductos{
+        margin-right: 4rem;
+        margin-left: 2rem;
+    }
+
+    .cajaTodosLosProductos .card {
+        width: 15rem;
+        height: 23rem;
+    }
+
+    label span::before{
+        margin-right: 4.5rem;
+    }
+}
+
+@media (max-width: 1280px) {
+    .cajaTodosLosProductos{
+        margin-left: 1rem;
+    }
+
+    .cajaTodosLosProductos .card {
+        width: 15rem;
+    }
+
+    label span::before{
+        margin-right: 3.5rem;
+    }
+ 
+    #crd4{
+        display: none;
+    }
+}
+
+@media (max-width: 1152px) {
+    .cajaTodosLosProductos{
+        margin-left: 1rem;
+    }
+
+    .cajaTodosLosProductos .card {
+        width: 15rem;
+        height: 23rem;
+    }
+
+    .cajaTodosLosProductos .card img{
+        height: 15rem;
+    }
+
+    label span::before{
+        margin-right: 2.5rem;
+    }
+}
+
+
+@media (max-width: 1024px) {
+    .cajaTodosLosProductos .card {
+        width: 10rem;
+        height: 18rem;
+    }
+
+    .cajaTodosLosProductos .card img{
+        height: 10rem;
+    }
+
+    label span::before{
+        margin-right: 1.5rem;
+    }
+}
+
+@media (max-width: 990px) {
+    
+    #divproducto{
+        size: 100%;
+    }
+
+    .cajaTodosLosProductos{
+        margin-left: 1rem;
+        flex-direction: column;
+        width: 98.4%;
+    }
+
+    .cajaTodosLosProductos .card {
+        width: 100%;
+        height: 20rem;
+        display: flex;
+        flex-direction: row;
+    }
+
+    .cajaTodosLosProductos .card img{
+        height: 19.9rem;
+    }
+
+    .cajaTodosLosProductos .card div{
+        height: 70%;
+    }
+
+    #crd4{
+        display: flex;
+    }
+}
+
+/*@media (max-width: 810px) {
+    #crd3{
+        display: none;
+    }
+}*/
+
+/*@media (max-width: 770px) {
+
+    .cajaTodosLosProductos{
+        flex-direction: column;
+        margin-left: 1rem;
+        margin-right: 0rem;
+    }
+
+    #crd3{
+        display: block;
+    }
+
+    #crd4{
+        display: block;
+    }
+}*/
+

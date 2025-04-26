@@ -1,0 +1,32 @@
+.botonPeticiones {
+    position: relative;
+    margin-left: 49rem;
+    margin-top: 5rem;
+}
+  
+.boton_link,
+.boton_link1,
+.boton_link2,
+.boton_link3 {
+    color: #FFF;
+    text-decoration: none;
+}
+
+.botones__opciones {
+    margin-left: 25rem;
+    display: flex;
+    
+}
+
+.link__boton {
+    text-decoration: none;
+}
+
+.boton__op {
+    margin-right: 1rem;
+}
+
+/*BOTON IMAGINARIO EN LA TABLA: PARA ABRIR MODAL*/
+.btn__tablaModal {
+    cursor: pointer;
+}

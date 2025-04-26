@@ -1,0 +1,54 @@
+
+.cardImage {
+    display: flex;
+    width: 29.735rem;
+    float: left;
+    border: none;
+    border-radius: 0px;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+   
+}
+
+.cardImage .image {
+    width: 100%;
+    height: 100%;
+    border: none;
+    transition: all .5s;
+    background-size: cover;
+    object-fit: cover;
+}
+
+.image:hover{
+   transform: scale(1.2);
+}
+
+.bottomBanner {
+    position: absolute;
+    margin-top: 16rem;
+    padding-left: 3rem;
+    padding-right: 3rem;
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+    border: 0;
+    display: flex;
+}
+
+/*Productos Muestra de la landing page*/
+
+.cajaProductosMuestra {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: .5rem;
+}
+
+.cajaProductosMuestra .card {
+    margin-right: 1rem;
+    border: 1px solid #000;
+    border-radius: 0px;
+    
+}
+
+

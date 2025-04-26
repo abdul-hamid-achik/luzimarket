@@ -1,0 +1,122 @@
+
+.alert {
+    position: relative;
+    top: 2rem;
+}
+
+.div-alert {
+    display: flex;
+    position: relative;
+    justify-content: center;
+    background: #ffdcd3;
+    border: 1px solid #ff4238;
+    width: 50rem;
+    left: 7rem;
+    border-radius: 15px;
+    margin-top: 1rem;
+}
+
+.imagen_alerta1 {
+    position: relative;
+    padding: 10px;
+    width: 2.5rem;
+    height: 2.5rem;
+    right: 13rem
+}
+
+.imagen_alerta2 {
+    position: relative;
+    padding: 10px;
+    width: 2.5rem;
+    height: 2.5rem;
+    left: 13.5rem;
+    color:#ff4238;
+}
+
+.cuerpoAlerta {
+    font-weight: 600;
+    font-size: 20px;
+    position: relative;
+    top: .1rem;
+    right: 12rem;
+    font-family: 'UniLTStd-L';
+    color:#ff4238;
+}
+
+/*Alerta SUCCESS*/
+.div-alert1 {
+    display: flex;
+    position: relative;
+    justify-content: center;
+    background: #e1f7d8;
+    border: 1px solid #009a00;
+    width: 50rem;
+    left: 7rem;
+    border-radius: 15px;
+    margin-top: 1rem;
+}
+
+.imagen_alerta11 {
+    position: relative;
+    padding: 10px;
+    width: 2.5rem;
+    height: 2.5rem;
+    right: 13rem
+}
+
+.imagen_alerta22 {
+    position: relative;
+    padding: 10px;
+    width: 2.5rem;
+    height: 2.5rem;
+    left: 13.5rem;
+    color:#ff4238;
+}
+
+.cuerpoAlerta1 {
+    font-weight: 600;
+    font-size: 20px;
+    position: relative;
+    top: .1rem;
+    right: 12rem;
+    font-family: 'UniLTStd-L';
+    color:#009a00;
+}
+
+.direccion__pagina {
+    font-family: 'UniLTStd-L';
+    font-weight: 100;
+    font-size: 22px;
+    position: relative;
+    left: 4.5rem;
+    top: 0rem;
+}
+
+.flecha {
+    position: relative;
+    left: 3rem;
+    top: 2.5rem;
+    width: 1rem;
+}
+
+.flecha1 {
+    position: relative;
+    left: 3rem;
+    top: 2.5rem;
+    width: 1rem;
+}
+
+.direccion__pagina1 {
+    font-family: 'UniLTStd-L';
+    font-weight: 100;
+    font-size: 22px;
+    position: relative;
+    left: 4.5rem;
+    top: 0rem;
+}
+
+.caja__direccion {
+    position: relative;
+    bottom: 4.7rem;
+    left: 8.5rem
+}

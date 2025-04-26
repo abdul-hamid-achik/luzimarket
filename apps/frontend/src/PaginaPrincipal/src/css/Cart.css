@@ -1,0 +1,14 @@
+.cart {
+  width: 80%;
+  margin: 0 auto;
+}
+
+h1.cart {
+  font-size: 200%;
+}
+
+h2.cart { 
+  display: flex;
+  justify-content: end;
+  text-align: right;
+}

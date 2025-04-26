@@ -1,0 +1,33 @@
+{
+  "name": "luzimarket",
+  "private": true,
+  "workspaces": [
+    "apps/backend",
+    "apps/frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently --kill-others --handle-input --raw \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "npm --workspace=apps/frontend run dev",
+    "dev:backend": "npm --workspace=apps/backend run dev",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:frontend": "npm --workspace=apps/frontend run build",
+    "build:backend": "npm --workspace=apps/backend run build",
+    "preview:frontend": "npm --workspace=apps/frontend run preview",
+    "lint": "npm run lint:backend && npm run lint:frontend",
+    "lint:backend": "npm --workspace=apps/backend run lint",
+    "lint:frontend": "npm --workspace=apps/frontend run lint",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "npm --workspace=apps/backend run test",
+    "test:frontend": "npm --workspace=apps/frontend run test:e2e",
+    "migrate:generate": "npm --workspace=apps/backend run migrate:generate",
+    "migrate:up": "npm --workspace=apps/backend run migrate:up",
+    "migrate:down": "npm --workspace=apps/backend run migrate:down",
+    "seed:backend": "npm --workspace=apps/backend run seed"
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.1"
+  },
+  "dependencies": {
+    "serverless-http": "^3.2.0"
+  }
+}

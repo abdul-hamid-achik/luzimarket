@@ -1,0 +1,48 @@
+.categoriasFiltros {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+
+}
+
+.LogoFiltroHandpicked {
+    width: 2rem;
+    height: fit-content;
+    margin-top: .5rem;
+}
+
+.TextoTituloFiltroHandpicked {
+    font-size: x-large;
+    margin-bottom: .5rem;
+    margin-top: .5rem;
+}
+
+/*.card{
+    width: 18rem;
+    width: 80%;
+}*/
+
+/*@media (max-width: 1280px) {
+    .card {
+        width: 15rem
+    }
+}
+
+@media (max-width: 1024px) {
+    .card {
+        width: 13rem
+    }
+}*/
+#divfiltro {
+    width: 25%;
+}
+
+@media (max-width: 990px) {
+    #FHP .card {
+        display: none;
+    }
+
+    #divfiltro {
+        display: none;
+    }
+}

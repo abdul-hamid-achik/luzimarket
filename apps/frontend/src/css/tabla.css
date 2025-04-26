@@ -1,0 +1,182 @@
+#tabla {
+  font-family: 'UniLTStd-L';
+  width: 90%;
+  position: relative;
+  top: 6rem;
+  left: 2rem;
+}
+  
+#tabla td, #tabla th {
+  padding: 10px;
+  border-radius: 10px;
+  margin-right: 5rem;
+}
+  
+#tabla th {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  text-align: left;
+  opacity: 50%;
+  font-family: 'UniLTStd-L';
+}
+
+#tabla td {
+    border-radius: 10px;
+    /* background: #d7e0eb; */
+}
+
+#tabla button {
+    padding-left: 40px;
+    padding-right: 40px;
+    border-radius: 7px;
+}
+
+
+.boton {
+  position: relative;
+  top: 15rem;
+  left: 48.5rem;
+}
+
+.boton_link,
+.boton_link1,
+.boton_link2,
+.boton_link3 {
+  color: #FFF;
+  text-decoration: none;
+}
+
+.boton1 {
+  position: relative;
+  bottom: 6.8rem;
+  left: 29.5rem;
+}
+
+.boton_link1 {
+  color: #000;
+}
+
+.boton2 {
+  position: relative;
+  bottom: 9.3rem;
+  left: 42rem;
+}
+
+.boton3 {
+  position: relative;
+  bottom: 11.8rem;
+  left: 54.3rem;
+}
+
+/*-------------------------------*/
+.boton_linkP1,
+.boton_linkP2,
+.boton_linkP3 {
+  color: #FFF;
+  text-decoration: none;
+}
+
+.botonP1 {
+  position: relative;
+  top: 10.8rem;
+  left: 29.5rem;
+}
+
+.boton_linkP1 {
+  color: #000;
+}
+
+.botonP2 {
+  position: relative;
+  top: 8.25rem;
+  left: 42rem;
+}
+
+.botonP3 {
+  position: relative;
+  top: 5.75rem;
+  left: 54.3rem;
+}
+
+.textarea_modal {
+  font-family: 'UniLTStd-L';
+}
+
+.titulo_modal {
+  font-family: 'UniLTStd-L';
+  font-size: 25px;
+  font-weight: lighter;
+  position: relative;
+  right: 13.5rem;
+  padding-bottom: 2rem;
+}
+
+
+.input_modal { 
+  padding: 10px;
+  font-size: 15px;
+  width: 45%;
+  border-radius: 7px;
+  border: .5px solid #000;
+  opacity: 50%;
+  transition: 0.3s;
+  font-family: 'UniLTStd-L';
+}
+
+.input_modal:hover {
+  opacity: 100%;
+}
+
+.textarea_modal {
+  resize: none;
+  font-size: 15px;
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  border-radius: 7px;
+  border: .5px solid #000;
+  opacity: 50%;
+  transition: 0.3s;
+  font-family: 'UniLTStd-L';
+  margin-bottom: 2rem;
+}
+
+.textarea_modal:hover {
+  opacity: 100%;
+}
+
+
+/*MODAL: TIENDAS*/
+.titulo_modal-tienda {
+  font-family: 'UniLTStd-L';
+  font-size: 25px;
+  font-weight: lighter;
+  position: relative;
+  right: 14.5rem;
+  padding-bottom: 2rem;
+}
+
+
+.input_modal-tienda {
+  padding: 10px;
+  font-size: 15px;
+  width: 45%;
+  border-radius: 7px;
+  border: .5px solid #000;
+  opacity: 50%;
+  transition: 0.3s;
+  font-family: 'UniLTStd-L';
+  margin-bottom: 3rem;
+}
+
+.input_modal-tienda:hover {
+  opacity: 100%;
+}
+
+
+.label_modal-tienda {
+  position: relative;
+  right: 11.5rem;
+}
+
+

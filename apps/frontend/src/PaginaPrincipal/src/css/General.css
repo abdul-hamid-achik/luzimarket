@@ -1,0 +1,251 @@
+html, body {
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    font-family: var(--fontLandingPage);
+}
+
+
+.BannerPrincipal {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: var(--fontLandingPage);
+}
+
+.CardImagen {
+    display: flex;
+    width: 21.07rem;
+    float: left;
+    border: none;
+    border-radius: 0px;
+}
+
+.botonBanner {
+    position: absolute;
+    margin-left: 4rem;
+    margin-top: 16rem;
+    padding-left: 3rem;
+    padding-right: 3rem;
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+    border: 0;
+}
+
+.botonBanner1 {
+    position: absolute;
+    margin-left: 6rem;
+    margin-top: 16rem;
+    padding-left: 3rem;
+    padding-right: 3rem;
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+    border: 0;
+}
+
+.botonBanner2 {
+    position: absolute;
+    margin-left: 3.5rem;
+    margin-top: 16rem;
+    padding-left: 3rem;
+    padding-right: 3rem;
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+    border: 0;
+}
+
+.botonBanner3 {
+    position: absolute;
+    margin-left: 6rem;
+    margin-top: 16rem;
+    padding-left: 3rem;
+    padding-right: 3rem;
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+    border: 0;
+}
+
+.cajaBody {
+    position: relative;
+    margin-top: 0rem;
+}
+
+.cajaBody {
+    position: relative;
+    margin-top: 0rem;
+}
+
+.Banners {
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.ImagenTextoBanner {
+    width: 35rem;
+    margin-top: -8rem;
+    margin-bottom: 2rem;
+}
+
+.BannerSecundario {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: var(--fontLandingPage);
+    margin-left: 2.7rem;
+}
+
+.BannerSecundario p {
+    line-height: 10px;
+}
+
+.btn {
+    background: #000;
+}
+
+.bannerOferta {
+    background: rgb(255,89,33);
+    background: linear-gradient(90deg, rgba(255,89,33,1) 0%, rgba(255,220,0,1) 52%, rgba(234,180,215,1) 100%);
+    padding: 15px;
+}
+
+.botonBanner4 {
+    padding-left: 3rem;
+    padding-right: 3rem;
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+    border: 0;
+    margin-left: auto;
+    margin-right: 1rem;
+    font-family: var(--fontLandingPage);
+}
+
+.botonBannerOferta {
+    display: flex;
+    align-items: end;
+}
+
+.cajaDescripcionPagina {
+    margin-top: 45rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10rem;
+}
+
+.cajaDescripcionPagina p {
+    font-family: var(--fontLandingPage);
+    line-height: 15px;
+    font-size: 25px;
+}
+
+.cajaDescripcionPagina p span {
+    font-family: var(--fontLandingPage);
+    font-weight: bolder;
+}
+
+.cajaDescripcionPagina .Simbolo {
+    font-size: 20px;
+    position: relative;
+    top: .5rem;
+}
+
+.cajaTodosLosProductos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cajaTodosLosProductos .card {
+    margin-right: 1rem;
+    border: 1px solid #000;
+    border-radius: 0px;
+    
+}
+.cajaTodosLosProductos .card img{
+    border-radius: 0px;
+    height: 15rem;
+}
+
+.titulosHandpicked {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 2rem;
+}
+
+.tituloLogo{
+    display: flex;
+    margin-left: -1rem;
+}
+
+.tituloLogo img {
+    width: 2.5rem;
+    margin-left: 1rem;
+}
+
+.tituloLogo h5 {
+    font-family: var(--fontLandingPage);
+    font-size: 27px;
+}
+
+.botonHandpicked {
+    margin-left: 16rem;
+}
+
+.Banners .BannerPrincipal img {
+    width: 100%;
+}
+.Banners .BannerSecundario img {
+    width: 100%;
+}
+/*RESPONSIVE PAGINA PRINCIPAL*/
+
+
+@media screen and (min-width: 1570px) and (orientation: landscape) {
+    .Banners .BannerPrincipal img {
+        width: auto;
+    }
+    .Banners .BannerSecundario img {
+        width: auto;
+    }
+}
+
+@media screen and (min-width: 1571px) and (orientation: landscape) {
+    .Banners .BannerPrincipal img {
+        width: 47rem;
+    }
+    .Banners .BannerSecundario img {
+        width: 47rem;
+    }
+}
+
+@media screen and (min-width: 1670px) and (orientation: landscape) {
+    .Banners .BannerPrincipal img {
+        width: 50rem;
+    }
+    .Banners .BannerSecundario img {
+        width: 50rem;
+    }
+}
+
+@media screen and (min-width: 1700px) and (orientation: landscape) {
+    .Banners .BannerPrincipal img {
+        width: 53rem;
+    }
+    .Banners .BannerSecundario img {
+        width: 50rem;
+    }
+}
+
+@media screen and (min-width: 1900px) and (orientation: landscape) and (max-width: 2000px) {
+    .Banners .BannerPrincipal img {
+        width: 60rem;
+    }
+    .Banners .BannerSecundario img {
+        width: 55rem;
+    }
+}
+

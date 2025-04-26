@@ -1,0 +1,141 @@
+/*
+==============================================================
+
+Code for create styles to the navbar's for Luzimarket's page
+
+==============================================================
+*/
+
+@import url("../css/root.css");
+
+/*============== Navbar Direccion ==============*/
+
+#NavbarDireccion {
+    background-color: #FFF;
+    font-family: var(--fontLandingPage);
+    font-size: 13px;
+    padding: 0rem;
+    border-bottom: 1px solid;
+}
+
+/* #NavbarDireccion .nav-item.dropdown .nav-link::after {
+    content: '';
+} */
+
+#NavbarDireccion .borderDropdown {
+    border-left: 1px solid;
+    border-right: 1px solid;
+    padding-left: 10px;
+    padding-right: 30px;
+    color: #000;
+}
+
+#NavbarDireccion .borderDropdownEstado {
+    border-left: 1px solid;
+    padding-left: 10px;
+    padding-right: 30px;
+    color: #000;
+}
+
+#NavbarDireccion .widthBoton {
+    margin-right: 1rem;
+    background-color: #FFF;
+    border: 1px solid #000;
+    border-radius: 15px;
+    padding-left: 10px;
+    padding-top: 5px;
+    padding-right: 10px;
+    display: flex;
+
+}
+
+#NavbarDireccion .TextoCentrado {
+    margin-top: 8.5px;
+    margin-right: 10px;
+} 
+
+/*==============================================*/
+
+/*============== Navbar Principal ==============*/
+
+#NavbarPrincipal {
+    background-color: var(--colorNavbarPO);
+    /* margin-top: 2.55rem; */
+}
+
+#NavbarPrincipal .ImagenNavbarPrincipal {
+    width: 10rem;
+    margin-left: 4.5rem;
+}
+
+#NavbarPrincipal .ImagenFormSearch {
+    width: 3.5rem;
+}
+
+#NavbarPrincipal .ImagenNavbarLogo {
+    width: 4rem;
+}
+
+#NavbarPrincipal .LogoNavbarPrincipal {
+    width: 3rem;
+} 
+
+#NavbarPrincipal .LogoFNavbarPrincipal {
+    width: 7rem;
+} 
+
+@media screen and (min-width: 360px) and (max-width: 990px){
+    #NavbarPrincipal .ImagenNavbarPrincipalMobile {
+        display: flex;
+        width: 10rem;
+    }
+    #NavbarPrincipal .div1NavbarPrincipal {
+        position: relative;
+        left: -5rem;
+        padding-left: 10px;
+    }
+    #NavbarDireccion .container{
+        margin-top: 5px;
+        margin-bottom: 5px;
+        justify-content: flex-end;
+    }
+    .widthBoton{
+        margin-top: 5px;
+    }
+}
+
+@media screen and (min-width: 991px){
+    #NavbarPrincipal .ImagenNavbarPrincipalMobile {
+        display: none;
+    }
+}
+
+/* ============================================== */
+
+/* ============== Navbar Opciones =============== */
+
+#NavbarOpciones {
+    background-color: var(--colorNavbarPO);
+    font-family: var(--fontLandingPage);
+    border-bottom: 1px solid #000;
+    /* margin-top: 6.5rem; */
+}
+
+#NavbarOpciones .nav-item {
+    margin-right: 1.5rem;
+}
+
+/* ============================================== */
+
+/* ============== General =============== */
+.navbarFixed {
+    width: 100%;
+    z-index: 1;
+}
+
+
+@media screen and (min-width: 360px) and (max-width: 990px){
+    #NavbarDireccion {
+        display: none;
+    }
+}

@@ -1,0 +1,47 @@
+.navbar {
+    background: #fff;
+    border-bottom: 1px solid black;
+}
+
+.container-fluid.connav{
+    text-align: center;
+}
+
+.img-usuario{
+    border: 2px solid black;
+    width: 60px;
+    height: 55px;
+    text-align: center;
+}
+
+.navbar-nav.start{
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar-nav.center{
+    justify-content: center;
+}
+
+.navbar-nav.end{
+    justify-content: center;
+}
+
+.offcanvas.slide{
+    position: fixed;
+    top: 0;
+    right: -340px; /*para que no salga de la pantalla*/
+    bottom: 0;
+    z-index: 980;
+    -webkit-transform: translateX(0);
+    transform: translateX(-100%);
+    visibility: visible; /*offcanvas-visibility*/
+    transition: transform .3s ease-in-out, visibility .3s ease-in-out;
+}
+
+@media (min-width: 768px){
+    .offcanvas.slide.show{
+        transform: none;
+        visibility: visible;
+    }
+}
