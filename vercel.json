@@ -1,16 +1,15 @@
 {
   "version": 2,
   "env": {
-    "DATABASE_URL": "@DATABASE_URL",
-    "JWT_SECRET": "@JWT_SECRET",
-    "STRIPE_SECRET_KEY": "@STRIPE_SECRET_KEY",
     "CORS_ORIGIN": "https://luzimarket.vercel.app"
   },
   "builds": [
     {
       "src": "apps/frontend/package.json",
       "use": "@vercel/static-build",
-      "config": { "distDir": "dist" }
+      "config": {
+        "distDir": "dist"
+      }
     },
     {
       "src": "apps/backend/src/index.ts",
@@ -18,7 +17,13 @@
     }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "apps/backend/src/index.ts" },
-    { "src": "/(.*)", "dest": "apps/frontend/dist/$1" }
+    {
+      "src": "/api/(.*)",
+      "dest": "apps/backend/src/index.ts"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "apps/frontend/dist/$1"
+    }
   ]
 }

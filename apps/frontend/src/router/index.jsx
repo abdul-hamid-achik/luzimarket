@@ -5,7 +5,7 @@ import NotFound from "../pages/NotFound";
 import Dashboard from "../pages/Dashboard";
 import Alertas from "../pages/Alertas";
 import Peticiones from "../pages/Peticiones";
-import Ventas from "../pages/ventas";
+import Ventas from "../pages/Ventas";
 import Categorias from "../pages/Categorias";
 import Locaciones from "../pages/Locaciones";
 import AdmisionesCuerpo from "../components/peticiones/Admisiones/CuerpoAdmisiones";
