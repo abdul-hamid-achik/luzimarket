@@ -2,10 +2,9 @@
   "version": 2,
   "env": {
     "CORS_ORIGIN": "https://luzimarket.vercel.app",
-    "DATABASE_URL": "@DATABASE_URL",
+    "DATABASE_URL": "@DATABASE_POSTGRES_URL",
     "JWT_SECRET": "@JWT_SECRET",
     "STRIPE_SECRET_KEY": "@STRIPE_SECRET_KEY",
-    "FEATURE_FLAG_IMPERSONATION": "@FEATURE_FLAG_IMPERSONATION"
   },
   "builds": [
     {

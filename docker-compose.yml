@@ -1,3 +1,4 @@
+version: "3.9"
 services:
   db:
     image: postgres:14-alpine
@@ -17,6 +18,7 @@ services:
     build:
       context: ./apps/backend
       dockerfile: Dockerfile
+    restart: always
     env_file:
       - .env
     environment:
@@ -33,6 +35,7 @@ services:
     build:
       context: ./apps/frontend
       dockerfile: Dockerfile
+    restart: always
     env_file:
       - .env
     ports:
@@ -41,7 +44,8 @@ services:
       - ./apps/frontend:/app
       - /app/node_modules
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     environment:
       - VITE_API_URL=http://backend:5000
 
