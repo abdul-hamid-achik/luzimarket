@@ -44,9 +44,11 @@ jobs:
 
       - name: Generate .env file
         run: |
-          cp .env.example .env
+          echo "DATABASE_URL=${DATABASE_URL}" > .env
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "CORS_ORIGIN=${CORS_ORIGIN}" >> .env
           echo "STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}" >> .env
+          echo "VITE_API_URL=${VITE_API_URL}" >> .env
 
       - name: Build & start services
         run: docker compose up -d --build
