@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { db } from "@/db";
 import { eq } from "drizzle-orm";
 import { categories } from "@/schema";
+import { StatusCodes } from "http-status-codes";
 
 export const createCategory = async (req: Request, res: Response) => {
   try {
@@ -9,13 +10,13 @@ export const createCategory = async (req: Request, res: Response) => {
       .insert(categories)
       .values({ name: req.body.name })
       .returning();
-    res.status(201).json(category);
+    res.status(StatusCodes.CREATED).json(category);
   } catch (err) {
     const error = err as { code?: string };
     if (error.code === "23505") {
-      return res.status(400).json({ error: "Category already exists" });
+      return res.status(StatusCodes.BAD_REQUEST).json({ error: "Category already exists" });
     }
-    res.status(500).json({ error: "Internal server error" });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
   }
 };
 
@@ -32,7 +33,7 @@ export const getCategory = async (req: Request, res: Response) => {
     .where(eq(categories.id, id))
     .limit(1);
   if (!cat[0]) {
-    return res.status(404).json({ error: "Category not found" });
+    return res.status(StatusCodes.NOT_FOUND).json({ error: "Category not found" });
   }
   res.json(cat[0]);
 };
@@ -47,15 +48,15 @@ export const updateCategory = async (req: Request, res: Response) => {
       .where(eq(categories.id, id))
       .returning();
     if (updated.length === 0) {
-      return res.status(404).json({ error: "Category not found" });
+      return res.status(StatusCodes.NOT_FOUND).json({ error: "Category not found" });
     }
     res.json(updated[0]);
   } catch (err) {
     const error = err as { code?: string };
     if (error.code === "23505") {
-      return res.status(400).json({ error: "Category name already exists" });
+      return res.status(StatusCodes.BAD_REQUEST).json({ error: "Category name already exists" });
     }
-    res.status(500).json({ error: "Internal server error" });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
   }
 };
 
@@ -63,7 +64,7 @@ export const deleteCategory = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   const deleted = await db.delete(categories).where(eq(categories.id, id)).returning();
   if (deleted.length === 0) {
-    return res.status(404).json({ error: "Category not found" });
+    return res.status(StatusCodes.NOT_FOUND).json({ error: "Category not found" });
   }
   res.json({ success: true });
 };

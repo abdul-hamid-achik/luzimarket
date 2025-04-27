@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { db } from "@/db";
 import { users } from "@/schema";
 import dotenv from "dotenv";
+import { StatusCodes } from "http-status-codes";
 
 dotenv.config();
 
@@ -19,13 +20,13 @@ export const register = async (req: Request, res: Response) => {
         passwordHash: hashedPassword,
       })
       .returning({ id: users.id, email: users.email, role: users.role });
-    res.status(201).json({ user });
+    res.status(StatusCodes.CREATED).json({ user });
   } catch (err) {
     const error = err as { code?: string };
     if (error.code === "23505") {
-      return res.status(400).json({ error: "Email already in use" });
+      return res.status(StatusCodes.BAD_REQUEST).json({ error: "Email already in use" });
     }
-    res.status(500).json({ error: "Internal server error" });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
   }
 };
 
@@ -39,11 +40,11 @@ export const login = async (req: Request, res: Response) => {
 
   const user = userRecord[0];
   if (!user) {
-    return res.status(401).json({ error: "Invalid credentials" });
+    return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Invalid credentials" });
   }
   const match = await bcrypt.compare(password, user.passwordHash);
   if (!match) {
-    return res.status(401).json({ error: "Invalid credentials" });
+    return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Invalid credentials" });
   }
   const token = jwt.sign(
     { id: user.id, email: user.email, role: user.role },

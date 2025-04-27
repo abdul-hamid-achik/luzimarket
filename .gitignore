@@ -36,3 +36,5 @@ playwright-trace
 .vercel
 .env*.local
 .op
+
+test-results/

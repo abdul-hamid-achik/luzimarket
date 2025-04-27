@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 import { Response } from "express";
 import { db } from "@/db";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import {
   carts,
   cartItems,
@@ -13,6 +13,7 @@ import {
 } from "@/schema";
 import { AuthRequest } from "@/middleware/auth";
 import dotenv from "dotenv";
+import { StatusCodes } from "http-status-codes";
 
 dotenv.config();
 
@@ -23,15 +24,15 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 export const createOrder = async (req: AuthRequest, res: Response) => {
   const userId = req.user?.id;
   if (!userId) {
-    return res.status(401).json({ error: "Unauthorized" });
+    return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Unauthorized" });
   }
   const cart = await db.select().from(carts).where(eq(carts.userId, userId)).limit(1);
   if (!cart[0]) {
-    return res.status(400).json({ error: "Cart is empty" });
+    return res.status(StatusCodes.BAD_REQUEST).json({ error: "Cart is empty" });
   }
   const items = await db.select().from(cartItems).where(eq(cartItems.cartId, cart[0].id));
   if (items.length === 0) {
-    return res.status(400).json({ error: "Cart is empty" });
+    return res.status(StatusCodes.BAD_REQUEST).json({ error: "Cart is empty" });
   }
 
   let total = 0;
@@ -64,10 +65,10 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
       .limit(1);
     const coupon = couponRec[0];
     if (!coupon) {
-      return res.status(400).json({ error: "Invalid coupon" });
+      return res.status(StatusCodes.BAD_REQUEST).json({ error: "Invalid coupon" });
     }
     if (coupon.expiresAt && coupon.expiresAt < new Date()) {
-      return res.status(400).json({ error: "Coupon expired" });
+      return res.status(StatusCodes.BAD_REQUEST).json({ error: "Coupon expired" });
     }
     total = (total * (100 - coupon.discountPercent)) / 100;
   }
@@ -81,11 +82,11 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
         confirm: true,
       });
       if (paymentIntent.status !== "succeeded") {
-        return res.status(400).json({ error: "Payment failed" });
+        return res.status(StatusCodes.BAD_REQUEST).json({ error: "Payment failed" });
       }
     } catch (err) {
       const error = err as { message?: string };
-      return res.status(400).json({ error: error.message || "Payment failed" });
+      return res.status(StatusCodes.BAD_REQUEST).json({ error: error.message || "Payment failed" });
     }
   }
 
@@ -106,13 +107,13 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
 
   await db.delete(cartItems).where(eq(cartItems.cartId, cart[0].id));
 
-  res.status(201).json(order);
+  res.status(StatusCodes.CREATED).json(order);
 };
 
 export const getOrders = async (req: AuthRequest, res: Response) => {
   const userId = req.user?.id;
   if (!userId) {
-    return res.status(401).json({ error: "Unauthorized" });
+    return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Unauthorized" });
   }
   const userOrders = await db.select().from(orders).where(eq(orders.userId, userId));
   res.json(userOrders);
@@ -121,18 +122,17 @@ export const getOrders = async (req: AuthRequest, res: Response) => {
 export const getOrder = async (req: AuthRequest, res: Response) => {
   const userId = req.user?.id;
   if (!userId) {
-    return res.status(401).json({ error: "Unauthorized" });
+    return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Unauthorized" });
   }
   const id = Number(req.params.id);
   const orderRec = await db
     .select()
     .from(orders)
-    .where(eq(orders.id, id))
-    .where(eq(orders.userId, userId))
+    .where(and(eq(orders.id, id), eq(orders.userId, userId)))
     .limit(1);
   const order = orderRec[0];
   if (!order) {
-    return res.status(404).json({ error: "Order not found" });
+    return res.status(StatusCodes.NOT_FOUND).json({ error: "Order not found" });
   }
   const items = await db.select().from(orderItems).where(eq(orderItems.orderId, id));
   res.json({ order, items });

@@ -10,7 +10,7 @@ COPY package.json package-lock.json ./
 COPY apps/frontend/package.json apps/frontend/package.json
 
 # install only the frontend workspace
-RUN npm ci --workspace=luizmarket
+RUN npm ci --workspace=apps/frontend --ignore-scripts
 
 # Stage 2: dev runtime
 FROM node:22-alpine

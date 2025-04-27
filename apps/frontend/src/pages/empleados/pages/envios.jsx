@@ -1,10 +1,10 @@
 // Removed import of non-existing CSS file "@/css/ordenes.css";
 import { useState } from "react";
-import { useOrders } from "@/api/hooks";
+import { useAdminOrders } from "@/api/hooks";
 
 function Ordenes() {
   const [BuscaTermino, setBuscarTermino] = useState("");
-  const { data: DatosOrdenes = [], isLoading, error } = useOrders();
+  const { data: DatosOrdenes = [], isLoading, error } = useAdminOrders();
 
   const handleCambioBusqueda = (event) => {
     setBuscarTermino(event.target.value);

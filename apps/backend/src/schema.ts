@@ -133,3 +133,23 @@ export const sales = pgTable("sales", {
   amount: integer("amount").notNull(),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
+
+// States table: list of delivery states
+export const states = pgTable("states", {
+  id: serial("id").primaryKey(),
+  label: varchar("label", { length: 255 }).notNull(),
+  value: varchar("value", { length: 50 }).notNull(),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+});
+
+// Admin orders table: mock orders for employees panel
+export const adminOrders = pgTable("admin_orders", {
+  id: integer("id").primaryKey(),
+  total: integer("total").notNull(),
+  cliente: varchar("cliente", { length: 255 }).notNull(),
+  estadoPago: varchar("estado_pago", { length: 50 }).notNull(),
+  estadoOrden: varchar("estado_orden", { length: 50 }).notNull(),
+  tipoEnvio: varchar("tipo_envio", { length: 50 }).notNull(),
+  fecha: text("fecha").notNull(),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+});

@@ -5,6 +5,8 @@ import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./swagger";
 import authRoutes from '@/routes/auth';
 import categoryRoutes from '@/routes/categories';
+import statesRoutes from '@/routes/states';
+import adminOrdersRoutes from '@/routes/adminOrders';
 import productRoutes from '@/routes/products';
 import cartRoutes from '@/routes/cart';
 import orderRoutes from '@/routes/orders';
@@ -13,6 +15,7 @@ import petitionsRoutes from '@/routes/petitions';
 import admissionsRoutes from '@/routes/petitions/admissions';
 import petitionProductsRoutes from '@/routes/petitions/products';
 import branchPetitionsRoutes from '@/routes/petitions/branches';
+import { StatusCodes } from "http-status-codes";
 // Import routes lazily under non-test environments to avoid pulling in full schema
 // and controllers during Jest smoke tests
 // (Dynamic requires ensure schema-related TS errors are skipped)
@@ -23,6 +26,9 @@ const app = express();
 // Middleware
 app.use(cors({ origin: process.env.CORS_ORIGIN || "*" }));
 app.use(bodyParser.json());
+
+// add health endpoint for Docker HEALTHCHECK and CI readiness
+app.get('/health', (_req, res) => res.sendStatus(StatusCodes.OK));
 
 // Mount API routes only when not testing
 if (process.env.NODE_ENV !== 'test') {
@@ -37,6 +43,8 @@ if (process.env.NODE_ENV !== 'test') {
   app.use("/api/petitions/admissions", admissionsRoutes);
   app.use("/api/petitions/products", petitionProductsRoutes);
   app.use("/api/petitions/branches", branchPetitionsRoutes);
+  app.use("/api/states", statesRoutes);
+  app.use("/api/admin/orders", adminOrdersRoutes);
 }
 
 // Swagger

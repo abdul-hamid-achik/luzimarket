@@ -7,6 +7,8 @@ import * as petitionsAdmissionsApi from "./petitionsAdmissions";
 import * as petitionsProductsApi from "./petitionsProducts";
 import * as petitionsBranchesApi from "./petitionsBranches";
 import * as petitionsApi from "./petitions";
+import * as statesApi from "./states";
+import * as adminOrdersApi from "./adminOrders";
 
 export const useProducts = () =>
   useQuery(['products'], productsApi.getProducts);
@@ -67,6 +69,9 @@ export const useCreateOrder = () => {
 export const useOrders = () =>
   useQuery(['orders'], ordersApi.getOrders);
 
+export const useAdminOrders = () =>
+  useQuery(['adminOrders'], adminOrdersApi.getAdminOrders);
+
 export const useOrder = (orderId) =>
   useQuery(['order', orderId], () => ordersApi.getOrder(orderId));
   
@@ -84,4 +89,7 @@ export const useBranchPetitions = () =>
   
 export const usePetitions = () =>
   useQuery(['petitions'], petitionsApi.getPetitions);
+  
+export const useStates = () =>
+  useQuery(['states'], statesApi.getStates);
   

@@ -1,0 +1,1 @@
+{"schema":"./dist/schema.js","out":"./drizzle","dialect":"postgresql","dbCredentials":{"connectionString":"${DATABASE_URL}"}}

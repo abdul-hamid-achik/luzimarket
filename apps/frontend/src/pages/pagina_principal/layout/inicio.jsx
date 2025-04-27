@@ -1,6 +1,6 @@
 // Paginas 
 import Navbars from "@/pages/pagina_principal/components/navbars/navbar_principal";
-import BodyLuzimarket from "@/pages/pagina_principal/components/partes_body/banner_principal";
+import BodyLuzi from "@/pages/pagina_principal/pages/body_luzi";
 import Footer from "@/pages/pagina_principal/components/footer";
 
 // Bootstrap 
@@ -24,7 +24,7 @@ const Inicio = () => {
 
          {/* ===== Start Container ===== */}
          <div className="BodyIndex">
-            <BodyLuzimarket />
+            <BodyLuzi />
          </div>
 
          {/* ===== End Container ===== */}

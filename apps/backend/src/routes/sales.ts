@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { db } from "@/db";
 import { sales } from "@/schema";
+import { StatusCodes } from "http-status-codes";
 
 const router = Router();
 
@@ -14,7 +15,7 @@ router.get("/", async (_req, res) => {
     res.json(allSales);
   } catch (err) {
     console.error("Error fetching sales from DB:", err);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
   }
 });
 

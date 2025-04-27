@@ -1,10 +1,12 @@
 import dotenv from 'dotenv';
 import { db } from '@/db';
 import { eq } from 'drizzle-orm';
-import { categories, products, sales } from '@/schema';
+import { categories, products, sales, states as statesTable, adminOrders as adminOrdersTable } from '@/schema';
 import { Categories } from '@/data/categoriesData';
 import { Products } from '@/data/productsData';
 import { Sales } from '@/data/salesData';
+import { States } from '@/data/statesData';
+import { AdminOrders } from '@/data/adminOrdersData';
 
 dotenv.config();
 
@@ -63,6 +65,31 @@ async function main() {
         await db.insert(sales)
           .values({ date: dateObj, amount: entry.May })
           .returning();
+      }
+    }
+    // Seed states data
+    console.log('Seeding states data...');
+    for (const st of States) {
+      const exists = await db.select().from(statesTable).where(eq(statesTable.value, st.value));
+      if (exists.length === 0) {
+        await db.insert(statesTable).values({ label: st.label, value: st.value }).returning();
+      }
+    }
+
+    // Seed admin orders data
+    console.log('Seeding admin orders data...');
+    for (const ord of AdminOrders) {
+      const existsOrd = await db.select().from(adminOrdersTable).where(eq(adminOrdersTable.id, ord.id));
+      if (existsOrd.length === 0) {
+        await db.insert(adminOrdersTable).values({
+          id: ord.id,
+          total: ord.total,
+          cliente: ord.cliente,
+          estadoPago: ord.estadoPago,
+          estadoOrden: ord.estadoOrden,
+          tipoEnvio: ord.tipoEnvio,
+          fecha: ord.fecha,
+        }).returning();
       }
     }
     console.log('Seed completed');

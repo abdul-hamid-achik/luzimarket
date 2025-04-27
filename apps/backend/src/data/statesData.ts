@@ -1,5 +1,10 @@
+// States data for delivery selection
+export interface State {
+  label: string;
+  value: string;
+}
 
-export const states = [
+export const States: State[] = [
   { label: "Nuevo Leon", value: "mty" },
   { label: "Coahuila", value: "sal" },
   { label: "Campeche", value: "cmp" },

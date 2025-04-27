@@ -8,13 +8,17 @@ module.exports = {
   testMatch: ['**/*.test.ts'],
   rootDir: './',
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
+  // Add path mapping to resolve @/ imports
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1'
+  },
   // Use a separate tsconfig for Jest to skip type errors
-  globals: {
-    'ts-jest': {
+  transform: {
+    '^.+\\.ts$': ['ts-jest', {
       tsconfig: 'tsconfig.jest.json',
       diagnostics: false
-    }
+    }]
   },
   // Store Jest cache inside the backend folder to avoid OS temp permissions issues
-  cacheDirectory: '<rootDir>/node_modules/.cache/jest',
+  cacheDirectory: '<rootDir>/node_modules/.cache/jest'
 };

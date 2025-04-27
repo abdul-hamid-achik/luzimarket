@@ -5,7 +5,6 @@ dotenv.config();
 const config: Config = {
   schema: "./src/schema.ts",
   out: "./drizzle",
-  driver: "pg",
   // SQL dialect for migrations: 'postgresql', 'mysql', or 'sqlite'
   dialect: "postgresql",
   dbCredentials: {

@@ -6,10 +6,10 @@ test.describe('Product Listing & Detail Flow', () => {
     await page.goto('/handpicked/productos');
     await expect(page).toHaveURL(/\/handpicked\/productos$/);
 
-    // Ensure at least one product card is visible
+    // Wait for the product cards container to appear
+    await page.waitForSelector('.cajaTodosLosProductos');
     const cards = page.locator('.cajaTodosLosProductos .card');
-    const count = await cards.count();
-    expect(count).toBeGreaterThan(0);
+    await expect(cards.first()).toBeVisible();
 
     // Navigate to the first product's detail
     await cards.first().locator('a').click();

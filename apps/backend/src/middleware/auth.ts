@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { StatusCodes } from "http-status-codes";
 
 dotenv.config();
 
@@ -22,12 +23,12 @@ export const authenticateJWT = (
     const token = authHeader.split(" ")[1];
     jwt.verify(token, process.env.JWT_SECRET || "default_jwt_secret", (err, user) => {
       if (err) {
-        return res.sendStatus(403);
+        return res.sendStatus(StatusCodes.FORBIDDEN);
       }
       req.user = user as AuthRequest["user"];
       next();
     });
   } else {
-    res.sendStatus(401);
+    res.sendStatus(StatusCodes.UNAUTHORIZED);
   }
 };

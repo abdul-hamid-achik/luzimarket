@@ -3,11 +3,12 @@ import { db } from "@/db";
 import { eq } from "drizzle-orm";
 import { carts, cartItems, products, productVariants } from "@/schema";
 import { AuthRequest } from "@/middleware/auth";
+import { StatusCodes } from "http-status-codes";
 
 export const getCart = async (req: AuthRequest, res: Response) => {
   const userId = req.user?.id;
   if (!userId) {
-    return res.status(401).json({ error: "Unauthorized" });
+    return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Unauthorized" });
   }
   let cart = await db.select().from(carts).where(eq(carts.userId, userId)).limit(1);
   if (cart.length === 0) {
@@ -35,7 +36,7 @@ export const getCart = async (req: AuthRequest, res: Response) => {
 export const addItemToCart = async (req: AuthRequest, res: Response) => {
   const userId = req.user?.id;
   if (!userId) {
-    return res.status(401).json({ error: "Unauthorized" });
+    return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Unauthorized" });
   }
   let cart = await db.select().from(carts).where(eq(carts.userId, userId)).limit(1);
   if (cart.length === 0) {
@@ -59,7 +60,7 @@ export const updateCartItem = async (req: AuthRequest, res: Response) => {
     .where(eq(cartItems.id, itemId))
     .returning();
   if (updated.length === 0) {
-    return res.status(404).json({ error: "Cart item not found" });
+    return res.status(StatusCodes.NOT_FOUND).json({ error: "Cart item not found" });
   }
   res.json(updated[0]);
 };
@@ -73,7 +74,7 @@ export const removeCartItem = async (req: AuthRequest, res: Response) => {
 export const clearCart = async (req: AuthRequest, res: Response) => {
   const userId = req.user?.id;
   if (!userId) {
-    return res.status(401).json({ error: "Unauthorized" });
+    return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Unauthorized" });
   }
   const cart = await db.select().from(carts).where(eq(carts.userId, userId)).limit(1);
   if (cart.length > 0) {
