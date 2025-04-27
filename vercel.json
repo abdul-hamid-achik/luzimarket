@@ -12,10 +12,11 @@
   },
   "builds": [
     {
-      "src": "apps/frontend/package.json",
+      "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "dist"
+        "buildCommand": "npm run build:frontend",
+        "distDir": "apps/frontend/dist"
       }
     },
     {
