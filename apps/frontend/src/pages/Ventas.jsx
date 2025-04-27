@@ -5,9 +5,9 @@ import {
   FaRegTimesCircle,
 } from "react-icons/fa";
 import "../CSS/AdminVentas.css";
-import DateRangePicker from "../Components/DatePicker";
-import OrderStatus from "../components/OrderStatus";
-import ChartVentas from "../components/ReCharts/RechartsVentas";
+import DateRangePicker from "import../";
+import OrderStatus from "import../";
+import ChartVentas from "import../";
 
 function Ventas() {
   const [FechaInicio, setFechaInicio] = useState(null);

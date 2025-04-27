@@ -1,10 +1,10 @@
 import React from 'react'
-import Flecha from '../images/flecha-correcta.png'
-import Graficos1 from '../images/GraficoPrueba1.png'
-import Graficos2 from '../images/GraficoPrueba2.png'
-import Graficos3 from '../images/GraficoPrueba3.png'
-import Graficos4 from '../images/GraficoPrueba4.png'
-import Graficos5 from '../images/GraficoPrueba5.png'
+import Flecha from "import../"
+import Graficos1 from "import../"
+import Graficos2 from "import../"
+import Graficos3 from "import../"
+import Graficos4 from "import../"
+import Graficos5 from "import../"
 import '../css/GraficosPrueba.css'
 
 

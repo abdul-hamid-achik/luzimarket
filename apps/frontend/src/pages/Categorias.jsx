@@ -1,7 +1,7 @@
 import React from "react";
 import { GoArrowRight } from "react-icons/go";
 import { Link } from "react-router-dom";
-import Categories from "../components/Categorias/index";
+import Categories from "import../";
 
 function Categorias() {
   return (

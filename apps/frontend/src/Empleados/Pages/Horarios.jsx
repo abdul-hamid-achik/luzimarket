@@ -1,7 +1,7 @@
 import React from "react";
-import Ciudades from "../Components/SelectEstadosCiudades";
-import BreadCrumb from "../../components/Breadcrumb";
-import Tabla from "../Components/TablaHorarios";
+import Ciudades from "import../";
+import BreadCrumb from "import../";
+import Tabla from "import../";
 
 const Horarios = () => {
   const items = [{ name: "Horarios", link: "/InicioEmpleados/Horarios" }];

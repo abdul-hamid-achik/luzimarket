@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
-import NavBarInicio from "./Components/Navbar";
-import SlideBar from "./Components/Slidebar";
+import NavBarInicio from "import./";
+import SlideBar from "import./";
 
 const Inicio = () => {
   return (

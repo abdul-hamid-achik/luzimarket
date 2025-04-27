@@ -17,13 +17,14 @@
     }
   ],
   "routes": [
+    { "handle": "filesystem" },
     {
       "src": "/api/(.*)",
       "dest": "apps/backend/src/index.ts"
     },
     {
       "src": "/(.*)",
-      "dest": "apps/frontend/dist/$1"
+      "dest": "apps/frontend/dist/index.html"
     }
   ]
 }

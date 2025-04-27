@@ -1,8 +1,8 @@
 import React from "react";
-import Usuario from "../PaginaPrincipal/src/images/LogoUserLuziMarket.png";
-import Logo from "../images/luzimarket-logo.png";
-import bandera from "../images/bandera_MX.png";
-import notificacion from "../images/notificacion.png";
+import Usuario from "import../";
+import Logo from "import../";
+import bandera from "import../";
+import notificacion from "import../";
 import { Link } from "react-router-dom";
 import "../css/Navbar.css";
 /*import {

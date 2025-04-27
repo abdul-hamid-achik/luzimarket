@@ -1,9 +1,9 @@
-import Admision from "../components/peticiones/Admision";
-import Productos from "../components/peticiones/Productos";
-import Sucursales from "../components/peticiones/Sucursales";
+import Admision from "import../";
+import Productos from "import../";
+import Sucursales from "import../";
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import BreadCrumb from "../components/Breadcrumb";
+import BreadCrumb from "import../";
 
 const Peticiones = () => {
   const items = [{ name: "Peticiones", link: "/inicio/peticiones" }];

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../CSS/Ordenes.css";
-import { DatosOrdenes } from "../Data/DataOrdenes";
+import { DatosOrdenes } from "import../";
 
 function Ordenes() {
   const [BuscaTermino, setBuscarTermino] = useState("");

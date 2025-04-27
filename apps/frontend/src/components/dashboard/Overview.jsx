@@ -1,6 +1,6 @@
 import React from "react";
-import Card from "../Cards/Card";
-import CharOverview from "../ReCharts/ChartOverview";
+import Card from "import../";
+import CharOverview from "import../";
 
 function Overview() {
   return <Card title="Overview" text="" ChartComponent={CharOverview} />;

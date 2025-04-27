@@ -1,6 +1,6 @@
-import Annual from "../components/dashboard/AnnualTarget";
-import Earnings from "../components/dashboard/TotalEarning";
-import Overview from "../components/dashboard/Overview";
+import Annual from "import../";
+import Earnings from "import../";
+import Overview from "import../";
 
 const Dashboard = () => {
   return (

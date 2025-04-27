@@ -1,5 +1,5 @@
-import danger from "../../images/danger_alerta.png";
-import ojo from "../../images/ojo.png";
+import danger from "import../";
+import ojo from "import../";
 
 const Alertas = () => {
   return (
