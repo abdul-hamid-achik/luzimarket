@@ -1,0 +1,132 @@
+name: CI & Deploy
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.sha }}
+      DATABASE_URL: postgres://postgres:password@db:5432/ecommerce
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      CORS_ORIGIN: http://localhost:5173
+      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+      VITE_API_URL: http://localhost:5000
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Cache npm
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build & start services
+        run: docker-compose up -d --build
+
+      - name: Wait for backend
+        run: |
+          for i in {1..30}; do
+            curl --fail http://localhost:5000/health && break
+            echo "Waiting for backend..."
+            sleep 2
+          done
+
+      - name: Run migrations
+        run: docker-compose exec -T backend npm run migrate:up
+
+      - name: Seed database
+        run: docker-compose exec -T backend npm run seed:backend
+
+      - name: Wait for frontend
+        run: |
+          for i in {1..30}; do
+            curl --fail http://localhost:5173 && break
+            echo "Waiting for frontend..."
+            sleep 2
+          done
+
+      - name: Run E2E Tests
+        run: npm run test:e2e
+
+      - name: Build for Vercel
+        run: |
+          # Build frontend for production
+          npm run build:frontend
+          # Build backend for production
+          npm run build:backend
+          # Prepare .vercel/output directory structure
+          mkdir -p .vercel/output
+
+      - name: Upload Vercel build output
+        uses: actions/upload-artifact@v3
+        with:
+          name: vercel-output
+          path: .vercel/output
+
+  deploy_preview:
+    if: github.event_name == 'pull_request'
+    needs: build_and_test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build output
+        uses: actions/download-artifact@v3
+        with:
+          name: vercel-output
+          path: .vercel/output
+
+      - name: Deploy Preview to Vercel
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token:      ${{ secrets.VERCEL_TOKEN }}
+          zeit-token:        ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id:     ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args:       --prebuilt
+
+  deploy_prod:
+    if: github.ref == 'refs/heads/main'
+    needs: build_and_test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build output
+        uses: actions/download-artifact@v3
+        with:
+          name: vercel-output
+          path: .vercel/output
+
+      - name: Deploy Production to Vercel
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token:      ${{ secrets.VERCEL_TOKEN }}
+          zeit-token:        ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id:     ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args:       --prebuilt --prod 

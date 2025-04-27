@@ -1,7 +1,11 @@
 {
   "version": 2,
   "env": {
-    "CORS_ORIGIN": "https://luzimarket.vercel.app"
+    "CORS_ORIGIN": "https://luzimarket.vercel.app",
+    "DATABASE_URL": "@DATABASE_URL",
+    "JWT_SECRET": "@JWT_SECRET",
+    "STRIPE_SECRET_KEY": "@STRIPE_SECRET_KEY",
+    "FEATURE_FLAG_IMPERSONATION": "@FEATURE_FLAG_IMPERSONATION"
   },
   "builds": [
     {
@@ -17,7 +21,9 @@
     }
   ],
   "routes": [
-    { "handle": "filesystem" },
+    {
+      "handle": "filesystem"
+    },
     {
       "src": "/api/(.*)",
       "dest": "apps/backend/src/index.ts"
