@@ -1,18 +1,18 @@
-import ImagenMuestra1 from "../images/imagen_muestra1.jpg";
-import ImagenMuestra2 from "../images/imagen_muestra2.jpg";
-import ImagenMuestra3 from "../images/imagen_muestra3.jpg";
-import ImagenMuestra4 from "../images/imagen_muestra4.jpg";
-import ImagenMuestraNvo1 from "../images/new_images_luzi/logo_hand_luzi1.png";
-import ImagenMuestraNvo2 from "../images/new_images_luzi/logo_hand_luzi2.png";
-import ImagenMuestraNvo3 from "../images/new_images_luzi/logo_luzi1.png";
-import ImagenMuestraNvo4 from "../images/new_images_luzi/logo_luzi2.png";
-import ImagenBanner1 from "../images/new_images_luzi/new_banner_luzi.png";
-import ImagenBanner2 from "../images/new_images_luzi/new_banner_luzi2.png";
-import LogoHandpicked from "../images/logo_like_luzimarket.png";
-import ModalIndex from "../components/modal_index";
+import ImagenMuestra1 from "@/pagina_principal/src/images/imagen_muestra1.jpg";
+import ImagenMuestra2 from "@/pagina_principal/src/images/imagen_muestra2.jpg";
+import ImagenMuestra3 from "@/pagina_principal/src/images/imagen_muestra3.jpg";
+import ImagenMuestra4 from "@/pagina_principal/src/images/imagen_muestra4.jpg";
+import ImagenMuestraNvo1 from "@/pagina_principal/src/images/new_images_luzi/logo_hand_luzi1.png";
+import ImagenMuestraNvo2 from "@/pagina_principal/src/images/new_images_luzi/logo_hand_luzi2.png";
+import ImagenMuestraNvo3 from "@/pagina_principal/src/images/new_images_luzi/logo_luzi1.png";
+import ImagenMuestraNvo4 from "@/pagina_principal/src/images/new_images_luzi/logo_luzi2.png";
+import ImagenBanner1 from "@/pagina_principal/src/images/new_images_luzi/new_banner_luzi.png";
+import ImagenBanner2 from "@/pagina_principal/src/images/new_images_luzi/new_banner_luzi2.png";
+import LogoHandpicked from "@/pagina_principal/src/images/logo_like_luzimarket.png";
+import ModalIndex from "@/pagina_principal/src/components/modal_index";
 
-import "../css/card_index.css";
-import "../css/general.css";
+import "@/pagina_principal/src/css/card_index.css";
+import "@/pagina_principal/src/css/general.css";
 // import { Button } from "@nextui-org/react"
 
 import Card from "react-bootstrap/Card";

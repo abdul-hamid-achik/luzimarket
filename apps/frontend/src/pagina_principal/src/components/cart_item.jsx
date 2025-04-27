@@ -1,5 +1,4 @@
-import React from "react";
-import "../css/cart_item.css";
+import "@/pagina_principal/src/css/cart_item.css";
 
 const CartItem = ({ item, onRemove, onQuantityChange }) => {
   return (

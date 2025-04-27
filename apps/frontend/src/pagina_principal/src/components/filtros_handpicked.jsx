@@ -1,8 +1,8 @@
 import Card from 'react-bootstrap/Card';
 // import { Collapse, Text } from "@nextui-org/react";
-import "../../../css/fonts.css"
-import "../css/filtros_handpicked.css"
-import LogoHandLuzi1 from "../images/new_images_luzi/logo_hand_luzi1.png"
+import "@/css/fonts.css"
+import "@/pagina_principal/src/css/filtros_handpicked.css"
+import LogoHandLuzi1 from "@/pagina_principal/src/images/new_images_luzi/logo_hand_luzi1.png"
 
 const styles = {
    height: 'min-content',

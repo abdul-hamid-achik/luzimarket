@@ -1,6 +1,6 @@
-import React from "react";
 import { Link } from "react-router-dom";
-import "../css/sucursal_form.css";
+import { Button } from "@nextui-org/react";
+import '@/css/sucursal_form.css';
 
 export default function App() {
   return (

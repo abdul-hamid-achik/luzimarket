@@ -1,7 +1,7 @@
-import ImagenBanner1 from "../../images/new_images_luzi/new_banner_luzi2.png";
-import ImagenBanner2 from "../../images/new_images_luzi/new_banner_luzi.png";
+import ImagenBanner1 from "@/images/new_images_luzi/new_banner_luzi2.png";
+import ImagenBanner2 from "@/images/new_images_luzi/new_banner_luzi.png";
 
-import "../../css/General.css"
+import "@/css/general.css"
 import { Button } from "@nextui-org/react"
 
 const BannerPrincipal = () => {

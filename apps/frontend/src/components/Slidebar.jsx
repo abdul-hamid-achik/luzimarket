@@ -1,14 +1,8 @@
-import React, { useState } from "react";
-import { Link, Navigate } from "react-router-dom";
-import "../css/Sidebar.css";
+import { Link } from "react-router-dom";
+import "@/css/sidebar.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const Sidebar = () => {
-  const [redirectTo, setRedirectTo] = useState(null);
-
-  const handleLinkClick = (url) => {
-    setRedirectTo(url);
-  };
 
   return (
     <div className="sidebar col-md">
@@ -55,7 +49,6 @@ const Sidebar = () => {
           </ul>
         </div>
       </div>
-      {redirectTo && <Navigate to={redirectTo} />}
     </div>
   );
 };

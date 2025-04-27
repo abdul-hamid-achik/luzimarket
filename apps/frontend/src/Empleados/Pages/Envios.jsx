@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import "../css/ordenes.css";
-import { DatosOrdenes } from "../data/data_ordenes";
+// Removed import of non-existing CSS file "@/css/ordenes.css";
+import { useState } from "react";
+import { Ventas as DatosOrdenes } from "@/data/data_ventas";
 
 function Ordenes() {
   const [BuscaTermino, setBuscarTermino] = useState("");

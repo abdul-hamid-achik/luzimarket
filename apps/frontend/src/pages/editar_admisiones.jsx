@@ -1,5 +1,4 @@
-import React from "react";
-import "../css/index.css";
+import "@/css/index.css";
 import { Button, Checkbox } from "@nextui-org/react";
 import { Link } from "react-router-dom";
 

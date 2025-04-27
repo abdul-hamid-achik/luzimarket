@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { z } from "zod";
-import { authenticateJWT } from "../middleware/auth";
-import { validate } from "../utils/validate";
-import { createOrder, getOrders, getOrder } from "../controllers/orderController";
+import { authenticateJWT } from "@/middleware/auth";
+import { validate } from "@/utils/validate";
+import { createOrder, getOrders, getOrder } from "@/controllers/orderController";
 
 const router = Router();
 

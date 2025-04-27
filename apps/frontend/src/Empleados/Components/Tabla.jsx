@@ -1,5 +1,4 @@
-import React from "react";
-import { Dropdown } from "bootstrap";
+// Removed unused import { Dropdown } from "bootstrap";
 
 const Tabla = () => {
   const datos = [
@@ -25,8 +24,8 @@ const Tabla = () => {
         </tr>
       </thead>
       {datos.map((dato, index) => (
-        <tbody>
-          <tr key={index}>
+        <tbody key={index}>
+          <tr>
             <td>
               <input
                 type="text"

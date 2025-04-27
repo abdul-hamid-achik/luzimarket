@@ -1,6 +1,5 @@
-import React from "react";
-import TablaAdmision from "../admisiones/cuerpo_admisiones";
-import BreadCrumb from "../../breadcrumb";
+import TablaAdmision from "@/components/peticiones/admisiones/cuerpo_admisiones";
+import BreadCrumb from "@/components/breadcrumb";
 
 const tablaSucursales = () => {
   const items = [

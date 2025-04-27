@@ -27,26 +27,25 @@ function startServer(port: number) {
   });
 }
 
+let currentIndex = 0;
+async function tryNextPort(portsToTry: number[], basePort: number) {
+  if (currentIndex >= portsToTry.length) {
+    console.error('No available ports found. Please check your port configuration.');
+    process.exit(1);
+  }
+
+  const port = portsToTry[currentIndex];
+  try {
+    await startServer(port);
+  } catch (err) {
+    currentIndex++;
+    await tryNextPort(portsToTry, basePort);
+  }
+}
+
 // Fallback to run locally with port fallback logic
 if (require.main === module) {
   const basePort = process.env.PORT ? parseInt(process.env.PORT) : 5000;
   const portsToTry = [basePort, basePort + 1, basePort + 2, basePort + 3];
-  let currentIndex = 0;
-
-  async function tryNextPort() {
-    if (currentIndex >= portsToTry.length) {
-      console.error('No available ports found. Please check your port configuration.');
-      process.exit(1);
-    }
-
-    const port = portsToTry[currentIndex];
-    try {
-      await startServer(port);
-    } catch (err) {
-      currentIndex++;
-      await tryNextPort();
-    }
-  }
-
-  tryNextPort();
+  tryNextPort(portsToTry, basePort);
 }

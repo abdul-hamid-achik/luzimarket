@@ -1,36 +1,36 @@
 import { createBrowserRouter } from "react-router-dom";
-import Login from "../pages/login";
-import Inicio from "../layout/inicio";
-import NotFound from "../pages/not_found";
-import Dashboard from "../pages/dashboard";
-import Alertas from "../pages/alertas";
-import Peticiones from "../pages/peticiones";
-import Ventas from "../pages/ventas";
-import Categorias from "../pages/categorias";
-import Locaciones from "../pages/locaciones";
-import AdmisionesCuerpo from "../components/peticiones/admisiones/cuerpo_admisiones";
-import ProductosCuerpo from "../components/peticiones/productos/cuerpo_producto";
-import SucursalesCuerpo from "../components/peticiones/sucursales/cuerpo_sucursales";
-import EditarAdmisiones from "../pages/editar_admisiones";
-import EditarProductos from "../pages/editar_producto";
-import EditarSucursales from "../pages/editar_sucursales";
-import PaginaInicialInicio from "../pagina_principal/src/pages/body_luzi";
-import Handpicked from "../pagina_principal/src/pages/hand_picked";
-import HandpickedProductos from "../pagina_principal/src/pages/productos";
-import Carrito from "../pagina_principal/src/pages/cart";
-import CustomerLogin from "../pagina_principal/src/pages/login_customer";
-import CustomerRegister from "../pagina_principal/src/pages/register_customer";
-import OrderConfirmation from "../pagina_principal/src/pages/order_confirmation";
-import PerfilUsuario from "../pagina_principal/src/pages/perfil_usuario";
-import RequireAuth from "../components/require_auth";
+import Login from '@/pages/login';
+import Inicio from '@/layout/inicio';
+import NotFound from '@/pages/not_found';
+import Dashboard from '@/pages/dashboard';
+import Alertas from '@/pages/alertas';
+import Peticiones from '@/pages/peticiones';
+import Ventas from '@/pages/ventas';
+import Categorias from '@/pages/categorias';
+import Locaciones from '@/pages/locaciones';
+import AdmisionesCuerpo from '@/components/peticiones/admisiones/cuerpo_admisiones';
+import ProductosCuerpo from '@/components/peticiones/productos/cuerpo_producto';
+import SucursalesCuerpo from '@/components/peticiones/sucursales/cuerpo_sucursales';
+import EditarAdmisiones from '@/pages/editar_admisiones';
+import EditarProductos from '@/pages/editar_producto';
+import EditarSucursales from '@/pages/editar_sucursales';
+import PaginaInicialInicio from '@/pagina_principal/src/pages/body_luzi';
+import Handpicked from '@/pagina_principal/src/pages/hand_picked';
+import HandpickedProductos from '@/pagina_principal/src/pages/productos';
+import Carrito from '@/pagina_principal/src/pages/cart';
+import CustomerLogin from '@/pagina_principal/src/pages/login_customer';
+import CustomerRegister from '@/pagina_principal/src/pages/register_customer';
+import OrderConfirmation from '@/pagina_principal/src/pages/order_confirmation';
+import PerfilUsuario from '@/pagina_principal/src/pages/perfil_usuario';
+import RequireAuth from '@/components/require_auth';
 
 // Admin empleados
-import Login2 from "../empleados/pages/login";
-import Inicio2 from "../empleados/inicio";
-import Dashboard2 from "../empleados/pages/dashboard";
-import Alertas2 from "../empleados/pages/alertas";
-import Envios from "../empleados/pages/envios";
-import Horarios from "../empleados/pages/horarios";
+import Login2 from '@/empleados/pages/login';
+import Inicio2 from '@/empleados/inicio';
+import Dashboard2 from '@/empleados/pages/dashboard';
+import Alertas2 from '@/empleados/pages/alertas';
+import Envios from '@/empleados/pages/envios';
+import Horarios from '@/empleados/pages/horarios';
 
 export const router = createBrowserRouter([
   /*PAGINA PRINCIPAL*/

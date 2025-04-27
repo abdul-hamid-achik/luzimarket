@@ -1,5 +1,5 @@
 import request from 'supertest';
-import app from './app';
+import app from '@/app';
 
 describe('API Smoke Tests', () => {
   it('should serve Swagger UI at /api/docs', async () => {

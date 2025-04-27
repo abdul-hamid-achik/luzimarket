@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { db } from "../db";
+import { db } from "@/db";
 import { eq } from "drizzle-orm";
-import { products } from "../schema";
+import { products } from "@/schema";
 
 export const createProduct = async (req: Request, res: Response) => {
   try {
@@ -10,8 +10,9 @@ export const createProduct = async (req: Request, res: Response) => {
       .values(req.body)
       .returning();
     res.status(201).json(product);
-  } catch (err: any) {
-    res.status(500).json({ error: "Internal server error" });
+  } catch (err) {
+    const error = err as { message?: string };
+    res.status(500).json({ error: error.message || "Internal server error" });
   }
 };
 

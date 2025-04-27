@@ -1,4 +1,3 @@
-import React from "react";
 
 export const states = [
   { label: "Nuevo Leon", value: "mty" },

@@ -1,5 +1,4 @@
-import React from "react";
-import "../../css/navbars.css"
+import "@/pagina_principal/src/css/navbars.css"
 
 const NavbarOpciones = () => {
    return (

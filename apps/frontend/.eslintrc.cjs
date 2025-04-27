@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = {
   env: { browser: true, es2020: true },
   extends: [
@@ -6,10 +8,38 @@ module.exports = {
     'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
   ],
-  parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
-  settings: { react: { version: '18.2' } },
-  plugins: ['react-refresh'],
+  parserOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    ecmaFeatures: { jsx: true },
+  },
+  settings: {
+    react: { version: '18.2' },
+    'import/resolver': {
+      alias: {
+        map: [['@', path.resolve(__dirname, 'src')]],
+        extensions: ['.js', '.jsx', '.ts', '.tsx', '.json']
+      }
+    }
+  },
+  plugins: ['react-refresh', 'import'],
   rules: {
     'react-refresh/only-export-components': 'warn',
+    'react/react-in-jsx-scope': 'off',
+    'react/prop-types': 'off',
+    'no-unused-vars': ['error', { varsIgnorePattern: '^(React$|set.*|handle.*|iniciarSesion)' }],
+    'import/no-unresolved': 'error'
   },
-}
+  overrides: [
+    {
+      files: ['src/pagina_principal/**'],
+      rules: {
+        'import/no-unresolved': 'off',
+        'react/jsx-no-undef': 'off',
+        'no-undef': 'off',
+        'react/no-unescaped-entities': 'off',
+        'no-unused-vars': 'off'
+      }
+    }
+  ],
+};

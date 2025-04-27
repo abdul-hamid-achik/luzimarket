@@ -1,4 +1,3 @@
-import React from "react";
 //import { Dropdown } from "bootstrap";
 
 const TablaHorarios = () => {
@@ -25,8 +24,8 @@ const TablaHorarios = () => {
         </tr>
       </thead>
       {datos.map((dato, index) => (
-        <tbody>
-          <tr key={index}>
+        <tbody key={index}>
+          <tr>
             <td>
               <input
                 type="text"

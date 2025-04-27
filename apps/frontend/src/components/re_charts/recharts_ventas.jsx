@@ -1,4 +1,3 @@
-import React from "react";
 import {
   LineChart,
   Line,
@@ -9,7 +8,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Ventas } from "../../data/data_ventas";
+import { Ventas } from "@/data/data_ventas";
 
 const ChartVentas = ({ FechaInicio, FechaFin }) => {
   // Filtrar los datos basados en las fechas seleccionadas

@@ -1,6 +1,6 @@
 //import Card from 'react-bootstrap/Card';
 // import { Collapse, Text } from "@nextui-org/react";
-import "../../../css/fonts.css"
+import "@/css/fonts.css"
 
 const styles = {
    width: '18rem', //18rem

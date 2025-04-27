@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { db } from "../db";
-import { users } from "../schema";
+import { db } from "@/db";
+import { users } from "@/schema";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -20,8 +20,9 @@ export const register = async (req: Request, res: Response) => {
       })
       .returning({ id: users.id, email: users.email, role: users.role });
     res.status(201).json({ user });
-  } catch (err: any) {
-    if (err.code === "23505") {
+  } catch (err) {
+    const error = err as { code?: string };
+    if (error.code === "23505") {
       return res.status(400).json({ error: "Email already in use" });
     }
     res.status(500).json({ error: "Internal server error" });
@@ -46,7 +47,7 @@ export const login = async (req: Request, res: Response) => {
   }
   const token = jwt.sign(
     { id: user.id, email: user.email, role: user.role },
-    process.env.JWT_SECRET!,
+    process.env.JWT_SECRET || "default_jwt_secret",
     { expiresIn: "7d" }
   );
   res.json({ token });

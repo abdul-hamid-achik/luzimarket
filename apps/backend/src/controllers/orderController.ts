@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import { Response } from "express";
-import { db } from "../db";
+import { db } from "@/db";
 import { eq } from "drizzle-orm";
 import {
   carts,
@@ -10,19 +10,22 @@ import {
   coupons,
   products,
   productVariants,
-} from "../schema";
-import { AuthRequest } from "../middleware/auth";
+} from "@/schema";
+import { AuthRequest } from "@/middleware/auth";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: "2022-11-15",
 });
 
 export const createOrder = async (req: AuthRequest, res: Response) => {
-  const userId = req.user!.id;
-  let cart = await db.select().from(carts).where(eq(carts.userId, userId)).limit(1);
+  const userId = req.user?.id;
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  const cart = await db.select().from(carts).where(eq(carts.userId, userId)).limit(1);
   if (!cart[0]) {
     return res.status(400).json({ error: "Cart is empty" });
   }
@@ -42,10 +45,10 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
       const variant =
         item.variantId
           ? (await db
-              .select({ additionalPrice: productVariants.additionalPrice })
-              .from(productVariants)
-              .where(eq(productVariants.id, item.variantId))
-              .limit(1))[0]
+            .select({ additionalPrice: productVariants.additionalPrice })
+            .from(productVariants)
+            .where(eq(productVariants.id, item.variantId))
+            .limit(1))[0]
           : null;
       const price = parseFloat(prod.price.toString()) + (variant ? parseFloat(variant.additionalPrice.toString()) : 0);
       total += price * item.quantity;
@@ -80,8 +83,9 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
       if (paymentIntent.status !== "succeeded") {
         return res.status(400).json({ error: "Payment failed" });
       }
-    } catch (err: any) {
-      return res.status(400).json({ error: err.message });
+    } catch (err) {
+      const error = err as { message?: string };
+      return res.status(400).json({ error: error.message || "Payment failed" });
     }
   }
 
@@ -106,13 +110,19 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
 };
 
 export const getOrders = async (req: AuthRequest, res: Response) => {
-  const userId = req.user!.id;
+  const userId = req.user?.id;
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
   const userOrders = await db.select().from(orders).where(eq(orders.userId, userId));
   res.json(userOrders);
 };
 
 export const getOrder = async (req: AuthRequest, res: Response) => {
-  const userId = req.user!.id;
+  const userId = req.user?.id;
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
   const id = Number(req.params.id);
   const orderRec = await db
     .select()

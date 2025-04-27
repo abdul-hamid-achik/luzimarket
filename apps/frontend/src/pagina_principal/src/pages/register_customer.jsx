@@ -1,9 +1,8 @@
-import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { AuthContext } from "../../../context/auth_context";
-import Navbars from "../components/navbars";
-import Footer from "../components/footer";
-import '../css/general.css';
+import { AuthContext } from "@/context/auth_context";
+import Navbars from "@/pagina_principal/src/components/navbars";
+import Footer from "@/pagina_principal/src/components/footer";
+import '@/pagina_principal/src/css/general.css';
 
 const RegisterCustomer = () => {
   const [email, setEmail] = useState('');

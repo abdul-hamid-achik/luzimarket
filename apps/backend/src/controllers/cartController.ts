@@ -1,11 +1,14 @@
-import { Request, Response } from "express";
-import { db } from "../db";
+import { Response } from "express";
+import { db } from "@/db";
 import { eq } from "drizzle-orm";
-import { carts, cartItems, products, productVariants } from "../schema";
-import { AuthRequest } from "../middleware/auth";
+import { carts, cartItems, products, productVariants } from "@/schema";
+import { AuthRequest } from "@/middleware/auth";
 
 export const getCart = async (req: AuthRequest, res: Response) => {
-  const userId = req.user!.id;
+  const userId = req.user?.id;
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
   let cart = await db.select().from(carts).where(eq(carts.userId, userId)).limit(1);
   if (cart.length === 0) {
     const [newCart] = await db.insert(carts).values({ userId }).returning();
@@ -30,7 +33,10 @@ export const getCart = async (req: AuthRequest, res: Response) => {
 };
 
 export const addItemToCart = async (req: AuthRequest, res: Response) => {
-  const userId = req.user!.id;
+  const userId = req.user?.id;
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
   let cart = await db.select().from(carts).where(eq(carts.userId, userId)).limit(1);
   if (cart.length === 0) {
     const [newCart] = await db.insert(carts).values({ userId }).returning();
@@ -65,8 +71,11 @@ export const removeCartItem = async (req: AuthRequest, res: Response) => {
 };
 
 export const clearCart = async (req: AuthRequest, res: Response) => {
-  const userId = req.user!.id;
-  let cart = await db.select().from(carts).where(eq(carts.userId, userId)).limit(1);
+  const userId = req.user?.id;
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  const cart = await db.select().from(carts).where(eq(carts.userId, userId)).limit(1);
   if (cart.length > 0) {
     await db.delete(cartItems).where(eq(cartItems.cartId, cart[0].id));
   }

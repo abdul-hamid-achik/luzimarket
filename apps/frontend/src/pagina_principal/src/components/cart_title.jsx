@@ -1,5 +1,4 @@
-import React from "react";
-import "../css/cart_title.css";
+import "@/pagina_principal/src/css/cart_title.css";
 
 const CartTitle = () => {
   return (

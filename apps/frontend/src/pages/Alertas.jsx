@@ -1,7 +1,7 @@
-import { GoArrowRight } from "react-icons/go";
-import Success from "../components/alertas/success";
-import Danger from "../components/alertas/danger";
-import BreadCrumb from "../components/breadcrumb";
+// Removed unused import { GoArrowRight } from "react-icons/go";
+import Success from '@/components/alertas/success';
+import Danger from '@/components/alertas/danger';
+import BreadCrumb from '@/components/breadcrumb';
 
 const Alertas = () => {
   const items = [{ name: "Alertas", link: "/inicio/alertas" }];

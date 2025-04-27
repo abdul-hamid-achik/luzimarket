@@ -1,6 +1,6 @@
-import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useState } from "react";
 
 function DateRangePicker({ onDateChange }) {
   const [FechaInicio, setFechaInicio] = useState(null);

@@ -1,12 +1,12 @@
-import React, { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect } from "react";
 import jwtDecode from 'jwt-decode';
-import { loginUser, registerUser } from "../api/auth";
+import { loginUser, registerUser } from "@/api/auth";
 
 export const AuthContext = createContext({
   user: null,
-  login: async () => {},
-  register: async () => {},
-  logout: () => {},
+  login: async () => { },
+  register: async () => { },
+  logout: () => { },
 });
 
 export const AuthProvider = ({ children }) => {

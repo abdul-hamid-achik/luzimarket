@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
-import { db } from './db';
+import { db } from '@/db';
 import { eq } from 'drizzle-orm';
-import { categories, products } from './schema';
+import { categories, products } from '@/schema';
 
 dotenv.config();
 

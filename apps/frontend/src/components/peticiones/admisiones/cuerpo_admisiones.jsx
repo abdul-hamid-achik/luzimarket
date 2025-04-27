@@ -1,7 +1,7 @@
-import "../Peticiones.css";
+import "@/components/peticiones/peticiones.css";
 import { GoArrowRight } from "react-icons/go";
 import { Link } from "react-router-dom";
-import React from "react";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@nextui-org/react";
 
 
 function tablaAdmisiones() {

@@ -1,13 +1,13 @@
-import React, { useState } from "react";
 import {
   FaRegCheckCircle,
   FaRegPauseCircle,
   FaRegTimesCircle,
 } from "react-icons/fa";
-import "../css/admin_ventas.css";
-import DateRangePicker from "../components/date_picker";
-import OrderStatus from "../components/order_status";
-import ChartVentas from "../components/re_charts/recharts_ventas";
+import "@/css/admin_ventas.css";
+import DateRangePicker from "@/components/date_picker";
+import OrderStatus from "@/components/order_status";
+import ChartVentas from "@/components/re_charts/recharts_ventas";
+import { useState } from "react";
 
 function Ventas() {
   const [FechaInicio, setFechaInicio] = useState(null);

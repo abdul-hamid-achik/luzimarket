@@ -1,47 +1,47 @@
-import Navbars from "../components/navbars/navbar_principal";
-import Footer from "../components/footer";
-import ModalUsr from "../components/modal_index";
+import Navbars from "@/pagina_principal/src/components/navbars/navbar_principal";
+import Footer from "@/pagina_principal/src/components/footer";
+import ModalUsr from "@/pagina_principal/src/components/modal_index";
 
 const Perfil = () => {
     return (
         <>
             <Navbars />
-            <div class="container rounded bg-white mt-5 mb-5">
-                <div class="row">
-                    <div class="col-md-3 border-right">
-                        <div class="d-flex flex-column align-items-center text-center p-3 py-5">
-                            <img class="rounded-circle mt-5" width="150px" height="150px" src="https://www.stockvault.net/data/2011/08/12/126170/preview16.jpg" />
-                            <span class="font-weight-bold mt-2">Nombre de Usuario</span></div>
+            <div className="container rounded bg-white mt-5 mb-5">
+                <div className="row">
+                    <div className="col-md-3 border-right">
+                        <div className="d-flex flex-column align-items-center text-center p-3 py-5">
+                            <img className="rounded-circle mt-5" width="150px" height="150px" src="https://www.stockvault.net/data/2011/08/12/126170/preview16.jpg" />
+                            <span className="font-weight-bold mt-2">Nombre de Usuario</span></div>
                     </div>
-                    <div class="col-md-5 border-right">
-                        <div class="p-3 py-5">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h3 class="text-right">Detalles del Perfil</h3>
+                    <div className="col-md-5 border-right">
+                        <div className="p-3 py-5">
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                                <h3 className="text-right">Detalles del Perfil</h3>
                             </div>
-                            <div class="row mt-2">
-                                <div class="col-md-6"><label class="labels">Nombre</label><input type="text" class="form-control" placeholder="first name" value="" /></div>
-                                <div class="col-md-6"><label class="labels">Apellido</label><input type="text" class="form-control" value="" placeholder="surname" /></div>
+                            <div className="row mt-2">
+                                <div className="col-md-6"><label className="labels">Nombre</label><input type="text" className="form-control" placeholder="first name" value="" /></div>
+                                <div className="col-md-6"><label className="labels">Apellido</label><input type="text" className="form-control" value="" placeholder="surname" /></div>
                             </div>
-                            <div class="row mt-3">
-                                <div class="col-md-12"><label class="labels">Telefono</label><input type="text" class="form-control" placeholder="enter phone number" value="" /></div>
-                                <div class="col-md-12"><label class="labels">Direccion</label><input type="text" class="form-control" placeholder="enter address line 1" value="" /></div>
-                                <div class="col-md-12"><label class="labels">Codigo Postal</label><input type="text" class="form-control" placeholder="enter address line 2" value="" /></div>
-                                <div class="col-md-12"><label class="labels">Estado</label><input type="text" class="form-control" placeholder="enter address line 2" value="" /></div>
-                                <div class="col-md-12"><label class="labels">Area</label><input type="text" class="form-control" placeholder="enter address line 2" value="" /></div>
+                            <div className="row mt-3">
+                                <div className="col-md-12"><label className="labels">Telefono</label><input type="text" className="form-control" placeholder="enter phone number" value="" /></div>
+                                <div className="col-md-12"><label className="labels">Direccion</label><input type="text" className="form-control" placeholder="enter address line 1" value="" /></div>
+                                <div className="col-md-12"><label className="labels">Codigo Postal</label><input type="text" className="form-control" placeholder="enter address line 2" value="" /></div>
+                                <div className="col-md-12"><label className="labels">Estado</label><input type="text" className="form-control" placeholder="enter address line 2" value="" /></div>
+                                <div className="col-md-12"><label className="labels">Area</label><input type="text" className="form-control" placeholder="enter address line 2" value="" /></div>
                             </div>
-                            <div class="row mt-3">
-                                <div class="col-md-6"><label class="labels">Pais</label><input type="text" class="form-control" placeholder="country" value="" /></div>
-                                <div class="col-md-6"><label class="labels">Estado/Region</label><input type="text" class="form-control" value="" placeholder="state" /></div>
+                            <div className="row mt-3">
+                                <div className="col-md-6"><label className="labels">Pais</label><input type="text" className="form-control" placeholder="country" value="" /></div>
+                                <div className="col-md-6"><label className="labels">Estado/Region</label><input type="text" className="form-control" value="" placeholder="state" /></div>
                             </div>
-                            <div class="mt-5"><button class="btn btn-primary profile-button" type="button">Guardar Cambios</button></div>
+                            <div className="mt-5"><button className="btn btn-primary profile-button" type="button">Guardar Cambios</button></div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="p-3 py-5">
-                            <div class="d-flex justify-content-between align-items-center experience"><h3>Metodo de pago</h3></div><br />
-                            <div class="col-md-12"><label class="labels">Tarjeta termina en *98</label>
+                    <div className="col-md-4">
+                        <div className="p-3 py-5">
+                            <div className="d-flex justify-content-between align-items-center experience"><h3>Metodo de pago</h3></div><br />
+                            <div className="col-md-12"><label className="labels">Tarjeta termina en *98</label>
                                 <button
-                                    class="btn btn-primary profile-button"
+                                    className="btn btn-primary profile-button"
                                     type="button"
                                     data-bs-toggle="modal"
                                     data-bs-target="#ModalCard">

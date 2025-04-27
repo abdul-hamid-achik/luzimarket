@@ -1,5 +1,4 @@
 import { image } from "@nextui-org/theme";
-import React from "react";
 import Select from 'react-select';
 
 const SelectPagoModal = () => {

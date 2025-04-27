@@ -1,10 +1,9 @@
-import React from "react";
-import SelectMetodoPago from "../../components/SelectMetodoPago";
+import SelectMetodoPago from "@/components/SelectMetodoPago";
 import { Link } from "react-router-dom";
 export default function App() {
   return (
     <>
-      <div className="modal fade" id="ModalCard" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="ModalCardLabel" aria-hidden="true">
+      <div className="modal fade" id="ModalCard" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="ModalCardLabel" aria-hidden="true">
         <div className="modal-dialog modal-dialog-centered ">
           <div className="modal-content">
             <div className="modal-header">

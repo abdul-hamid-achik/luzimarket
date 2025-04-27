@@ -1,12 +1,11 @@
-import React from 'react';
 import { useParams } from 'react-router-dom';
-import { useProduct, useAddToCart } from "../../../api/hooks";
-import Navbars from "../components/navbars";
-import Footer from "../components/footer";
-import CollapseDetails from "../components/collapse";
-import LogoLikeLuzimarket from "../images/logo_like_luzimarket.png";
-import "../css/handpicked.css";
-import "../css/general.css";
+import { useProduct, useAddToCart } from "@/api/hooks";
+import Navbars from "@/pagina_principal/src/components/navbars";
+import Footer from "@/pagina_principal/src/components/footer";
+import CollapseDetails from "@/pagina_principal/src/components/collapse";
+import LogoLikeLuzimarket from "@/pagina_principal/src/images/logo_like_luzimarket.png";
+import "@/pagina_principal/src/css/handpicked.css";
+import "@/pagina_principal/src/css/general.css";
 import { Card, Button, ButtonGroup } from "react-bootstrap";
 
 const Handpicked = () => {

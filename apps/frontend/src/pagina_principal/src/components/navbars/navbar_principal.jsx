@@ -1,14 +1,14 @@
 /* CSS */
-import "../../css/Navbars.css";
+import "@/pagina_principal/src/css/navbars.css";
 
 /* Imagenes para el navbar */
-import LogoLetraLuzimarket from "../../images/new_images_luzi/logo_luzi1.png";
-import SearchLogo from "../../images/search_logo_luzimarket.png";
-import LogoluziImagen from "../../images/logo_luzimarket.png";
-import LogoLikeLuzi from "../../images/logo_like_luzimarket.png";
-import LogoUserLuzi from "../../images/logo_user_luzi_market.png";
-import LogoCartLuzi from "../../images/cart_luzimarket.png";
-import LogoFamilyLuzi from "../../images/logo_family_luzimarket.png";
+import LogoLetraLuzimarket from "@/pagina_principal/src/images/new_images_luzi/logo_luzi1.png";
+import SearchLogo from "@/pagina_principal/src/images/search_logo_luzimarket.png";
+import LogoluziImagen from "@/pagina_principal/src/images/logo_luzimarket.png";
+import LogoLikeLuzi from "@/pagina_principal/src/images/logo_like_luzimarket.png";
+import LogoUserLuzi from "@/pagina_principal/src/images/logo_user_luzi_market.png";
+import LogoCartLuzi from "@/pagina_principal/src/images/cart_luzimarket.png";
+import LogoFamilyLuzi from "@/pagina_principal/src/images/logo_family_luzimarket.png";
 
 /* Librería */
 import { Input } from "@nextui-org/react";

@@ -1,6 +1,6 @@
-import NavbarPrincipal from "../components/navbars/navbar_principal";
-import NavbarDireccion from "../components/navbars/navbar_direccion";
-import NavbarOpciones from "../components/navbars/navbar_opciones";
+import NavbarPrincipal from "@/pagina_principal/src/components/navbars/navbar_principal";
+import NavbarDireccion from "@/pagina_principal/src/components/navbars/navbar_direccion";
+import NavbarOpciones from "@/pagina_principal/src/components/navbars/navbar_opciones";
 
 const Navbars = () => {
    return (

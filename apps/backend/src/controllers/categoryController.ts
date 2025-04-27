@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { db } from "../db";
+import { db } from "@/db";
 import { eq } from "drizzle-orm";
-import { categories } from "../schema";
+import { categories } from "@/schema";
 
 export const createCategory = async (req: Request, res: Response) => {
   try {
@@ -10,8 +10,9 @@ export const createCategory = async (req: Request, res: Response) => {
       .values({ name: req.body.name })
       .returning();
     res.status(201).json(category);
-  } catch (err: any) {
-    if (err.code === "23505") {
+  } catch (err) {
+    const error = err as { code?: string };
+    if (error.code === "23505") {
       return res.status(400).json({ error: "Category already exists" });
     }
     res.status(500).json({ error: "Internal server error" });
@@ -49,8 +50,9 @@ export const updateCategory = async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Category not found" });
     }
     res.json(updated[0]);
-  } catch (err: any) {
-    if (err.code === "23505") {
+  } catch (err) {
+    const error = err as { code?: string };
+    if (error.code === "23505") {
       return res.status(400).json({ error: "Category name already exists" });
     }
     res.status(500).json({ error: "Internal server error" });

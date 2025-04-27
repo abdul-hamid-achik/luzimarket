@@ -1,11 +1,10 @@
-import React from 'react'
-import Flecha from "../../assets/img/flecha.png"
-import Graficos1 from "../../assets/img/graficos1.png"
-import Graficos2 from "../../assets/img/graficos2.png"
-import Graficos3 from "../../assets/img/graficos3.png"
-import Graficos4 from "../../assets/img/graficos4.png"
-import Graficos5 from "../../assets/img/graficos5.png"
-import '../css/GraficosPrueba.css'
+import Flecha from '@/images/flecha_correcta.png'
+import Graficos1 from '@/images/grafico_prueba1.png'
+import Graficos2 from '@/images/grafico_prueba2.png'
+import Graficos3 from '@/images/grafico_prueba3.png'
+import Graficos4 from '@/images/grafico_prueba4.png'
+import Graficos5 from '@/images/grafico_prueba5.png'
+import '@/css/graficos_prueba.css'
 
 
 function tienda() {
