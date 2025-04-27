@@ -18,7 +18,9 @@
     "lint:frontend": "npm --workspace=apps/frontend run lint",
     "test": "npm run test:backend && npm run test:frontend",
     "test:backend": "npm --workspace=apps/backend run test",
-    "test:frontend": "npm --workspace=apps/frontend run test:e2e",
+    "test:frontend": "npm run test:e2e",
+    "postinstall": "playwright install",
+    "test:e2e": "playwright test",
     "migrate:generate": "npm --workspace=apps/backend run migrate:generate",
     "migrate:up": "npm --workspace=apps/backend run migrate:up",
     "migrate:down": "npm --workspace=apps/backend run migrate:down",
@@ -29,7 +31,8 @@
     "eslint": "^8.57.1",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-import-resolver-typescript": "^4.3.4",
-    "eslint-plugin-import": "^2.31.0"
+    "eslint-plugin-import": "^2.31.0",
+    "@playwright/test": "^1.37.1"
   },
   "dependencies": {
     "serverless-http": "^3.2.0"

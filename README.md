@@ -53,14 +53,13 @@ We use Jest and Supertest to validate API endpoints in the backend.
 npm run test:backend   # runs Jest tests in apps/backend/
 ```
 
-### Frontend End-to-End Tests
+### End-to-End Tests (Full Stack)
 
-We use Playwright to test the frontend UI and flows.
+We use Playwright to test the full application stack, including the database, backend, and frontend. Docker Compose will bring up the PostgreSQL database and backend service automatically.
 
 ```bash
-cd apps/frontend
-npx playwright install    # download browser binaries (once)
-npm run test:e2e          # run Playwright tests
+npm install                # installs dependencies and Playwright browsers
+npm run test:frontend      # spins up DB+backend via Docker Compose and runs the E2E suite
 ```
 
 ### Full Test Suite
