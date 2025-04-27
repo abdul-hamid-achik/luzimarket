@@ -9,35 +9,35 @@
 
 @font-face {
     font-family: AdobeMy;
-    src: url("../fonts/adobe_myungjo_std_medium.otf") format('truetype');
+    src: url("../assets/fonts/adobe_myungjo_std_medium.otf") format('truetype');
 }
 
 @font-face {
     font-family: JHALight;
-    src: url("../fonts/jha_times_now_light.otf") format('truetype');
+    src: url("../assets/fonts/jha_times_now_light.otf") format('truetype');
 }
 
 @font-face {
     font-family: TimesNowSemi;
-    src: url("../fonts/times_now_semi_light.otf") format('truetype');
+    src: url("../assets/fonts/times_now_semi_light.otf") format('truetype');
 }
 
 @font-face {
     font-family: UniLTProL;
-    src: url("../fonts/univers_ltpro_45_light.otf") format('truetype');
+    src: url("../assets/fonts/univers_ltpro_45_light.otf") format('truetype');
 }
 
 @font-face {
     font-family: UniLTStd-L;
-    src: url("../fonts/univers_ltstd_light.otf") format('truetype');
+    src: url("../assets/fonts/univers_ltstd_light.otf") format('truetype');
 }
 
 @font-face {
     font-family: UniLTStd-LO;
-    src: url("../fonts/univers_ltstd_light_obl.otf") format('truetype');
+    src: url("../assets/fonts/univers_ltstd_light_obl.otf") format('truetype');
 }
 
 @font-face {
     font-family: UniLTStd-BO;
-    src: url("../fonts/univers_ltstd_bold.otf") format('truetype');
+    src: url("../assets/fonts/univers_ltstd_bold.otf") format('truetype');
 }

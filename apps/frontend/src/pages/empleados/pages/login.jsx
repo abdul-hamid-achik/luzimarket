@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import "@/css/login.css";
-import LuziLogoAdmin from "@/assets/images/luzimarket_logo_empleado.png";
+import LuziLogoAdmin from "@/pages/pagina_principal/images/new_images_luzi/logo_luzi1.png";
 import { useState } from "react";
 import Inicio from "@/layout/inicio";
 
@@ -48,7 +48,7 @@ const Login = () => {
               placeholder="Password"
               id="txtPass"
             />
-            <Link to="/inicio/dashboard" className="button">
+            <Link to="/InicioEmpleados/DashboardEmpleados" className="button">
               Entrar
             </Link>
           </div>

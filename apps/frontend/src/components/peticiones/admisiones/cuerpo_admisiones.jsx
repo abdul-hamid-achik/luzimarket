@@ -1,10 +1,17 @@
 import "@/components/peticiones/peticiones.css";
+import React from 'react';
+import { useAdmissionPetitions } from '@/api/hooks';
 import { GoArrowRight } from "react-icons/go";
 import { Link } from "react-router-dom";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@nextui-org/react";
 
+// Fix: Component name should start with uppercase, and useAdmissionPetitions should only be called in a component
+function TablaAdmisiones() {
+  const { data: admissions = [], isLoading, error } = useAdmissionPetitions();
 
-function tablaAdmisiones() {
+  if (isLoading) return <div>Loading admission petitions...</div>;
+  if (error) return <div>Error loading admission petitions.</div>;
+
   return (
     <div className="container mt-5 p-5 overflow-y-auto">
       <nav aria-label="breadcrumb">
@@ -27,9 +34,9 @@ function tablaAdmisiones() {
               <i className="text-secondary fs-4 me-3 icon-link">
                 <GoArrowRight />
               </i>
-              <Link href="#" className="text-decoration-none text-dark">
+              <span className="text-decoration-none text-dark">
                 Afiliado
-              </Link>
+              </span>
             </h2>
           </li>
         </ol>
@@ -46,273 +53,63 @@ function tablaAdmisiones() {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>
-                <input
-                  type="text"
-                  className="form-control bg-body-tertiary border-0 p-3"
-                  value="Juan Luis Guerra"
-                  readOnly
-                />
-              </td>
-
-              <td>
-                <input
-                  type="text"
-                  className="form-control bg-body-tertiary border-0 p-3"
-                  value="Pastelería La Estrella"
-                  readOnly
-                />
-              </td>
-
-              <td>
-                <input
-                  type="text"
-                  className="form-control bg-body-tertiary border-0 p-3"
-                  value="16 / 03 / 2023"
-                  readOnly
-                />
-              </td>
-
-              <td>
-                <Dropdown>
-                  <DropdownTrigger>
-                    <Button variant="bordered">Open Menu</Button>
-                  </DropdownTrigger>
-                  <DropdownMenu aria-label="Static Actions">
-                    <DropdownItem key="Aceptar" to="#">
-                      Aceptar
-                    </DropdownItem>
-                    <DropdownItem key="Editar">
-                      <Link to="/inicio/peticiones/Productos">Editar</Link>
-                    </DropdownItem>
-                    <DropdownItem key="Borrar">Borrar</DropdownItem>
-                  </DropdownMenu>
-                </Dropdown>
-              </td>
-            </tr>
-
-            <tr>
-              <td>
-                <input
-                  type="text"
-                  className="form-control bg-body-tertiary border-0 p-3"
-                  value="Evelyn Rose"
-                  readOnly
-                />
-              </td>
-
-              <td>
-                <input
-                  type="text"
-                  className="form-control bg-body-tertiary border-0 p-3"
-                  value="ROWSE"
-                  readOnly
-                />
-              </td>
-
-              <td>
-                <input
-                  type="text"
-                  className="form-control bg-body-tertiary border-0 p-3"
-                  value="01 / 12 / 2022"
-                  readOnly
-                />
-              </td>
-
-              <td></td>
-            </tr>
-
-            <tr>
-              <td>
-                <input
-                  type="text"
-                  className="form-control bg-body-tertiary border-0 p-3"
-                  value="Mariana García"
-                  readOnly
-                />
-              </td>
-
-              <td>
-                <input
-                  type="text"
-                  className="form-control bg-body-tertiary border-0 p-3"
-                  value="Phamilia"
-                  readOnly
-                />
-              </td>
-
-              <td>
-                <input
-                  type="text"
-                  className="form-control bg-body-tertiary border-0 p-3"
-                  value="25 / 02 / 2023"
-                  readOnly
-                />
-              </td>
-
-              <td></td>
-            </tr>
-
-            <tr>
-              <td>
-                <input
-                  type="text"
-                  className="form-control bg-body-tertiary border-0 p-3"
-                  value="Alejandro Magno III"
-                  readOnly
-                />
-              </td>
-
-              <td>
-                <input
-                  type="text"
-                  className="form-control bg-body-tertiary border-0 p-3"
-                  value="Lyto®"
-                  readOnly
-                />
-              </td>
-
-              <td>
-                <input
-                  type="text"
-                  className="form-control bg-body-tertiary border-0 p-3"
-                  value="12 / 12 / 2022"
-                  readOnly
-                />
-              </td>
-
-              <td></td>
-            </tr>
-
-            <tr>
-              <td>
-                <input
-                  type="text"
-                  className="form-control bg-body-tertiary border-0 p-3"
-                  value="Alejandro Magno III"
-                  readOnly
-                />
-              </td>
-
-              <td>
-                <input
-                  type="text"
-                  className="form-control bg-body-tertiary border-0 p-3"
-                  value="Lyto®"
-                  readOnly
-                />
-              </td>
-
-              <td>
-                <input
-                  type="text"
-                  className="form-control bg-body-tertiary border-0 p-3"
-                  value="12 / 12 / 2022"
-                  readOnly
-                />
-              </td>
-
-              <td></td>
-            </tr>
+            {admissions.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="text-center text-secondary">
+                  No hay peticiones de admisión.
+                </td>
+              </tr>
+            ) : (
+              admissions.map((admission, idx) => (
+                <tr key={admission.id || idx}>
+                  <td>
+                    <input
+                      type="text"
+                      className="form-control bg-body-tertiary border-0 p-3"
+                      value={admission.nombre || ""}
+                      readOnly
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      className="form-control bg-body-tertiary border-0 p-3"
+                      value={admission.marca || ""}
+                      readOnly
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      className="form-control bg-body-tertiary border-0 p-3"
+                      value={admission.fecha_creacion || ""}
+                      readOnly
+                    />
+                  </td>
+                  <td>
+                    <Dropdown>
+                      <DropdownTrigger>
+                        <Button variant="bordered">Acciones</Button>
+                      </DropdownTrigger>
+                      <DropdownMenu aria-label="Static Actions">
+                        <DropdownItem key="Aceptar" to="#">
+                          Aceptar
+                        </DropdownItem>
+                        <DropdownItem key="Editar">
+                          <Link to={`/inicio/peticiones/Productos/${admission.id || ""}`}>Editar</Link>
+                        </DropdownItem>
+                        <DropdownItem key="Borrar">Borrar</DropdownItem>
+                      </DropdownMenu>
+                    </Dropdown>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
     </div>
-    /*<>
-      <div>
-        <img src={Flecha} className="flecha" />
-        <h1 className="direccion__pagina">Peticiones</h1>
-      </div>
-      <div className='caja__direccion'>
-         <img src={Flecha} className="flecha1" />
-        <h1 className="direccion__pagina1">Admisiones</h1>
-      </div>
-      <table id="tablaPeticiones">
-        <tr>
-          <th>Nombre</th>
-          <th>Marca</th>
-          <th>Fecha de Creación</th>
-          <th>Acciones</th>
-        </tr>
-        <tr>
-          <td>Alfreds Futterkiste</td>
-          <td>Maria Anders</td>
-          <td>17 / 08 / 2000</td>
-          <td>
-            <Dropdown>
-              <Dropdown.Button color="default">Entrar</Dropdown.Button>
-              <Dropdown.Menu
-                color="default"
-                variant="solid"
-                aria-label="Actions"
-              >
-                <Dropdown.Item key="new">Aceptar</Dropdown.Item>
-                <Dropdown.Item key="copy">
-                  <Link to="/inicio/peticiones/admisiones/editar" className="button_admision">
-                    Editar
-                  </Link>
-                </Dropdown.Item>
-                <Dropdown.Item key="edit">Borrar</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-          </td>
-        </tr>
-        <tr>
-          <td>Berglunds snabbköp</td>
-          <td>Christina Berglund</td>
-          <td>01 / 10 / 2015</td>
-          <td>
-            <Dropdown>
-              <Dropdown.Button color="default">Entrar</Dropdown.Button>
-              <Dropdown.Menu
-                color="default"
-                variant="solid"
-                aria-label="Actions"
-              >
-                <Dropdown.Item key="new">Aceptar</Dropdown.Item>
-                <Dropdown.Item key="copy">
-                  <Link to="/inicio/peticiones/admisiones/editar" className="button_admision">
-                    Editar
-                  </Link>
-                </Dropdown.Item>
-                <Dropdown.Item key="edit">Borrar</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-          </td>
-        </tr>
-        <tr>
-          <td>Centro comercial Moctezuma</td>
-          <td>Francisco Chang</td>
-          <td>25 / 08 / 2020</td>
-          <td>
-            <Dropdown>
-              <Dropdown.Button color="default">Entrar</Dropdown.Button>
-              <Dropdown.Menu
-                color="default"
-                variant="solid"
-                aria-label="Actions"
-              >
-                <Dropdown.Item auto key="new">Aceptar</Dropdown.Item>
-                <Dropdown.Item auto key="copy">
-                <Link to="/inicio/peticiones/admisiones/editar" className="button_admision">Editar</Link>
-                </Dropdown.Item>
-                <Dropdown.Item auto key="edit">Borrar</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-          </td>
-        </tr>
-      </table>
-
-      <Button css={{
-          background: "black",
-          color: "White",
-          border: "1px"
-       }} className="botonPeticiones">
-          <Link to="/inicio/peticiones" className="boton_link">Regresar</Link> 
-        </Button>
-    </>*/
   );
 }
 
-export default tablaAdmisiones;
+export default TablaAdmisiones;

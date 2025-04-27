@@ -2,6 +2,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as productsApi from "./products";
 import * as cartApi from "./cart";
 import * as ordersApi from "./orders";
+import * as salesApi from "./sales";
+import * as petitionsAdmissionsApi from "./petitionsAdmissions";
+import * as petitionsProductsApi from "./petitionsProducts";
+import * as petitionsBranchesApi from "./petitionsBranches";
+import * as petitionsApi from "./petitions";
 
 export const useProducts = () =>
   useQuery(['products'], productsApi.getProducts);
@@ -64,3 +69,19 @@ export const useOrders = () =>
 
 export const useOrder = (orderId) =>
   useQuery(['order', orderId], () => ordersApi.getOrder(orderId));
+  
+export const useSales = () =>
+  useQuery(['sales'], salesApi.getSales);
+  
+export const useAdmissionPetitions = () =>
+  useQuery(['admissionPetitions'], petitionsAdmissionsApi.getAdmissionPetitions);
+
+export const useProductPetitions = () =>
+  useQuery(['productPetitions'], petitionsProductsApi.getProductPetitions);
+
+export const useBranchPetitions = () =>
+  useQuery(['branchPetitions'], petitionsBranchesApi.getBranchPetitions);
+  
+export const usePetitions = () =>
+  useQuery(['petitions'], petitionsApi.getPetitions);
+  

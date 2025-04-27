@@ -2,7 +2,10 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@/pagina_principal/*": ["src/pages/pagina_principal/*"],
+      "@/empleados/*": ["src/pages/empleados/*"],
+      "@/assets/*": ["src/assets/*"]
     }
   },
   "include": ["src"]

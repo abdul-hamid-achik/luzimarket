@@ -14,23 +14,23 @@ import SucursalesCuerpo from '@/components/peticiones/sucursales/cuerpo_sucursal
 import EditarAdmisiones from '@/pages/editar_admisiones';
 import EditarProductos from '@/pages/editar_producto';
 import EditarSucursales from '@/pages/editar_sucursales';
-import PaginaInicialInicio from '@/pagina_principal/src/pages/body_luzi';
-import Handpicked from '@/pagina_principal/src/pages/hand_picked';
-import HandpickedProductos from '@/pagina_principal/src/pages/productos';
-import Carrito from '@/pagina_principal/src/pages/cart';
-import CustomerLogin from '@/pagina_principal/src/pages/login_customer';
-import CustomerRegister from '@/pagina_principal/src/pages/register_customer';
-import OrderConfirmation from '@/pagina_principal/src/pages/order_confirmation';
-import PerfilUsuario from '@/pagina_principal/src/pages/perfil_usuario';
+import PaginaInicialInicio from '@/pages/pagina_principal/pages/body_luzi';
+import Handpicked from '@/pages/pagina_principal/pages/hand_picked';
+import HandpickedProductos from '@/pages/pagina_principal/pages/productos';
+import Carrito from '@/pages/pagina_principal/pages/cart';
+import CustomerLogin from '@/pages/pagina_principal/pages/login_customer';
+import CustomerRegister from '@/pages/pagina_principal/pages/register_customer';
+import OrderConfirmation from '@/pages/pagina_principal/pages/order_confirmation';
+import PerfilUsuario from '@/pages/pagina_principal/pages/perfil_usuario';
 import RequireAuth from '@/components/require_auth';
 
 // Admin empleados
-import Login2 from '@/empleados/pages/login';
-import Inicio2 from '@/empleados/inicio';
-import Dashboard2 from '@/empleados/pages/dashboard';
-import Alertas2 from '@/empleados/pages/alertas';
-import Envios from '@/empleados/pages/envios';
-import Horarios from '@/empleados/pages/horarios';
+import Login2 from '@/pages/empleados/pages/login';
+import Inicio2 from '@/pages/empleados/inicio';
+import Dashboard2 from '@/pages/empleados/pages/dashboard';
+import Alertas2 from '@/pages/empleados/pages/alertas';
+import Envios from '@/pages/empleados/pages/envios';
+import Horarios from '@/pages/empleados/pages/horarios';
 
 export const router = createBrowserRouter([
   /*PAGINA PRINCIPAL*/

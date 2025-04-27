@@ -8,6 +8,11 @@ import categoryRoutes from '@/routes/categories';
 import productRoutes from '@/routes/products';
 import cartRoutes from '@/routes/cart';
 import orderRoutes from '@/routes/orders';
+import salesRoutes from '@/routes/sales';
+import petitionsRoutes from '@/routes/petitions';
+import admissionsRoutes from '@/routes/petitions/admissions';
+import petitionProductsRoutes from '@/routes/petitions/products';
+import branchPetitionsRoutes from '@/routes/petitions/branches';
 // Import routes lazily under non-test environments to avoid pulling in full schema
 // and controllers during Jest smoke tests
 // (Dynamic requires ensure schema-related TS errors are skipped)
@@ -27,6 +32,11 @@ if (process.env.NODE_ENV !== 'test') {
   app.use("/api/products", productRoutes);
   app.use("/api/cart", cartRoutes);
   app.use("/api/orders", orderRoutes);
+  app.use("/api/sales", salesRoutes);
+  app.use("/api/petitions", petitionsRoutes);
+  app.use("/api/petitions/admissions", admissionsRoutes);
+  app.use("/api/petitions/products", petitionProductsRoutes);
+  app.use("/api/petitions/branches", branchPetitionsRoutes);
 }
 
 // Swagger

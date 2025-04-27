@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 import { Button } from "@nextui-org/react";
 import "@/css/form_productos.css";
-import Flecha from "@/images/flecha_correcta.png";
-import ImagenProducto1 from "@/images/pastel_chocolate.jpg";
-import ImagenProducto2 from "@/images/pastel_fresa.jpg";
-import ImagenProducto3 from "@/images/pastel_vainilla.jpg";
+import Flecha from "@/assets/images/flecha_correcta.png";
+import ImagenProducto1 from "@/assets/images/pastel_chocolate.jpg";
+import ImagenProducto2 from "@/assets/images/pastel_fresa.jpg";
+import ImagenProducto3 from "@/assets/images/pastel_vainilla.jpg";
 
 export default function App() {
   return (

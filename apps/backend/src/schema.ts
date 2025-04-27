@@ -125,3 +125,11 @@ export const reviews = pgTable("reviews", {
   comment: text("comment"),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
+
+// Sales table: stores daily sales amounts
+export const sales = pgTable("sales", {
+  id: serial("id").primaryKey(),
+  date: timestamp("date").notNull(),
+  amount: integer("amount").notNull(),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+});

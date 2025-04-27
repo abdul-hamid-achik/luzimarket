@@ -1,3 +1,4 @@
+import React from "react";
 import {
   LineChart,
   Line,
@@ -8,11 +9,12 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Ventas } from "@/data/data_ventas";
+import { useSales } from "@/api/hooks";
 
 const ChartVentas = ({ FechaInicio, FechaFin }) => {
-  // Filtrar los datos basados en las fechas seleccionadas
-  const fechaFiltrada = Ventas.filter((Entrada) => {
+  const { data: ventas = [] } = useSales();
+
+  const fechaFiltrada = ventas.filter((Entrada) => {
     const FechaEntrada = new Date(Entrada.date);
     return (
       (!FechaInicio || FechaEntrada >= FechaInicio) &&
@@ -33,7 +35,7 @@ const ChartVentas = ({ FechaInicio, FechaFin }) => {
         <Legend />
         <Line
           type="monotone"
-          dataKey="May"
+          dataKey="amount"
           stroke="#8884d8"
           activeDot={{ r: 8 }}
         />
