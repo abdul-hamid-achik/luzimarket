@@ -1,31 +1,33 @@
-# Stage 1: install deps for the backend workspace
-FROM node:22-alpine AS deps
+# Stage 1: build the backend workspace
+FROM node:22-alpine AS builder
 WORKDIR /app
-# copy root manifests
+# skip postinstall and other lifecycle scripts (e.g. playwright install)
+ENV NPM_CONFIG_IGNORE_SCRIPTS=true
+
+# copy monorepo manifests and backend package
 COPY package.json package-lock.json ./
-# copy backend workspace manifest for dependency resolution
-COPY apps/backend/package.json ./apps/backend/package.json
-# install only the backend workspace, omit dev dependencies and skip scripts
-RUN npm ci --workspace=apps/backend --omit=dev --ignore-scripts
+COPY tsconfig.base.json ./
+COPY apps/backend/package.json apps/backend/package.json
 
-# Stage 2: build the backend
-FROM node:22-alpine AS build
-WORKDIR /app
-# bring in installed modules
-COPY --from=deps /app/node_modules ./node_modules
-# copy backend source
-COPY apps/backend/ ./
-# compile TS to JS
-RUN npm run build
+# copy backend source code
+COPY apps/backend/ apps/backend/
 
-# Stage 3: production runner
-FROM node:22-alpine AS runner
+# install only the backend workspace and build (skip lifecycle scripts)
+RUN npm ci --workspace=ecommerce-backend --ignore-scripts
+# compile TypeScript using explicit project path so tsconfig.base.json is found
+RUN npx tsc -p apps/backend/tsconfig.json
+
+# Stage 2: production runner
+FROM node:22-alpine
 WORKDIR /app
-# copy built output and modules
-COPY --from=build /app/dist ./dist
-COPY --from=deps /app/node_modules ./node_modules
+
+# copy built output and node_modules
+COPY --from=builder /app/apps/backend/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+
 # healthcheck for backend
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
     CMD wget -qO- http://localhost:5000/health || exit 1
+
 EXPOSE 5000
 CMD ["npm", "start"]

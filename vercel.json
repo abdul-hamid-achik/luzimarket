@@ -32,8 +32,8 @@
       "dest": "apps/backend/src/index.ts"
     },
     {
-      "src": "/(.*)",
-      "dest": "apps/frontend/dist/index.html"
+      "src": "^/(.*)$",
+      "dest": "/index.html"
     }
   ]
 }

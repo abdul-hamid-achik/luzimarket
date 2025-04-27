@@ -1,24 +1,30 @@
 # Stage 1: install deps for the frontend workspace
-FROM node:22-alpine AS deps
+FROM node:22-alpine AS builder
 WORKDIR /app
-# copy root manifests
-COPY package.json package-lock.json ./
-# copy frontend workspace manifest for dependency resolution
-COPY apps/frontend/package.json ./apps/frontend/package.json
-# install only the frontend workspace (including dev deps)
-RUN npm ci --workspace=apps/frontend
 
-# Stage 2: runtime
-FROM node:22-alpine AS runner
+# skip lifecycle scripts (postinstall, etc)
+ENV NPM_CONFIG_IGNORE_SCRIPTS=true
+
+# copy monorepo manifests and workspace manifest
+COPY package.json package-lock.json ./
+COPY apps/frontend/package.json apps/frontend/package.json
+
+# install only the frontend workspace
+RUN npm ci --workspace=luizmarket
+
+# Stage 2: dev runtime
+FROM node:22-alpine
 WORKDIR /app
-# copy node_modules from deps stage
-COPY --from=deps /app/node_modules ./node_modules
-# copy frontend source
+
+# copy node_modules from builder stage
+COPY --from=builder /app/node_modules ./node_modules
+
+# copy source code
 COPY apps/frontend/ ./
+
 # healthcheck for Vite dev server
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD wget -qO- http://localhost:5173 || exit 1
-# expose port
+
 EXPOSE 5173
-# start dev server
 CMD ["npm","run","dev","--","--host","0.0.0.0"] 
