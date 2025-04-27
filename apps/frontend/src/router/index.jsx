@@ -14,7 +14,7 @@ import SucursalesCuerpo from '@/components/peticiones/sucursales/cuerpo_sucursal
 import EditarAdmisiones from '@/pages/editar_admisiones';
 import EditarProductos from '@/pages/editar_producto';
 import EditarSucursales from '@/pages/editar_sucursales';
-import PaginaInicialInicio from '@/pages/pagina_principal/pages/body_luzi';
+import PaginaInicialInicio from '@/pages/pagina_principal/layout/inicio';
 import Handpicked from '@/pages/pagina_principal/pages/hand_picked';
 import HandpickedProductos from '@/pages/pagina_principal/pages/productos';
 import Carrito from '@/pages/pagina_principal/pages/cart';

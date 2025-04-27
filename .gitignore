@@ -34,3 +34,5 @@ playwright-trace
 .env.test.local
 .env.production.local
 .vercel
+.env*.local
+.op
