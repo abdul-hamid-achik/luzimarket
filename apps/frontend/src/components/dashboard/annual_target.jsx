@@ -1,6 +1,6 @@
 import React from "react";
-import Card from "import../";
-import CharAnnual from "import../";
+import Card from "../../components/cards/card";
+import CharAnnual from "../../components/re_charts/chart_annual";
 
 function AnnualTarget() {
   return (

@@ -1,8 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
-import { useCreateOrder } from "import../";
-import "../css/CartCheckout.css";
+import { useCreateOrder } from "../../../api/hooks";
+import "../css/cart_checkout.css";
 
 const Checkout = ({ cartItems }) => {
   const navigate = useNavigate();

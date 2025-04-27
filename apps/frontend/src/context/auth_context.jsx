@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import jwtDecode from 'jwt-decode';
-import { loginUser, registerUser } from "import../";
+import { loginUser, registerUser } from "../api/auth";
 
 export const AuthContext = createContext({
   user: null,

@@ -1,9 +1,9 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useOrder } from "import../";
-import Navbars from "import../";
-import Footer from "import../";
-import '../css/General.css';
+import { useOrder } from "../../../api/hooks";
+import Navbars from "../components/navbars/navbar_principal";
+import Footer from "../components/footer";
+import '../css/general.css';
 
 const OrderConfirmation = () => {
   const { id } = useParams();

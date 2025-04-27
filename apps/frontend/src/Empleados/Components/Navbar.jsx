@@ -1,8 +1,8 @@
 import React from "react";
-import Usuario from "import../";
-import Logo from "import../";
-import bandera from "import../";
-import notificacion from "import../";
+import Usuario from "../../pagina_principal/src/images/logo_user_luzi_market.png";
+import Logo from "../../images/luzimarket_logo_empleado.png";
+import bandera from "../../images/bandera_mx.png";
+import notificacion from "../../images/notificacion.png";
 
 const Navbar = () => {
   return (

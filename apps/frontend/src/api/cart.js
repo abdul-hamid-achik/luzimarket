@@ -1,4 +1,4 @@
-import api from "import./";
+import api from "./client";
 
 export const getCart = () => api.get('/cart').then(res => res.data);
 export const addToCart = (payload) => api.post('/cart', payload).then(res => res.data);

@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
-import "../css/Login.css";
-import LuziLogoAdmin from "import../";
+import "../css/login.css";
+import LuziLogoAdmin from "../images/luzimarket_logo_empleado.png";
 import { useState } from "react";
-import Inicio from "import../";
+import Inicio from "../layout/inicio";
 
 const Login = () => {
   const [miLogin, setLogin] = useState("false");

@@ -1,6 +1,6 @@
 import React from "react";
-import Card from "import../";
-import TotalChar from "import../";
+import Card from "../../components/cards/card";
+import TotalChar from "../../components/re_charts/chart_total_ear";
 
 function TotalEarnings() {
   return (

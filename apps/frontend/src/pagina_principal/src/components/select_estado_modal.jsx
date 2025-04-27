@@ -1,8 +1,7 @@
 import React from "react";
 import Select from 'react-select';
-import {states} from "import../";
 
-const SelectCiudadModal  = ( ) => { 
+const SelectCiudadModal = () => {
   const options = [
     { value: 'option1', label: 'Nuevo León' },
     { value: 'option2', label: 'Coahula' },
@@ -12,11 +11,11 @@ const SelectCiudadModal  = ( ) => {
   ];
 
   return (
-      <Select
-        options={options}
-        placeholder="Seleccione un Estado"
-        onChange={(selectedOption) => console.log(selectedOption)}
-      />
+    <Select
+      options={options}
+      placeholder="Seleccione un Estado"
+      onChange={(selectedOption) => console.log(selectedOption)}
+    />
   );
 }
 export default SelectCiudadModal;

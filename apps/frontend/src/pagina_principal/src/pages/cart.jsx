@@ -1,14 +1,14 @@
 //Componentes Generales
-import Navbars from "import../";
-import Footer from "import../";
+import Navbars from "../components/navbars/navbar_principal";
+import Footer from "../components/footer";
 
 //componentes del carrito
 import React from "react";
-import { useCart, useUpdateCartItem, useRemoveCartItem } from "import../";
-import Checkout from "import../";
-import CartTitle from "import../";
-import CartItem from "import../";
-import "../css/Cart.css";
+import { useCart, useUpdateCartItem, useRemoveCartItem } from "../../../api/hooks";
+import Checkout from "../components/cart_checkout";
+import CartTitle from "../components/cart_title";
+import CartItem from "../components/cart_item";
+import "../css/cart.css";
 
 const Cart = () => {
   const { data, isLoading, error } = useCart();

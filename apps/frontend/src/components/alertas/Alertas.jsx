@@ -1,6 +1,6 @@
 import { GoArrowRight } from "react-icons/go";
-import Success from "import./";
-import Danger from "import./";
+import Success from "../images/success.png";
+import Danger from "../images/danger.png";
 
 const Alertas = () => {
   return (

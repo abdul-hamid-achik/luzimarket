@@ -1,12 +1,12 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { useProduct, useAddToCart } from "import../";
-import Navbars from "import../";
-import Footer from "import../";
-import CollapseDetails from "import../";
-import LogoLikeLuzimarket from "import../";
-import "../css/Handpicked.css";
-import "../css/General.css";
+import { useProduct, useAddToCart } from "../../../api/hooks";
+import Navbars from "../components/navbars";
+import Footer from "../components/footer";
+import CollapseDetails from "../components/collapse";
+import LogoLikeLuzimarket from "../images/logo_like_luzimarket.png";
+import "../css/handpicked.css";
+import "../css/general.css";
 import { Card, Button, ButtonGroup } from "react-bootstrap";
 
 const Handpicked = () => {

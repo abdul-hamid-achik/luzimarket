@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "../css/SucursalForm.css";
+import "../css/sucursal_form.css";
 
 export default function App() {
   return (

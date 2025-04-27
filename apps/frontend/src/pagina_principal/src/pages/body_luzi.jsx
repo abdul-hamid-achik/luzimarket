@@ -1,18 +1,18 @@
-import ImagenMuestra1 from "import../";
-import ImagenMuestra2 from "import../";
-import ImagenMuestra3 from "import../";
-import ImagenMuestra4 from "import../";
-import ImagenMuestraNvo1 from "import../";
-import ImagenMuestraNvo2 from "import../";
-import ImagenMuestraNvo3 from "import../";
-import ImagenMuestraNvo4 from "import../";
-import ImagenBanner1 from "import../";
-import ImagenBanner2 from "import../";
-import LogoHandpicked from "import../";
-import ModalIndex from "import../";
+import ImagenMuestra1 from "../images/imagen_muestra1.jpg";
+import ImagenMuestra2 from "../images/imagen_muestra2.jpg";
+import ImagenMuestra3 from "../images/imagen_muestra3.jpg";
+import ImagenMuestra4 from "../images/imagen_muestra4.jpg";
+import ImagenMuestraNvo1 from "../images/new_images_luzi/logo_hand_luzi1.png";
+import ImagenMuestraNvo2 from "../images/new_images_luzi/logo_hand_luzi2.png";
+import ImagenMuestraNvo3 from "../images/new_images_luzi/logo_luzi1.png";
+import ImagenMuestraNvo4 from "../images/new_images_luzi/logo_luzi2.png";
+import ImagenBanner1 from "../images/new_images_luzi/new_banner_luzi.png";
+import ImagenBanner2 from "../images/new_images_luzi/new_banner_luzi2.png";
+import LogoHandpicked from "../images/logo_like_luzimarket.png";
+import ModalIndex from "../components/modal_index";
 
-import "../css/CardIndex.css";
-import "../css/General.css";
+import "../css/card_index.css";
+import "../css/general.css";
 // import { Button } from "@nextui-org/react"
 
 import Card from "react-bootstrap/Card";

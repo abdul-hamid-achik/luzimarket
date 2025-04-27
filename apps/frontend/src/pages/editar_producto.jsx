@@ -1,10 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "../css/FormProductos.css";
-import Flecha from "import../";
-import ImagenProducto1 from "import../";
-import ImagenProducto2 from "import../";
-import ImagenProducto3 from "import../";
+import "../css/form_productos.css";
+import Flecha from "../images/flecha_correcta.png";
+import ImagenProducto1 from "../images/pastel_chocolate.jpg";
+import ImagenProducto2 from "../images/pastel_fresa.jpg";
+import ImagenProducto3 from "../images/pastel_vainilla.jpg";
 
 export default function App() {
   return (

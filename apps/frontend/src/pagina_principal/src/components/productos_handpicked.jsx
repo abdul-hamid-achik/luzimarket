@@ -1,8 +1,8 @@
 import React from 'react';
 import Card from 'react-bootstrap/Card';
 import { Link } from 'react-router-dom';
-import { useProducts } from "import../";
-import '../css/Producto.css';
+import { useProducts } from "../../../api/hooks";
+import '../css/producto.css';
 
 const ProductosHandpicked = () => {
   const { data: products, isLoading, error } = useProducts();

@@ -1,14 +1,14 @@
-import NavbarPrincipal from "import../";
-import NavbarDireccion from "import../";
-import NavbarOpciones from "import../";
+import NavbarPrincipal from "../components/navbars/navbar_principal";
+import NavbarDireccion from "../components/navbars/navbar_direccion";
+import NavbarOpciones from "../components/navbars/navbar_opciones";
 
 const Navbars = () => {
-   return(
+   return (
       <>
          <div className="navbarFixed">
-            <NavbarDireccion/>
-            <NavbarPrincipal/>
-            <NavbarOpciones/>
+            <NavbarDireccion />
+            <NavbarPrincipal />
+            <NavbarOpciones />
          </div>
       </>
    );

@@ -1,7 +1,7 @@
 // Paginas 
-import Navbars from "import../";
-import BodyLuzimarket from "import../";
-import Footer from "import../";
+import Navbars from "../components/navbars/navbar_principal";
+import BodyLuzimarket from "../components/partes_body/banner_principal";
+import Footer from "../components/footer";
 
 // Bootstrap 
 import 'bootstrap/dist/css/bootstrap.css';

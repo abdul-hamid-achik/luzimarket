@@ -1,4 +1,4 @@
-import api from "import./";
+import api from "./client";
 
 /**
  * Register a new user

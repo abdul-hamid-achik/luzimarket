@@ -1,6 +1,6 @@
 import React from "react";
-import SelectEstado from "import../" 
-import SelectCiudad from "import../";
+import SelectEstado from "./select_estado_modal";
+import SelectCiudad from "./select_ciudad_modal";
 import { Link } from "react-router-dom";
 export default function App() {
   return (
@@ -10,21 +10,21 @@ export default function App() {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title text-center" id="staticBackdropLabel">SELECCIONE UBICACIÓN DE ENTREGA</h5>
-                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div className="modal-body">
-              <SelectEstado/>
+              <SelectEstado />
               <br />
-              <SelectCiudad/>
+              <SelectCiudad />
             </div>
             <div className="modal-footer">
-              <button type="button" 
-                className="btn" 
-                data-bs-dismiss="modal" 
+              <button type="button"
+                className="btn"
+                data-bs-dismiss="modal"
                 style={{
-                  background: "#000", 
-                  color: "#FFF", 
-                  paddingLeft: "25px", 
+                  background: "#000",
+                  color: "#FFF",
+                  paddingLeft: "25px",
                   paddingRight: "25px",
                   paddingBottom: "10px",
                   paddingTop: "10px",

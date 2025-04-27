@@ -1,5 +1,5 @@
 import React from "react";
-import "../css/CartTitle.css";
+import "../css/cart_title.css";
 
 const CartTitle = () => {
   return (

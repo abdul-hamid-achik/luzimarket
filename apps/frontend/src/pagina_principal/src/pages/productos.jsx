@@ -1,10 +1,10 @@
-import Navbars from "import../";
-import Footer from "import../";
-import FiltrosHandpicked from "import../";
-import ProductosHandpicked from "import../";
-import ImagenMuestraProducto from "import../";
-import "../css/Handpicked.css";
-import "../css/General.css";
+import Navbars from "../components/navbars";
+import Footer from "../components/footer";
+import FiltrosHandpicked from "../components/filtros_handpicked";
+import ProductosHandpicked from "../components/productos_handpicked";
+import ImagenMuestraProducto from "../components/partes_body/banner_cards"; // replace with actual image if needed
+import "../css/handpicked.css";
+import "../css/general.css";
 import { Card } from "react-bootstrap";
 
 const HandpickedProductos = () => {

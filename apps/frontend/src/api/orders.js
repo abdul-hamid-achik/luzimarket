@@ -1,4 +1,4 @@
-import api from "import./";
+import api from "./client";
 
 /**
  * Create a new order

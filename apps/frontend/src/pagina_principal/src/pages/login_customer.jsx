@@ -1,9 +1,9 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { AuthContext } from "import../";
-import Navbars from "import../";
-import Footer from "import../";
-import '../css/General.css';
+import { AuthContext } from "../../../context/auth_context";
+import Navbars from "../components/navbars";
+import Footer from "../components/footer";
+import '../css/general.css';
 
 const LoginCustomer = () => {
   const [email, setEmail] = useState('');

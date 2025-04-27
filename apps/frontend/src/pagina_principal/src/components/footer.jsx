@@ -1,11 +1,11 @@
 import "../css/Footer.css"
-import Tiktok from "import../";
-import Facebook from "import../";
-import X from "import../";
-import Instagram from "import../";
-import Whatsapp from "import../";
-import Youtube from "import../";
-import LogoLuziUser from "import../";
+import Tiktok from "../images/tik_tok.png";
+import Facebook from "../images/facebook.png";
+import X from "../images/x.png";
+import Instagram from "../images/instagram.png";
+import Whatsapp from "../images/whatsapp.png";
+import Youtube from "../images/youtube.png";
+import LogoLuziUser from "../images/new_images_luzi/logo_luzi_user.png";
 
 
 const Footer = () => {
@@ -13,8 +13,8 @@ const Footer = () => {
       <>
          <div className="sticky-bottom">
             <div className="footerPrimerPiso">
-               <img src={LogoLuziUser} className="bannerLogoFooter"/>
-               
+               <img src={LogoLuziUser} className="bannerLogoFooter" />
+
                <div className="FooterTextoPiso2">
                   <p>País: México</p>
                   <p>Newsletter</p>
@@ -24,12 +24,12 @@ const Footer = () => {
                </div>
 
                <div className="FooterImagenesBannerPiso3">
-                  <img src={Facebook} className="bannerRedesSociales2"/>
-                  <img src={Youtube} className="bannerRedesSociales"/>
-                  <img src={Tiktok} className="bannerRedesSociales2"/>
-                  <img src={X} className="bannerRedesSociales2"/>
-                  <img src={Instagram} className="bannerRedesSociales2"/>
-                  <img src={Whatsapp} className="bannerRedesSociales2"/>
+                  <img src={Facebook} className="bannerRedesSociales2" />
+                  <img src={Youtube} className="bannerRedesSociales" />
+                  <img src={Tiktok} className="bannerRedesSociales2" />
+                  <img src={X} className="bannerRedesSociales2" />
+                  <img src={Instagram} className="bannerRedesSociales2" />
+                  <img src={Whatsapp} className="bannerRedesSociales2" />
                </div>
 
             </div>

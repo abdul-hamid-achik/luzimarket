@@ -1,7 +1,7 @@
 import { GoArrowRight } from "react-icons/go";
-import Success from "import../";
-import Danger from "import../";
-import BreadCrumb from "import../";
+import Success from "../../components/alertas/success";
+import Danger from "../../components/alertas/danger";
+import BreadCrumb from "../../components/BreadCrumb";
 
 const Alertas = () => {
   const items = [

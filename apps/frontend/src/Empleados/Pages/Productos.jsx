@@ -1,8 +1,8 @@
 import React from "react";
-import Tetera1 from "import../";
-import Tetera2 from "import../";
-import Tetera3 from "import../";
-import BreadCrumb from "import../";
+import Tetera1 from "../../assets/img/tetera1.png";
+import Tetera2 from "../../assets/img/tetera2.png";
+import Tetera3 from "../../assets/img/tetera3.png";
+import BreadCrumb from "../../components/BreadCrumb";
 
 const tablaProducto = () => {
   const items = [

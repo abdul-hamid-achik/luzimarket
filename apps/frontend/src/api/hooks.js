@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import * as productsApi from "import./";
-import * as cartApi from "import./";
+import * as productsApi from "./products";
+import * as cartApi from "./cart";
+import * as ordersApi from "./orders";
 
 export const useProducts = () =>
   useQuery(['products'], productsApi.getProducts);
@@ -46,8 +47,6 @@ export const useClearCart = () => {
     },
   });
 };
-// Orders hooks
-import * as ordersApi from "export./";
 
 export const useCreateOrder = () => {
   const queryClient = useQueryClient();
