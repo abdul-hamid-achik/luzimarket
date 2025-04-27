@@ -1,7 +1,8 @@
 {
   "version": 2,
   "env": {
-    "CORS_ORIGIN": "https://luzimarket.vercel.app"
+    "CORS_ORIGIN": "https://luzimarket.vercel.app",
+    "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1"
   },
   "builds": [
     {
