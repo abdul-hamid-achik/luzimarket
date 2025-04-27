@@ -4,6 +4,12 @@
     "CORS_ORIGIN": "https://luzimarket.vercel.app",
     "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1"
   },
+  "build": {
+    "env": {
+      "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1",
+      "npm_config_ignore_scripts": "true"
+    }
+  },
   "builds": [
     {
       "src": "apps/frontend/package.json",
