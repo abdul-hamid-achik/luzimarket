@@ -12,7 +12,7 @@
     "migrate:push": "drizzle-kit push",
     "test": "jest --config jest.config.js --passWithNoTests",
     "lint": "eslint src --ext .ts",
-    "seed": "ts-node-dev --respawn --transpile-only src/seed.ts",
+    "seed": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/seed.ts",
     "swagger:generate": "node dist/swagger.js"
   },
   "dependencies": {
