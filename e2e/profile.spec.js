@@ -9,21 +9,27 @@ test.describe('Customer Profile Page', () => {
     await page.goto('/register');
     await page.fill('input[type="email"]', email);
     await page.fill('input[type="password"]', password);
-    await page.click('button:has-text("Register")');
-    await page.waitForURL(/\/login$/);
+    // Submit registration and wait for redirect to login
+    await Promise.all([
+      page.waitForURL(/\/login$/),
+      page.click('button:has-text("Register")'),
+    ]);
     await page.fill('input[type="email"]', email);
     await page.fill('input[type="password"]', password);
-    await page.click('button:has-text("Login")');
-    await page.waitForURL('/');
+    // Submit login and wait for redirect to home
+    await Promise.all([
+      page.waitForURL(/\//),
+      page.click('button:has-text("Login")'),
+    ]);
 
     // Navigate to profile
     await page.goto('/perfil');
     await page.waitForURL('/perfil');
 
-    // Check profile heading and save button
-    const heading = page.locator('h3:has-text("Detalles del Perfil")');
-    await expect(heading).toBeVisible();
-    const saveBtn = page.locator('button:has-text("Guardar Cambios")');
-    await expect(saveBtn).toBeVisible();
+    // Wait for profile page elements
+    await page.waitForSelector('h3:has-text("Detalles del Perfil")');
+    await expect(page.locator('h3:has-text("Detalles del Perfil")')).toBeVisible();
+    await page.waitForSelector('button:has-text("Guardar Cambios")');
+    await expect(page.locator('button:has-text("Guardar Cambios")')).toBeVisible();
   });
 });

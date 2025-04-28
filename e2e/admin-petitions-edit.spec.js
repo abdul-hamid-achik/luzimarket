@@ -34,7 +34,8 @@ test.describe('Admin Petitions Edit Forms', () => {
     await page.goto('/inicio/peticiones/sucursales/editar');
     await page.waitForURL(/\/inicio\/peticiones\/sucursales\/editar$/);
     // Check sucursal form fields visible
-    await expect(page.locator('input#text__Suc')).toBeVisible();
+    await expect(page.locator('input[placeholder="Nombre del producto"]')).toBeVisible();
+    await expect(page.locator('input[placeholder="Precio del producto"]')).toBeVisible();
     await expect(page.locator('textarea#descripcion__Suc')).toBeVisible();
     // Click Regresar button
     await page.click('a.boton_linkP1');

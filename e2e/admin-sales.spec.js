@@ -10,12 +10,16 @@ test.describe('Admin Sales Page', () => {
     // Navigate to Sales
     await page.click('a:has-text("Ventas")');
     await page.waitForURL(/\/inicio\/ventas$/);
+    // Wait for status cards to render
+    await page.waitForSelector('.ContainerOrderStatus .card');
 
     // Verify status cards count
     const statusCards = page.locator('.ContainerOrderStatus .card');
     await expect(statusCards).toHaveCount(3);
 
     // Verify chart area visible
+    // Wait for chart svg to load
+    await page.waitForSelector('.ContainerChartsVentas svg');
     const chart = page.locator('.ContainerChartsVentas svg');
     await expect(chart).toBeVisible();
   });

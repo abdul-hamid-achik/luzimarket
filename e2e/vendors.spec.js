@@ -31,8 +31,10 @@ test.describe('Employee (Vendor) Flows', () => {
     // Directly navigate to orders route
     await page.goto('/InicioEmpleados/Envios');
     // Check heading
+    await page.waitForSelector('h1');
     await expect(page.locator('h1')).toHaveText('Ordenes');
     // Search input present
+    await page.waitForSelector('input.search-input');
     await expect(page.locator('input.search-input')).toBeVisible();
   });
 

@@ -62,7 +62,7 @@ services:
       backend:
         condition: service_healthy
     environment:
-      - VITE_API_URL=http://backend:5000
+      - VITE_API_URL=http://localhost:5001
 
 volumes:
   db_data:

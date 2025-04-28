@@ -9,8 +9,12 @@ test.describe('Cart Management Flow', () => {
     await page.goto('/register');
     await page.fill('input[type="email"]', email);
     await page.fill('input[type="password"]', password);
-    await page.click('button:has-text("Register")');
-    await page.waitForURL(/\/login$/);
+    // Submit registration and wait for redirect to login
+    await Promise.all([
+      page.waitForURL(/\/login$/),
+      page.click('button:has-text("Register")'),
+    ]);
+    await page.waitForURL('/');
     await page.fill('input[type="email"]', email);
     await page.fill('input[type="password"]', password);
     await page.click('button:has-text("Login")');

@@ -8,11 +8,12 @@ test.describe('Homepage Public View', () => {
     const mainBanner = page.locator('.Banners .BannerPrincipal img');
     await expect(mainBanner).toBeVisible();
 
-    // Check Handpicked section title
-    const handpickedTitle = page.locator('h5').first();
-    await expect(handpickedTitle).toHaveText(/Handpicked/);
+    // Wait for Handpicked section to render and verify the title
+    await page.waitForSelector('.titulosHandpicked h5');
+    await expect(page.locator('.titulosHandpicked h5')).toHaveText(/Handpicked/);
 
     // Ensure at least four products are shown in the preview
+    await page.waitForSelector('.cajaProductosMuestra img');
     const productCards = page.locator('.cajaProductosMuestra img');
     await expect(productCards).toHaveCount(4);
   });

@@ -8,7 +8,7 @@ const config: Config = {
   // SQL dialect for migrations: 'postgresql', 'mysql', or 'sqlite'
   dialect: "postgresql",
   dbCredentials: {
-    connectionString: process.env.DATABASE_URL!,
+    url: process.env.DATABASE_URL as string,
   },
 };
 

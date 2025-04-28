@@ -9,6 +9,7 @@
     "migrate:generate": "drizzle-kit generate --name",
     "migrate:up": "drizzle-kit up",
     "migrate:down": "drizzle-kit drop",
+    "migrate:push": "drizzle-kit push",
     "test": "jest --config jest.config.js --passWithNoTests",
     "lint": "eslint src --ext .ts",
     "seed": "ts-node-dev --respawn --transpile-only src/seed.ts",

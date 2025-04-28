@@ -24,6 +24,7 @@
     "migrate:generate": "npm --workspace=apps/backend run migrate:generate",
     "migrate:up": "npm --workspace=apps/backend run migrate:up",
     "migrate:down": "npm --workspace=apps/backend run migrate:down",
+    "migrate:push": "npm --workspace=apps/backend run migrate:push",
     "seed:backend": "npm --workspace=apps/backend run seed"
   },
   "devDependencies": {
