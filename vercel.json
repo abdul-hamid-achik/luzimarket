@@ -32,15 +32,15 @@
   ],
   "routes": [
     {
-      "handle": "filesystem"
-    },
-    {
       "src": "/api/(.*)",
       "dest": "apps/backend/dist/index.js",
-      "continue": true,
       "headers": {
-        "cache-control": "s-maxage=0"
+        "cache-control": "no-cache, no-store",
+        "x-vercel-max-age": "0"
       }
+    },
+    {
+      "handle": "filesystem"
     },
     {
       "src": "^/(.*)$",
