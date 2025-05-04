@@ -27,6 +27,13 @@
       }
     }
   ],
+  "functions": {
+    "apps/backend/src/index.ts": {
+      "includeFiles": [
+        "apps/backend/tsconfig.json"
+      ]
+    }
+  },
   "routes": [
     {
       "handle": "filesystem"
