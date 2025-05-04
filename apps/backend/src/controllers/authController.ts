@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { db } from "@/db";
-import { users } from "@/schema";
+import { db } from "../db";
+import { users } from "../schema";
 import dotenv from "dotenv";
 import { StatusCodes } from "http-status-codes";
 

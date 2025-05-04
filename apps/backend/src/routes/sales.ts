@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { db } from "@/db";
-import { sales } from "@/schema";
+import { db } from "../db";
+import { sales } from "../schema";
 import { StatusCodes } from "http-status-codes";
 
 const router = Router();

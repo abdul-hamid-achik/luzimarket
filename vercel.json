@@ -15,32 +15,29 @@
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "buildCommand": "npm run build:frontend",
+        "buildCommand": "npm run build",
         "distDir": "apps/frontend/dist"
       }
     },
     {
-      "src": "apps/backend/src/index.ts",
+      "src": "apps/backend/dist/index.js",
       "use": "@vercel/node",
       "config": {
-        "runtime": "nodejs22.x"
+        "runtime": "nodejs22.x",
+        "includeFiles": [
+          "apps/backend/tsconfig.json",
+          "tsconfig.base.json"
+        ]
       }
     }
   ],
-  "functions": {
-    "apps/backend/src/index.ts": {
-      "includeFiles": [
-        "apps/backend/tsconfig.json"
-      ]
-    }
-  },
   "routes": [
     {
       "handle": "filesystem"
     },
     {
       "src": "/api/(.*)",
-      "dest": "apps/backend/src/index.ts"
+      "dest": "apps/backend/dist/index.js"
     },
     {
       "src": "^/(.*)$",

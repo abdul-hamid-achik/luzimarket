@@ -1,14 +1,14 @@
 import { Router } from "express";
 import { z } from "zod";
-import { authenticateJWT } from "@/middleware/auth";
-import { validate } from "@/utils/validate";
+import { authenticateJWT } from "../middleware/auth";
+import { validate } from "../utils/validate";
 import {
   createProduct,
   getProducts,
   getProduct,
   updateProduct,
   deleteProduct,
-} from "@/controllers/productController";
+} from "../controllers/productController";
 
 const router = Router();
 
