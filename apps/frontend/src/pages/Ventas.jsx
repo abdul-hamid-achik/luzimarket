@@ -21,24 +21,30 @@ function Ventas() {
   return (
     <div className="container Ventas">
       <div className="ContainerOrderStatus">
-        <OrderStatus
-          icon={<FaRegCheckCircle />}
-          orderCount={57}
-          title="new orders"
-          status="Awaiting processing"
-        />
-        <OrderStatus
-          icon={<FaRegPauseCircle />}
-          orderCount={5}
-          title="orders"
-          status="On Hold"
-        />
-        <OrderStatus
-          icon={<FaRegTimesCircle />}
-          orderCount={15}
-          title="products"
-          status="Out of stock"
-        />
+        <div className="card">
+          <OrderStatus
+            icon={<FaRegCheckCircle />}
+            orderCount={57}
+            title="new orders"
+            status="Awaiting processing"
+          />
+        </div>
+        <div className="card">
+          <OrderStatus
+            icon={<FaRegPauseCircle />}
+            orderCount={5}
+            title="orders"
+            status="On Hold"
+          />
+        </div>
+        <div className="card">
+          <OrderStatus
+            icon={<FaRegTimesCircle />}
+            orderCount={15}
+            title="products"
+            status="Out of stock"
+          />
+        </div>
       </div>
       <hr />
       <div className="container Ventas">

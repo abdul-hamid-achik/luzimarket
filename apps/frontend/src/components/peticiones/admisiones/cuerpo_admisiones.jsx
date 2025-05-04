@@ -9,9 +9,6 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@
 function TablaAdmisiones() {
   const { data: admissions = [], isLoading, error } = useAdmissionPetitions();
 
-  if (isLoading) return <div>Loading admission petitions...</div>;
-  if (error) return <div>Error loading admission petitions.</div>;
-
   return (
     <div className="container mt-5 p-5 overflow-y-auto">
       <nav aria-label="breadcrumb">
@@ -43,7 +40,7 @@ function TablaAdmisiones() {
       </nav>
 
       <div className="container p-5 ">
-        <table className="table table-borderless ">
+        <table className="table table-borderless">
           <thead className="thead-light">
             <tr>
               <th className="text-body-tertiary">Nombre</th>
@@ -53,10 +50,10 @@ function TablaAdmisiones() {
             </tr>
           </thead>
           <tbody>
-            {admissions.length === 0 ? (
+            {(isLoading || admissions.length === 0) ? (
               <tr>
                 <td colSpan={4} className="text-center text-secondary">
-                  No hay peticiones de admisión.
+                  {isLoading ? 'Loading admission petitions...' : 'No hay peticiones de admisión.'}
                 </td>
               </tr>
             ) : (
@@ -96,7 +93,7 @@ function TablaAdmisiones() {
                           Aceptar
                         </DropdownItem>
                         <DropdownItem key="Editar">
-                          <Link to={`/inicio/peticiones/Productos/${admission.id || ""}`}>Editar</Link>
+                          <Link to={`/inicio/peticiones/productos/${admission.id || ""}`}>Editar</Link>
                         </DropdownItem>
                         <DropdownItem key="Borrar">Borrar</DropdownItem>
                       </DropdownMenu>

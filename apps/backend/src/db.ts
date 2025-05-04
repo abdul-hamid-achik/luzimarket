@@ -43,6 +43,11 @@ export function getDb() {
       statement_timeout: 15000, // 15 seconds
     });
 
+    // Add error listener for unexpected pool errors
+    _pool.on('error', (err: Error) => {
+      console.error('Unexpected Postgres pool error', err);
+    });
+
     // Initialize db with the pool
     _db = drizzle(_pool);
   }
@@ -67,3 +72,13 @@ export async function closePool() {
     _db = null;
   }
 }
+
+// Add graceful shutdown hooks to close the pool when the process exits
+process.on('SIGTERM', async () => {
+  console.log('SIGTERM received: closing database pool');
+  await closePool();
+});
+process.on('SIGINT', async () => {
+  console.log('SIGINT received: closing database pool');
+  await closePool();
+});

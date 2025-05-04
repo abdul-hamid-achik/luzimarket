@@ -20,7 +20,7 @@
     "test": "npm run test:backend && npm run test:frontend",
     "test:backend": "npm --workspace=apps/backend run test",
     "test:frontend": "npm run test:e2e",
-    "postinstall": "playwright install",
+    "postinstall": "if [ \"$VERCEL\" ]; then echo 'Skipping Playwright install on Vercel'; else playwright install; fi",
     "test:e2e": "playwright test",
     "migrate:generate": "npm --workspace=apps/backend run migrate:generate",
     "migrate:up": "npm --workspace=apps/backend run migrate:up",

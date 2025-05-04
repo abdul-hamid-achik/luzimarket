@@ -29,7 +29,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // add health endpoint for Docker HEALTHCHECK and CI readiness
-app.get('/health', (_req, res) => res.sendStatus(StatusCodes.OK));
+app.get('/api/health', (_req, res) => res.sendStatus(StatusCodes.OK));
 
 // Mount API routes only when not testing
 if (process.env.NODE_ENV !== 'test') {
