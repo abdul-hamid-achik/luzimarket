@@ -6,8 +6,7 @@
   },
   "build": {
     "env": {
-      "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1",
-      "npm_config_ignore_scripts": "true"
+      "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1"
     }
   },
   "builds": [
@@ -26,7 +25,8 @@
         "runtime": "nodejs22.x",
         "includeFiles": [
           "apps/backend/tsconfig.json",
-          "tsconfig.base.json"
+          "tsconfig.base.json",
+          "node_modules/bcrypt/lib/binding/**"
         ]
       }
     }
