@@ -5,8 +5,11 @@ import http from "http";
 
 dotenv.config();
 
-// Export handler for serverless deployments
-export const handler = serverless(app);
+// Create the serverless handler for Vercel
+const handler = serverless(app);
+
+// Export using TypeScript "export =" which compiles to CommonJS module.exports
+export = handler;
 
 // Function to try starting the server on a given port
 function startServer(port: number) {

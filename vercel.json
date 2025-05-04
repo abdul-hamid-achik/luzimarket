@@ -22,15 +22,7 @@
       "src": "apps/backend/dist/index.js",
       "use": "@vercel/node",
       "config": {
-        "runtime": "nodejs22.x",
-        "includeFiles": [
-          "apps/backend/tsconfig.json",
-          "tsconfig.base.json",
-          "node_modules/bcrypt/lib/binding/**"
-        ],
-        "externalModules": [
-          "bcrypt"
-        ]
+        "runtime": "nodejs22.x"
       }
     }
   ],
