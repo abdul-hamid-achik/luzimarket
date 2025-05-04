@@ -37,7 +37,7 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
 
   let total = 0;
   const itemDetails = await Promise.all(
-    items.map(async (item) => {
+    items.map(async (item: any) => {
       const prod = (await db
         .select({ price: products.price })
         .from(products)

@@ -26,7 +26,7 @@ async function main() {
 
     // Map category names to IDs
     const dbCats = await db.select().from(categories);
-    const catMap = new Map(dbCats.map((c) => [c.name, c.id]));
+    const catMap = new Map(dbCats.map((c: any) => [c.name, c.id]));
 
     // Seed products
     console.log('Seeding products...');

@@ -3,12 +3,16 @@ import app from "./app";
 import serverless from "serverless-http";
 import http from "http";
 
+// Configure environment as early as possible
 dotenv.config();
 
-// Create the serverless handler for Vercel
+console.log(`Starting server in ${process.env.NODE_ENV || 'development'} mode`);
+
+// Create handler but don't initialize database until first request
 const handler = serverless(app);
 
 // Export using TypeScript "export =" which compiles to CommonJS module.exports
+// This creates proper handler for Vercel serverless function
 export = handler;
 
 // Function to try starting the server on a given port
@@ -46,7 +50,8 @@ async function tryNextPort(portsToTry: number[], basePort: number) {
   }
 }
 
-// Fallback to run locally with port fallback logic
+// Fallback to run locally with port fallback logic 
+// This only executes when directly running the script, not in serverless
 if (require.main === module) {
   const basePort = process.env.PORT ? parseInt(process.env.PORT) : 5000;
   const portsToTry = [basePort, basePort + 1, basePort + 2, basePort + 3];

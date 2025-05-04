@@ -22,7 +22,11 @@
       "src": "apps/backend/dist/index.js",
       "use": "@vercel/node",
       "config": {
-        "runtime": "nodejs22.x"
+        "runtime": "nodejs22.x",
+        "maxDuration": 60,
+        "regions": "all",
+        "memory": 1024,
+        "useFluidCompute": true
       }
     }
   ],
@@ -32,7 +36,11 @@
     },
     {
       "src": "/api/(.*)",
-      "dest": "apps/backend/dist/index.js"
+      "dest": "apps/backend/dist/index.js",
+      "continue": true,
+      "headers": {
+        "cache-control": "s-maxage=0"
+      }
     },
     {
       "src": "^/(.*)$",
