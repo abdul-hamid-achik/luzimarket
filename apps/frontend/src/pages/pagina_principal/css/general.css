@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
     width: 100%;
     overflow-x: hidden;
     overflow-y: auto;
@@ -80,12 +81,13 @@ html, body {
     margin: 0;
     padding: 0;
     display: flex;
+    gap: 2rem;
 }
 
 .ImagenTextoBanner {
-    width: 35rem;
-    margin-top: -8rem;
-    margin-bottom: 2rem;
+    width: 100%;
+    height: auto;
+    margin: 0 0 2rem;
 }
 
 .BannerSecundario {
@@ -94,7 +96,6 @@ html, body {
     justify-content: center;
     align-items: center;
     font-family: var(--fontLandingPage);
-    margin-left: 2.7rem;
 }
 
 .BannerSecundario p {
@@ -106,8 +107,8 @@ html, body {
 }
 
 .bannerOferta {
-    background: rgb(255,89,33);
-    background: linear-gradient(90deg, rgba(255,89,33,1) 0%, rgba(255,220,0,1) 52%, rgba(234,180,215,1) 100%);
+    background: rgb(255, 89, 33);
+    background: linear-gradient(90deg, rgba(255, 89, 33, 1) 0%, rgba(255, 220, 0, 1) 52%, rgba(234, 180, 215, 1) 100%);
     padding: 15px;
 }
 
@@ -163,9 +164,10 @@ html, body {
     margin-right: 1rem;
     border: 1px solid #000;
     border-radius: 0px;
-    
+
 }
-.cajaTodosLosProductos .card img{
+
+.cajaTodosLosProductos .card img {
     border-radius: 0px;
     height: 15rem;
 }
@@ -176,7 +178,7 @@ html, body {
     margin-bottom: 2rem;
 }
 
-.tituloLogo{
+.tituloLogo {
     display: flex;
     margin-left: -1rem;
 }
@@ -198,9 +200,11 @@ html, body {
 .Banners .BannerPrincipal img {
     width: 100%;
 }
+
 .Banners .BannerSecundario img {
     width: 100%;
 }
+
 /*RESPONSIVE PAGINA PRINCIPAL*/
 
 
@@ -208,6 +212,7 @@ html, body {
     .Banners .BannerPrincipal img {
         width: auto;
     }
+
     .Banners .BannerSecundario img {
         width: auto;
     }
@@ -217,6 +222,7 @@ html, body {
     .Banners .BannerPrincipal img {
         width: 47rem;
     }
+
     .Banners .BannerSecundario img {
         width: 47rem;
     }
@@ -226,6 +232,7 @@ html, body {
     .Banners .BannerPrincipal img {
         width: 50rem;
     }
+
     .Banners .BannerSecundario img {
         width: 50rem;
     }
@@ -235,6 +242,7 @@ html, body {
     .Banners .BannerPrincipal img {
         width: 53rem;
     }
+
     .Banners .BannerSecundario img {
         width: 50rem;
     }
@@ -244,8 +252,13 @@ html, body {
     .Banners .BannerPrincipal img {
         width: 60rem;
     }
+
     .Banners .BannerSecundario img {
         width: 55rem;
     }
 }
 
+.Banners>.BannerPrincipal,
+.Banners>.BannerSecundario {
+    flex: 1;
+}

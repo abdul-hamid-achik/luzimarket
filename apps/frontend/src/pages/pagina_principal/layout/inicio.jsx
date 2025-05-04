@@ -1,5 +1,5 @@
 // Paginas 
-import Navbars from "@/pages/pagina_principal/components/navbars/navbar_principal";
+import Navbars from "@/pages/pagina_principal/components/navbars";
 import BodyLuzi from "@/pages/pagina_principal/pages/body_luzi";
 import Footer from "@/pages/pagina_principal/components/footer";
 

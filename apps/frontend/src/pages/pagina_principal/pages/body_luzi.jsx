@@ -15,9 +15,45 @@ import "@/pages/pagina_principal/css/general.css";
 import Card from "react-bootstrap/Card";
 import { Link } from "react-router-dom";
 
+// Fallback product data in case API fails
+const fallbackProducts = [
+  {
+    id: 1,
+    name: "Producto 1",
+    description: "HAY DESIGN",
+    price: 2500,
+    imageUrl: ImagenMuestra1
+  },
+  {
+    id: 2,
+    name: "Producto 2",
+    description: "HAY DESIGN",
+    price: 2500,
+    imageUrl: ImagenMuestra2
+  },
+  {
+    id: 3,
+    name: "Producto 3",
+    description: "HAY DESIGN",
+    price: 2500,
+    imageUrl: ImagenMuestra3
+  },
+  {
+    id: 4,
+    name: "Producto 4",
+    description: "HAY DESIGN",
+    price: 2500,
+    imageUrl: ImagenMuestra4
+  }
+];
+
 const BodyLuzi = () => {
+  console.log('BodyLuzi component is rendering...');
   // Move hook call to top-level of component
-  const { data: products = [], isLoading, error } = useProducts();
+  const { data: apiProducts = [], isLoading, error } = useProducts();
+
+  // Use API products if available, otherwise use fallback products
+  const products = apiProducts.length > 0 ? apiProducts : fallbackProducts;
 
   return (
     <>
@@ -114,12 +150,24 @@ const BodyLuzi = () => {
           {isLoading ? (
             <div>Loading products...</div>
           ) : error ? (
-            <div>Error loading products.</div>
+            // Show fallback products if there's an error
+            fallbackProducts.map((product) => (
+              <Card style={{ width: '18rem' }} key={product.id}>
+                <Link to={`handpicked/productos/${product.id}`}>
+                  <Card.Img variant="top" src={product.imageUrl} />
+                </Link>
+                <Card.Body>
+                  <Card.Title>{product.name}</Card.Title>
+                  <Card.Text>{product.description}</Card.Text>
+                  <Card.Text>${product.price.toFixed(2)}</Card.Text>
+                </Card.Body>
+              </Card>
+            ))
           ) : (
             products.slice(0, 4).map((product) => (
               <Card style={{ width: '18rem' }} key={product.id}>
                 <Link to={`handpicked/productos/${product.id}`}>
-                  <Card.Img variant="top" src={product.imageUrl} />
+                  <Card.Img variant="top" src={product.imageUrl || ImagenMuestra1} />
                 </Link>
                 <Card.Body>
                   <Card.Title>{product.name}</Card.Title>
