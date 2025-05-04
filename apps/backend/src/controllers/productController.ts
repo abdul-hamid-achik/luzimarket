@@ -10,7 +10,8 @@ export const createProduct = async (req: Request, res: Response) => {
       .insert(products)
       .values(req.body)
       .returning();
-    res.status(StatusCodes.CREATED).json(product);
+    const p: any = product;
+    res.status(StatusCodes.CREATED).json({ ...p, price: parseFloat(p.price) });
   } catch (err) {
     const error = err as { message?: string };
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message || "Internal server error" });
@@ -19,7 +20,8 @@ export const createProduct = async (req: Request, res: Response) => {
 
 export const getProducts = async (req: Request, res: Response) => {
   const prods = await db.select().from(products);
-  res.json(prods);
+  const formattedProds = prods.map((p: any) => ({ ...p, price: parseFloat(p.price) }));
+  res.json(formattedProds);
 };
 
 export const getProduct = async (req: Request, res: Response) => {
@@ -32,7 +34,8 @@ export const getProduct = async (req: Request, res: Response) => {
   if (!prod[0]) {
     return res.status(StatusCodes.NOT_FOUND).json({ error: "Product not found" });
   }
-  res.json(prod[0]);
+  const p: any = prod[0];
+  res.json({ ...p, price: parseFloat(p.price) });
 };
 
 export const updateProduct = async (req: Request, res: Response) => {
@@ -45,7 +48,8 @@ export const updateProduct = async (req: Request, res: Response) => {
   if (updated.length === 0) {
     return res.status(StatusCodes.NOT_FOUND).json({ error: "Product not found" });
   }
-  res.json(updated[0]);
+  const p: any = updated[0];
+  res.json({ ...p, price: parseFloat(p.price) });
 };
 
 export const deleteProduct = async (req: Request, res: Response) => {
