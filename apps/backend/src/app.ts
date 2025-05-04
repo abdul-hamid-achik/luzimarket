@@ -24,7 +24,8 @@ import { StatusCodes } from "http-status-codes";
 const app = express();
 
 // Middleware
-app.use(cors({ origin: process.env.CORS_ORIGIN || "*" }));
+// Allow all CORS origins (use specific origins in production via CORS_ORIGIN env var)
+app.use(cors());
 app.use(bodyParser.json());
 
 // add health endpoint for Docker HEALTHCHECK and CI readiness

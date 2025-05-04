@@ -9,6 +9,7 @@
     "dev": "concurrently --kill-others --handle-input --raw \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "npm --workspace=apps/frontend run dev",
     "dev:backend": "npm --workspace=apps/backend run dev",
+    "deploy": "npx vercel@latest --prod",
     "build": "npm run build:backend && npm run build:frontend",
     "build:frontend": "npm --workspace=apps/frontend run build",
     "build:backend": "npm --workspace=apps/backend run build",
