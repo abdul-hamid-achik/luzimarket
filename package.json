@@ -26,7 +26,8 @@
     "migrate:up": "npm --workspace=apps/backend run migrate:up",
     "migrate:down": "npm --workspace=apps/backend run migrate:down",
     "migrate:push": "npm --workspace=apps/backend run migrate:push",
-    "seed:backend": "npm --workspace=apps/backend run seed"
+    "migrate:pull": "npm --workspace=apps/backend run migrate:pull",
+    "seed": "npm --workspace=apps/backend run seed"
   },
   "devDependencies": {
     "@playwright/test": "^1.37.1",

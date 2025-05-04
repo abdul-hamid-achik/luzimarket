@@ -43,10 +43,12 @@ COPY --from=builder /app/apps/backend/dist ./dist
 # Generate runtime tsconfig.json for alias mapping
 RUN echo '{"compilerOptions":{"baseUrl":".","paths":{"@/*":["dist/*"]}}}' > tsconfig.json
 
-EXPOSE 5000
+ARG PORT=5000
+ENV PORT=${PORT}
+EXPOSE ${PORT}
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-    CMD curl --fail http://localhost:5000/health || exit 1
+    CMD curl --fail http://localhost:${PORT}/health || exit 1
 
 CMD ["node", "-r", "tsconfig-paths/register", "dist/index.js"]
