@@ -19,30 +19,30 @@ import { Link } from "react-router-dom";
 const fallbackProducts = [
   {
     id: 1,
-    name: "Producto 1",
-    description: "HAY DESIGN",
-    price: 2500,
+    name: "Bouquet de Rosas",
+    description: "Hermoso ramo de rosas frescas para momentos especiales.",
+    price: 650,
     imageUrl: ImagenMuestra1
   },
   {
     id: 2,
-    name: "Producto 2",
-    description: "HAY DESIGN",
-    price: 2500,
+    name: "Caja de Donas",
+    description: "Selección de donas artesanales (6 piezas).",
+    price: 150,
     imageUrl: ImagenMuestra2
   },
   {
     id: 3,
-    name: "Producto 3",
-    description: "HAY DESIGN",
+    name: "Experiencia Cena",
+    description: "Cena para dos con decoración especial y menú de 3 tiempos.",
     price: 2500,
     imageUrl: ImagenMuestra3
   },
   {
     id: 4,
-    name: "Producto 4",
-    description: "HAY DESIGN",
-    price: 2500,
+    name: "Juego de Tazas",
+    description: "Set de 4 tazas cerámicas coloridas.",
+    price: 350,
     imageUrl: ImagenMuestra4
   }
 ];

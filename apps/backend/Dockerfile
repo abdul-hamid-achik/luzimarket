@@ -49,6 +49,6 @@ EXPOSE ${PORT}
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-    CMD curl --fail http://localhost:${PORT}/health || exit 1
+    CMD curl --fail http://localhost:${PORT}/api/health || exit 1
 
 CMD ["node", "-r", "tsconfig-paths/register", "dist/index.js"]

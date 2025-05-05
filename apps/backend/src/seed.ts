@@ -1,102 +1,72 @@
-import dotenv from 'dotenv';
-import { db } from '@/db';
-import { eq } from 'drizzle-orm';
-import { categories, products, sales, states as statesTable, adminOrders as adminOrdersTable } from '@/schema';
+import 'dotenv/config';
+import { Pool } from 'pg';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import * as schema from '@/schema';
+import { reset, seed } from 'drizzle-seed';
 import { Categories } from '@/data/categoriesData';
 import { Products } from '@/data/productsData';
 import { Sales } from '@/data/salesData';
-import { States } from '@/data/statesData';
+import { States as StateSeeds } from '@/data/statesData';
 import { AdminOrders } from '@/data/adminOrdersData';
 
-dotenv.config();
-
 async function main() {
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const db = drizzle(pool);
+
   try {
-    // Seed categories
-    console.log('Seeding categories...');
-    for (const cat of Categories) {
-      const exists = await db
-        .select()
-        .from(categories)
-        .where(eq(categories.name, cat.name));
-      if (exists.length === 0) {
-        await db.insert(categories).values({ name: cat.name }).returning();
-      }
-    }
+    console.log('Resetting database...');
+    await reset(db, schema);
 
-    // Map category names to IDs
-    const dbCats = await db.select().from(categories);
-    const catMap = new Map(dbCats.map((c: any) => [c.name, c.id]));
+    console.log('Seeding database with static arrays...');
+    await seed(db, schema).refine((f: any) => ({
+      categories: {
+        count: Categories.length,
+        columns: { name: f.valuesFromArray({ values: Categories.map(c => c.name), isUnique: true }) },
+      },
+      products: {
+        count: Products.length,
+        columns: {
+          name: f.valuesFromArray({ values: Products.map(p => p.name), isUnique: true }),
+          description: f.valuesFromArray({ values: Products.map(p => p.description) }),
+          price: f.valuesFromArray({ values: Products.map(p => p.price) }),
+          categoryId: f.valuesFromArray({ values: Products.map(p => Categories.findIndex(c => c.name === p.category) + 1) }),
+          imageUrl: f.valuesFromArray({ values: Products.map(p => p.imageUrl) }),
+        },
+      },
+      sales: {
+        count: Sales.length,
+        columns: {
+          date: f.valuesFromArray({ values: Sales.map(s => new Date(s.date)) }),
+          amount: f.valuesFromArray({ values: Sales.map(s => s.May) }),
+        },
+      },
+      states: {
+        count: StateSeeds.length,
+        columns: {
+          value: f.valuesFromArray({ values: StateSeeds.map(s => s.value), isUnique: true }),
+          label: f.valuesFromArray({ values: StateSeeds.map(s => s.label), isUnique: true }),
+        },
+      },
+      adminOrders: {
+        count: AdminOrders.length,
+        columns: {
+          id: f.valuesFromArray({ values: AdminOrders.map(o => o.id), isUnique: true }),
+          total: f.valuesFromArray({ values: AdminOrders.map(o => o.total) }),
+          cliente: f.valuesFromArray({ values: AdminOrders.map(o => o.cliente) }),
+          estadoPago: f.valuesFromArray({ values: AdminOrders.map(o => o.estadoPago) }),
+          estadoOrden: f.valuesFromArray({ values: AdminOrders.map(o => o.estadoOrden) }),
+          tipoEnvio: f.valuesFromArray({ values: AdminOrders.map(o => o.tipoEnvio) }),
+          fecha: f.valuesFromArray({ values: AdminOrders.map(o => o.fecha) }),
+        },
+      },
+    }));
 
-    // Seed products
-    console.log('Seeding products...');
-    for (const p of Products) {
-      const catId = catMap.get(p.category);
-      if (!catId) {
-        console.warn(`Category not found for product: ${p.name}`);
-        continue;
-      }
-      const prodExists = await db
-        .select()
-        .from(products)
-        .where(eq(products.name, p.name));
-      if (prodExists.length === 0) {
-        await db.insert(products)
-          .values({
-            name: p.name,
-            description: p.description,
-            price: p.price.toString(),
-            categoryId: catId,
-            imageUrl: p.imageUrl,
-          })
-          .returning();
-      }
-    }
-
-    // Seed sales data
-    console.log('Seeding sales data...');
-    for (const entry of Sales) {
-      const dateObj = new Date(entry.date);
-      const saleExists = await db
-        .select()
-        .from(sales)
-        .where(eq(sales.date, dateObj));
-      if (saleExists.length === 0) {
-        await db.insert(sales)
-          .values({ date: dateObj, amount: entry.May })
-          .returning();
-      }
-    }
-    // Seed states data
-    console.log('Seeding states data...');
-    for (const st of States) {
-      const exists = await db.select().from(statesTable).where(eq(statesTable.value, st.value));
-      if (exists.length === 0) {
-        await db.insert(statesTable).values({ label: st.label, value: st.value }).returning();
-      }
-    }
-
-    // Seed admin orders data
-    console.log('Seeding admin orders data...');
-    for (const ord of AdminOrders) {
-      const existsOrd = await db.select().from(adminOrdersTable).where(eq(adminOrdersTable.id, ord.id));
-      if (existsOrd.length === 0) {
-        await db.insert(adminOrdersTable).values({
-          id: ord.id,
-          total: ord.total,
-          cliente: ord.cliente,
-          estadoPago: ord.estadoPago,
-          estadoOrden: ord.estadoOrden,
-          tipoEnvio: ord.tipoEnvio,
-          fecha: ord.fecha,
-        }).returning();
-      }
-    }
     console.log('Seed completed');
   } catch (err) {
     console.error('Seed error:', err);
+    process.exit(1);
   } finally {
-    process.exit(0);
+    await pool.end();
   }
 }
 

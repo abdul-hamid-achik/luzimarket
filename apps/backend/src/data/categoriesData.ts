@@ -4,9 +4,8 @@ export interface CategorySeed {
 }
 
 export const Categories: CategorySeed[] = [
-  { name: 'Electronics' },
-  { name: 'Books' },
-  { name: 'Clothing' },
-  { name: 'Home & Kitchen' },
-  { name: 'Toys' },
+  { name: 'Flowershop' },
+  { name: 'Sweet' },
+  { name: 'Events + Dinners' },
+  { name: 'Giftshop' },
 ];
