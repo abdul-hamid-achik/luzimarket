@@ -57,7 +57,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install dependencies
-        run: npm install --ignore-scripts
+        run: npm ci --silent --ignore-scripts
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps

@@ -59,7 +59,7 @@
     "styled-components": "^5.3.11",
     "web-vitals": "^2.1.4",
     "tinacms": "^1.2.0",
-    "@tinacms/graphql": "^0.66.0",
+    "@tinacms/graphql": "^1.2.0",
     "graphql-request": "^5.0.0",
     "graphql": "^16.6.0"
   },
