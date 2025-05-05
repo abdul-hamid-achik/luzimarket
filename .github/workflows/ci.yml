@@ -64,10 +64,10 @@ jobs:
           done
 
       - name: Run migrations
-        run: docker compose exec -T backend npm run migrate:up
+        run: docker compose exec -T backend npm run migrate:push
 
       - name: Seed database
-        run: docker compose exec -T backend npm run seed:backend
+        run: docker compose exec -T backend npm run seed
 
       - name: Wait for frontend
         run: |
