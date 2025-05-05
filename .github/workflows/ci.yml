@@ -29,14 +29,18 @@ jobs:
           APPEND_PORT: 'db:5432'
           ALLOW_ADDR_REGEX: '.*'
           LOG_TRAFFIC: 'true'
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
     env:
       TAG: ${{ github.sha }}
       DATABASE_URL: postgres://postgres:password@db:5432/ecommerce
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       CORS_ORIGIN: http://localhost:5173
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-      VITE_API_URL: http://localhost:5173
-      PORT: 5000
+      VITE_API_URL: http://localhost:5173/api
+      PORT: 6000
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -53,7 +57,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install dependencies
-        run: npm ci --silent --ignore-scripts
+        run: npm ci --ignore-scripts
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
