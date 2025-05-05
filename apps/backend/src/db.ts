@@ -18,7 +18,6 @@ let _pool: any | null = null;
 
 export function getDb() {
   if (!_db) {
-    // Only create the pool when getDb is first called
     console.log('Initializing database connection pool');
 
     // Set timeout values that respect Vercel serverless constraints
@@ -34,20 +33,18 @@ export function getDb() {
       throw new Error('No database connection string provided');
     }
 
+    // Always use Postgres driver/pool in non-serverless contexts
     _pool = new Pool({
       connectionString,
       max,
       connectionTimeoutMillis: connectionTimeoutMs,
       idleTimeoutMillis: idleTimeoutMs,
-      // Add statement timeout to prevent hanging queries
-      statement_timeout: 15000, // 15 seconds
+      statement_timeout: 15000,
     });
-
     // Add error listener for unexpected pool errors
     _pool.on('error', (err: Error) => {
       console.error('Unexpected Postgres pool error', err);
     });
-
     // Initialize db with the pool
     _db = drizzle(_pool);
   }

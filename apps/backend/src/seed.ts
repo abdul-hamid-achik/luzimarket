@@ -1,6 +1,5 @@
 import 'dotenv/config';
-import { Pool } from 'pg';
-import { drizzle } from 'drizzle-orm/node-postgres';
+// removed static drizzle import; we'll dynamically load the correct driver below
 import * as schema from '@/schema';
 import { reset, seed } from 'drizzle-seed';
 import { Categories } from '@/data/categoriesData';
@@ -10,8 +9,20 @@ import { States as StateSeeds } from '@/data/statesData';
 import { AdminOrders } from '@/data/adminOrdersData';
 
 async function main() {
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-  const db = drizzle(pool);
+  const url = process.env.DATABASE_URL!;
+  let db: any;
+  let pool: any;
+  if (url.startsWith('postgres://') || url.startsWith('postgresql://')) {
+    const { Pool } = await import('pg');
+    const { drizzle } = await import('drizzle-orm/node-postgres');
+    pool = new Pool({ connectionString: url });
+    db = drizzle(pool);
+  } else if (url.startsWith('http://') || url.startsWith('https://')) {
+    const { drizzle } = await import('drizzle-orm/neon-http');
+    db = drizzle(url);
+  } else {
+    throw new Error(`Unsupported DATABASE_URL protocol: ${url}`);
+  }
 
   try {
     console.log('Resetting database...');
@@ -66,7 +77,10 @@ async function main() {
     console.error('Seed error:', err);
     process.exit(1);
   } finally {
-    await pool.end();
+    if (pool) {
+      console.log('Closing pool');
+      await pool.end();
+    }
   }
 }
 
