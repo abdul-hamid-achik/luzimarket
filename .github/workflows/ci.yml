@@ -17,7 +17,8 @@ jobs:
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       CORS_ORIGIN: http://localhost:5173
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-      VITE_API_URL: http://localhost:5000
+      VITE_API_URL: http://localhost:5173
+      PORT: 5000
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -45,10 +46,11 @@ jobs:
       - name: Generate .env file
         run: |
           echo "DATABASE_URL=${DATABASE_URL}" > .env
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "JWT_SECRET=${JWT_SECRET}" >> .env
           echo "CORS_ORIGIN=${CORS_ORIGIN}" >> .env
-          echo "STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}" >> .env
+          echo "STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}" >> .env
           echo "VITE_API_URL=${VITE_API_URL}" >> .env
+          echo "PORT=${PORT}" >> .env
 
       - name: Build & start services
         run: docker compose up -d --build
@@ -56,7 +58,7 @@ jobs:
       - name: Wait for backend
         run: |
           for i in {1..30}; do
-            curl --fail http://localhost:5000/health && break
+            curl --fail http://localhost:${PORT}/health && break
             echo "Waiting for backend..."
             sleep 2
           done
