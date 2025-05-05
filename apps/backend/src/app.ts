@@ -1,4 +1,8 @@
 import express from "express";
+import { graphqlHTTP } from 'express-graphql';
+import { createSchema } from '@tinacms/graphql';
+import { FileSystem } from '@tinacms/git-client';
+import tinaConfig from '../.tina/schema';
 import cors from "cors";
 import bodyParser from "body-parser";
 import swaggerUi from "swagger-ui-express";
@@ -31,24 +35,31 @@ app.use(bodyParser.json());
 // add health endpoint for Docker HEALTHCHECK and CI readiness
 app.get('/api/health', (_req, res) => res.sendStatus(StatusCodes.OK));
 
-// Mount API routes only when not testing
-if (process.env.NODE_ENV !== 'test') {
-  // Use require() to defer loading
-  app.use("/api/auth", authRoutes);
-  app.use("/api/categories", categoryRoutes);
-  app.use("/api/products", productRoutes);
-  app.use("/api/cart", cartRoutes);
-  app.use("/api/orders", orderRoutes);
-  app.use("/api/sales", salesRoutes);
-  app.use("/api/petitions", petitionsRoutes);
-  app.use("/api/petitions/admissions", admissionsRoutes);
-  app.use("/api/petitions/products", petitionProductsRoutes);
-  app.use("/api/petitions/branches", branchPetitionsRoutes);
-  app.use("/api/states", statesRoutes);
-  app.use("/api/admin/orders", adminOrdersRoutes);
-}
+// Mount API routes
+app.use('/api/auth', authRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/sales', salesRoutes);
+app.use('/api/petitions', petitionsRoutes);
+app.use('/api/petitions/admissions', admissionsRoutes);
+app.use('/api/petitions/products', petitionProductsRoutes);
+app.use('/api/petitions/branches', branchPetitionsRoutes);
+app.use('/api/states', statesRoutes);
+app.use('/api/admin/orders', adminOrdersRoutes);
 
 // Swagger
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// Tina CMS GraphQL API
+const tinaSchema = createSchema({
+  config: { rootPath: process.cwd(), branch: process.env.GIT_BRANCH || 'main' },
+  collections: tinaConfig.collections,
+  client: new FileSystem(),
+});
+app.use(
+  '/admin/graphql',
+  graphqlHTTP({ schema: tinaSchema, graphiql: true }),
+);
 
 export default app;

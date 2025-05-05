@@ -9,6 +9,7 @@ import * as petitionsBranchesApi from "./petitionsBranches";
 import * as petitionsApi from "./petitions";
 import * as statesApi from "./states";
 import * as adminOrdersApi from "./adminOrders";
+import * as categoriesApi from "./categories";
 
 export const useProducts = () =>
   useQuery(['products'], productsApi.getProducts);
@@ -74,10 +75,10 @@ export const useAdminOrders = () =>
 
 export const useOrder = (orderId) =>
   useQuery(['order', orderId], () => ordersApi.getOrder(orderId));
-  
+
 export const useSales = () =>
   useQuery(['sales'], salesApi.getSales);
-  
+
 export const useAdmissionPetitions = () =>
   useQuery(['admissionPetitions'], petitionsAdmissionsApi.getAdmissionPetitions);
 
@@ -86,10 +87,12 @@ export const useProductPetitions = () =>
 
 export const useBranchPetitions = () =>
   useQuery(['branchPetitions'], petitionsBranchesApi.getBranchPetitions);
-  
+
 export const usePetitions = () =>
   useQuery(['petitions'], petitionsApi.getPetitions);
-  
+
 export const useStates = () =>
   useQuery(['states'], statesApi.getStates);
-  
+
+export const useCategories = () =>
+  useQuery(['categories'], categoriesApi.getCategories);

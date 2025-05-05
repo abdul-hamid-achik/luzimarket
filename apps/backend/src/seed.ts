@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import { WebSocket } from 'ws';
 import { neonConfig } from '@neondatabase/serverless';
-import { URL } from 'url';
 // removed static drizzle import; we'll dynamically load the correct driver below
 import * as schema from '@/schema';
 import { reset, seed } from 'drizzle-seed';

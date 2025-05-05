@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { db } from '../db';
-import { adminOrders } from '../schema';
+import { db } from '@/db';
+import { adminOrders } from '@/schema';
 
 const router = Router();
 

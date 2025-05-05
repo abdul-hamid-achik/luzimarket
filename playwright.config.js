@@ -9,7 +9,7 @@ module.exports = defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: [ ['list'], ['html', { open: 'never' }] ],
+  reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL: 'http://localhost:5173',
     actionTimeout: 0,
@@ -19,7 +19,7 @@ module.exports = defineConfig({
   },
   webServer: {
     // Start DB & backend via Docker Compose, run migrations & seed, then launch frontend
-    command: 'docker-compose up -d && npm run migrate:up && npm run seed:backend && npm run dev:frontend',
+    command: 'docker-compose up -d && npm run migrate:up && npm run seed && npm run dev:frontend',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
   },

@@ -4,19 +4,31 @@ import { RouterProvider } from "react-router-dom";
 import { router } from "./router";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { TinaProvider, TinaCMS } from 'tinacms';
+import { TinaGraphQLClient } from '@tinacms/graphql';
+import { GraphQLClient } from 'graphql-request';
 import { AuthProvider } from "./context/auth_context";
 
 console.log('Application is starting to render...');
 
 const queryClient = new QueryClient();
+// TinaCMS setup
+const graphQLClient = new GraphQLClient('/admin/graphql');
+const cms = new TinaCMS({
+  apis: { tina: new TinaGraphQLClient({ client: graphQLClient }) },
+  sidebar: true,
+  enabled: true,
+});
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
+  <TinaProvider cms={cms}>
+    <React.StrictMode>
     <AuthProvider>
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </AuthProvider>
-  </React.StrictMode>
+    </React.StrictMode>
+  </TinaProvider>
 );

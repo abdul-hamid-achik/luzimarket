@@ -1,9 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.DEV
-    ? import.meta.env.VITE_API_URL || 'http://localhost:6000/api'
-    : '/api',
+  baseURL: import.meta.env.VITE_API_URL || '/api',
 });
 // Attach JWT token from sessionStorage to headers if present
 api.interceptors.request.use((config) => {

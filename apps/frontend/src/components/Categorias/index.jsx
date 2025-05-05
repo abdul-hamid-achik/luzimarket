@@ -12,6 +12,10 @@ import {
   FaBook,
 } from "react-icons/fa";
 
+import { useCategories } from '@/api/hooks';
+import CategoryItem from './cat_item';
+import { FaTags } from 'react-icons/fa'; // fallback icon
+
 const CatSlider = () => {
   var settings = {
     infinite: true,
@@ -49,97 +53,28 @@ const CatSlider = () => {
     cssEase: "linear",
   };
 
+  // Fetch categories dynamically
+  const { data: categories = [], isLoading, error } = useCategories();
+
+  if (isLoading) {
+    return <p>Loading categories...</p>;
+  }
+  if (error) {
+    return <p className="text-danger">Error loading categories: {error.message}</p>;
+  }
+
   return (
     <>
       <div className="catSliderSection">
         <div className="container-fluid">
-          <Slider
-            {...settings}
-            className="cat_slider_Main"
-            id="cat_slider_Main"
-          >
-            {/* CATEGORIAS */}
-            <div className="item">
-              <div className="info">
-                <span className="icon">
-                  <FaGlasses />
-                </span>
-                <h5>Lentes</h5>
-              </div>
-            </div>
-            <div className="item">
-              <div className="info">
-                <span className="icon">
-                  <FaTshirt />
-                </span>
-                <h5>Ropa</h5>
-              </div>
-            </div>
-            <div className="item">
-              <div className="info">
-                <span className="icon">
-                  <FaLaptop />
-                </span>
-                <h5>Electrónica</h5>
-              </div>
-            </div>
-            <div className="item">
-              <div className="info">
-                <span className="icon">
-                  <FaCamera />
-                </span>
-                <h5>Fotografía</h5>
-              </div>
-            </div>
-            <div className="item">
-              <div className="info">
-                <span className="icon">
-                  <FaBook />
-                </span>
-                <h5>Libros</h5>
-              </div>
-            </div>
-
-            <div className="item">
-              <div className="info">
-                <span className="icon">
-                  <FaGlasses />
-                </span>
-                <h5>Lentes</h5>
-              </div>
-            </div>
-            <div className="item">
-              <div className="info">
-                <span className="icon">
-                  <FaTshirt />
-                </span>
-                <h5>Ropa</h5>
-              </div>
-            </div>
-            <div className="item">
-              <div className="info">
-                <span className="icon">
-                  <FaLaptop />
-                </span>
-                <h5>Electrónica</h5>
-              </div>
-            </div>
-            <div className="item">
-              <div className="info">
-                <span className="icon">
-                  <FaCamera />
-                </span>
-                <h5>Fotografía</h5>
-              </div>
-            </div>
-            <div className="item">
-              <div className="info">
-                <span className="icon">
-                  <FaBook />
-                </span>
-                <h5>Libros</h5>
-              </div>
-            </div>
+          <Slider {...settings} className="cat_slider_Main" id="cat_slider_Main">
+            {categories.map(cat => (
+              <CategoryItem
+                key={cat.id}
+                icon={<FaTags />}
+                title={cat.name}
+              />
+            ))}
           </Slider>
         </div>
       </div>

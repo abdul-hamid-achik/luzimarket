@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
-import { register, login, guest } from "../controllers/authController";
-import { validate } from "../utils/validate";
+import { register, login, guest } from "@/controllers/authController";
+import { validate } from "@/utils/validate";
 
 const router = Router();
 

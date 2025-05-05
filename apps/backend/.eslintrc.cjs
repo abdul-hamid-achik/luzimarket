@@ -25,6 +25,8 @@ module.exports = {
     }
   },
   rules: {
-    'no-restricted-imports': ['error', { patterns: ['../**'] }]
+    'no-restricted-imports': ['error', { patterns: ['../**'] }],
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off',
   }
 };
