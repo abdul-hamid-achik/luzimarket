@@ -40,7 +40,9 @@
     , "graphql": "^16.6.0"
     , "tinacms": "^1.2.0"
     , "@tinacms/graphql": "^0.66.0"
-    , "@tinacms/git-client": "^0.66.0"
+    /* Removed explicit git-client; using CLI to pull correct version */
+    /* , "@tinacms/git-client": "^0.66.0" */
+    , "@tinacms/cli": "^1.2.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
