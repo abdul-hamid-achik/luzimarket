@@ -1,0 +1,11 @@
+{
+  "title": "Home",
+  "body": [
+    {
+      "type": "p",
+      "children": [
+        { "text": "Welcome to your new Tina-powered site!" }
+      ]
+    }
+  ]
+}

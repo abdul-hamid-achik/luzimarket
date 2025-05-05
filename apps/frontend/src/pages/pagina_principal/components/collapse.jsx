@@ -1,53 +1,50 @@
 import "@/css/fonts.css"
 
-const CollapseDetails = () => {
+import { productDetails } from '@/data/productDetails';
+
+const CollapseDetails = ({ product }) => {
+   // Lookup accordion sections for this product
+   const sections = productDetails[product.id] || [];
+   const accordionId = `accordion-${product.id}`;
    return (
       <>
-         <div className="card" style={{ width: "30rem" }}>
+         <div className="card" style={{ width: '30rem' }}>
             <div className="card-body">
-               <h5 className="card-title">Tenis Nike Air</h5>
-               <h6 className="card-subtitle mb-2 text-muted">NIKE</h6>
-               <h6 className="card-subtitle mb-2 text-muted">$1,550</h6>
-               <p className="card-text">
-                  Some quick example text to build on the card title and make up the bulk of the card&#39;s content.
-               </p>
-               <div className="accordion accordion-flush" id="accordionFlushExample">
-                  <div className="accordion-item">
-                     <h2 className="accordion-header" id="flush-headingOne">
-                        <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-                           Accordion Item #1
-                        </button>
-                     </h2>
-                     <div id="flush-collapseOne" className="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
-                        <div className="accordion-body">
-                           Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> className. This is the first item&#39;s accordion body.
+               <h5 className="card-title">{product.name}</h5>
+               <h6 className="card-subtitle mb-2 text-muted">{product.category || ''}</h6>
+               <h6 className="card-subtitle mb-2 text-muted">${product.price.toFixed(2)}</h6>
+               <p className="card-text">{product.description}</p>
+               <div className="accordion accordion-flush" id={accordionId}>
+                  {sections.map((sec, idx) => {
+                     const hdrId = `heading-${product.id}-${idx}`;
+                     const collapseId = `collapse-${product.id}-${idx}`;
+                     return (
+                        <div className="accordion-item" key={idx}>
+                           <h2 className="accordion-header" id={hdrId}>
+                              <button
+                                 className={`accordion-button ${idx !== 0 ? 'collapsed' : ''}`}
+                                 type="button"
+                                 data-bs-toggle="collapse"
+                                 data-bs-target={`#${collapseId}`}
+                                 aria-expanded={idx === 0}
+                                 aria-controls={collapseId}
+                              >
+                                 {sec.title}
+                              </button>
+                           </h2>
+                           <div
+                              id={collapseId}
+                              className={`accordion-collapse collapse ${idx === 0 ? 'show' : ''}`}
+                              aria-labelledby={hdrId}
+                              data-bs-parent={`#${accordionId}`}
+                           >
+                              <div className="accordion-body">
+                                 {sec.content}
+                              </div>
+                           </div>
                         </div>
-                     </div>
-                  </div>
-                  <div className="accordion-item">
-                     <h2 className="accordion-header" id="flush-headingTwo">
-                        <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
-                           Accordion Item #2
-                        </button>
-                     </h2>
-                     <div id="flush-collapseTwo" className="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
-                        <div className="accordion-body">
-                           Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> className. This is the second item&#39;s accordion body. Let&#39;s imagine this being filled with some actual content.
-                        </div>
-                     </div>
-                  </div>
-                  <div className="accordion-item">
-                     <h2 className="accordion-header" id="flush-headingThree">
-                        <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
-                           Accordion Item #3
-                        </button>
-                     </h2>
-                     <div id="flush-collapseThree" className="accordion-collapse collapse" aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushExample">
-                        <div className="accordion-body">
-                           Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> className. This is the third item&#39;s accordion body. Nothing more exciting happening here in terms of content, but just filling up the space to make it look, at least at first glance, a bit more representative of how this would look in a real-world application.
-                        </div>
-                     </div>
-                  </div>
+                     );
+                  })}
                </div>
             </div>
          </div>

@@ -41,6 +41,10 @@
       }
     },
     {
+      "src": "/admin/graphql",
+      "dest": "apps/backend/dist/index.js"
+    },
+    {
       "handle": "filesystem"
     },
     {

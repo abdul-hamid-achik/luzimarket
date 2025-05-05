@@ -2,7 +2,7 @@ import express from "express";
 import { graphqlHTTP } from 'express-graphql';
 import { createSchema } from '@tinacms/graphql';
 import { FileSystem } from '@tinacms/git-client';
-import tinaConfig from '../.tina/schema';
+import tinaConfig from './.tina/schema';
 import cors from "cors";
 import bodyParser from "body-parser";
 import swaggerUi from "swagger-ui-express";
