@@ -1,4 +1,5 @@
-import { drizzle } from "drizzle-orm/node-postgres";
+import { drizzle as drizzlePg } from "drizzle-orm/node-postgres";
+import { drizzle as drizzleHttp } from "drizzle-orm/neon-http";
 import { Pool } from "pg";
 import dotenv from "dotenv";
 import { WebSocket } from 'ws';
@@ -6,11 +7,14 @@ import { neonConfig } from '@neondatabase/serverless';
 
 dotenv.config();
 
-// Configure Neon for serverless environments when in production
-if (process.env.NODE_ENV === 'production') {
-  neonConfig.webSocketConstructor = WebSocket;
-  neonConfig.poolQueryViaFetch = true;
-}
+// Always configure Neon HTTP/WebSocket proxy support
+neonConfig.webSocketConstructor = WebSocket;
+neonConfig.poolQueryViaFetch = true;
+// Configure local HTTP/WebSocket proxy mapping for Drizzle HTTP driver
+neonConfig.wsProxy = (host) => `${host}/v1`;
+neonConfig.useSecureWebSocket = false;
+neonConfig.pipelineTLS = false;
+neonConfig.pipelineConnect = false;
 
 // Create a singleton for the database connection
 let _db: any | null = null;
@@ -33,20 +37,33 @@ export function getDb() {
       throw new Error('No database connection string provided');
     }
 
-    // Always use Postgres driver/pool in non-serverless contexts
-    _pool = new Pool({
-      connectionString,
-      max,
-      connectionTimeoutMillis: connectionTimeoutMs,
-      idleTimeoutMillis: idleTimeoutMs,
-      statement_timeout: 15000,
-    });
-    // Add error listener for unexpected pool errors
-    _pool.on('error', (err: Error) => {
-      console.error('Unexpected Postgres pool error', err);
-    });
-    // Initialize db with the pool
-    _db = drizzle(_pool);
+    // Decide between HTTP (Neon via proxy) or Postgres driver
+    const useHttpDriver =
+      connectionString.startsWith('http://') ||
+      connectionString.startsWith('https://') ||
+      process.env.USE_NEON_HTTP === 'true';
+    if (useHttpDriver) {
+      // Use HTTP-based Neon driver
+      _db = drizzleHttp(connectionString);
+    } else {
+      // Use Postgres pool
+      const poolConfig: any = {
+        connectionString,
+        max,
+        connectionTimeoutMillis: connectionTimeoutMs,
+        idleTimeoutMillis: idleTimeoutMs,
+        statement_timeout: 15000,
+      };
+      // Fallback SSL for Neon Postgres endpoints if needed
+      if (connectionString.includes('neon.tech')) {
+        poolConfig.ssl = { rejectUnauthorized: false };
+      }
+      _pool = new Pool(poolConfig);
+      _pool.on('error', (err: Error) => {
+        console.error('Unexpected Postgres pool error', err);
+      });
+      _db = drizzlePg(_pool);
+    }
   }
 
   return _db;

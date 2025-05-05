@@ -59,9 +59,13 @@ export const productVariants = pgTable("product_variants", {
 export const carts = pgTable("carts", {
   id: serial("id").primaryKey(),
   userId: integer("user_id")
-    .notNull()
     .references(() => users.id),
+  guestId: varchar("guest_id", { length: 36 }),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
+}, (table) => {
+  return {
+    guestIdIdx: uniqueIndex("guest_id_idx").on(table.guestId),
+  };
 });
 
 export const cartItems = pgTable("cart_items", {

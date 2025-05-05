@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
-import { register, login } from "../controllers/authController";
+import { register, login, guest } from "../controllers/authController";
 import { validate } from "../utils/validate";
 
 const router = Router();
@@ -70,5 +70,18 @@ router.post("/register", validate(registerSchema), register);
  *         description: Unauthorized
  */
 router.post("/login", validate(loginSchema), login);
+
+/**
+ * @swagger
+ * /api/auth/guest:
+ *   post:
+ *     summary: Issue a guest token for anonymous users
+ *     tags:
+ *       - Auth
+ *     responses:
+ *       200:
+ *         description: Guest JWT token
+ */
+router.post("/guest", guest);
 
 export default router;

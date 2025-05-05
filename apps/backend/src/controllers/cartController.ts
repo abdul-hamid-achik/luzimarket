@@ -6,13 +6,17 @@ import { AuthRequest } from "@/middleware/auth";
 import { StatusCodes } from "http-status-codes";
 
 export const getCart = async (req: AuthRequest, res: Response) => {
-  const userId = req.user?.id;
-  if (!userId) {
+  const { id: userId, guestId } = req.user ?? {};
+  if (!userId && !guestId) {
     return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Unauthorized" });
   }
-  let cart = await db.select().from(carts).where(eq(carts.userId, userId)).limit(1);
+  const filter = userId ? eq(carts.userId, userId) : eq(carts.guestId, guestId!);
+  let cart = await db.select().from(carts).where(filter).limit(1);
   if (cart.length === 0) {
-    const [newCart] = await db.insert(carts).values({ userId }).returning();
+    const values: any = {};
+    if (userId) values.userId = userId;
+    if (guestId) values.guestId = guestId;
+    const [newCart] = await db.insert(carts).values(values).returning();
     cart = [newCart];
   }
   const items = await db
@@ -34,13 +38,17 @@ export const getCart = async (req: AuthRequest, res: Response) => {
 };
 
 export const addItemToCart = async (req: AuthRequest, res: Response) => {
-  const userId = req.user?.id;
-  if (!userId) {
+  const { id: userId, guestId } = req.user ?? {};
+  if (!userId && !guestId) {
     return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Unauthorized" });
   }
-  let cart = await db.select().from(carts).where(eq(carts.userId, userId)).limit(1);
+  const filter = userId ? eq(carts.userId, userId) : eq(carts.guestId, guestId!);
+  let cart = await db.select().from(carts).where(filter).limit(1);
   if (cart.length === 0) {
-    const [newCart] = await db.insert(carts).values({ userId }).returning();
+    const values: any = {};
+    if (userId) values.userId = userId;
+    if (guestId) values.guestId = guestId;
+    const [newCart] = await db.insert(carts).values(values).returning();
     cart = [newCart];
   }
   const { productId, variantId, quantity } = req.body;
@@ -72,11 +80,12 @@ export const removeCartItem = async (req: AuthRequest, res: Response) => {
 };
 
 export const clearCart = async (req: AuthRequest, res: Response) => {
-  const userId = req.user?.id;
-  if (!userId) {
+  const { id: userId, guestId } = req.user ?? {};
+  if (!userId && !guestId) {
     return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Unauthorized" });
   }
-  const cart = await db.select().from(carts).where(eq(carts.userId, userId)).limit(1);
+  const filter = userId ? eq(carts.userId, userId) : eq(carts.guestId, guestId!);
+  const cart = await db.select().from(carts).where(filter).limit(1);
   if (cart.length > 0) {
     await db.delete(cartItems).where(eq(cartItems.cartId, cart[0].id));
   }

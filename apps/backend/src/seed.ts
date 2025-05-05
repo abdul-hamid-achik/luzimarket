@@ -1,4 +1,7 @@
 import 'dotenv/config';
+import { WebSocket } from 'ws';
+import { neonConfig } from '@neondatabase/serverless';
+import { URL } from 'url';
 // removed static drizzle import; we'll dynamically load the correct driver below
 import * as schema from '@/schema';
 import { reset, seed } from 'drizzle-seed';
@@ -8,21 +11,29 @@ import { Sales } from '@/data/salesData';
 import { States as StateSeeds } from '@/data/statesData';
 import { AdminOrders } from '@/data/adminOrdersData';
 
+// Always configure Neon HTTP/WebSocket proxy support in seed script
+neonConfig.webSocketConstructor = WebSocket;
+neonConfig.poolQueryViaFetch = true;
+// Configure local HTTP/WebSocket proxy mapping for Drizzle HTTP driver
+neonConfig.wsProxy = (host) => `${host}/v1`;
+neonConfig.useSecureWebSocket = false;
+neonConfig.pipelineTLS = false;
+neonConfig.pipelineConnect = false;
+
 async function main() {
-  const url = process.env.DATABASE_URL!;
-  let db: any;
-  let pool: any;
-  if (url.startsWith('postgres://') || url.startsWith('postgresql://')) {
-    const { Pool } = await import('pg');
-    const { drizzle } = await import('drizzle-orm/node-postgres');
-    pool = new Pool({ connectionString: url });
-    db = drizzle(pool);
-  } else if (url.startsWith('http://') || url.startsWith('https://')) {
-    const { drizzle } = await import('drizzle-orm/neon-http');
-    db = drizzle(url);
-  } else {
-    throw new Error(`Unsupported DATABASE_URL protocol: ${url}`);
-  }
+  // Use LOCAL_POSTGRES_URL for local Docker Compose (maps to localhost:5433)
+  const url = process.env.NODE_ENV === 'production'
+    ? process.env.DATABASE_URL!
+    : process.env.LOCAL_POSTGRES_URL || process.env.DATABASE_URL!;
+  console.log('Connecting to database at', url);
+  const { Pool } = await import('pg');
+  const { drizzle } = await import('drizzle-orm/node-postgres');
+  const pool = new Pool({
+    connectionString: url,
+    // SSL fallback for Neon
+    ...(url.includes('neon.tech') && { ssl: { rejectUnauthorized: false } }),
+  });
+  const db = drizzle(pool);
 
   try {
     console.log('Resetting database...');

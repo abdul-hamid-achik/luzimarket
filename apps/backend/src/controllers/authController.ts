@@ -3,9 +3,10 @@ import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { db } from "../db";
-import { users } from "../schema";
+import { users, carts } from "../schema";
 import dotenv from "dotenv";
 import { StatusCodes } from "http-status-codes";
+import { v4 as uuidv4 } from "uuid";
 
 dotenv.config();
 
@@ -46,10 +47,40 @@ export const login = async (req: Request, res: Response) => {
   if (!match) {
     return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Invalid credentials" });
   }
+  // Check for guest token in Authorization header to merge carts
+  let guestIdFromToken: string | undefined;
+  const authHeader = req.headers.authorization;
+  if (authHeader) {
+    const [scheme, token] = authHeader.split(" ");
+    if (scheme === "Bearer" && token) {
+      try {
+        const decodedGuest = jwt.verify(token, process.env.JWT_SECRET || "default_jwt_secret") as any;
+        guestIdFromToken = decodedGuest.guestId;
+      } catch {
+        // ignore invalid guest token
+      }
+    }
+  }
+  // Merge guest cart into user cart if guestId present
+  if (guestIdFromToken) {
+    const existingGuestCart = await db.select().from(carts).where(eq(carts.guestId, guestIdFromToken)).limit(1);
+    if (existingGuestCart.length > 0) {
+      await db.update(carts)
+        .set({ userId: user.id, guestId: null })
+        .where(eq(carts.guestId, guestIdFromToken));
+    }
+  }
   const token = jwt.sign(
     { id: user.id, email: user.email, role: user.role },
     process.env.JWT_SECRET || "default_jwt_secret",
     { expiresIn: "7d" }
   );
+  res.json({ token });
+};
+
+// Generate a guest token for anonymous users
+export const guest = (_req: Request, res: Response) => {
+  const guestId = uuidv4();
+  const token = jwt.sign({ guestId }, process.env.JWT_SECRET || "default_jwt_secret", { expiresIn: "7d" });
   res.json({ token });
 };
