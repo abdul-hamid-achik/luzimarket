@@ -95,9 +95,21 @@ jobs:
 
       - name: Build for Vercel
         run: |
-          npm --prefix apps/frontend run build
-          npm --prefix apps/backend run build
+          echo "This step has been deprecated. Separate build steps below will handle backend and frontend builds."
+
+      - name: Build backend
+        working-directory: apps/backend
+        run: npm run build
+
+      - name: Build frontend
+        working-directory: apps/frontend
+        run: npm run build
+
+      - name: Prepare Vercel output
+        run: |
           mkdir -p .vercel/output
+          cp -r apps/frontend/dist .vercel/output/frontend
+          cp -r apps/backend/dist .vercel/output/backend
 
       - name: Upload Vercel build output
         uses: actions/upload-artifact@v4
