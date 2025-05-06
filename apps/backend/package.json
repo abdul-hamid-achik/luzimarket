@@ -41,7 +41,7 @@
     "tinacms": "^1.2.0",
     "tinacms-gitprovider-github": "^2.0.16",
     "tsconfig-paths": "^4.2.0",
-    "ws": "^8.18.1",
+    "ws": "^8.18.2",
     "zod": "^3.23.2"
   },
   "devDependencies": {

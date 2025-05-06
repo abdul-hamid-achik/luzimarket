@@ -12,7 +12,7 @@ console.log('Application is starting to render...');
 const queryClient = new QueryClient();
 // TinaCMS setup
 const cms = new TinaCMS({
-  apis: { tina: createClient({ url: '/admin/graphql' }) },
+  apis: { admin: createClient({ url: '/admin/graphql' }) },
   sidebar: true,
   enabled: true,
 });
