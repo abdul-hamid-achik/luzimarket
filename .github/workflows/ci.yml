@@ -95,8 +95,8 @@ jobs:
 
       - name: Build for Vercel
         run: |
-          npm run build:frontend
-          npm run build:backend
+          npm --prefix apps/frontend run build
+          npm --prefix apps/backend run build
           mkdir -p .vercel/output
 
       - name: Upload Vercel build output
