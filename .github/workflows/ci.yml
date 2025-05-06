@@ -31,7 +31,7 @@ jobs:
           LOG_TRAFFIC: 'true'
     env:
       TAG: ${{ github.sha }}
-      DATABASE_URL: postgres://postgres:password@db:5432/ecommerce
+      DATABASE_URL: postgres://postgres:password@localhost:5432/ecommerce
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       CORS_ORIGIN: http://localhost:5173
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
@@ -89,21 +89,13 @@ jobs:
       - name: Seed database
         run: npm run seed
 
-      - name: Build backend
-        run: npm run build:backend
-
-      - name: Build frontend
-        run: npm run build:frontend
-
-      - name: Start backend and frontend
-        run: |
-          npm --workspace=apps/backend run start &
-          npm --workspace=apps/frontend run preview &
-          for i in {1..30}; do curl --fail http://localhost:${PORT}/api/health && break; echo "Waiting for backend..."; sleep 2; done
-          for i in {1..30}; do curl --fail http://localhost:5173 && break; echo "Waiting for frontend..."; sleep 2; done
-
-      - name: Run E2E Tests
-        run: npm run test:e2e
+      - name: Run E2E via background-server
+        uses: BerniWittmann/background-server-action@v1
+        with:
+          build: npm run build
+          start: npm run start
+          wait-on: 'http://localhost:6000/api/health,http://localhost:5173'
+          command: npm run test:e2e
 
       - name: Build for Vercel
         run: |
