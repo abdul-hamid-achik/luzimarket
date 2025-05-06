@@ -31,12 +31,18 @@ jobs:
           LOG_TRAFFIC: 'true'
     env:
       TAG: ${{ github.sha }}
-      DATABASE_URL: postgres://postgres:password@localhost:5432/ecommerce
+      DATABASE_URL: postgres://postgres:password@db:5432/ecommerce
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       CORS_ORIGIN: http://localhost:5173
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
       VITE_API_URL: http://localhost:5173/api
       PORT: 6000
+      GITHUB_BRANCH: main
+      GITHUB_OWNER: abdul-hamid-achik
+      GITHUB_REPO: abdul-hamid-achik/luzimarket
+      GITHUB_PERSONAL_ACCESS_TOKEN: ${{ github.token }}
+      TINA_PUBLIC_IS_LOCAL: 'true'
+      GIT_BRANCH: main
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -66,10 +72,16 @@ jobs:
           echo "STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}" >> .env
           echo "VITE_API_URL=${VITE_API_URL}" >> .env
           echo "PORT=${PORT}" >> .env
+          echo "GITHUB_BRANCH=${GITHUB_BRANCH}" >> .env
+          echo "GITHUB_OWNER=${GITHUB_OWNER}" >> .env
+          echo "GITHUB_REPO=${GITHUB_REPO}" >> .env
+          echo "GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}" >> .env
+          echo "TINA_PUBLIC_IS_LOCAL=${TINA_PUBLIC_IS_LOCAL}" >> .env
+          echo "GIT_BRANCH=${GIT_BRANCH}" >> .env
 
       - name: Wait for DB
         run: |
-          for i in {1..30}; do pg_isready -h localhost -U postgres && break; echo "Waiting for DB..."; sleep 2; done
+          for i in {1..30}; do pg_isready -h db -U postgres && break; echo "Waiting for DB..."; sleep 2; done
 
       - name: Run migrations
         run: npm run migrate:push
