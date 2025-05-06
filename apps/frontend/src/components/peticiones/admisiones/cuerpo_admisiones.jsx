@@ -7,7 +7,7 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@
 
 // Fix: Component name should start with uppercase, and useAdmissionPetitions should only be called in a component
 function TablaAdmisiones() {
-  const { data: admissions = [], isLoading, error } = useAdmissionPetitions();
+  const { data: admissions = [], isLoading } = useAdmissionPetitions();
 
   return (
     <div className="container mt-5 p-5 overflow-y-auto">

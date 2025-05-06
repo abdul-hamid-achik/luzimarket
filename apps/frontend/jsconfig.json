@@ -2,11 +2,25 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@/pagina_principal/*": ["src/pages/pagina_principal/*"],
-      "@/empleados/*": ["src/pages/empleados/*"],
-      "@/assets/*": ["src/assets/*"]
+      "@/*": [
+        "src/*"
+      ],
+      "@/tina/*": [
+        "tina/*"
+      ],
+      "@/pagina_principal/*": [
+        "src/pages/pagina_principal/*"
+      ],
+      "@/empleados/*": [
+        "src/pages/empleados/*"
+      ],
+      "@/assets/*": [
+        "src/assets/*"
+      ]
     }
   },
-  "include": ["src"]
+  "include": [
+    "src",
+    "tina"
+  ]
 }

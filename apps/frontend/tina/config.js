@@ -48,6 +48,25 @@ export default defineConfig({
           },
         ],
       },
+      {
+        name: "productDetails",
+        label: "Product Details",
+        path: "content/productDetails",
+        format: "markdown",
+        fields: [
+          { type: "string", name: "productId", label: "Product ID", required: true },
+          {
+            type: "object",
+            list: true,
+            name: "sections",
+            label: "Sections",
+            fields: [
+              { type: "string", name: "title", label: "Section Title" },
+              { type: "rich-text", name: "content", label: "Content" },
+            ],
+          },
+        ],
+      },
     ],
   },
 });

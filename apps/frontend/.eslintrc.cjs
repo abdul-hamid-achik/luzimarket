@@ -17,7 +17,7 @@ module.exports = {
     react: { version: '18.2' },
     'import/resolver': {
       alias: {
-        map: [['@', path.resolve(__dirname, 'src')]],
+        map: [['@', path.resolve(__dirname, 'src')], ['@/tina', path.resolve(__dirname, 'tina')]],
         extensions: ['.js', '.jsx', '.ts', '.tsx', '.json']
       }
     }

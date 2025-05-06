@@ -40,6 +40,7 @@ export default defineConfig({
 
     resolve: {
         alias: {
+            '@/tina': path.resolve(__dirname, 'tina'),
             '@': path.resolve(__dirname, 'src'),
             'path': path.resolve(__dirname, 'src/shims/path.js'),
             'net': path.resolve(__dirname, 'src/shims/net.js'),

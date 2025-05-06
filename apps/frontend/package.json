@@ -5,6 +5,7 @@
   "type": "module",
   "homepage": "https://luzimarket-admin.000webhostapp.com/",
   "scripts": {
+    "prebuild": "npx @tinacms/cli build --local --skip-cloud-checks --rootPath . || true",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",

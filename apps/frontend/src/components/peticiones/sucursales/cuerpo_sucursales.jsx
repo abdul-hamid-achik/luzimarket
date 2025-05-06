@@ -1,8 +1,8 @@
-import TablaAdmision from "@/components/peticiones/admisiones/cuerpo_admisiones";
+import React from 'react';
 import BreadCrumb from "@/components/breadcrumb";
 import { useBranchPetitions } from '@/api/hooks';
 
-const tablaSucursales = () => {
+function TablaSucursales() {
   const { data: branches = [], isLoading } = useBranchPetitions();
   const items = [
     { name: "Peticiones", link: "/inicio/peticiones" },
@@ -11,7 +11,7 @@ const tablaSucursales = () => {
 
   return (
     <div className="mt-5 ms-5 w-100 p-5">
-      <BreadCrumb items={items} activeItem={"Sucursales"} />
+      <BreadCrumb items={items} activeItem="Sucursales" />
       <div className="container p-5">
         <table className="table table-borderless">
           <thead>
@@ -48,6 +48,6 @@ const tablaSucursales = () => {
       </div>
     </div>
   );
-};
+}
 
-export default tablaSucursales;
+export default TablaSucursales;

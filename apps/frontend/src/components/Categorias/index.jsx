@@ -2,16 +2,6 @@ import Slider from "react-slick";
 import "./style.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
-/* ICONOS */
-import {
-  FaGlasses,
-  FaTshirt,
-  FaLaptop,
-  FaCamera,
-  FaBook,
-} from "react-icons/fa";
-
 import { useCategories } from '@/api/hooks';
 import CategoryItem from './cat_item';
 import { FaTags } from 'react-icons/fa'; // fallback icon
