@@ -1,8 +1,6 @@
 import express from "express";
-import { graphqlHTTP } from 'express-graphql';
-import { createSchema } from '@tinacms/graphql';
-import { FileSystem } from '@tinacms/git-client';
-import tinaConfig from './.tina/schema';
+import { TinaNodeBackend, LocalBackendAuthentication } from '@tinacms/datalayer';
+import databaseClient from './tina/database';
 import cors from "cors";
 import bodyParser from "body-parser";
 import swaggerUi from "swagger-ui-express";
@@ -52,14 +50,10 @@ app.use('/api/admin/orders', adminOrdersRoutes);
 // Swagger
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Tina CMS GraphQL API
-const tinaSchema = createSchema({
-  config: { rootPath: process.cwd(), branch: process.env.GIT_BRANCH || 'main' },
-  collections: tinaConfig.collections,
-  client: new FileSystem(),
+const handler = TinaNodeBackend({
+  authentication: LocalBackendAuthentication(),
+  databaseClient,
 });
-app.use(
-  '/admin/graphql',
-  graphqlHTTP({ schema: tinaSchema, graphiql: true }),
-);
+app.use('/admin/graphql', (req, res) => handler(req, res));
 
 export default app;

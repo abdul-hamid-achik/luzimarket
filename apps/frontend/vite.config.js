@@ -1,34 +1,61 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
+import { NodeModulesPolyfillPlugin } from '@esbuild-plugins/node-modules-polyfill';
 
 export default defineConfig({
-    // Serve from this folder
-    root: '.',
-
-    plugins: [react()],
+    plugins: [
+        react(),
+        nodePolyfills({
+            protocolImports: false,
+            overrides: {
+                net: path.resolve(__dirname, 'src/shims/net.js'),
+                path: path.resolve(__dirname, 'src/shims/path.js'),
+                url: path.resolve(__dirname, 'src/shims/url.js'),
+            }
+        }),
+    ],
+    optimizeDeps: {
+        esbuildOptions: {
+            define: { global: 'globalThis', 'process.env': {} },
+            plugins: [
+                NodeGlobalsPolyfillPlugin({ process: true, buffer: true }),
+                NodeModulesPolyfillPlugin(),
+            ],
+        },
+    },
 
     server: {
         cors: true,
         proxy: {
             '/api': {
-                target: 'http://localhost:5000',
+                target: 'http://localhost:6000',
                 changeOrigin: true,
                 secure: false,
                 rewrite: (path) => path.replace(/^\/api/, '')
+            },
+            '/admin/graphql': {
+                target: 'http://localhost:6000',
+                changeOrigin: true,
+                secure: false
             }
         }
     },
 
     build: {
-        // Output into dist inside this folder
         outDir: 'dist',
-        emptyOutDir: true
+        emptyOutDir: true,
     },
 
     resolve: {
         alias: {
-            '@': path.resolve(__dirname, 'src')
-        }
+            '@': path.resolve(__dirname, 'src'),
+            'path': path.resolve(__dirname, 'src/shims/path.js'),
+            'net': path.resolve(__dirname, 'src/shims/net.js'),
+            'url': path.resolve(__dirname, 'src/shims/url.js'),
+        },
+        preferBuiltins: false,
     }
 }); 
