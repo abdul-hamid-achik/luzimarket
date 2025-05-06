@@ -8,7 +8,7 @@ console.log(`Starting server in ${process.env.NODE_ENV || 'development'} mode`);
 
 // Local dev: start server if run directly
 if (require.main === module) {
-  const port = process.env.PORT ? parseInt(process.env.PORT) : 5000;
+  const port = process.env.PORT ? parseInt(process.env.PORT) : 6000;
   app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
   });

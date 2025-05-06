@@ -1,7 +1,11 @@
 import axios from 'axios';
 
+// Force API calls through the Vite proxy in development (avoiding Chrome's restricted ports)
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL:
+    import.meta.env.MODE === 'development'
+      ? '/api'
+      : import.meta.env.VITE_API_URL || '/api',
 });
 // Attach JWT token from sessionStorage to headers if present
 api.interceptors.request.use((config) => {
