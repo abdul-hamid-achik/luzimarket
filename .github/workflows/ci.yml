@@ -29,6 +29,8 @@ jobs:
           APPEND_PORT: 'db:5432'
           ALLOW_ADDR_REGEX: '.*'
           LOG_TRAFFIC: 'true'
+        ports:
+          - 5432:5432
     env:
       TAG: ${{ github.sha }}
       DATABASE_URL: postgres://postgres:password@localhost:5432/ecommerce
@@ -81,7 +83,7 @@ jobs:
 
       - name: Wait for DB
         run: |
-          for i in {1..30}; do pg_isready -h db -U postgres && break; echo "Waiting for DB..."; sleep 2; done
+          for i in {1..30}; do pg_isready -h localhost -p 5432 -U postgres && break; echo "Waiting for DB..."; sleep 2; done
 
       - name: Run migrations
         run: npm run migrate:push
