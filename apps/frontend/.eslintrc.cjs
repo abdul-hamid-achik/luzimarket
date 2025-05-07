@@ -17,8 +17,14 @@ module.exports = {
     react: { version: '18.2' },
     'import/resolver': {
       alias: {
-        map: [['@', path.resolve(__dirname, 'src')], ['@/tina', path.resolve(__dirname, 'tina')]],
-        extensions: ['.js', '.jsx', '.ts', '.tsx', '.json']
+        map: [
+          ['@/tina', path.resolve(__dirname, 'tina')],
+          ['@/pagina_principal', path.resolve(__dirname, 'src/pages/pagina_principal')],
+          ['@/empleados', path.resolve(__dirname, 'src/pages/empleados')],
+          ['@/assets', path.resolve(__dirname, 'src/assets')],
+          ['@', path.resolve(__dirname, 'src')]
+        ],
+        extensions: ['.js', '.jsx', '.json']
       }
     }
   },

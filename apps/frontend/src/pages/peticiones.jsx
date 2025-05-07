@@ -1,5 +1,5 @@
 import { usePetitions } from '@/api/hooks';
-import PetitionCard from '@/components/peticiones/PetitionCard';
+import PetitionCard from '@/components/peticiones/petitioncard';
 import "bootstrap/dist/css/bootstrap.min.css";
 import BreadCrumb from '@/components/breadcrumb';
 
