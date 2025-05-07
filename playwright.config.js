@@ -17,12 +17,13 @@ module.exports = defineConfig({
     video: 'retain-on-failure',
     trace: 'on-first-retry',
   },
-  webServer: {
-    // Start DB & backend via Docker Compose, run migrations & seed, then launch frontend
-    command: 'docker-compose up -d && npm run migrate:up && npm run seed && npm run dev:frontend',
-    url: 'http://localhost:5173',
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: process.env.CI
+    ? undefined // In CI, servers are already running; don't start anything
+    : {
+      command: 'docker-compose up -d && npm run migrate:up && npm run seed && npm run dev:frontend',
+      url: 'http://localhost:5173',
+      reuseExistingServer: true,
+    },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'firefox', use: { ...devices['Desktop Firefox'] } },

@@ -38,3 +38,5 @@ playwright-trace
 .op
 
 test-results/
+
+tmp/

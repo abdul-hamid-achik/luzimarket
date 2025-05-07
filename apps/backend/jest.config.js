@@ -5,7 +5,7 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   testEnvironmentOptions: {},
-  testMatch: ['**/*.test.ts'],
+  testMatch: ['**/*.test.ts', '**/*.spec.ts'],
   rootDir: './',
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   // Add path mapping to resolve @/ imports

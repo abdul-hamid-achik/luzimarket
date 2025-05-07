@@ -8,8 +8,7 @@ export default class DrizzleAdapter extends AbstractLevel<string, any> {
 
   constructor(db: any) {
     super({
-      supports: { list: true, put: true, get: true, delete: true },
-      encodings: { utf8: true }
+      supports: { list: true, put: true, get: true, delete: true }
     });
     this.db = db;
   }
