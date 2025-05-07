@@ -20,13 +20,13 @@ export default defineConfig({
         cors: true,
         proxy: {
             '/api': {
-                target: 'http://localhost:6000',
+                target: 'http://localhost:8080',
                 changeOrigin: true,
                 secure: false,
                 rewrite: (path) => path.replace(/^\/api/, '')
             },
             '/admin/graphql': {
-                target: 'http://localhost:6000',
+                target: 'http://localhost:8080',
                 changeOrigin: true,
                 secure: false
             }

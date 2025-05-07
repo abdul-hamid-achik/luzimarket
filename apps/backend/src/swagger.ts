@@ -11,8 +11,9 @@ const options = {
       version: "1.0.0",
     },
     servers: [
+      // Hardcoded for local dev; Vercel prod will use its own routing
       {
-        url: `http://localhost:${process.env.PORT || 5000}/api`,
+        url: `http://localhost:8080/api`,
       },
     ],
   },
