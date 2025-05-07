@@ -23,7 +23,7 @@
       "src": "apps/backend/dist/index.js",
       "use": "@vercel/node",
       "config": {
-        "runtime": "nodejs22.x",
+        "runtime": "nodejs22.8.x",
         "maxDuration": 60,
         "regions": "all",
         "memory": 1024,

@@ -73,3 +73,7 @@ npm test
 ## Security Note
 
 JWT tokens are stored in `sessionStorage` (vs. `localStorage`) to limit persistence to the browser session. For production, consider HTTP-only secure cookies or other strategies to mitigate XSS risks.
+
+## Node.js Version Requirement
+
+This project requires **Node.js v22.8.0 or later** due to a critical UTF-8 encoding bug in earlier v22.x releases. See [nodejs/node#54543](https://github.com/nodejs/node/issues/54543) for details.
