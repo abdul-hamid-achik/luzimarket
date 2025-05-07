@@ -1,5 +1,5 @@
 import express from "express";
-import { TinaNodeBackend, LocalBackendAuthentication } from '@tinacms/datalayer';
+import { TinaNodeBackend, LocalBackendAuthProvider } from '@tinacms/datalayer';
 import databaseClient from './tina/database';
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -51,7 +51,7 @@ app.use('/api/admin/orders', adminOrdersRoutes);
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Tina CMS GraphQL API
 const handler = TinaNodeBackend({
-  authentication: LocalBackendAuthentication(),
+  authProvider: LocalBackendAuthProvider(),
   databaseClient,
 });
 app.use('/admin/graphql', (req, res) => handler(req, res));
