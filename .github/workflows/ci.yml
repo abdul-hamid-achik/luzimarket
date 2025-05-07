@@ -204,13 +204,12 @@ jobs:
           path: .vercel/output
 
       - name: Deploy Preview to Vercel
-        uses: amondnet/vercel-action@v20
+        uses: vercel/action@v20
         with:
-          vercel-token:      ${{ secrets.VERCEL_TOKEN }}
-          zeit-token:        ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id:     ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args:       --prebuilt
+          vercel_token: ${{ secrets.VERCEL_TOKEN }}
+          vercel_org_id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel_project_id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working_directory: .vercel/output
 
   deploy_prod:
     if: github.ref == 'refs/heads/main'
@@ -227,10 +226,10 @@ jobs:
           path: .vercel/output
 
       - name: Deploy Production to Vercel
-        uses: amondnet/vercel-action@v20
+        uses: vercel/action@v20
         with:
-          vercel-token:      ${{ secrets.VERCEL_TOKEN }}
-          zeit-token:        ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id:     ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args:       --prebuilt --prod
+          vercel_token: ${{ secrets.VERCEL_TOKEN }}
+          vercel_org_id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel_project_id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working_directory: .vercel/output
+          prod: true
