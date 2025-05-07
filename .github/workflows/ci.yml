@@ -90,7 +90,7 @@ jobs:
         with:
           build: npm run build
           start: npm run start
-          wait-on: 'http://localhost:6000/api/health,http://localhost:5173'
+          wait-on: 'http://localhost:6000/api/health,http://localhost:4173'
           command: npm run test:e2e
 
       - name: Build for Vercel
