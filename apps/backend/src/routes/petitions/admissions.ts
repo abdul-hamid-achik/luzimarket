@@ -7,7 +7,7 @@ const router = Router();
  * GET /api/petitions/admissions
  * Returns a list of affiliate (admission) petitions.
  */
-router.get("/admissions", (_req, res) => {
+router.get("/", (_req, res) => {
   res.json(AdmissionPetitions);
 });
 

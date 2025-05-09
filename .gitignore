@@ -40,3 +40,4 @@ playwright-trace
 test-results/
 
 tmp/
+**/coverage/

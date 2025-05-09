@@ -1,3 +1,4 @@
+import React from 'react';
 
 const CardDashboard = ({ title, title2, text, ChartComponent }) => {
   return (

@@ -1,16 +1,21 @@
-import api from './client';
+import api from '@/api/client';
 import { getCategories } from './categories';
 
-jest.mock('./client');
+vi.mock('@/api/client', () => ({
+  default: {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
+  },
+}));
 
-describe('categories API', () => {
-  afterEach(() => jest.resetAllMocks());
-
-  it('getCategories should fetch categories', async () => {
-    const mockData = [{ id: 1, name: 'Cat' }];
+describe('getCategories', () => {
+  it('calls api.get with correct endpoint and returns data', async () => {
+    const mockData = [{ id: 1 }];
     api.get.mockResolvedValue({ data: mockData });
-    const res = await getCategories();
+    const result = await getCategories();
     expect(api.get).toHaveBeenCalledWith('/categories');
-    expect(res).toEqual(mockData);
+    expect(result).toEqual(mockData);
   });
 });

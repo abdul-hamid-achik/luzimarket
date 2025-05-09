@@ -7,7 +7,7 @@ const router = Router();
  * GET /api/petitions/products
  * Returns a list of product addition petitions.
  */
-router.get("/products", (_req, res) => {
+router.get("/", (_req, res) => {
   res.json(ProductPetitions);
 });
 

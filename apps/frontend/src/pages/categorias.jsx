@@ -1,7 +1,7 @@
+import React from 'react';
 import { GoArrowRight } from "react-icons/go";
 import { Link } from "react-router-dom";
 import { useCategories } from '@/api/hooks';
-
 function Categorias() {
   const { data: categories = [], isLoading, error } = useCategories();
   return (

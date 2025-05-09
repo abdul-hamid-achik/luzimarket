@@ -1,5 +1,23 @@
+vi.mock('./products', () => ({
+  getProducts: () => { console.log('MOCKED PRODUCTS API'); return Promise.resolve([{ name: 'Prod A' }, { name: 'Prod B' }]); },
+  getProduct: () => Promise.resolve({ name: 'Prod A' }),
+}));
+vi.mock('./cart', () => ({
+  getCart: () => Promise.resolve({ items: [{ productName: 'Item 1' }, { productName: 'Item 2' }] }),
+  addToCart: () => Promise.resolve({}),
+  updateCartItem: () => Promise.resolve({}),
+  removeCartItem: () => Promise.resolve({}),
+  clearCart: () => Promise.resolve({}),
+  fetchCart: () => Promise.resolve({ items: [{ productName: 'Item 1' }, { productName: 'Item 2' }] }),
+}));
+vi.mock('./states', () => ({
+  fetchStates: () => Promise.resolve([{ label: 'State A', value: 'a' }, { label: 'State B', value: 'b' }]),
+  getStates: () => Promise.resolve([{ label: 'State A', value: 'a' }, { label: 'State B', value: 'b' }]),
+}));
+
 import React from 'react';
-import { renderWithProviders, screen, waitFor } from '../test-utils';
+import { renderWithProviders, waitFor } from '../test-utils.jsx';
+import { screen } from '@testing-library/react';
 import { useProducts, useCart, useStates } from './hooks';
 
 // Helper components that consume the hooks
@@ -31,7 +49,7 @@ describe('React Query hooks', () => {
   it('useCart fetches and displays cart item names', async () => {
     renderWithProviders(<CartComp />);
     expect(screen.getByText('Loading cart...')).toBeInTheDocument();
-    await waitFor(() => expect(screen.getByText('Prod A')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('Item 1,Item 2')).toBeInTheDocument());
   });
 
   it('useStates fetches and displays state labels', async () => {

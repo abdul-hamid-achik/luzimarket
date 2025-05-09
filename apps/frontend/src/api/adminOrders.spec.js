@@ -1,10 +1,10 @@
 import api from './client';
 import { getAdminOrders } from './adminOrders';
 
-jest.mock('./client');
+vi.mock('./client');
 
 describe('adminOrders API', () => {
-  afterEach(() => jest.resetAllMocks());
+  afterEach(() => vi.resetAllMocks());
 
   it('getAdminOrders should fetch admin orders', async () => {
     const mockData = [{ id: 1, total: 100 }];

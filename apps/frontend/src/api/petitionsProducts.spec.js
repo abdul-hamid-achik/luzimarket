@@ -1,10 +1,10 @@
 import api from './client';
 import { getProductPetitions } from './petitionsProducts';
 
-jest.mock('./client');
+vi.mock('./client');
 
 describe('petitionsProducts API', () => {
-  afterEach(() => jest.resetAllMocks());
+  afterEach(() => vi.resetAllMocks());
 
   it('getProductPetitions should fetch product petitions', async () => {
     const mockData = [{ id: 1, name: 'P' }];

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const PetitionCard = ({ title, badgeCount, description, link }) => {
   return (
-    <div className="card p-3 rounded-5 w-100">
+    <div data-testid="petition-card" className="card p-3 rounded-5 w-100">
       <div className="d-flex justify-content-between m-4">
         <h3 className="card-title">{title}</h3>
         {badgeCount != null && (

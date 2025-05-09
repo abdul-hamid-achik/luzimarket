@@ -1,10 +1,10 @@
 import api from './client';
 import { getSales } from './sales';
 
-jest.mock('./client');
+vi.mock('./client');
 
 describe('sales API', () => {
-  afterEach(() => jest.resetAllMocks());
+  afterEach(() => vi.resetAllMocks());
 
   it('getSales should fetch sales data', async () => {
     const mockData = [{ date: 'd', May: 1 }];

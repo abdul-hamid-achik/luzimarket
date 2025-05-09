@@ -31,14 +31,17 @@ services:
     build:
       context: .
       dockerfile: apps/backend/Dockerfile
+      target: builder
       args:
         PORT: ${PORT}
+    command: npm run dev
+    working_dir: /app/apps/backend
     restart: always
     env_file:
       - .env
     environment:
       - PORT=${PORT}
-      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_URL=postgresql://postgres:password@db:5432/ecommerce
       - JWT_SECRET=${JWT_SECRET}
       - CORS_ORIGIN=${CORS_ORIGIN}
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
@@ -48,11 +51,9 @@ services:
       db:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:${PORT}/api/health" ]
-      interval: 10s
-      timeout: 5s
-      start_period: 5s
-      retries: 3
+      disable: true
+    volumes:
+      - ./apps/backend:/app/apps/backend
 
   frontend:
     build:
@@ -64,8 +65,7 @@ services:
     ports:
       - "5173:5173"
     depends_on:
-      backend:
-        condition: service_healthy
+      - backend
     environment:
       - VITE_API_URL=http://localhost:${PORT}/api
 

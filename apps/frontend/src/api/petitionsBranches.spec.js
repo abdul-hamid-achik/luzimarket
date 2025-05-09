@@ -1,10 +1,10 @@
 import api from './client';
 import { getBranchPetitions } from './petitionsBranches';
 
-jest.mock('./client');
+vi.mock('./client');
 
 describe('petitionsBranches API', () => {
-  afterEach(() => jest.resetAllMocks());
+  afterEach(() => vi.resetAllMocks());
 
   it('getBranchPetitions should fetch branch petitions', async () => {
     const mockData = [{ id: 1, name: 'B' }];

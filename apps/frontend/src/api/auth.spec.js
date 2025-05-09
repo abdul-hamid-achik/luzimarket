@@ -1,11 +1,18 @@
-import api from './client';
+import api from '@/api/client';
 import { registerUser, loginUser } from './auth';
 import { registerResponse, loginResponse } from '../__fixtures__/auth.fixture';
 
-jest.mock('./client');
+vi.mock('@/api/client', () => ({
+  default: {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
+  },
+}));
 
 describe('auth API', () => {
-  afterEach(() => jest.resetAllMocks());
+  afterEach(() => vi.resetAllMocks());
 
   it('registerUser should post registration data', async () => {
     const payload = { email: 'a@b.com', password: 'pw' };
@@ -21,5 +28,27 @@ describe('auth API', () => {
     const res = await loginUser(payload);
     expect(api.post).toHaveBeenCalledWith('/auth/login', payload);
     expect(res).toEqual(loginResponse);
+  });
+});
+
+describe('registerUser', () => {
+  it('calls api.post with /auth/register and payload, returns data', async () => {
+    const payload = { email: 'test@example.com', password: 'password' };
+    const mockData = { id: 1 };
+    api.post.mockResolvedValue({ data: mockData });
+    const result = await registerUser(payload);
+    expect(api.post).toHaveBeenCalledWith('/auth/register', payload);
+    expect(result).toEqual(mockData);
+  });
+});
+
+describe('loginUser', () => {
+  it('calls api.post with /auth/login and payload, returns data', async () => {
+    const payload = { email: 'user', password: 'pass' };
+    const mockData = { token: 'abc123' };
+    api.post.mockResolvedValue({ data: mockData });
+    const result = await loginUser(payload);
+    expect(api.post).toHaveBeenCalledWith('/auth/login', payload);
+    expect(result).toEqual(mockData);
   });
 });

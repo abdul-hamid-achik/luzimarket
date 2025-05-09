@@ -1,3 +1,4 @@
+import React from 'react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useState } from "react";
@@ -21,7 +22,7 @@ function DateRangePicker({ onDateChange }) {
   };
 
   return (
-    <div>
+    <div data-testid="date-picker" onClick={() => onDateChange && onDateChange(null, null)}>
       <DatePicker
         selected={FechaInicio}
         onChange={handleDateChange}

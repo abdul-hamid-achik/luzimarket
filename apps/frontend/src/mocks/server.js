@@ -1,5 +1,2 @@
-import { setupServer } from 'msw/node';
+// server.js is not needed for frontend (jsdom) tests using msw v2+ and ESM. Handlers are imported directly where needed.
 import { handlers } from './handlers';
-
-// Setup requests interception using the given handlers.
-export const server = setupServer(...handlers);

@@ -1,6 +1,19 @@
 const path = require('path');
 
 module.exports = {
+  overrides: [
+    {
+      files: ['**/*.spec.ts', '**/__mocks__/**'],
+      rules: {
+        // Ignore all lint errors in test specs and mocks
+        '@typescript-eslint/no-unused-vars': 'off',
+        '@typescript-eslint/no-explicit-any': 'off',
+        'no-console': 'off',
+        'import/no-extraneous-dependencies': 'off',
+        // Add more rules to ignore as needed
+      },
+    },
+  ],
   root: true,
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -28,5 +41,13 @@ module.exports = {
     'no-restricted-imports': ['error', { patterns: ['../**'] }],
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
-  }
+  },
+  overrides: [
+    {
+      files: ['**/*.spec.ts', '**/*.test.ts'],
+      rules: {
+        'no-restricted-imports': 'off',
+      },
+    },
+  ],
 };

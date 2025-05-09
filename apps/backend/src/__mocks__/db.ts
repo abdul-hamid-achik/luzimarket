@@ -1,10 +1,2 @@
-/**
- * Auto-mocked database client for Jest
- */
-const mockFn = () => jest.fn();
-export const db = {
-  select: mockFn(),
-  insert: mockFn(),
-  update: mockFn(),
-  delete: mockFn(),
-};
+// No longer needed. Use the real db (which swaps to pglite under Vitest)
+export * from '../db';

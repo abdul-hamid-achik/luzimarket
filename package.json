@@ -6,7 +6,7 @@
     "apps/frontend"
   ],
   "scripts": {
-    "dev": "concurrently --kill-others --handle-input --raw \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev": "docker compose up --build -d",
     "dev:frontend": "npm --workspace=apps/frontend run dev",
     "dev:backend": "npm --workspace=apps/backend run dev",
     "deploy": "npx --yes vercel@latest --prod",
@@ -17,9 +17,9 @@
     "lint": "npm run lint:backend && npm run lint:frontend",
     "lint:backend": "npm --workspace=apps/backend run lint",
     "lint:frontend": "npm --workspace=apps/frontend run lint",
-    "test": "npm run test:backend && npm run test:frontend",
     "test:backend": "npm --workspace=apps/backend run test",
     "test:frontend": "npm --workspace=apps/frontend run test",
+    "test": "npm run test:backend && npm run test:frontend",
     "postinstall": "if [ \"$VERCEL\" ]; then echo 'Skipping Playwright install on Vercel'; else playwright install; fi",
     "test:e2e": "playwright test",
     "migrate:generate": "npm --workspace=apps/backend run migrate:generate",
@@ -33,14 +33,14 @@
     "start": "concurrently --kill-others --raw --handle-input \"npm run start:backend\" \"npm run start:frontend\""
   },
   "devDependencies": {
-    "@playwright/test": "^1.37.1",
-    "concurrently": "^8.0.1",
+    "@playwright/test": "^1.52.0",
     "drizzle-orm": "^0.43.1",
-    "eslint": "^8.57.1",
+    "eslint": "^8.57.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-import-resolver-typescript": "^4.3.4",
     "eslint-plugin-import": "^2.31.0",
-    "typescript": "^4.9.5"
+    "typescript": "^4.9.5",
+    "vitest": "^3.1.3"
   },
   "dependencies": {
     "serverless-http": "^3.2.0"

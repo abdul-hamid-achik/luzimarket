@@ -1,10 +1,10 @@
 import api from './client';
 import { getAdmissionPetitions } from './petitionsAdmissions';
 
-jest.mock('./client');
+vi.mock('./client');
 
 describe('petitionsAdmissions API', () => {
-  afterEach(() => jest.resetAllMocks());
+  afterEach(() => vi.resetAllMocks());
 
   it('getAdmissionPetitions should fetch admission petitions', async () => {
     const mockData = [{ id: 1, name: 'A' }];

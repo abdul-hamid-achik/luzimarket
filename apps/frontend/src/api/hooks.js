@@ -1,15 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import * as productsApi from "./products";
-import * as cartApi from "./cart";
-import * as ordersApi from "./orders";
-import * as salesApi from "./sales";
-import * as petitionsAdmissionsApi from "./petitionsAdmissions";
-import * as petitionsProductsApi from "./petitionsProducts";
-import * as petitionsBranchesApi from "./petitionsBranches";
-import * as petitionsApi from "./petitions";
-import * as statesApi from "./states";
-import * as adminOrdersApi from "./adminOrders";
-import * as categoriesApi from "./categories";
+import * as productsApi from "@/api/products";
+import * as cartApi from "@/api/cart";
+import * as ordersApi from "@/api/orders";
+import * as salesApi from "@/api/sales";
+import * as petitionsAdmissionsApi from "@/api/petitionsAdmissions";
+import * as petitionsProductsApi from "@/api/petitionsProducts";
+import * as petitionsBranchesApi from "@/api/petitionsBranches";
+import * as petitionsApi from "@/api/petitions";
+import * as statesApi from "@/api/states";
+import * as adminOrdersApi from "@/api/adminOrders";
+import * as categoriesApi from "@/api/categories";
 
 export const useProducts = () =>
   useQuery(['products'], productsApi.getProducts);

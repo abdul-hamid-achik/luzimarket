@@ -1,3 +1,4 @@
+import React from 'react';
 import { usePetitions } from '@/api/hooks';
 import PetitionCard from '@/components/peticiones/petitioncard';
 import "bootstrap/dist/css/bootstrap.min.css";

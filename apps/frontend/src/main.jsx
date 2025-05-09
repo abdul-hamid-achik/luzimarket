@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { TinaProvider, TinaCMS } from 'tinacms';
 import { createClient } from 'tinacms/dist/client';
-import queries from '@/tina/__generated__/client';
+import queries from '@tina/__generated__/client';
 import AppComponent from './app';
 
 console.log('Application is starting to render...');

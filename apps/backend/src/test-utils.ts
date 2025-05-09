@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { vi } from 'vitest';
 
 export function makeReq(
   body: any = {},
@@ -14,7 +15,7 @@ export function makeReq(
 
 export function makeRes(): Response {
   const res: any = {};
-  res.status = jest.fn().mockReturnValue(res);
-  res.json = jest.fn().mockReturnValue(res);
+  res.status = vi.fn().mockReturnValue(res);
+  res.json = vi.fn().mockReturnValue(res);
   return res as Response;
 }

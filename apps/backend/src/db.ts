@@ -4,6 +4,8 @@ import { Pool } from "pg";
 import dotenv from "dotenv";
 import { WebSocket } from 'ws';
 import { neonConfig } from '@neondatabase/serverless';
+import { PGlite } from '@electric-sql/pglite';
+import * as schema from './schema';
 
 dotenv.config();
 
@@ -20,7 +22,16 @@ neonConfig.pipelineConnect = false;
 let _db: any | null = null;
 let _pool: any | null = null;
 
+
 export function getDb() {
+  if (process.env.VITEST) {
+    // Use in-memory Postgres (pglite) for Vitest
+    if (!(global as any)._testDb) {
+      (global as any)._testPglite = new PGlite();
+      (global as any)._testDb = require('drizzle-orm/pglite').drizzle((global as any)._testPglite, { schema });
+    }
+    return (global as any)._testDb;
+  }
   if (!_db) {
     console.log('Initializing database connection pool');
 
@@ -32,6 +43,7 @@ export function getDb() {
     const connectionString = process.env.DATABASE_URL ||
       process.env.POSTGRES_URL ||
       process.env.LOCAL_POSTGRES_URL;
+    console.log("→ connecting to database with", connectionString);
 
     if (!connectionString) {
       throw new Error('No database connection string provided');
@@ -70,12 +82,14 @@ export function getDb() {
 }
 
 // Backwards compatibility for existing code
-export const db = new Proxy({} as any, {
-  get: (target, prop) => {
-    const dbInstance = getDb();
-    return dbInstance[prop as keyof typeof dbInstance];
-  }
-});
+export const db = process.env.VITEST
+  ? (global as any)._testDb || getDb()
+  : new Proxy({} as any, {
+    get: (target, prop) => {
+      const dbInstance = getDb();
+      return dbInstance[prop as keyof typeof dbInstance];
+    }
+  });
 
 // Function to explicitly close the pool (useful for tests)
 export async function closePool() {

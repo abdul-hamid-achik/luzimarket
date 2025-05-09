@@ -1,10 +1,10 @@
 import api from './client';
 import { createOrder, getOrders, getOrder } from './orders';
 
-jest.mock('./client');
+vi.mock('./client');
 
 describe('orders API', () => {
-  afterEach(() => jest.resetAllMocks());
+  afterEach(() => vi.resetAllMocks());
 
   it('getOrders should fetch orders', async () => {
     const mockData = [{ id: 1, total: 10 }];

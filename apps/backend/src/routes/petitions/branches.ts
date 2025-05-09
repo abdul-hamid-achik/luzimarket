@@ -7,7 +7,7 @@ const router = Router();
  * GET /api/petitions/branches
  * Returns a list of branch/store petitions.
  */
-router.get("/branches", (_req, res) => {
+router.get("/", (_req, res) => {
   res.json(BranchPetitions);
 });
 

@@ -4,6 +4,7 @@ import LuziLogoAdmin from "@/assets/images/luzimarket_logo_empleado.png";
 import { useState } from "react";
 import Inicio from "@/layout/inicio";
 
+import React from 'react';
 const Login = () => {
   const [miLogin, setLogin] = useState("false");
   const [usuario, setUsuario] = useState("");

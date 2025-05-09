@@ -1,3 +1,4 @@
+import React from "react";
 import Usuario from "@/assets/images/luzimarket_logo_empleado.png";
 import Logo from "@/assets/images/luzimarket_logo.png";
 import bandera from "@/assets/images/bandera_mx.png";

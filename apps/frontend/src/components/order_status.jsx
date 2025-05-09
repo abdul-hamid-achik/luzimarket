@@ -1,3 +1,4 @@
+import React from 'react';
 import { IconContext } from "react-icons";
 
 const OrderStatus = ({ icon, orderCount, title, status }) => {

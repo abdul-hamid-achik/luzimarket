@@ -1,24 +1,31 @@
-import api from './client';
+import api from '@/api/client';
 import { getProducts, getProduct } from './products';
 
-jest.mock('./client');
+vi.mock('@/api/client', () => ({
+  default: {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
+  },
+}));
 
-describe('products API', () => {
-  afterEach(() => jest.resetAllMocks());
-
-  it('getProducts should fetch list of products', async () => {
-    const mockData = [{ id: 1, name: 'A' }];
+describe('getProducts', () => {
+  it('calls api.get with /products and returns data', async () => {
+    const mockData = [{ id: 1 }];
     api.get.mockResolvedValue({ data: mockData });
-    const res = await getProducts();
+    const result = await getProducts();
     expect(api.get).toHaveBeenCalledWith('/products');
-    expect(res).toEqual(mockData);
+    expect(result).toEqual(mockData);
   });
+});
 
-  it('getProduct should fetch single product by id', async () => {
-    const mockData = { id: 2, name: 'B' };
+describe('getProduct', () => {
+  it('calls api.get with /products/:id and returns data', async () => {
+    const mockData = { id: 2 };
     api.get.mockResolvedValue({ data: mockData });
-    const res = await getProduct(2);
+    const result = await getProduct(2);
     expect(api.get).toHaveBeenCalledWith('/products/2');
-    expect(res).toEqual(mockData);
+    expect(result).toEqual(mockData);
   });
 });

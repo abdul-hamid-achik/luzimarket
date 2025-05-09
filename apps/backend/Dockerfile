@@ -26,16 +26,10 @@ WORKDIR /app
 # Install runtime utilities for healthcheck
 RUN apk add --no-cache curl
 
-# Copy package.json to install production dependencies
+# Copy installed node_modules from the builder stage
+COPY --from=builder /app/node_modules ./node_modules
+# Copy package.json for metadata
 COPY apps/backend/package.json ./package.json
-
-# Install all production dependencies needed by backend
-RUN npm init -y && \
-    npm install --no-save \
-    json5 tsconfig-paths express cors dotenv \
-    bcrypt body-parser drizzle-orm http-status-codes jsonwebtoken \
-    pg postgres serverless-http stripe swagger-jsdoc swagger-ui-express \
-    ws zod @neondatabase/serverless
 
 # Copy built application code
 COPY --from=builder /app/apps/backend/dist ./dist
@@ -43,7 +37,7 @@ COPY --from=builder /app/apps/backend/dist ./dist
 # Generate runtime tsconfig.json for alias mapping
 RUN echo '{"compilerOptions":{"baseUrl":".","paths":{"@/*":["dist/*"]}}}' > tsconfig.json
 
-ARG PORT=5000
+ARG PORT=8080
 ENV PORT=${PORT}
 EXPOSE ${PORT}
 

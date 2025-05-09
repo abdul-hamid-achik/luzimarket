@@ -1,10 +1,10 @@
 import api from './client';
 import { getStates } from './states';
 
-jest.mock('./client');
+vi.mock('./client');
 
 describe('states API', () => {
-  afterEach(() => jest.resetAllMocks());
+  afterEach(() => vi.resetAllMocks());
 
   it('getStates should fetch states', async () => {
     const mockData = [{ label: 'X', value: 'x' }];
