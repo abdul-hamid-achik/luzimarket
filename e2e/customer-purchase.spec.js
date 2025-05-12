@@ -41,9 +41,10 @@ test.describe('Customer End-to-End Purchase Flow', () => {
     // Go to cart
     await page.click('a[href="/carrito"]');
     await page.waitForURL(/\/carrito$/);
+    await page.waitForSelector('.tabla-carrito');
 
     // Verify one item in cart
-    const cartItems = page.locator('div.tabla-carrito');
+    const cartItems = page.locator('.tabla-carrito');
     await expect(cartItems).toHaveCount(1);
 
     // Checkout

@@ -6,7 +6,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from "recharts";
 import { useSales } from "@/api/hooks";
@@ -32,7 +31,6 @@ const ChartVentas = ({ FechaInicio, FechaFin }) => {
         <XAxis dataKey="date" />
         <YAxis />
         <Tooltip />
-        <Legend />
         <Line
           type="monotone"
           dataKey="amount"

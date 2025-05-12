@@ -3,20 +3,22 @@
   "private": true,
   "workspaces": [
     "apps/backend",
-    "apps/frontend"
+    "apps/frontend",
+    "apps/strapi"
   ],
   "scripts": {
     "dev": "docker compose up --build -d",
     "dev:frontend": "npm --workspace=apps/frontend run dev",
     "dev:backend": "npm --workspace=apps/backend run dev",
     "deploy": "npx --yes vercel@latest --prod",
-    "build": "npm run build:backend && npm run build:frontend",
-    "build:frontend": "npm --workspace=apps/frontend run build",
-    "build:backend": "npm --workspace=apps/backend run build",
+    "build": "npm-run-all --parallel build:*",
+    "build:frontend": "cd apps/frontend && npm run build",
+    "build:backend": "cd apps/backend && npm run build",
+    "build:strapi": "cd apps/strapi && npm run build",
     "preview:frontend": "npm --workspace=apps/frontend run preview",
-    "lint": "npm run lint:backend && npm run lint:frontend",
-    "lint:backend": "npm --workspace=apps/backend run lint",
-    "lint:frontend": "npm --workspace=apps/frontend run lint",
+    "lint": "npm-run-all --parallel lint:*",
+    "lint:backend": "cd apps/backend && npm run lint",
+    "lint:frontend": "cd apps/frontend && npm run lint",
     "test:backend": "npm --workspace=apps/backend run test",
     "test:frontend": "npm --workspace=apps/frontend run test",
     "test": "npm run test:backend && npm run test:frontend",
@@ -39,6 +41,7 @@
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-import-resolver-typescript": "^4.3.4",
     "eslint-plugin-import": "^2.31.0",
+    "npm-run-all": "^4.1.5",
     "typescript": "^4.9.5",
     "vitest": "^3.1.3"
   },

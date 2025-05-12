@@ -3,10 +3,9 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const config: Config = {
-  // Include main schema and Tina-specific schema for migrations
+  // Include main schema for migrations
   schema: [
     "./src/schema.ts",
-    "./src/tina/schema.ts",
   ],
   out: "./drizzle",
   // SQL dialect for migrations: 'postgresql', 'mysql', or 'sqlite'

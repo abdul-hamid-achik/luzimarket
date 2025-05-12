@@ -5,7 +5,7 @@ test.describe('UI Guest Cart Flow', () => {
     test('guest can add item to cart and it persists after login', async ({ page }) => {
         // Guest: visit home and navigate to first product
         await page.goto('/');
-        await page.locator('.cajaTodosLosProductos a').first().click();
+        await page.locator('.cajaProductosMuestra a').first().click();
         // Wait for product detail page
         await page.waitForURL(/handpicked\/productos\/\d+$/);
         // Add to cart
@@ -14,7 +14,7 @@ test.describe('UI Guest Cart Flow', () => {
         // Go to cart page and verify item is present
         await page.goto('/carrito');
         await page.waitForURL(/\/carrito$/);
-        const cartItems = page.locator('div.tabla-carrito');
+        const cartItems = page.locator('.tabla-carrito');
         await expect(cartItems).toHaveCount(1);
 
         // Prepare new user credentials
@@ -42,6 +42,6 @@ test.describe('UI Guest Cart Flow', () => {
         // After login, revisit cart and verify the previously added item remains
         await page.goto('/carrito');
         await page.waitForURL(/\/carrito$/);
-        await expect(page.locator('div.tabla-carrito')).toHaveCount(1);
+        await expect(page.locator('.tabla-carrito')).toHaveCount(1);
     });
 }); 

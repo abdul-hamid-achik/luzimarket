@@ -14,7 +14,6 @@ test.describe('Cart Management Flow', () => {
       page.waitForURL(/\/login$/),
       page.click('button:has-text("Register")'),
     ]);
-    await page.waitForURL('/');
     await page.fill('input[type="email"]', email);
     await page.fill('input[type="password"]', password);
     await page.click('button:has-text("Login")');
@@ -29,9 +28,10 @@ test.describe('Cart Management Flow', () => {
     // Go to cart
     await page.goto('/carrito');
     await page.waitForURL(/\/carrito$/);
+    await page.waitForSelector('.quantity-display');
 
     // Verify single cart item
-    const cartRow = page.locator('div.tabla-carrito').first();
+    const cartRow = page.locator('.tabla-carrito').first();
     const quantityDisplay = cartRow.locator('.quantity-display');
     await expect(quantityDisplay).toHaveText('1');
 
@@ -47,6 +47,6 @@ test.describe('Cart Management Flow', () => {
 
     // Remove item
     await cartRow.locator('button.remove-button').click();
-    await expect(page.locator('div.tabla-carrito')).toHaveCount(0);
+    await expect(page.locator('.tabla-carrito')).toHaveCount(0);
   });
 });

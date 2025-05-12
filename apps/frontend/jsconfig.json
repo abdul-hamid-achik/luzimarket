@@ -5,9 +5,6 @@
       "@/*": [
         "src/*"
       ],
-      "@/tina/*": [
-        "tina/*"
-      ],
       "@/pagina_principal/*": [
         "src/pages/pagina_principal/*"
       ],
@@ -20,7 +17,6 @@
     }
   },
   "include": [
-    "src",
-    "tina"
+    "src"
   ]
 }

@@ -5,11 +5,9 @@ on:
     branches:
       - main
   pull_request:
-    branches:
-      - "**"
 
 jobs:
-  build_and_test:
+  test:
     runs-on: ubuntu-latest
     services:
       db:
@@ -26,70 +24,42 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     env:
-      TAG: ${{ github.sha }}
       DATABASE_URL: postgres://postgres:password@localhost:5432/ecommerce
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       CORS_ORIGIN: http://localhost:5173
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
       VITE_API_URL: http://localhost:5173/api
-      GITHUB_BRANCH: main
-      GITHUB_OWNER: abdul-hamid-achik
-      GITHUB_REPO: abdul-hamid-achik/luzimarket
-      GITHUB_PERSONAL_ACCESS_TOKEN: ${{ github.token }}
-      TINA_PUBLIC_IS_LOCAL: 'true'
-      GIT_BRANCH: main
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-
       - name: Cache npm
         uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-
       - name: Install dependencies
         run: npm ci --silent --ignore-scripts
-
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps
-
-      - name: Generate .env file
+      - name: Prepare .env file
         run: |
           echo "DATABASE_URL=${DATABASE_URL}" > .env
           echo "JWT_SECRET=${JWT_SECRET}" >> .env
           echo "CORS_ORIGIN=${CORS_ORIGIN}" >> .env
           echo "STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}" >> .env
           echo "VITE_API_URL=${VITE_API_URL}" >> .env
-          echo "PORT=${PORT}" >> .env
-          echo "GITHUB_BRANCH=${GITHUB_BRANCH}" >> .env
-          echo "GITHUB_OWNER=${GITHUB_OWNER}" >> .env
-          echo "GITHUB_REPO=${GITHUB_REPO}" >> .env
-          echo "GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}" >> .env
-          echo "TINA_PUBLIC_IS_LOCAL=${TINA_PUBLIC_IS_LOCAL}" >> .env
-          echo "GIT_BRANCH=${GIT_BRANCH}" >> .env
-
       - name: Wait for DB
         run: |
           for i in {1..30}; do pg_isready -h localhost -p 5432 -U postgres && break; echo "Waiting for DB..."; sleep 2; done
-
       - name: Run migrations
         run: npm run migrate:push
-
       - name: Seed database
         run: npm run seed
-      - name: Run backend unit tests
-        run: npm run test:backend
-
-      - name: Run frontend unit tests
-        run: npm run test:frontend
-
-      - name: Run E2E via background-server
+      - name: Run unit tests
+        run: npm run test
+      - name: Run E2E tests
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: BerniWittmann/background-server-action@v1
         with:
@@ -98,138 +68,56 @@ jobs:
           wait-on: 'http://localhost:8080/api/health,http://localhost:5173'
           command: npm run test:e2e
 
-      - name: Prepare Vercel output
-        run: |
-          mkdir -p .vercel/output
-          cp -r apps/frontend/dist .vercel/output/frontend
-          cp -r apps/backend/dist .vercel/output/backend
-
-      - name: Upload Vercel build output
-        uses: actions/upload-artifact@v4
-        with:
-          name: vercel-output
-          path: .vercel/output
-
-  test_backend_and_frontend:
+  deploy-preview:
     if: github.event_name == 'pull_request'
+    needs: test
     runs-on: ubuntu-latest
-    services:
-      db:
-        image: postgres:17-alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: ecommerce
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 5
-    env:
-      TAG: ${{ github.sha }}
-      DATABASE_URL: postgres://postgres:password@localhost:5432/ecommerce
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      CORS_ORIGIN: http://localhost:5173
-      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-      VITE_API_URL: http://localhost:5173/api
-      GITHUB_BRANCH: main
-      GITHUB_OWNER: abdul-hamid-achik
-      GITHUB_REPO: abdul-hamid-achik/luzimarket
-      GITHUB_PERSONAL_ACCESS_TOKEN: ${{ github.token }}
-      TINA_PUBLIC_IS_LOCAL: 'true'
-      GIT_BRANCH: main
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-
-      - name: Cache npm
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-
       - name: Install dependencies
-        run: npm ci --silent --ignore-scripts
-
-      - name: Generate .env file
+        run: npm ci
+      - name: Build frontend
+        run: npm run build --prefix apps/frontend
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      - name: Deploy to Vercel (Preview)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          echo "DATABASE_URL=${DATABASE_URL}" > .env
-          echo "JWT_SECRET=${JWT_SECRET}" >> .env
-          echo "CORS_ORIGIN=${CORS_ORIGIN}" >> .env
-          echo "STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}" >> .env
-          echo "VITE_API_URL=${VITE_API_URL}" >> .env
-          echo "PORT=${PORT}" >> .env
-          echo "GITHUB_BRANCH=${GITHUB_BRANCH}" >> .env
-          echo "GITHUB_OWNER=${GITHUB_OWNER}" >> .env
-          echo "GITHUB_REPO=${GITHUB_REPO}" >> .env
-          echo "GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}" >> .env
-          echo "TINA_PUBLIC_IS_LOCAL=${TINA_PUBLIC_IS_LOCAL}" >> .env
-          echo "GIT_BRANCH=${GIT_BRANCH}" >> .env
+          vercel deploy --token $VERCEL_TOKEN --confirm \
+            --org-id $VERCEL_ORG_ID --project-id $VERCEL_PROJECT_ID \
+            --cwd apps/frontend
 
-      - name: Wait for DB
-        run: |
-          for i in {1..30}; do pg_isready -h localhost -p 5432 -U postgres && break; echo "Waiting for DB..."; sleep 2; done
-
-      - name: Run migrations
-        run: npm run migrate:push
-
-      - name: Seed database
-        run: npm run seed
-
-      - name: Run backend tests
-        run: npm run test:backend
-
-      - name: Run frontend tests
-        run: npm run test:frontend
-
-  deploy_preview:
-    if: github.event_name == 'pull_request'
-    needs: [build_and_test, test_backend_and_frontend]
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Download build output
-        uses: actions/download-artifact@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          name: vercel-output
-          path: .vercel/output
-
-      - name: Deploy Preview to Vercel
-        uses: vercel/action@v20
-        with:
-          vercel_token: ${{ secrets.VERCEL_TOKEN }}
-          vercel_org_id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel_project_id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working_directory: .vercel/output
-
-  deploy_prod:
-    if: github.ref == 'refs/heads/main'
-    needs: build_and_test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Download build output
-        uses: actions/download-artifact@v3
-        with:
-          name: vercel-output
-          path: .vercel/output
-
-      - name: Deploy Production to Vercel
-        uses: vercel/action@v20
-        with:
-          vercel_token: ${{ secrets.VERCEL_TOKEN }}
-          vercel_org_id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel_project_id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working_directory: .vercel/output
-          prod: true
+          node-version: '22'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build frontend
+        run: npm run build --prefix apps/frontend
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      - name: Deploy to Vercel (Production)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          vercel deploy --prod --token $VERCEL_TOKEN --confirm \
+            --org-id $VERCEL_ORG_ID --project-id $VERCEL_PROJECT_ID \
+            --cwd apps/frontend

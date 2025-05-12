@@ -18,7 +18,6 @@ module.exports = {
     'import/resolver': {
       alias: {
         map: [
-          ['@/tina', path.resolve(__dirname, 'tina')],
           ['@/pagina_principal', path.resolve(__dirname, 'src/pages/pagina_principal')],
           ['@/empleados', path.resolve(__dirname, 'src/pages/empleados')],
           ['@/assets', path.resolve(__dirname, 'src/assets')],

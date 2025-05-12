@@ -10,6 +10,7 @@ import * as petitionsApi from "@/api/petitions";
 import * as statesApi from "@/api/states";
 import * as adminOrdersApi from "@/api/adminOrders";
 import * as categoriesApi from "@/api/categories";
+import { getProductDetails } from "@/api/productDetails";
 
 export const useProducts = () =>
   useQuery(['products'], productsApi.getProducts);
@@ -96,3 +97,6 @@ export const useStates = () =>
 
 export const useCategories = () =>
   useQuery(['categories'], categoriesApi.getCategories);
+
+export const useProductDetails = (productId) =>
+  useQuery(['productDetails', productId], () => getProductDetails(productId));

@@ -6,6 +6,7 @@ import { WebSocket } from 'ws';
 import { neonConfig } from '@neondatabase/serverless';
 import { PGlite } from '@electric-sql/pglite';
 import * as schema from './schema';
+import logger from './logger';
 
 dotenv.config();
 
@@ -33,7 +34,7 @@ export function getDb() {
     return (global as any)._testDb;
   }
   if (!_db) {
-    console.log('Initializing database connection pool');
+    logger.info('Initializing database connection pool');
 
     // Set timeout values that respect Vercel serverless constraints
     const connectionTimeoutMs = 10000; // 10 seconds
@@ -43,7 +44,7 @@ export function getDb() {
     const connectionString = process.env.DATABASE_URL ||
       process.env.POSTGRES_URL ||
       process.env.LOCAL_POSTGRES_URL;
-    console.log("→ connecting to database with", connectionString);
+    logger.info(`→ connecting to database with ${connectionString}`);
 
     if (!connectionString) {
       throw new Error('No database connection string provided');
@@ -72,7 +73,7 @@ export function getDb() {
       }
       _pool = new Pool(poolConfig);
       _pool.on('error', (err: Error) => {
-        console.error('Unexpected Postgres pool error', err);
+        logger.error({ err }, 'Unexpected Postgres pool error');
       });
       _db = drizzlePg(_pool);
     }
@@ -94,7 +95,7 @@ export const db = process.env.VITEST
 // Function to explicitly close the pool (useful for tests)
 export async function closePool() {
   if (_pool) {
-    console.log('Closing database connection pool');
+    logger.info('Closing database connection pool');
     await _pool.end();
     _pool = null;
     _db = null;
@@ -103,10 +104,10 @@ export async function closePool() {
 
 // Add graceful shutdown hooks to close the pool when the process exits
 process.on('SIGTERM', async () => {
-  console.log('SIGTERM received: closing database pool');
+  logger.info('SIGTERM received: closing database pool');
   await closePool();
 });
 process.on('SIGINT', async () => {
-  console.log('SIGINT received: closing database pool');
+  logger.info('SIGINT received: closing database pool');
   await closePool();
 });

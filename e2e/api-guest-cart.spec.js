@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 
 // Base URL for API endpoints
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'http://localhost:8080/api';
 
 test.describe('API Guest Cart Flow', () => {
     let guestToken;

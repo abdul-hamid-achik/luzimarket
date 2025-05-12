@@ -3,11 +3,26 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 
 export default defineConfig({
-    plugins: [react()],
-    resolve: {
-        alias: {
-            '@': path.resolve(__dirname, 'src'),
-            '@tina': path.resolve(__dirname, 'tina')
-        }
-    }
+  plugins: [react()],
+  resolve: {
+    alias: [
+      {
+        find: '@web',
+        replacement: path.resolve(__dirname, 'src'),
+      },
+      {
+        find: '@',
+        replacement: path.resolve(__dirname, 'src'),
+      },
+    ],
+  },
+  server: {
+    proxy: {
+      '/api': {
+        target: process.env.VITE_API_URL || 'http://localhost:8080',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 }) 

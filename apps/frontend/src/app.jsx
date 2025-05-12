@@ -7,7 +7,7 @@ import { router } from '@/router';
 
 const queryClient = new QueryClient();
 
-const AppComponent = (
+const AppComponent = () => (
     <React.StrictMode>
         <AuthProvider>
             <QueryClientProvider client={queryClient}>

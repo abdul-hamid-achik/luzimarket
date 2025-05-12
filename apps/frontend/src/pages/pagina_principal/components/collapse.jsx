@@ -1,10 +1,15 @@
 import "@/css/fonts.css"
 
 import { productDetails } from '@/data/productDetails';
+import { useProductDetails } from "@/api/hooks";
 
 const CollapseDetails = ({ product }) => {
    // Lookup accordion sections for this product
-   const sections = productDetails[product.id] || [];
+   const { data: apiSections, isLoading, error } = useProductDetails(product.id);
+   // Use API sections when available, otherwise fallback to local data
+   const sections = (apiSections && apiSections.length > 0)
+      ? apiSections
+      : (productDetails[product.id] || []);
    const accordionId = `accordion-${product.id}`;
    return (
       <>

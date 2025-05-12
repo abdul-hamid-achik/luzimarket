@@ -1,4 +1,4 @@
-import Navbars from "@/pages/pagina_principal/components/navbars/navbar_principal";
+import Navbars from "@/pages/pagina_principal/components/navbars";
 import Footer from "@/pages/pagina_principal/components/footer";
 import ModalUsr from "@/pages/pagina_principal/components/modal_index";
 

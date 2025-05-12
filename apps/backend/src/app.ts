@@ -1,6 +1,4 @@
 import express from "express";
-import { TinaNodeBackend, LocalBackendAuthProvider } from '@tinacms/datalayer';
-import databaseClient from './tina/database';
 import cors from "cors";
 import bodyParser from "body-parser";
 import swaggerUi from "swagger-ui-express";
@@ -17,13 +15,17 @@ import petitionsRoutes from './routes/petitions';
 import admissionsRoutes from './routes/petitions/admissions';
 import petitionProductsRoutes from './routes/petitions/products';
 import branchPetitionsRoutes from './routes/petitions/branches';
+import productDetailsRoutes from './routes/productDetails';
 import { StatusCodes } from "http-status-codes";
+import logger from "./logger";
+import expressPino from "express-pino-logger";
 // Import routes lazily under non-test environments to avoid pulling in full schema
 // and controllers during Jest smoke tests
 // (Dynamic requires ensure schema-related TS errors are skipped)
 // Swagger UI is always available
 
 const app = express();
+app.use(expressPino({ logger }));
 
 // Middleware
 // Allow all CORS origins (use specific origins in production via CORS_ORIGIN env var)
@@ -46,14 +48,15 @@ app.use('/api/petitions/products', petitionProductsRoutes);
 app.use('/api/petitions/branches', branchPetitionsRoutes);
 app.use('/api/states', statesRoutes);
 app.use('/api/admin/orders', adminOrdersRoutes);
+app.use('/api/product-details', productDetailsRoutes);
 
 // Swagger
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-// Tina CMS GraphQL API
-const handler = TinaNodeBackend({
-  authProvider: LocalBackendAuthProvider(),
-  databaseClient,
+
+// Error-handling middleware
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    logger.error({ err, req: { method: req.method, url: req.url, headers: req.headers } }, "Unhandled error");
+    res.status(err.status || 500).json({ error: "Internal server error" });
 });
-app.use('/admin/graphql', (req, res) => handler(req, res));
 
 export default app;

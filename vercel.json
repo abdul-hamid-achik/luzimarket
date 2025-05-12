@@ -3,7 +3,10 @@
   "installCommand": "npm install",
   "env": {
     "CORS_ORIGIN": "https://luzimarket.vercel.app",
-    "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1"
+    "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1",
+    "STRAPI_URL": "${STRAPI_URL}",
+    "STRAPI_API_TOKEN": "${STRAPI_API_TOKEN}",
+    "LOG_LEVEL": "info"
   },
   "build": {
     "env": {

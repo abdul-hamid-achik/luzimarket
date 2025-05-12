@@ -2,6 +2,8 @@ import React from 'react';
 import { GoArrowRight } from "react-icons/go";
 import { Link } from "react-router-dom";
 import { useCategories } from '@/api/hooks';
+import CatSlider from '@/components/categorias';
+
 function Categorias() {
   const { data: categories = [], isLoading, error } = useCategories();
   return (
@@ -21,17 +23,8 @@ function Categorias() {
         </ol>
       </nav>
 
-      {isLoading && <p>Loading categories...</p>}
-      {error && <p className="text-danger">Error loading categories: {error.message}</p>}
-      {!isLoading && !error && (
-        <ul className="list-group">
-          {categories.map(cat => (
-            <li key={cat.id} className="list-group-item">
-              {cat.name}
-            </li>
-          ))}
-        </ul>
-      )}
+      {/* Always render the slider for categories */}
+      <CatSlider />
     </div>
   );
 }
