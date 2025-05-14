@@ -4,14 +4,16 @@
   "private": true,
   "description": "A Strapi application",
   "scripts": {
+    "develop": "strapi develop",
+    "start": "strapi start",
     "build": "strapi build",
+    "strapi": "strapi",
+    "init-db": "node ./scripts/init-db.js",
+    "seed": "node ./scripts/seed.js",
+    "setup": "node ./scripts/setup.js",
+    "docker-seed": "cd ../.. && docker-compose exec strapi node ./scripts/seed.js",
     "console": "strapi console",
     "deploy": "strapi deploy",
-    "dev": "strapi develop",
-    "develop": "strapi develop",
-    "seed": "node ./scripts/seed.js",
-    "start": "strapi start",
-    "strapi": "strapi",
     "upgrade": "npx @strapi/upgrade latest",
     "upgrade:dry": "npx @strapi/upgrade latest --dry"
   },
@@ -31,6 +33,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   },
   "engines": {

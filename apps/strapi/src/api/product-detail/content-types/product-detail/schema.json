@@ -12,14 +12,23 @@
     },
     "pluginOptions": {},
     "attributes": {
-        "productId": {
-            "type": "integer"
+        "name": {
+            "type": "string",
+            "required": true
         },
-        "title": {
+        "description": {
+            "type": "text"
+        },
+        "price": {
+            "type": "decimal"
+        },
+        "imageUrl": {
             "type": "string"
         },
-        "content": {
-            "type": "text"
+        "category": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::category.category"
         }
     }
 }

@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@seed/*": ["../../shared/seed/*"]
+    },
     "module": "CommonJS",
     "moduleResolution": "Node",
     "lib": ["ES2020"],

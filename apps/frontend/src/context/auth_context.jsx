@@ -39,14 +39,39 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async ({ email, password }) => {
-    const { token } = await loginUser({ email, password });
-    sessionStorage.setItem('token', token);
-    const decoded = jwtDecode(token);
-    setUser(decoded);
+    try {
+      const result = await loginUser({ email, password });
+      console.log('loginUser result:', result);
+      const { jwt, user } = result;
+      if (!jwt) {
+        throw new Error('No JWT returned from backend');
+      }
+      sessionStorage.setItem('token', jwt);
+      const decoded = jwtDecode(jwt);
+      setUser(decoded);
+      return result;
+    } catch (err) {
+      console.error('Login error:', err);
+      throw err;
+    }
   };
 
   const register = async ({ email, password }) => {
-    await registerUser({ email, password });
+    try {
+      const result = await registerUser({ email, password });
+      console.log('registerUser result:', result);
+      const { jwt, user } = result;
+      if (!jwt) {
+        throw new Error('No JWT returned from backend');
+      }
+      sessionStorage.setItem('token', jwt);
+      const decoded = jwtDecode(jwt);
+      setUser(decoded);
+      return result;
+    } catch (err) {
+      console.error('Register error:', err);
+      throw err;
+    }
   };
 
   const logout = () => {
@@ -59,4 +84,5 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
+
 };

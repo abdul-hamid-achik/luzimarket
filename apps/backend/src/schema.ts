@@ -9,18 +9,7 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
-
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  email: varchar("email", { length: 256 }).notNull(),
-  passwordHash: text("password_hash").notNull(),
-  role: varchar("role", { length: 50 }).notNull().default("customer"),
-  createdAt: timestamp("created_at").notNull().default(sql`now()`),
-}, (table) => {
-  return {
-    emailIdx: uniqueIndex("email_idx").on(table.email),
-  };
-});
+// [REMOVED] No longer importing or using users, reviews, adminOrders, states tables.
 
 export const categories = pgTable("categories", {
   id: serial("id").primaryKey(),
@@ -58,8 +47,7 @@ export const productVariants = pgTable("product_variants", {
 
 export const carts = pgTable("carts", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id")
-    .references(() => users.id),
+  
   guestId: varchar("guest_id", { length: 36 }),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 }, (table) => {
@@ -83,9 +71,7 @@ export const cartItems = pgTable("cart_items", {
 
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id")
-    .notNull()
-    .references(() => users.id),
+
   total: numeric("total", { precision: 12, scale: 2 }).notNull(),
   status: varchar("status", { length: 50 }).notNull().default("pending"),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
@@ -117,18 +103,7 @@ export const coupons = pgTable("coupons", {
   };
 });
 
-export const reviews = pgTable("reviews", {
-  id: serial("id").primaryKey(),
-  productId: integer("product_id")
-    .notNull()
-    .references(() => products.id),
-  userId: integer("user_id")
-    .notNull()
-    .references(() => users.id),
-  rating: integer("rating").notNull(),
-  comment: text("comment"),
-  createdAt: timestamp("created_at").notNull().default(sql`now()`),
-});
+// [REMOVED] reviews table (migrated to Strapi or not used)
 
 // Sales table: stores daily sales amounts
 export const sales = pgTable("sales", {
@@ -138,22 +113,6 @@ export const sales = pgTable("sales", {
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
 
-// States table: list of delivery states
-export const states = pgTable("states", {
-  id: serial("id").primaryKey(),
-  label: varchar("label", { length: 255 }).notNull(),
-  value: varchar("value", { length: 50 }).notNull(),
-  createdAt: timestamp("created_at").notNull().default(sql`now()`),
-});
+// [REMOVED] states table (not needed)
 
-// Admin orders table: mock orders for employees panel
-export const adminOrders = pgTable("admin_orders", {
-  id: integer("id").primaryKey(),
-  total: integer("total").notNull(),
-  cliente: varchar("cliente", { length: 255 }).notNull(),
-  estadoPago: varchar("estado_pago", { length: 50 }).notNull(),
-  estadoOrden: varchar("estado_orden", { length: 50 }).notNull(),
-  tipoEnvio: varchar("tipo_envio", { length: 50 }).notNull(),
-  fecha: text("fecha").notNull(),
-  createdAt: timestamp("created_at").notNull().default(sql`now()`),
-});
+// [REMOVED] adminOrders table (not needed)

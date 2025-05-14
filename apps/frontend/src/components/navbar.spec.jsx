@@ -10,9 +10,40 @@ describe('NavbarAdmin', () => {
         <NavbarAdmin />
       </MemoryRouter>
     );
-    // Navigation role
     expect(screen.getByRole('navigation')).toBeInTheDocument();
-    // Example: check for a link
-    // expect(screen.getByText('Dashboard')).toBeInTheDocument();
+  });
+
+  it('shows user email when logged in', () => {
+    jest.mock('@/context/auth_context', () => ({
+      AuthContext: {
+        Provider: ({ children }) => children,
+        Consumer: ({ children }) => children({ user: { email: 'test@example.com' } })
+      },
+      useAuth: () => ({ user: { email: 'test@example.com' } })
+    }));
+    render(
+      <MemoryRouter>
+        <NavbarAdmin />
+      </MemoryRouter>
+    );
+    expect(screen.getByText('test@example.com')).toBeInTheDocument();
+  });
+
+  it('shows Invitado and login/register links when not logged in', () => {
+    jest.mock('@/context/auth_context', () => ({
+      AuthContext: {
+        Provider: ({ children }) => children,
+        Consumer: ({ children }) => children({ user: null })
+      },
+      useAuth: () => ({ user: null })
+    }));
+    render(
+      <MemoryRouter>
+        <NavbarAdmin />
+      </MemoryRouter>
+    );
+    expect(screen.getByText('Invitado')).toBeInTheDocument();
+    expect(screen.getByText('Login')).toBeInTheDocument();
+    expect(screen.getByText('Register')).toBeInTheDocument();
   });
 });

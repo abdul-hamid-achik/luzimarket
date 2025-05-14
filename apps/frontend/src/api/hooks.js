@@ -11,6 +11,9 @@ import * as statesApi from "@/api/states";
 import * as adminOrdersApi from "@/api/adminOrders";
 import * as categoriesApi from "@/api/categories";
 import { getProductDetails } from "@/api/productDetails";
+import * as articlesApi from "@/api/articles";
+import * as brandsApi from "@/api/brands";
+import * as favoritesApi from "@/api/favorites";
 
 export const useProducts = () =>
   useQuery(['products'], productsApi.getProducts);
@@ -100,3 +103,15 @@ export const useCategories = () =>
 
 export const useProductDetails = (productId) =>
   useQuery(['productDetails', productId], () => getProductDetails(productId));
+
+export const useArticles = () =>
+  useQuery(['articles'], articlesApi.getArticles);
+
+export const useArticle = (articleId) =>
+  useQuery(['article', articleId], () => articlesApi.getArticle(articleId));
+
+export const useBrands = () =>
+  useQuery(['brands'], brandsApi.getBrands);
+
+export const useFavorites = () =>
+  useQuery(['favorites'], favoritesApi.getFavorites);

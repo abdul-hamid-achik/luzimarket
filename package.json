@@ -29,7 +29,9 @@
     "migrate:down": "npm --workspace=apps/backend run migrate:down",
     "migrate:push": "npm --workspace=apps/backend run migrate:push",
     "migrate:pull": "npm --workspace=apps/backend run migrate:pull",
-    "seed": "npm --workspace=apps/backend run seed",
+    "seed": "node scripts/seed-all.js",
+    "seed:backend": "npm --workspace=apps/backend run seed",
+    "seed:strapi": "npm --workspace=apps/strapi run docker-seed",
     "start:backend": "npm --workspace=apps/backend run start",
     "start:frontend": "npm --workspace=apps/frontend run preview",
     "start": "concurrently --kill-others --raw --handle-input \"npm run start:backend\" \"npm run start:frontend\""

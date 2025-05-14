@@ -34,7 +34,7 @@ describe('auth API', () => {
 describe('registerUser', () => {
   it('calls api.post with /auth/register and payload, returns data', async () => {
     const payload = { email: 'test@example.com', password: 'password' };
-    const mockData = { id: 1 };
+    const mockData = { jwt: 'mockjwt', user: { id: 1, email: 'test@example.com' } };
     api.post.mockResolvedValue({ data: mockData });
     const result = await registerUser(payload);
     expect(api.post).toHaveBeenCalledWith('/auth/register', payload);
@@ -45,7 +45,7 @@ describe('registerUser', () => {
 describe('loginUser', () => {
   it('calls api.post with /auth/login and payload, returns data', async () => {
     const payload = { email: 'user', password: 'pass' };
-    const mockData = { token: 'abc123' };
+    const mockData = { jwt: 'mockjwt', user: { id: 1, email: 'user' } };
     api.post.mockResolvedValue({ data: mockData });
     const result = await loginUser(payload);
     expect(api.post).toHaveBeenCalledWith('/auth/login', payload);

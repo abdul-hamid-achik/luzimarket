@@ -15,6 +15,7 @@ import EditarAdmisiones from '@/pages/editar_admisiones';
 import EditarProductos from '@/pages/editar_producto';
 import EditarSucursales from '@/pages/editar_sucursales';
 import PaginaInicialInicio from '@/pages/pagina_principal/layout/inicio';
+import BodyLuzi from '@/pages/pagina_principal/pages/body_luzi';
 import Handpicked from '@/pages/pagina_principal/pages/hand_picked';
 import HandpickedProductos from '@/pages/pagina_principal/pages/productos';
 import Carrito from '@/pages/pagina_principal/pages/cart';
@@ -22,6 +23,10 @@ import CustomerLogin from '@/pages/pagina_principal/pages/login_customer';
 import CustomerRegister from '@/pages/pagina_principal/pages/register_customer';
 import OrderConfirmation from '@/pages/pagina_principal/pages/order_confirmation';
 import PerfilUsuario from '@/pages/pagina_principal/pages/perfil_usuario';
+import TiendasMarcas from '@/pages/pagina_principal/pages/tiendas_marcas';
+import Ocasiones from '@/pages/pagina_principal/pages/ocasiones';
+import Editorial from '@/pages/pagina_principal/pages/editorial';
+import Favoritos from '@/pages/pagina_principal/pages/favoritos';
 import RequireAuth from '@/components/require_auth';
 
 // Admin empleados
@@ -39,54 +44,20 @@ export const router = createBrowserRouter([
     path: "/",
     element: <PaginaInicialInicio />,
     errorElement: <NotFound />,
-    index: true,
-  },
-  {
-    path: "handpicked/productos",
-    element: <HandpickedProductos />,
-    errorElement: <NotFound />,
-  },
-  {
-    path: "handpicked/productos/:id",
-    element: <Handpicked />,
-    errorElement: <NotFound />,
-  },
-  {
-    path: "carrito",
-    element: (
-      <RequireAuth>
-        <Carrito />
-      </RequireAuth>
-    ),
-    errorElement: <NotFound />
-  },
-  {
-    path: "login",
-    element: <CustomerLogin />,
-    errorElement: <NotFound />
-  },
-  {
-    path: "register",
-    element: <CustomerRegister />,
-    errorElement: <NotFound />
-  },
-  {
-    path: "perfil",
-    element: (
-      <RequireAuth>
-        <PerfilUsuario />
-      </RequireAuth>
-    ),
-    errorElement: <NotFound />
-  },
-  {
-    path: "order-confirmation/:id",
-    element: (
-      <RequireAuth>
-        <OrderConfirmation />
-      </RequireAuth>
-    ),
-    errorElement: <NotFound />
+    children: [
+      { index: true, element: <BodyLuzi /> },
+      { path: "handpicked/productos", element: <HandpickedProductos /> },
+      { path: "handpicked/productos/:id", element: <Handpicked /> },
+      { path: "carrito", element: <RequireAuth><Carrito /></RequireAuth> },
+      { path: "login", element: <CustomerLogin /> },
+      { path: "register", element: <CustomerRegister /> },
+      { path: "perfil", element: <RequireAuth><PerfilUsuario /></RequireAuth> },
+      { path: "order-confirmation/:id", element: <RequireAuth><OrderConfirmation /></RequireAuth> },
+      { path: "tiendas-marcas", element: <TiendasMarcas /> },
+      { path: "ocasiones", element: <Ocasiones /> },
+      { path: "editorial", element: <Editorial /> },
+      { path: "favoritos", element: <Favoritos /> },
+    ],
   },
 
   /*---------------------------------------*/

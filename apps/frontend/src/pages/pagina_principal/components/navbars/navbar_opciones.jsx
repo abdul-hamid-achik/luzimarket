@@ -1,4 +1,5 @@
 import "@/pages/pagina_principal/css/navbars.css"
+import { Link } from "react-router-dom";
 
 const NavbarOpciones = () => {
    return (
@@ -8,23 +9,23 @@ const NavbarOpciones = () => {
                <div className="collapse navbar-collapse" id="navbarNav">
                   <ul className="navbar-nav mx-auto">
                      <li className="nav-item">
-                        <a className="nav-link" href="#">Best Sellers</a>
-                     </li>
-                     <li className="nav-item">
-                        <a className="nav-link" href="#">Handpicked</a>
-                     </li>
-                     <li className="nav-item">
-                        <a className="nav-link" href="#">Tiendas + Marcas</a>
-                     </li>
-                     <li className="nav-item">
-                        <a className="nav-link" href="#">Categorias</a>
-                     </li>
-                     <li className="nav-item">
-                        <a className="nav-link" href="#">Ocasiones</a>
-                     </li>
-                     <li className="nav-item">
-                        <a className="nav-link" href="#">Editorial</a>
-                     </li>
+  <Link className="nav-link" to="/handpicked/productos">Best Sellers</Link>
+</li>
+<li className="nav-item">
+  <Link className="nav-link" to="/handpicked/productos">Handpicked</Link>
+</li>
+<li className="nav-item">
+  <Link className="nav-link" to="/tiendas-marcas">Tiendas + Marcas</Link> {/* Placeholder route */}
+</li>
+<li className="nav-item">
+  <Link className="nav-link" to="/categorias">Categorias</Link>
+</li>
+<li className="nav-item">
+  <Link className="nav-link" to="/ocasiones">Ocasiones</Link> {/* Placeholder route */}
+</li>
+<li className="nav-item">
+  <Link className="nav-link" to="/editorial">Editorial</Link> {/* Placeholder route */}
+</li>
                   </ul>
                </div>
             </div>

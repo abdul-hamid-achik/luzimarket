@@ -16,11 +16,19 @@ const LoginCustomer = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
     try {
       await login({ email, password });
       navigate(from, { replace: true });
     } catch (err) {
-      setError(err.message || 'Login failed');
+      // Show backend/Strapi error message if available
+      if (err && err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
+      } else if (err && err.message) {
+        setError(err.message);
+      } else {
+        setError('Login failed');
+      }
     }
   };
 

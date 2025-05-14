@@ -12,7 +12,11 @@ import LogoCartLuzi from "@/pages/pagina_principal/images/cart_luzimarket.png";
 /* Librería */
 import { Link } from "react-router-dom";
 
+import { useContext } from "react";
+import { AuthContext } from "@/context/auth_context";
+
 const NavbarPrincipal = () => {
+  const { user } = useContext(AuthContext);
   return (
     <>
       <nav className="navbar navbar-expand-lg" id="NavbarPrincipal">
@@ -35,10 +39,24 @@ const NavbarPrincipal = () => {
                 />
               </Link>
             </div>
-            <div className="navbar-nav mx-5">
-              <div className="cajaLogosLuzi">
-                <img src={LogoUserLuzi} className="LogoNavbarPrincipal" />
-                <img src={LogoLikeLuzi} className="LogoNavbarPrincipal" />
+            <div className="navbar-nav mx-5 align-items-center">
+              <div className="cajaLogosLuzi d-flex align-items-center">
+                <Link to="/perfil">
+                  <img src={LogoUserLuzi} className="LogoNavbarPrincipal" />
+                </Link>
+                {/* Show user email or 'Invitado' */}
+                <span className="ms-2 fw-bold" style={{ minWidth: 120 }}>
+                  {user?.email ? user.email : 'Invitado'}
+                </span>
+                {/* Optionally, show login/register if not logged in */}
+                {!user?.email && (
+                  <span className="ms-3">
+                    <Link to="/login">Login</Link> / <Link to="/register">Register</Link>
+                  </span>
+                )}
+                <Link to="/favoritos">
+                  <img src={LogoLikeLuzi} className="LogoNavbarPrincipal" />
+                </Link>
                 <Link to="/carrito">
                   <img src={LogoCartLuzi} className="LogoNavbarPrincipal" />
                 </Link>

@@ -14,11 +14,27 @@ const RegisterCustomer = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
     try {
-      await register({ email, password });
-      navigate('/login');
+      const regResult = await register({ email, password });
+      console.log('Register result:', regResult);
+      // After auto-login, redirect to home or profile
+      navigate('/', { replace: true });
+      setTimeout(() => {
+        if (window.location.pathname !== '/') {
+          setError('Did not redirect to home after registration. Current URL: ' + window.location.pathname);
+        }
+      }, 2000);
     } catch (err) {
-      setError(err.message || 'Registration failed');
+      // Show backend/Strapi error message if available
+      console.error('Registration error:', err);
+      if (err && err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
+      } else if (err && err.message) {
+        setError(err.message);
+      } else {
+        setError('Registration failed');
+      }
     }
   };
 

@@ -38,6 +38,7 @@ const NavbarAdmin = () => {
               className="nav-link dropdown"
               data-bs-toggle="dropdown"
               aria-expanded="false"
+              tabIndex={0}
             >
               <img
                 src={Usuario}
@@ -50,18 +51,18 @@ const NavbarAdmin = () => {
             </a>
             <ul className="dropdown-menu">
               <li>
-                <Link className="dropdown-item" href="#">
-                  Action
+                <Link className="dropdown-item" to="/perfil">
+                  Perfil
                 </Link>
               </li>
               <li>
-                <Link className="dropdown-item" href="#">
-                  Another action
+                <Link className="dropdown-item" to="/login">
+                  Login
                 </Link>
               </li>
               <li>
-                <Link className="dropdown-item" href="#">
-                  Something else here
+                <Link className="dropdown-item" to="/register">
+                  Register
                 </Link>
               </li>
             </ul>
@@ -69,7 +70,7 @@ const NavbarAdmin = () => {
         </ul>
 
         <ul className="navbar-nav center col-md-6">
-          <Link className="navbar-brand" href="#">
+          <Link className="navbar-brand" to="/">
             <img
               src={Logo}
               alt="Logo Empresa"
@@ -80,12 +81,12 @@ const NavbarAdmin = () => {
         </ul>
 
         <ul className="navbar-nav end col-md-3 d-none d-lg-block">
-          <a href="#">
+          <Link to="/" tabIndex={-1} aria-label="Bandera">
             <img src={bandera} alt="Icono Bandera" width={25} />
-          </a>
-          <a href="#" className="ms-4">
+          </Link>
+          <Link to="/" className="ms-4" tabIndex={-1} aria-label="Notificación">
             <img src={notificacion} alt="Icono Notificación" width={25} />
-          </a>
+          </Link>
         </ul>
 
         <div

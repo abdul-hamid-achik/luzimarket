@@ -9,7 +9,8 @@ COPY package.json package-lock.json ./
 
 # Install dependencies
 RUN npm install
-RUN mkdir -p /node_modules_cache && cp -r node_modules /node_modules_cache
+RUN npm rebuild esbuild
+RUN mkdir -p /node_modules_cache && cp -r node_modules/. /node_modules_cache
 
 # Copy the rest of the app files
 COPY . ./

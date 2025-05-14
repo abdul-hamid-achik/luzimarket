@@ -1,6 +1,6 @@
 // Paginas 
+import { Outlet } from "react-router-dom";
 import Navbars from "@/pages/pagina_principal/components/navbars";
-import BodyLuzi from "@/pages/pagina_principal/pages/body_luzi";
 import Footer from "@/pages/pagina_principal/components/footer";
 
 // Bootstrap 
@@ -24,7 +24,7 @@ const Inicio = () => {
 
          {/* ===== Start Container ===== */}
          <div className="BodyIndex">
-            <BodyLuzi />
+            <Outlet />
          </div>
 
          {/* ===== End Container ===== */}

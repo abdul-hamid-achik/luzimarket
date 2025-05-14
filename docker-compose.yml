@@ -82,18 +82,22 @@ services:
       context: ./apps/strapi
       dockerfile: Dockerfile
     command: npm run develop
+    env_file:
+      - .env
     environment:
       - HOST=0.0.0.0
       - PORT=1337
       - DATABASE_CLIENT=postgres
       - DATABASE_HOST=db
       - DATABASE_PORT=5432
-      - DATABASE_NAME=ecommerce_strapi
+      - DATABASE_NAME=ecommerce
       - DATABASE_USERNAME=postgres
       - DATABASE_PASSWORD=password
       - APP_KEYS=${APP_KEYS}
       - API_TOKEN_SALT=${API_TOKEN_SALT}
       - ADMIN_JWT_SECRET=${ADMIN_JWT_SECRET}
+      - TRANSFER_TOKEN_SALT=qrmV5VW3Qc7nN8KzXtp5RA==
+      - ENCRYPTION_KEY=hKTfJhZUY6VfQ+bI5WYSz7oYBXfZSyeqXou3Oy5efIc=
     volumes:
       - ./apps/strapi:/srv/app
       - strapi_node_modules:/srv/app/node_modules

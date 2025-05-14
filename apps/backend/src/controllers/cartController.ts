@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { db } from "@/db";
-import { eq } from "drizzle-orm";
+import { eq, isNull } from "drizzle-orm";
 import { carts, cartItems, products, productVariants } from "@/schema";
 import { AuthRequest } from "@/middleware/auth";
 import { StatusCodes } from "http-status-codes";
@@ -52,9 +52,35 @@ export const addItemToCart = async (req: AuthRequest, res: Response) => {
     cart = [newCart];
   }
   const { productId, variantId, quantity } = req.body;
+  // Check if item already exists in cart (same product and variant)
+  // Build where clause for Drizzle ORM
+  const whereClause = [
+    eq(cartItems.cartId, cart[0].id),
+    eq(cartItems.productId, productId),
+  ];
+  if (variantId) {
+    whereClause.push(eq(cartItems.variantId, variantId));
+  } else {
+    whereClause.push(isNull(cartItems.variantId));
+  }
+  const existing = await db
+    .select()
+    .from(cartItems)
+    .where(...whereClause);
+  if (existing.length > 0) {
+    // Increment quantity
+    const newQuantity = existing[0].quantity + (quantity || 1);
+    const [updated] = await db
+      .update(cartItems)
+      .set({ quantity: newQuantity })
+      .where(eq(cartItems.id, existing[0].id))
+      .returning();
+    return res.json(updated);
+  }
+  // Insert new item
   const [item] = await db
     .insert(cartItems)
-    .values({ cartId: cart[0].id, productId, variantId: variantId || null, quantity })
+    .values({ cartId: cart[0].id, productId, variantId: variantId || null, quantity: quantity || 1 })
     .returning();
   res.status(201).json(item);
 };

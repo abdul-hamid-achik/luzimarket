@@ -3,7 +3,8 @@ import "@/pages/pagina_principal/css/cart_item.css";
 const CartItem = ({ item, onRemove, onQuantityChange }) => {
   // Normalize fields from API
   const name = item.productName || item.name || '';
-  const priceValue = item.productPrice ?? item.price ?? 0;
+  const rawPriceValue = item.productPrice ?? item.price ?? 0;
+const priceValue = typeof rawPriceValue === 'number' ? rawPriceValue : Number(rawPriceValue) || 0;
   const description = item.productDescription || item.description || '';
   const imageUrl = item.productImage || item.image || '';
   return (
@@ -26,7 +27,7 @@ const CartItem = ({ item, onRemove, onQuantityChange }) => {
           </td>
           <td className="price">
             <div className="item-options">
-              <label>${priceValue.toFixed(2)}</label>
+              <label>${typeof priceValue === 'number' && !isNaN(priceValue) ? priceValue.toFixed(2) : '0.00'}</label>
             </div>
           </td>
           <td className="cantidad">
@@ -48,7 +49,7 @@ const CartItem = ({ item, onRemove, onQuantityChange }) => {
           </td>
           <td className="total">
             <div className="item-total">
-              ${(priceValue * item.quantity).toFixed(2)}
+              {typeof priceValue === 'number' && !isNaN(priceValue) ? `$${(priceValue * item.quantity).toFixed(2)}` : '$0.00'}
             </div>
           </td>
         </tr>

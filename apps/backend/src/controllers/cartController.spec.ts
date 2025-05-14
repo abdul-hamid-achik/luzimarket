@@ -55,6 +55,21 @@ describe('cartController', () => {
       expect(items.length).toBe(1);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ productId: 5, quantity: 2 }));
     });
+
+    it('should increment quantity if same product is added again', async () => {
+      // First add
+      const req1: any = { user: { id: 10 }, body: { productId: 5, quantity: 1 } };
+      const res1 = makeRes();
+      await addItemToCart(req1, res1);
+      // Add again
+      const req2: any = { user: { id: 10 }, body: { productId: 5, quantity: 2 } };
+      const res2 = makeRes();
+      await addItemToCart(req2, res2);
+      // There should be only one cart item, quantity = 3
+      const items = await db.select().from(cartItems);
+      expect(items.length).toBe(1);
+      expect(items[0].quantity).toBe(3);
+    });
   });
 
   describe('updateCartItem', () => {
