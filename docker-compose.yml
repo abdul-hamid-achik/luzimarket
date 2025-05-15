@@ -98,9 +98,12 @@ services:
       - ADMIN_JWT_SECRET=${ADMIN_JWT_SECRET}
       - TRANSFER_TOKEN_SALT=qrmV5VW3Qc7nN8KzXtp5RA==
       - ENCRYPTION_KEY=hKTfJhZUY6VfQ+bI5WYSz7oYBXfZSyeqXou3Oy5efIc=
+      - NODE_ENV=development
     volumes:
       - ./apps/strapi:/srv/app
-      - strapi_node_modules:/srv/app/node_modules
+      - /srv/app/node_modules
+      - /srv/app/.cache
+      - /srv/app/build
     ports:
       - "1337:1337"
     depends_on:

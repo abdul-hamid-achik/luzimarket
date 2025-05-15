@@ -1,5 +1,3 @@
-import Navbars from "@/pages/pagina_principal/components/navbars";
-import Footer from "@/pages/pagina_principal/components/footer";
 import FiltrosHandpicked from "@/pages/pagina_principal/components/filtros_handpicked";
 import ProductosHandpicked from "@/pages/pagina_principal/components/productos_handpicked";
 import "@/pages/pagina_principal/css/handpicked.css";
@@ -7,20 +5,16 @@ import "@/pages/pagina_principal/css/general.css";
 
 const HandpickedProductos = () => {
    return (
-      <>
-         <Navbars />
-         <div className="containerHP">
-            <div className="row">
-               <div className="col" id="divfiltro"> {/*col-md-3*/}
-                  <FiltrosHandpicked />
-               </div>
-               <div className="col" id="divproducto"> {/*col-md-9*/}
-                  <ProductosHandpicked />
-               </div>
+      <div className="container-fluid py-4">
+         <div className="row">
+            <div className="col-lg-3 col-md-4" id="divfiltro">
+               <FiltrosHandpicked />
+            </div>
+            <div className="col-lg-9 col-md-8 col-12" id="divproducto">
+               <ProductosHandpicked />
             </div>
          </div>
-         <Footer />
-      </>
+      </div>
    );
 }
 export default HandpickedProductos;

@@ -11,7 +11,6 @@
     "init-db": "node ./scripts/init-db.js",
     "seed": "node ./scripts/seed.js",
     "setup": "node ./scripts/setup.js",
-    "docker-seed": "cd ../.. && docker-compose exec strapi node ./scripts/seed.js",
     "console": "strapi console",
     "deploy": "strapi deploy",
     "upgrade": "npx @strapi/upgrade latest",

@@ -9,12 +9,17 @@
 }
 
 .cat_slider_Main .item {
-  height: auto;
+  height: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  padding: 15px 0px;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
 }
 
 .cat_slider_Main .item .info {
@@ -26,10 +31,13 @@
   padding: 15px;
   transition: all 0.3s ease-in-out;
   position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 .cat_slider_Main .item .info .icon {
   font-size: 300%;
+  color: #6c757d;
 }
 
 .cat_slider_Main .slick-arrow .slick-next {
@@ -50,6 +58,17 @@
 }
 
 .cat_slider_Main .item:hover .info {
+  transform: scale(1.05);
+}
+
+.cat_slider_Main .item:hover {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
-  transform: scale(1.1);
+  background-color: #e9ecef;
+}
+
+.cat_slider_Main h5 {
+  margin-top: 10px;
+  font-size: 1.1rem;
+  color: #343a40;
+  text-align: center;
 }

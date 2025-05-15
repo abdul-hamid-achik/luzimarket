@@ -1,6 +1,5 @@
 //Componentes Generales
-import Navbars from "@/pages/pagina_principal/components/navbars/navbar_principal";
-import Footer from "@/pages/pagina_principal/components/footer";
+// Remove duplicate navbar and footer imports
 
 //componentes del carrito
 import { useCart, useUpdateCartItem, useRemoveCartItem } from "@/api/hooks";
@@ -28,27 +27,23 @@ const Cart = () => {
   };
 
   return (
-    <>
-      <Navbars />
-      <div className="container" style={{ marginBottom: '7%' }}>
-        <CartTitle />
-        <div className="hstack gap-3">
-          <div className="container">
-            {items.map((item) => (
-              <CartItem
-                key={item.id}
-                item={item}
-                onRemove={() => handleRemoveItem(item.id)}
-                onQuantityChange={(qty) => handleQuantityChange(item.id, qty)}
-              />
-            ))}
-          </div>
-          <div className="vr"></div>
-          <Checkout cartItems={items} />
+    <div className="container" style={{ marginBottom: '7%' }}>
+      <CartTitle />
+      <div className="hstack gap-3">
+        <div className="container">
+          {items.map((item) => (
+            <CartItem
+              key={item.id}
+              item={item}
+              onRemove={() => handleRemoveItem(item.id)}
+              onQuantityChange={(qty) => handleQuantityChange(item.id, qty)}
+            />
+          ))}
         </div>
+        <div className="vr"></div>
+        <Checkout cartItems={items} />
       </div>
-      <Footer />
-    </>
+    </div>
   );
 };
 

@@ -37,7 +37,7 @@ COPY --from=builder /app/apps/backend/dist ./dist
 # Generate runtime tsconfig.json for alias mapping
 RUN echo '{"compilerOptions":{"baseUrl":".","paths":{"@/*":["dist/*"]}}}' > tsconfig.json
 
-ARG PORT=8080
+ARG PORT=8000
 ENV PORT=${PORT}
 EXPOSE ${PORT}
 

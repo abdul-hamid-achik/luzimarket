@@ -15,22 +15,27 @@ const fallbackCategories = [
 
 const CatSlider = () => {
   // Fetch categories dynamically
-  const { data: categories = [] } = useCategories();
+  const { data: categories = [], isLoading } = useCategories();
 
   // Determine categories for display: use fetched data when available, otherwise fallback
   const displayCategories = (categories && categories.length > 0) ? categories : fallbackCategories;
 
   return (
     <div className="catSliderSection">
-      <div className="container-fluid">
-        {/* Render category items directly without Slider for instant display */}
-        {displayCategories.map(cat => (
-          <CategoryItem
-            key={cat.id}
-            icon={<FaTags />}
-            title={cat.name}
-          />
-        ))}
+      <div className="container">
+        <h3 className="mb-4">Nuestras Categorías</h3>
+        <div className="cat_slider_Main">
+          <div className="row">
+            {displayCategories.map(cat => (
+              <div key={cat.id} className="col-md-3 col-sm-6 mb-4">
+                <CategoryItem
+                  icon={<FaTags />}
+                  title={cat.name}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

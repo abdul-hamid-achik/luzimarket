@@ -13,7 +13,7 @@ const options = {
     servers: [
       // Hardcoded for local dev; Vercel prod will use its own routing
       {
-        url: `http://localhost:8080/api`,
+        url: `http://localhost:8000/api`,
       },
     ],
   },
