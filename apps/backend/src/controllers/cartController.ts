@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { db } from "@/db";
-import { eq, isNull } from "drizzle-orm";
+import { eq, isNull, and } from "drizzle-orm";
 import { carts, cartItems, products, productVariants } from "@/schema";
 import { AuthRequest } from "@/middleware/auth";
 import { StatusCodes } from "http-status-codes";
@@ -66,7 +66,7 @@ export const addItemToCart = async (req: AuthRequest, res: Response) => {
   const existing = await db
     .select()
     .from(cartItems)
-    .where(...whereClause);
+    .where(and(...whereClause));
   if (existing.length > 0) {
     // Increment quantity
     const newQuantity = existing[0].quantity + (quantity || 1);
