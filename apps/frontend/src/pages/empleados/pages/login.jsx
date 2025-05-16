@@ -14,7 +14,7 @@ const Login = () => {
     var txtUsusario = document.getElementById("txtUser").value();
     var txtPassword = document.getElementById("txtPass").value();
 
-    if (txtUsusario.lenght === 0 || txtPassword.lenght === 0) {
+    if (txtUsusario.length === 0 || txtPassword.length === 0) {
       alert("Complete el datos para iniciar sesion");
     } else {
       if (usuario == "admin" && password == "admin") {
