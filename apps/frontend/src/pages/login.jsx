@@ -12,8 +12,8 @@ const Login = () => {
 
   function iniciarSesion(e) {
     e.preventDefault();
-    var txtUsusario = document.getElementById("txtUser").value();
-    var txtPassword = document.getElementById("txtPass").value();
+    var txtUsusario = document.getElementById("txtUser").value;
+    var txtPassword = document.getElementById("txtPass").value;
 
     if (txtUsusario.lenght === 0 || txtPassword.lenght === 0) {
       alert("Complete el datos para iniciar sesion");
