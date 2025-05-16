@@ -136,7 +136,7 @@ drizzle.config.json
 playwright.config.js
 tsconfig.base.json
 tsconfig.json
-vite.config.js
+vite.config.ts
 ```
 
 ## Contributing
