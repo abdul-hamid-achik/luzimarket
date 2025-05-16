@@ -86,6 +86,7 @@ describe('authController', () => {
       const req = { body: { email: 'u@v.com', password: 'pw' }, headers: {} } as any;
       const res = mockResponse();
       await login(req, res as any);
+      expect(res.status).toHaveBeenCalledWith(StatusCodes.OK);
       expect(jwt.sign).toHaveBeenCalled();
       expect(res.json).toHaveBeenCalledWith({ token: fakeToken });
     });
