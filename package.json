@@ -34,7 +34,8 @@
     "seed:strapi": "npm --workspace=apps/strapi run docker-seed",
     "start:backend": "npm --workspace=apps/backend run start",
     "start:frontend": "npm --workspace=apps/frontend run preview",
-    "start": "concurrently --kill-others --raw --handle-input \"npm run start:backend\" \"npm run start:frontend\""
+    "start": "concurrently --kill-others --raw --handle-input \"npm run start:backend\" \"npm run start:frontend\"",
+    "migrate": "node ./scripts/migrate.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.52.0",

@@ -33,9 +33,12 @@ test.describe('Admin Petitions Edit Forms', () => {
   test('Branch edit form and back navigation', async ({ page }) => {
     await page.goto('/inicio/peticiones/sucursales/editar');
     await page.waitForURL(/\/inicio\/peticiones\/sucursales\/editar$/);
-    // Check sucursal form fields visible
-    await expect(page.locator('input[placeholder="Nombre del producto"]')).toBeVisible();
-    await expect(page.locator('input[placeholder="Precio del producto"]')).toBeVisible();
+    // Check sucursal form fields visible by ID
+    const branchInputs = page.locator('input#text__Suc');
+    await expect(branchInputs).toHaveCount(2);
+    await expect(branchInputs.first()).toBeVisible();
+    await expect(branchInputs.nth(1)).toBeVisible();
+    // Check description textarea
     await expect(page.locator('textarea#descripcion__Suc')).toBeVisible();
     // Click Regresar button
     await page.click('a.boton_linkP1');

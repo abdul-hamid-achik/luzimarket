@@ -12,13 +12,13 @@ test.describe('Handpicked Filters Accordion', () => {
     const secondHeader = accordionHeaders.nth(1);
     await secondHeader.click();
     // Verify second body is visible
-    const secondBody = page.locator('#collapseTwo .accordion-body');
+    const secondBody = page.locator('#collapsePrice .accordion-body');
     await expect(secondBody).toBeVisible();
 
     // Collapse third section
     const thirdHeader = accordionHeaders.nth(2);
     await thirdHeader.click();
-    const thirdBody = page.locator('#collapseThree .accordion-body');
+    const thirdBody = page.locator('#collapseColor .accordion-body');
     await expect(thirdBody).toBeVisible();
   });
 });

@@ -36,6 +36,10 @@
   ],
   "routes": [
     {
+      "src": "/strapi/(.*)",
+      "dest": "/api/strapi.js"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "apps/backend/dist/index.js",
       "headers": {

@@ -153,6 +153,26 @@ async function main() {
       } else {
         console.log('Sales data already exists, skipping');
       }
+
+      // Seed a default category and product for E2E tests
+      try {
+        const catCountRes = await pool.query('SELECT COUNT(*) FROM categories');
+        const hasCategories = parseInt(catCountRes.rows[0].count) > 0;
+        if (!hasCategories) {
+          console.log('Seeding default category and product...');
+          const catRes = await pool.query(
+            "INSERT INTO categories (name, created_at) VALUES ('Default Category', NOW()) RETURNING id"
+          );
+          const catId = catRes.rows[0].id;
+          await pool.query(
+            `INSERT INTO products (name, description, price, category_id, image_url, created_at, updated_at) VALUES ('Sample Product', 'A seeded product', 19.99, $1, '', NOW(), NOW())`,
+            [catId]
+          );
+          console.log('Seeded a sample category and product');
+        }
+      } catch (err) {
+        console.error('Error seeding default category/product:', err);
+      }
     } catch (err) {
       console.error('Error seeding data:', err);
       console.log('Continuing anyway...');
