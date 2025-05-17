@@ -36,7 +36,7 @@
     "start:frontend": "npm --workspace=apps/frontend run preview",
     "start": "concurrently --kill-others --raw --handle-input \"npm run start:backend\" \"npm run start:frontend\"",
     "migrate": "node ./scripts/migrate.js",
-    "studio": "cd apps/backend && npx drizzle-kit studio"
+    "studio": "cd apps/backend && npx --yes drizzle-kit studio"
   },
   "devDependencies": {
     "@playwright/test": "^1.52.0",

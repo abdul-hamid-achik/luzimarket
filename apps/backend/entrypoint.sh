@@ -1,14 +1,13 @@
-#!/usr/bin/env sh
-set -e
+#!/bin/sh
 
-# Run database migrations
-echo "Running database migrations..."
-npm run migrate:up
-echo "Database migrations completed"
+if [ -z "$STRAPI_API_TOKEN" ] && [ -n "$STRAPI_API_TOKEN_FILE" ]; then
+  while [ ! -f "$STRAPI_API_TOKEN_FILE" ]; do
+    echo "Waiting for Strapi API token..."
+    sleep 2
+  done
 
-echo "Seeding database..."
-npm run seed
-echo "Database seeded successfully"
+  export STRAPI_API_TOKEN=$(cat "$STRAPI_API_TOKEN_FILE")
+fi
 
-# Execute the main container command
+# Execute the main command
 exec "$@" 

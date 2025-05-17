@@ -1,4 +1,17 @@
 export default ({ env }) => ({
+    'api-token': {
+      enabled: true,
+      config: {
+        tokens: [
+          {
+            name: 'Backend Access Token',
+            description: 'Token for backend service to access Strapi API',
+            type: 'full-access',
+            token: env('STRAPI_API_TOKEN'),
+          },
+        ],
+      },
+    },
     'users-permissions': {
         enabled: true,
         config: {

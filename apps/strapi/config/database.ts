@@ -6,11 +6,11 @@ export default ({ env }) => {
   const connections = {
     postgres: {
       connection: {
-        host: env('DATABASE_HOST', 'db'),
+        host: env('DATABASE_HOST', 'localhost'),
         port: env.int('DATABASE_PORT', 5432),
-        database: env('DATABASE_NAME', 'ecommerce'),
-        user: env('DATABASE_USERNAME', 'postgres'),
-        password: env('DATABASE_PASSWORD', 'password'),
+        database: env('DATABASE_NAME', 'strapi'),
+        user: env('DATABASE_USERNAME', 'strapi'),
+        password: env('DATABASE_PASSWORD', 'strapi'),
         ssl: env.bool('DATABASE_SSL', false) && {
           key: env('DATABASE_SSL_KEY', undefined),
           cert: env('DATABASE_SSL_CERT', undefined),
@@ -38,6 +38,7 @@ export default ({ env }) => {
       forceMigration: true,
       runMigrations: true,
       debug: true,
+      useTypescriptMigrations: true
     },
   };
 };

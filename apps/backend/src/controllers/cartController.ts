@@ -23,23 +23,34 @@ export const getCart = async (req: AuthRequest, res: Response) => {
   const itemsRaw = await db.select().from(cartItems).where(eq(cartItems.cartId, cart[0].id));
   try {
     const items = await Promise.all(itemsRaw.map(async (item: any) => {
-      const { data: prodResp } = await strapi.get(`/api/products/${item.productId}?populate=variants`);
-      const prod = prodResp.data;
-      const variant = item.variantId
-        ? prod.attributes.variants?.data.find((v: any) => v.id === item.variantId)
-        : null;
-      return {
-        id: item.id,
-        quantity: item.quantity,
-        productId: prod.id,
-        productName: prod.attributes.name,
-        productPrice: parseFloat(prod.attributes.price),
-        variantId: variant?.id,
-        variantName: variant?.attributes.name,
-        additionalPrice: variant ? parseFloat(variant.attributes.additionalPrice) : 0,
-      };
+      try {
+        const { data: prodResp } = await strapi.get(`/api/products/${item.productId}?populate=variants`);
+        const prod = prodResp.data;
+        const variant = item.variantId
+          ? prod.attributes.variants?.data.find((v: any) => v.id === item.variantId)
+          : null;
+        return {
+          id: item.id,
+          quantity: item.quantity,
+          productId: prod.id,
+          productName: prod.attributes.name,
+          productPrice: parseFloat(prod.attributes.price),
+          variantId: variant?.id,
+          variantName: variant?.attributes.name,
+          additionalPrice: variant ? parseFloat(variant.attributes.additionalPrice) : 0,
+        };
+      } catch (err: any) {
+        // If product not found, skip it and remove from cart
+        if (err.message.includes('404')) {
+          await db.delete(cartItems).where(eq(cartItems.id, item.id));
+          return null;
+        }
+        throw err;
+      }
     }));
-    return res.json({ cart: cart[0], items });
+    // Filter out null items (products that were not found and removed)
+    const validItems = items.filter(item => item !== null);
+    return res.json({ cart: cart[0], items: validItems });
   } catch (err: any) {
     console.error('Error fetching product details for cart items', err);
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
