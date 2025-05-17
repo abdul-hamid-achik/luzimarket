@@ -1,30 +1,30 @@
 # syntax=docker/dockerfile:1.3
 
-# Stage 1: deps - install all workspace dependencies
+# Stage 1: deps - install dependencies
 FROM node:22-alpine AS deps
-WORKDIR /app
-# Copy only the root manifest and the Strapi workspace manifest
-COPY package.json package-lock.json ./
-COPY apps/strapi/package.json apps/strapi/package.json
-# Install only the Strapi workspace dependencies
-RUN npm ci --workspace=apps/strapi
+# Installing libvips-dev for sharp Compatibility
+RUN apk update && apk add --no-cache build-base gcc autoconf automake zlib-dev libpng-dev nasm bash vips-dev git
+ARG NODE_ENV=development
+ENV NODE_ENV=${NODE_ENV}
 
-# Stage 2: runner - final Strapi runtime
+WORKDIR /opt/app
+# Copy root package files for workspace resolution
+COPY package.json package-lock.json ./
+COPY apps/strapi/package.json ./
+# Install dependencies
+RUN npm install
+ENV PATH=/opt/app/node_modules/.bin:$PATH
+
+# Stage 2: runner - final runtime
 FROM node:22-alpine AS runner
-# Install runtime dependencies
-RUN apk add --no-cache postgresql-client
-# Copy only Strapi node_modules from deps into parent dir
-COPY --from=deps /app/node_modules /srv/app/node_modules
-# Also populate workspace-specific node_modules so bind mounts don't overwrite deps
-COPY --from=deps /app/node_modules /srv/app/apps/strapi/node_modules
-# Copy Strapi source into subdirectory
-COPY apps/strapi/ /srv/app/apps/strapi
-# Install entrypoint
-COPY apps/strapi/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
-# Set working directory into Strapi workspace
-WORKDIR /srv/app/apps/strapi
+RUN apk add --no-cache postgresql-client vips-dev wget
+WORKDIR /opt/app
+# Copy deps and source
+COPY --from=deps /opt/app/node_modules ./node_modules
+COPY apps/strapi/ ./
+# Set permissions
+RUN chown -R node:node /opt/app
+USER node
 # Expose and run
 EXPOSE 1337
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-CMD ["npm","run","develop"] 
+CMD ["npm", "run", "develop"] 

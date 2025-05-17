@@ -55,10 +55,13 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      strapi:
+        condition: service_healthy
     healthcheck:
       disable: true
     volumes:
       - ./apps/backend:/app/apps/backend
+      - /app/apps/backend/node_modules
 
   frontend:
     build:
@@ -77,21 +80,13 @@ services:
       - CHOKIDAR_INTERVAL=1000
     volumes:
       - ./apps/frontend:/app/apps/frontend
-      - frontend_node_modules:/app/apps/frontend/node_modules
+      - /app/apps/frontend/node_modules
 
   strapi:
     build:
       context: .
       dockerfile: apps/strapi/Dockerfile
-    command: >
-      sh -c "
-        while ! pg_isready -h db -p 5432 -U postgres; do
-          echo 'Waiting for PostgreSQL to become available...'
-          sleep 1
-        done
-        echo 'Starting Strapi...'
-        npm run strapi develop -- --debug
-      "
+    command: npm run develop
     restart: unless-stopped
     env_file:
       - .env
@@ -110,9 +105,15 @@ services:
       - TRANSFER_TOKEN_SALT=qrmV5VW3Qc7nN8KzXtp5RA==
       - ENCRYPTION_KEY=hKTfJhZUY6VfQ+bI5WYSz7oYBXfZSyeqXou3Oy5efIc=
       - NODE_ENV=development
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:1337/admin/login" ]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     volumes:
-      - ./apps/strapi:/srv/app/apps/strapi
-      - strapi_node_modules:/srv/app/apps/strapi/node_modules
+      - ./apps/strapi:/opt/app
+      - /opt/app/node_modules
     ports:
       - "1337:1337"
     depends_on:
@@ -122,5 +123,3 @@ services:
 volumes:
   db_data:
     external: false
-  frontend_node_modules:
-  strapi_node_modules:
