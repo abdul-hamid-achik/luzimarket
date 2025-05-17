@@ -56,8 +56,8 @@ ENCRYPTION_KEY=your_encryption_key
 # Backend ↔ Strapi connection (for the backend container)
 STRAPI_URL=http://localhost:1337
 STRAPI_API_TOKEN=your_strapi_api_content_token
-# Alternatively, use a file-based token (backend reads from this path):
-# STRAPI_API_TOKEN_FILE=/strapi/.token
+# The token above is automatically provisioned by the Strapi `api-token`
+# extension during bootstrap.
 ```
 
 ## Installation
