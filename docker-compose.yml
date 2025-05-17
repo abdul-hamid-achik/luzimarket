@@ -91,7 +91,6 @@ services:
       context: .
       dockerfile: apps/strapi/Dockerfile
     restart: unless-stopped
-    command: npm run develop
     env_file:
       - .env
     environment:
@@ -106,8 +105,8 @@ services:
       - APP_KEYS=${APP_KEYS}
       - API_TOKEN_SALT=${API_TOKEN_SALT}
       - ADMIN_JWT_SECRET=${ADMIN_JWT_SECRET}
-      - TRANSFER_TOKEN_SALT=qrmV5VW3Qc7nN8KzXtp5RA==
-      - ENCRYPTION_KEY=hKTfJhZUY6VfQ+bI5WYSz7oYBXfZSyeqXou3Oy5efIc=
+      - TRANSFER_TOKEN_SALT=${TRANSFER_TOKEN_SALT}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       # Static Strapi API token for backend service (code-based configuration)
       - STRAPI_API_TOKEN=${STRAPI_API_TOKEN}
       - NODE_ENV=development

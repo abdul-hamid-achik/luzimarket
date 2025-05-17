@@ -17,10 +17,6 @@ RUN npm config set fetch-retry-maxtimeout 600000 -g && npm install
 # Copy Strapi app source
 COPY apps/strapi ./
 
-# Copy the start.sh wrapper script into the image and make it executable
-COPY apps/strapi/start.sh /opt/app/start.sh
-RUN chmod +x /opt/app/start.sh
-
 # Stage 2: runner - final runtime image
 FROM node:22-alpine AS runner
 # Install runtime dependencies
@@ -37,4 +33,4 @@ USER node
 
 # Expose the Strapi port and run the wrapper
 EXPOSE 1337
-ENTRYPOINT ["/opt/app/start.sh"] 
+CMD ["npm", "run", "develop"]
