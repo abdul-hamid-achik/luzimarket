@@ -1,5 +1,5 @@
 # Use an official lightweight Node.js image
-FROM node:18-alpine
+FROM node:22-alpine
 
 # Install PostgreSQL client tools for database interaction
 RUN apk add --no-cache postgresql-client
