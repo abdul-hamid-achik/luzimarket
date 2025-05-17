@@ -1,29 +1,30 @@
-# Use an official lightweight Node.js image
-FROM node:22-alpine
+# syntax=docker/dockerfile:1.3
 
-# Install PostgreSQL client tools for database interaction
-RUN apk add --no-cache postgresql-client
-
-# Create app directory
-WORKDIR /srv/app
-
-# Copy dependencies definitions
+# Stage 1: deps - install all workspace dependencies
+FROM node:22-alpine AS deps
+WORKDIR /app
+# Copy only the root manifest and the Strapi workspace manifest
 COPY package.json package-lock.json ./
+COPY apps/strapi/package.json apps/strapi/package.json
+# Install only the Strapi workspace dependencies
+RUN npm ci --workspace=apps/strapi
 
-# Install dependencies
-RUN npm install
-RUN npm uninstall esbuild
-RUN npm install esbuild@0.21.5 --save-exact
-RUN mkdir -p /node_modules_cache && cp -r node_modules/. /node_modules_cache
-
-# Copy the rest of the app files
-COPY . ./
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+# Stage 2: runner - final Strapi runtime
+FROM node:22-alpine AS runner
+# Install runtime dependencies
+RUN apk add --no-cache postgresql-client
+# Copy only Strapi node_modules from deps into parent dir
+COPY --from=deps /app/node_modules /srv/app/node_modules
+# Also populate workspace-specific node_modules so bind mounts don't overwrite deps
+COPY --from=deps /app/node_modules /srv/app/apps/strapi/node_modules
+# Copy Strapi source into subdirectory
+COPY apps/strapi/ /srv/app/apps/strapi
+# Install entrypoint
+COPY apps/strapi/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
-
-# Expose Strapi default port
+# Set working directory into Strapi workspace
+WORKDIR /srv/app/apps/strapi
+# Expose and run
 EXPOSE 1337
-
-# Start Strapi in development mode
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-CMD ["npm", "run", "develop"] 
+CMD ["npm","run","develop"] 

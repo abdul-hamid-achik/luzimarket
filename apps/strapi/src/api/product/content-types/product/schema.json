@@ -1,0 +1,70 @@
+{
+    "kind": "collectionType",
+    "collectionName": "products",
+    "info": {
+        "singularName": "product",
+        "pluralName": "products",
+        "displayName": "Product",
+        "description": "A bouquet, gift or item for sale"
+    },
+    "options": {
+        "draftAndPublish": false
+    },
+    "attributes": {
+        "title": {
+            "type": "string",
+            "required": true
+        },
+        "slug": {
+            "type": "uid",
+            "targetField": "title"
+        },
+        "description": {
+            "type": "richtext"
+        },
+        "price": {
+            "type": "decimal"
+        },
+        "salePrice": {
+            "type": "decimal"
+        },
+        "sku": {
+            "type": "string",
+            "unique": true
+        },
+        "inStock": {
+            "type": "integer",
+            "default": 0
+        },
+        "gallery": {
+            "type": "media",
+            "multiple": true,
+            "allowedTypes": [
+                "images"
+            ]
+        },
+        "category": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::category.category"
+        },
+        "brand": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::brand.brand"
+        },
+        "variants": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::variant.variant",
+            "mappedBy": "product"
+        },
+        "tags": {
+            "type": "string",
+            "repeatable": true
+        },
+        "rating": {
+            "type": "decimal"
+        }
+    }
+}

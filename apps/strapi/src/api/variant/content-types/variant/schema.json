@@ -1,0 +1,36 @@
+{
+    "kind": "collectionType",
+    "collectionName": "variants",
+    "info": {
+        "singularName": "variant",
+        "pluralName": "variants",
+        "displayName": "Variant"
+    },
+    "options": {
+        "draftAndPublish": false
+    },
+    "attributes": {
+        "name": {
+            "type": "string",
+            "required": true
+        },
+        "price": {
+            "type": "decimal"
+        },
+        "sku": {
+            "type": "string",
+            "unique": true
+        },
+        "stock": {
+            "type": "integer"
+        },
+        "product": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::product.product"
+        },
+        "options": {
+            "type": "json"
+        }
+    }
+}

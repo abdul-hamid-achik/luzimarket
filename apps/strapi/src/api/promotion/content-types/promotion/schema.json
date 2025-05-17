@@ -1,0 +1,40 @@
+{
+    "kind": "collectionType",
+    "collectionName": "promotions",
+    "info": {
+        "singularName": "promotion",
+        "pluralName": "promotions",
+        "displayName": "Promotion",
+        "description": "Coupon or promotion"
+    },
+    "options": {
+        "draftAndPublish": false
+    },
+    "attributes": {
+        "code": {
+            "type": "string",
+            "required": true,
+            "unique": true
+        },
+        "discount": {
+            "type": "integer"
+        },
+        "type": {
+            "type": "enumeration",
+            "enum": [
+                "percent",
+                "fixed"
+            ]
+        },
+        "active": {
+            "type": "boolean",
+            "default": true
+        },
+        "validFrom": {
+            "type": "datetime"
+        },
+        "validTo": {
+            "type": "datetime"
+        }
+    }
+}

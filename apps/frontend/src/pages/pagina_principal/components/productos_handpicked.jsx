@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { useProducts } from "@/api/hooks";
 import '@/pages/pagina_principal/css/producto.css';
 
-const ProductosHandpicked = () => {
-  const { data: products = [], isLoading, error } = useProducts();
+const ProductosHandpicked = ({ filters = {} }) => {
+  const { data: products = [], isLoading, error } = useProducts(filters);
 
   if (isLoading) return (
     <div className="text-center p-5">

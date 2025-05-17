@@ -154,24 +154,29 @@ async function main() {
         console.log('Sales data already exists, skipping');
       }
 
-      // Seed a default category and product for E2E tests
+      // Seed coupons for demo purposes
       try {
-        const catCountRes = await pool.query('SELECT COUNT(*) FROM categories');
-        const hasCategories = parseInt(catCountRes.rows[0].count) > 0;
-        if (!hasCategories) {
-          console.log('Seeding default category and product...');
-          const catRes = await pool.query(
-            "INSERT INTO categories (name, created_at) VALUES ('Default Category', NOW()) RETURNING id"
-          );
-          const catId = catRes.rows[0].id;
-          await pool.query(
-            `INSERT INTO products (name, description, price, category_id, image_url, created_at, updated_at) VALUES ('Sample Product', 'A seeded product', 19.99, $1, '', NOW(), NOW())`,
-            [catId]
-          );
-          console.log('Seeded a sample category and product');
+        const couponCountRes = await pool.query('SELECT COUNT(*) FROM coupons');
+        const hasCoupons = parseInt(couponCountRes.rows[0].count) > 0;
+        if (!hasCoupons) {
+          console.log('Seeding coupons...');
+          const coupons = [
+            { code: 'WELCOME10', discount_percent: 10, expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) },
+            { code: 'SUMMER20', discount_percent: 20, expires_at: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000) },
+            { code: 'BLACKFRIDAY50', discount_percent: 50, expires_at: new Date('2025-11-29') },
+          ];
+          for (const coupon of coupons) {
+            await pool.query(
+              'INSERT INTO coupons (code, discount_percent, expires_at) VALUES ($1, $2, $3)',
+              [coupon.code, coupon.discount_percent, coupon.expires_at]
+            );
+          }
+          console.log(`Inserted ${coupons.length} coupons`);
+        } else {
+          console.log('Coupons already exist, skipping');
         }
       } catch (err) {
-        console.error('Error seeding default category/product:', err);
+        console.error('Error seeding coupons:', err);
       }
     } catch (err) {
       console.error('Error seeding data:', err);

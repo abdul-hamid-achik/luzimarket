@@ -34,7 +34,8 @@ services:
       target: builder
       args:
         PORT: ${PORT}
-    command: npm run dev -- --poll
+    entrypoint: [ "/app/apps/backend/entrypoint.sh" ]
+    command: [ "npm", "run", "dev", "--", "--poll" ]
     working_dir: /app/apps/backend
     restart: always
     env_file:
@@ -75,13 +76,13 @@ services:
       - CHOKIDAR_USEPOLLING=true
       - CHOKIDAR_INTERVAL=1000
     volumes:
-      - ./apps/frontend:/app
-      - frontend_node_modules:/app/node_modules
+      - ./apps/frontend:/app/apps/frontend
+      - frontend_node_modules:/app/apps/frontend/node_modules
 
   strapi:
     build:
-      context: ./apps/strapi
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: apps/strapi/Dockerfile
     command: >
       sh -c "
         while ! pg_isready -h db -p 5432 -U postgres; do
@@ -110,11 +111,8 @@ services:
       - ENCRYPTION_KEY=hKTfJhZUY6VfQ+bI5WYSz7oYBXfZSyeqXou3Oy5efIc=
       - NODE_ENV=development
     volumes:
-      - ./apps/strapi:/srv/app
-      - strapi_node_modules:/srv/app/node_modules
-      - strapi_build:/srv/app/.cache
-      - strapi_build:/srv/app/build
-      - strapi_data:/srv/app/.tmp
+      - ./apps/strapi:/srv/app/apps/strapi
+      - strapi_node_modules:/srv/app/apps/strapi/node_modules
     ports:
       - "1337:1337"
     depends_on:
@@ -126,5 +124,3 @@ volumes:
     external: false
   frontend_node_modules:
   strapi_node_modules:
-  strapi_build:
-  strapi_data:

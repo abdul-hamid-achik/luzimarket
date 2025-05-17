@@ -292,6 +292,104 @@ async function seed() {
             console.log('✅ Products already exist');
         }
 
+        // 5. Seed new Product entries
+        const newProdCount = await strapi.db.query('api::product.product').count();
+        if (newProdCount === 0) {
+            console.log('Seeding demo products...');
+            const categories = await strapi.entityService.findMany('api::category.category');
+            const catMap = {};
+            categories.forEach(c => { catMap[c.slug] = c.id; });
+            const demoProducts = [
+                {
+                    title: 'Ramo de Rosas', slug: 'ramo-de-rosas', description: 'Hermoso ramo de rosas rojas',
+                    price: 500, salePrice: 450, sku: 'RAMO-0001', inStock: 25,
+                    category: catMap['flowershop'], brand: null, tags: ['rosas', 'flores']
+                },
+                {
+                    title: 'Caja de Globos', slug: 'caja-de-globos', description: 'Caja con globos de colores',
+                    price: 300, salePrice: 270, sku: 'GLOB-0001', inStock: 30,
+                    category: catMap['cumpleanos'], brand: null, tags: ['globos', 'celebracion']
+                },
+                {
+                    title: 'Arreglo Floral Premium', slug: 'arreglo-floral-premium', description: 'Arreglo mixto premium',
+                    price: 800, salePrice: 700, sku: 'FLOR-0001', inStock: 10,
+                    category: catMap['flowershop'], brand: null, tags: ['premium', 'flores']
+                }
+            ];
+            for (const p of demoProducts) {
+                await strapi.entityService.create('api::product.product', { data: p });
+            }
+            console.log('✅ Seeded demo products');
+        } else {
+            console.log('✅ Demo products already exist');
+        }
+
+        // 6. Seed Variants
+        const varCount = await strapi.db.query('api::variant.variant').count();
+        if (varCount === 0) {
+            console.log('Seeding variants...');
+            const products = await strapi.entityService.findMany('api::product.product');
+            const variants = [];
+            products.forEach(prod => {
+                variants.push({ name: prod.title + ' - Pequeño', price: prod.price, sku: prod.sku + '-S', stock: 10, product: prod.id });
+                variants.push({ name: prod.title + ' - Grande', price: prod.price * 1.5, sku: prod.sku + '-L', stock: 5, product: prod.id });
+            });
+            for (const v of variants) {
+                await strapi.entityService.create('api::variant.variant', { data: v });
+            }
+            console.log('✅ Seeded variants');
+        } else {
+            console.log('✅ Variants already exist');
+        }
+
+        // 7. Seed Bundles
+        const bundleCount = await strapi.db.query('api::bundle.bundle').count();
+        if (bundleCount === 0) {
+            console.log('Seeding bundles...');
+            const prods = await strapi.entityService.findMany('api::product.product');
+            if (prods.length >= 2) {
+                await strapi.entityService.create('api::bundle.bundle', {
+                    data: {
+                        title: 'Combo Rosa y Globos', slug: 'combo-rosa-y-globos', products: [prods[0].id, prods[1].id],
+                        price: (prods[0].price + prods[1].price) * 0.9
+                    }
+                });
+                await strapi.entityService.create('api::bundle.bundle', {
+                    data: {
+                        title: 'Combo Premium', slug: 'combo-premium', products: [prods[0].id, prods[2]?.id || prods[1].id],
+                        price: (prods[0].price + (prods[2]?.price || prods[1].price)) * 0.85
+                    }
+                });
+            }
+            console.log('✅ Seeded bundles');
+        } else {
+            console.log('✅ Bundles already exist');
+        }
+
+        // 8. Seed Promotions
+        const promoCount = await strapi.db.query('api::promotion.promotion').count();
+        if (promoCount === 0) {
+            console.log('Seeding promotions...');
+            const now = new Date();
+            const nextMonth = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+            await strapi.entityService.create('api::promotion.promotion', { data: { code: 'WELCOME10', discount: 10, type: 'percent', active: true, validFrom: now, validTo: nextMonth } });
+            await strapi.entityService.create('api::promotion.promotion', { data: { code: 'SUMMER5', discount: 5, type: 'percent', active: true, validFrom: now, validTo: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000) } });
+            console.log('✅ Seeded promotions');
+        } else {
+            console.log('✅ Promotions already exist');
+        }
+
+        // 9. Seed Delivery Zones
+        const zoneCount = await strapi.db.query('api::delivery-zone.delivery-zone').count();
+        if (zoneCount === 0) {
+            console.log('Seeding delivery zones...');
+            await strapi.entityService.create('api::delivery-zone.delivery-zone', { data: { name: 'Ciudad de México', cities: ['Ciudad de México', 'Distrito Federal'], fee: 50, minDays: 0, maxDays: 0 } });
+            await strapi.entityService.create('api::delivery-zone.delivery-zone', { data: { name: 'Interior de la República', cities: ['Guadalajara', 'Monterrey'], fee: 100, minDays: 1, maxDays: 3 } });
+            console.log('✅ Seeded delivery zones');
+        } else {
+            console.log('✅ Delivery zones already exist');
+        }
+
     } catch (err) {
         console.error('Error during seeding:', err);
         throw err;

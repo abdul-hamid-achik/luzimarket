@@ -1,9 +1,10 @@
 import { Response } from "express";
 import { db } from "@/db";
 import { eq, isNull, and } from "drizzle-orm";
-import { carts, cartItems, products, productVariants } from "@/schema";
+import { carts, cartItems } from "@/schema";
 import { AuthRequest } from "@/middleware/auth";
 import { StatusCodes } from "http-status-codes";
+import strapi from '@/utils/strapiClient';
 
 export const getCart = async (req: AuthRequest, res: Response) => {
   const { id: userId, guestId } = req.user ?? {};
@@ -19,22 +20,30 @@ export const getCart = async (req: AuthRequest, res: Response) => {
     const [newCart] = await db.insert(carts).values(values).returning();
     cart = [newCart];
   }
-  const items = await db
-    .select({
-      id: cartItems.id,
-      productId: cartItems.productId,
-      variantId: cartItems.variantId,
-      quantity: cartItems.quantity,
-      productName: products.name,
-      productPrice: products.price,
-      variantName: productVariants.name,
-      additionalPrice: productVariants.additionalPrice,
-    })
-    .from(cartItems)
-    .leftJoin(products, eq(products.id, cartItems.productId))
-    .leftJoin(productVariants, eq(productVariants.id, cartItems.variantId))
-    .where(eq(cartItems.cartId, cart[0].id));
-  res.json({ cart: cart[0], items });
+  const itemsRaw = await db.select().from(cartItems).where(eq(cartItems.cartId, cart[0].id));
+  try {
+    const items = await Promise.all(itemsRaw.map(async (item: any) => {
+      const { data: prodResp } = await strapi.get(`/api/products/${item.productId}?populate=variants`);
+      const prod = prodResp.data;
+      const variant = item.variantId
+        ? prod.attributes.variants?.data.find((v: any) => v.id === item.variantId)
+        : null;
+      return {
+        id: item.id,
+        quantity: item.quantity,
+        productId: prod.id,
+        productName: prod.attributes.name,
+        productPrice: parseFloat(prod.attributes.price),
+        variantId: variant?.id,
+        variantName: variant?.attributes.name,
+        additionalPrice: variant ? parseFloat(variant.attributes.additionalPrice) : 0,
+      };
+    }));
+    return res.json({ cart: cart[0], items });
+  } catch (err: any) {
+    console.error('Error fetching product details for cart items', err);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
+  }
 };
 
 export const addItemToCart = async (req: AuthRequest, res: Response) => {
@@ -86,7 +95,7 @@ export const addItemToCart = async (req: AuthRequest, res: Response) => {
 };
 
 export const updateCartItem = async (req: AuthRequest, res: Response) => {
-  const itemId = Number(req.params.itemId);
+  const itemId = req.params.itemId;
   const { quantity } = req.body;
   const updated = await db
     .update(cartItems)
@@ -100,7 +109,7 @@ export const updateCartItem = async (req: AuthRequest, res: Response) => {
 };
 
 export const removeCartItem = async (req: AuthRequest, res: Response) => {
-  const itemId = Number(req.params.itemId);
+  const itemId = req.params.itemId;
   await db.delete(cartItems).where(eq(cartItems.id, itemId));
   res.json({ success: true });
 };

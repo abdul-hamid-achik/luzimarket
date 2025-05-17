@@ -1,118 +1,81 @@
-import {
-  pgTable,
-  serial,
-  text,
-  varchar,
-  timestamp,
-  integer,
-  numeric,
-  uniqueIndex,
-} from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
-// [REMOVED] No longer importing or using users, reviews, adminOrders, states tables.
-
-export const categories = pgTable("categories", {
-  id: serial("id").primaryKey(),
-  name: varchar("name", { length: 255 }).notNull(),
-  createdAt: timestamp("created_at").notNull().default(sql`now()`),
-}, (table) => {
-  return {
-    nameIdx: uniqueIndex("name_idx").on(table.name),
-  };
-});
-
-export const products = pgTable("products", {
-  id: serial("id").primaryKey(),
-  name: varchar("name", { length: 255 }).notNull(),
-  description: text("description"),
-  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
-  categoryId: integer("category_id")
-    .notNull()
-    .references(() => categories.id),
-  imageUrl: text("image_url"),
-  createdAt: timestamp("created_at").notNull().default(sql`now()`),
-  updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
-});
-
-export const productVariants = pgTable("product_variants", {
-  id: serial("id").primaryKey(),
-  productId: integer("product_id")
-    .notNull()
-    .references(() => products.id),
-  name: varchar("name", { length: 255 }).notNull(),
-  additionalPrice: numeric("additional_price", { precision: 10, scale: 2 })
-    .notNull()
-    .default(sql`0`),
-});
+import { pgTable, varchar, integer, timestamp, numeric, uniqueIndex, index } from "drizzle-orm/pg-core";
+import { sql, relations } from "drizzle-orm";
 
 export const carts = pgTable("carts", {
-  id: serial("id").primaryKey(),
-  
+  id: varchar("id", { length: 26 }).primaryKey(),
+  userId: integer("user_id"),
   guestId: varchar("guest_id", { length: 36 }),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
-}, (table) => {
-  return {
-    guestIdIdx: uniqueIndex("guest_id_idx").on(table.guestId),
-  };
-});
+}, (table) => [
+  index("carts_user_id_idx").on(table.userId),
+  uniqueIndex("guest_id_idx").on(table.guestId),
+]);
 
 export const cartItems = pgTable("cart_items", {
-  id: serial("id").primaryKey(),
-  cartId: integer("cart_id")
-    .notNull()
-    .references(() => carts.id),
-  productId: integer("product_id")
-    .notNull()
-    .references(() => products.id),
-  variantId: integer("variant_id")
-    .references(() => productVariants.id),
+  id: varchar("id", { length: 26 }).primaryKey(),
+  cartId: varchar("cart_id", { length: 26 }).notNull().references(() => carts.id),
+  productId: integer("product_id").notNull(),
+  variantId: integer("variant_id"),
   quantity: integer("quantity").notNull().default(sql`1`),
-});
+}, (table) => [
+  index("cart_items_cart_id_idx").on(table.cartId),
+  index("cart_items_product_id_idx").on(table.productId),
+]);
 
 export const orders = pgTable("orders", {
-  id: serial("id").primaryKey(),
-
+  id: varchar("id", { length: 26 }).primaryKey(),
+  userId: integer("user_id"),
   total: numeric("total", { precision: 12, scale: 2 }).notNull(),
   status: varchar("status", { length: 50 }).notNull().default("pending"),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
   updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
-});
+}, (table) => [
+  index("orders_user_id_idx").on(table.userId),
+  index("orders_status_idx").on(table.status),
+]);
 
 export const orderItems = pgTable("order_items", {
-  id: serial("id").primaryKey(),
-  orderId: integer("order_id")
-    .notNull()
-    .references(() => orders.id),
-  productId: integer("product_id")
-    .notNull()
-    .references(() => products.id),
-  variantId: integer("variant_id")
-    .references(() => productVariants.id),
+  id: varchar("id", { length: 26 }).primaryKey(),
+  orderId: varchar("order_id", { length: 26 }).notNull().references(() => orders.id),
+  productId: integer("product_id").notNull(),
+  variantId: integer("variant_id"),
   quantity: integer("quantity").notNull(),
   price: numeric("price", { precision: 10, scale: 2 }).notNull(),
-});
+}, (table) => [
+  index("order_items_order_id_idx").on(table.orderId),
+  index("order_items_product_id_idx").on(table.productId),
+]);
 
 export const coupons = pgTable("coupons", {
-  id: serial("id").primaryKey(),
+  id: varchar("id", { length: 26 }).primaryKey(),
   code: varchar("code", { length: 50 }).notNull(),
   discountPercent: integer("discount_percent").notNull(),
   expiresAt: timestamp("expires_at"),
-}, (table) => {
-  return {
-    codeIdx: uniqueIndex("code_idx").on(table.code),
-  };
-});
+}, (table) => [
+  uniqueIndex("code_idx").on(table.code),
+]);
 
-// [REMOVED] reviews table (migrated to Strapi or not used)
-
-// Sales table: stores daily sales amounts
 export const sales = pgTable("sales", {
-  id: serial("id").primaryKey(),
+  id: varchar("id", { length: 26 }).primaryKey(),
   date: timestamp("date").notNull(),
   amount: integer("amount").notNull(),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
-});
+}, (table) => [
+  index("sales_date_idx").on(table.date),
+]);
 
-// [REMOVED] states table (not needed)
+export const cartsRelations = relations(carts, ({ many }) => ({
+  items: many(cartItems),
+}));
 
-// [REMOVED] adminOrders table (not needed)
+export const cartItemsRelations = relations(cartItems, ({ one }) => ({
+  cart: one(carts, { fields: [cartItems.cartId], references: [carts.id] }),
+}));
+
+export const ordersRelations = relations(orders, ({ many }) => ({
+  items: many(orderItems),
+}));
+
+export const orderItemsRelations = relations(orderItems, ({ one }) => ({
+  order: one(orders, { fields: [orderItems.orderId], references: [orders.id] }),
+}));

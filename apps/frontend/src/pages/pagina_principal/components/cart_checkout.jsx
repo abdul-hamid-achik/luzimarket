@@ -1,11 +1,15 @@
 import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
-import { useCreateOrder } from "@/api/hooks";
+import { useCreateOrder, useDeliveryZones } from "@/api/hooks";
 import "@/pages/pagina_principal/css/cart_checkout.css";
+import { useState } from 'react';
 
 const Checkout = ({ cartItems }) => {
   const navigate = useNavigate();
   const createOrder = useCreateOrder();
+  // Delivery zones state
+  const { data: zones = [], isLoading: zonesLoading } = useDeliveryZones();
+  const [selectedZone, setSelectedZone] = useState(null);
   // Constantes de operaciones matematicas
   const CalcularSubTotal = (cartItems) => {
     return cartItems.reduce(
@@ -19,7 +23,8 @@ const Checkout = ({ cartItems }) => {
   };
 
   const CalcularTotal = (cartItems) => {
-    return CalcularSubTotal(cartItems) + CalcularIVA(cartItems) + 50;
+    const shipping = selectedZone ? selectedZone.fee : 0;
+    return CalcularSubTotal(cartItems) + CalcularIVA(cartItems) + shipping;
   };
 
   return (
@@ -39,7 +44,26 @@ const Checkout = ({ cartItems }) => {
 
       <div className="d-flex justify-content-between">
         <div>Envio</div>
-        <div>$50.00</div>
+        <div>
+          {zonesLoading
+            ? 'Cargando zonas...'
+            : (
+              <select
+                value={selectedZone?.id || ''}
+                onChange={(e) => {
+                  const zone = zones.find(z => z.id === parseInt(e.target.value, 10));
+                  setSelectedZone(zone);
+                }}
+              >
+                <option value="" disabled>Selecciona zona</option>
+                {zones.map(zone => (
+                  <option key={zone.id} value={zone.id}>
+                    {zone.name} (${zone.fee.toFixed(2)})
+                  </option>
+                ))}
+              </select>
+            )}
+        </div>
       </div>
 
       <hr />
@@ -51,7 +75,7 @@ const Checkout = ({ cartItems }) => {
       <button
         className="btn btn-dark w-100 mt-3"
         onClick={() => {
-          createOrder.mutate({}, {
+          createOrder.mutate({ deliveryZoneId: selectedZone?.id }, {
             onSuccess: (data) => {
               navigate(`/order-confirmation/${data.id}`);
             },

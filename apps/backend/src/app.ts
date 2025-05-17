@@ -18,6 +18,7 @@ import branchPetitionsRoutes from './routes/petitions/branches';
 import productDetailsRoutes from './routes/productDetails';
 import articleRoutes from './routes/articles';
 import brandRoutes from './routes/brands';
+import deliveryZonesRoutes from './routes/deliveryZones';
 import { StatusCodes } from "http-status-codes";
 import logger from "./logger";
 import expressPino from "express-pino-logger";
@@ -53,6 +54,7 @@ app.use('/api/admin/orders', adminOrdersRoutes);
 app.use('/api/product-details', productDetailsRoutes);
 app.use('/api/articles', articleRoutes);
 app.use('/api/brands', brandRoutes);
+app.use('/api/delivery-zones', deliveryZonesRoutes);
 
 // Swagger
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));

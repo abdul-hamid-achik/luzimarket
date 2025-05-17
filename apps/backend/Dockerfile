@@ -1,48 +1,33 @@
-# Stage 1: builder
-FROM node:22-alpine AS builder
+# syntax=docker/dockerfile:1.3
+
+# Stage 1: deps - install all dependencies
+FROM node:22-alpine AS deps
 WORKDIR /app
-
-# Install build tools for native modules
 RUN apk add --no-cache python3 make g++
-
-# Copy package files
 COPY package.json package-lock.json tsconfig.base.json ./
-COPY apps/backend/package.json ./apps/backend/
-
-# Install dependencies with --ignore-scripts to avoid postinstall
+COPY apps/backend/package.json apps/backend/package.json
+COPY apps/frontend/package.json apps/frontend/package.json
+COPY apps/strapi/package.json apps/strapi/package.json
 RUN npm ci --ignore-scripts
 
-# Copy application code
-COPY apps/backend/ ./apps/backend/
-
-# Build the application
+# Stage 2: builder - compile the backend
+FROM deps AS builder
 WORKDIR /app/apps/backend
+COPY apps/backend/ ./
 RUN npm run build
 
-# Stage 2: production runner
+# Stage 3: runner - production runtime
 FROM node:22-alpine AS runner
 WORKDIR /app
-
-# Install runtime utilities for healthcheck
 RUN apk add --no-cache curl
-
-# Copy installed node_modules from the builder stage
-COPY --from=builder /app/node_modules ./node_modules
-# Copy package.json for metadata
+COPY --from=deps /app/node_modules ./node_modules
 COPY apps/backend/package.json ./package.json
-
-# Copy built application code
 COPY --from=builder /app/apps/backend/dist ./dist
-
-# Generate runtime tsconfig.json for alias mapping
+# Generate runtime tsconfig for path aliases
 RUN echo '{"compilerOptions":{"baseUrl":".","paths":{"@/*":["dist/*"]}}}' > tsconfig.json
-
 ARG PORT=8000
 ENV PORT=${PORT}
 EXPOSE ${PORT}
-
-# Health check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
     CMD curl --fail http://localhost:${PORT}/api/health || exit 1
-
-CMD ["node", "-r", "tsconfig-paths/register", "dist/index.js"]
+CMD ["node","-r","tsconfig-paths/register","dist/index.js"]

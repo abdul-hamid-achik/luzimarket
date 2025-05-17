@@ -8,12 +8,11 @@ import {
   orders,
   orderItems,
   coupons,
-  products,
-  productVariants,
 } from "@/schema";
 import { AuthRequest } from "@/middleware/auth";
 import dotenv from "dotenv";
 import { StatusCodes } from "http-status-codes";
+import strapi from '@/utils/strapiClient';
 
 dotenv.config();
 
@@ -38,20 +37,14 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
   let total = 0;
   const itemDetails = await Promise.all(
     items.map(async (item: any) => {
-      const prod = (await db
-        .select({ price: products.price })
-        .from(products)
-        .where(eq(products.id, item.productId))
-        .limit(1))[0];
-      const variant =
-        item.variantId
-          ? (await db
-            .select({ additionalPrice: productVariants.additionalPrice })
-            .from(productVariants)
-            .where(eq(productVariants.id, item.variantId))
-            .limit(1))[0]
-          : null;
-      const price = parseFloat(prod.price.toString()) + (variant ? parseFloat(variant.additionalPrice.toString()) : 0);
+      const { data: prodResp } = await strapi.get(`/api/products/${item.productId}?populate=variants`);
+      const prod = prodResp.data;
+      const basePrice = parseFloat(prod.attributes.price);
+      const variantData = item.variantId
+        ? prod.attributes.variants?.data.find((v: any) => v.id === item.variantId)
+        : null;
+      const additionalPrice = variantData ? parseFloat(variantData.attributes.additionalPrice) : 0;
+      const price = basePrice + additionalPrice;
       total += price * item.quantity;
       return { ...item, price };
     })
@@ -124,7 +117,7 @@ export const getOrder = async (req: AuthRequest, res: Response) => {
   if (!userId) {
     return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Unauthorized" });
   }
-  const id = Number(req.params.id);
+  const id = req.params.id;
   const orderRec = await db
     .select()
     .from(orders)
