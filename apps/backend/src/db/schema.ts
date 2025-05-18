@@ -73,6 +73,18 @@ export const cartItems = pgTable('cart_items', {
     quantity: integer('quantity').notNull().default(1),
 });
 
+export const states = pgTable('states', {
+    id: serial('id').primaryKey(),
+    label: text('label').notNull(),
+    value: text('value').notNull().unique(),
+});
+
+export const deliveryZones = pgTable('delivery_zones', {
+    id: serial('id').primaryKey(),
+    name: text('name').notNull(),
+    fee: integer('fee').notNull().default(0),
+});
+
 // Orders & order items
 export const orders = pgTable('orders', {
     id: serial('id').primaryKey(),
@@ -136,4 +148,10 @@ export const bundleItems = pgTable('bundle_items', {
 export type BundleInsert = typeof bundles.$inferInsert;
 export type BundleSelect = typeof bundles.$inferSelect;
 export type BundleItemInsert = typeof bundleItems.$inferInsert;
-export type BundleItemSelect = typeof bundleItems.$inferSelect; 
+export type BundleItemSelect = typeof bundleItems.$inferSelect;
+
+export type StateInsert = typeof states.$inferInsert;
+export type StateSelect = typeof states.$inferSelect;
+
+export type DeliveryZoneInsert = typeof deliveryZones.$inferInsert;
+export type DeliveryZoneSelect = typeof deliveryZones.$inferSelect;
