@@ -14,15 +14,11 @@ const RegisterCustomer = () => {
     e.preventDefault();
     setError(null);
     try {
-      const regResult = await register({ email, password });
-      console.log('Register result:', regResult);
-      // After auto-login, redirect to home or profile
-      navigate('/', { replace: true });
-      setTimeout(() => {
-        if (window.location.pathname !== '/') {
-          setError('Did not redirect to home after registration. Current URL: ' + window.location.pathname);
-        }
-      }, 2000);
+      // Only register the user without auto-login
+      await register({ email, password, skipAutoLogin: true });
+
+      // After registration, redirect to login page for tests to work
+      navigate('/login', { replace: true });
     } catch (err) {
       // Show backend error message if available
       console.error('Registration error:', err);

@@ -42,12 +42,15 @@ export const AuthProvider = ({ children }) => {
     try {
       const result = await loginUser({ email, password });
       console.log('loginUser result:', result);
-      const { jwt, user } = result;
-      if (!jwt) {
-        throw new Error('No JWT returned from backend');
+
+      // Extract token correctly - API returns { token } directly
+      const { token } = result;
+      if (!token) {
+        throw new Error('No token returned from backend');
       }
-      sessionStorage.setItem('token', jwt);
-      const decoded = jwtDecode(jwt);
+
+      sessionStorage.setItem('token', token);
+      const decoded = jwtDecode(token);
       setUser(decoded);
       return result;
     } catch (err) {
@@ -56,17 +59,22 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async ({ email, password }) => {
+  const register = async ({ email, password, skipAutoLogin = false }) => {
     try {
       const result = await registerUser({ email, password });
       console.log('registerUser result:', result);
-      const { jwt, user } = result;
-      if (!jwt) {
-        throw new Error('No JWT returned from backend');
+
+      // Only set user and token if not skipping auto-login
+      if (!skipAutoLogin) {
+        const { token } = result;
+        if (!token) {
+          throw new Error('No token returned from backend');
+        }
+        sessionStorage.setItem('token', token);
+        const decoded = jwtDecode(token);
+        setUser(decoded);
       }
-      sessionStorage.setItem('token', jwt);
-      const decoded = jwtDecode(jwt);
-      setUser(decoded);
+
       return result;
     } catch (err) {
       console.error('Register error:', err);

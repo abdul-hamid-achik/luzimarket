@@ -2,12 +2,14 @@ import React, { useState, useEffect, useContext } from 'react';
 // Remove duplicate navbar and footer imports
 import ModalUsr from "@/pages/inicio/components/modal_index";
 import { AuthContext } from '@/context/auth_context';
+import { Alert } from 'react-bootstrap';
 
 const Perfil = () => {
     const { user } = useContext(AuthContext);
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [saveSuccess, setSaveSuccess] = useState(false);
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -21,36 +23,73 @@ const Perfil = () => {
     });
 
     useEffect(() => {
-        if (!user) return;
+        if (!user) {
+            setLoading(false);
+            setError('User not authenticated');
+            return;
+        }
 
         // Fetch user profile from API
-        fetch(`/api/profiles/user/${user.id}`)
-            .then(response => {
-                if (!response.ok) throw new Error('Error fetching profile');
-                return response.json();
-            })
-            .then(data => {
-                setProfile(data);
-                // Initialize form with profile data
-                setFormData({
-                    firstName: data.firstName || '',
-                    lastName: data.lastName || '',
-                    phone: data.phone || '',
-                    address: data.address || '',
-                    postalCode: data.postalCode || '',
-                    state: data.state || '',
-                    area: data.area || '',
-                    country: data.country || '',
-                    stateRegion: data.stateRegion || ''
-                });
-                setLoading(false);
-            })
-            .catch(err => {
+        const fetchProfile = async () => {
+            try {
+                const userId = user.userId || user.id;
+                if (!userId) {
+                    throw new Error('User ID not found in token');
+                }
+
+                const response = await fetch(`/api/profiles/user/${userId}`);
+
+                if (!response.ok) {
+                    // If the profile doesn't exist yet, create a default one
+                    if (response.status === 404) {
+                        // Initialize with empty profile
+                        initializeProfile({
+                            id: null,
+                            firstName: '',
+                            lastName: '',
+                            email: user.email,
+                            phone: '',
+                            address: '',
+                            postalCode: '',
+                            state: '',
+                            area: '',
+                            country: '',
+                            stateRegion: ''
+                        });
+                        return;
+                    }
+                    throw new Error(`Error fetching profile: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                initializeProfile(data);
+            } catch (err) {
                 console.error('Error fetching profile:', err);
-                setError('Could not load profile data');
+                setError(err.message || 'Failed to load profile');
                 setLoading(false);
-            });
+            }
+        };
+
+        fetchProfile();
     }, [user]);
+
+    const initializeProfile = (data) => {
+        setProfile(data);
+        // Initialize form with profile data
+        setFormData({
+            firstName: data.firstName || '',
+            lastName: data.lastName || '',
+            phone: data.phone || '',
+            address: data.address || '',
+            postalCode: data.postalCode || '',
+            state: data.state || '',
+            area: data.area || '',
+            country: data.country || '',
+            stateRegion: data.stateRegion || ''
+        });
+        setLoading(false);
+        setError(null);
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -62,15 +101,31 @@ const Perfil = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!profile || !user) return;
+        if (!user) {
+            setError('User not authenticated');
+            return;
+        }
 
-        // Update profile via API
-        fetch(`/api/profiles/${profile.id}`, {
-            method: 'PUT',
+        setLoading(true);
+
+        // Prepare the API endpoint and method
+        const method = profile?.id ? 'PUT' : 'POST';
+        const url = profile?.id
+            ? `/api/profiles/${profile.id}`
+            : '/api/profiles';
+
+        // Send the update request
+        fetch(url, {
+            method,
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${sessionStorage.getItem('token')}`
             },
-            body: JSON.stringify(formData)
+            body: JSON.stringify({
+                ...formData,
+                userId: user.userId || user.id,
+                email: user.email
+            })
         })
             .then(response => {
                 if (!response.ok) throw new Error('Error updating profile');
@@ -78,42 +133,53 @@ const Perfil = () => {
             })
             .then(data => {
                 setProfile(data);
-                alert('Profile updated successfully!');
+                setSaveSuccess(true);
+                setTimeout(() => setSaveSuccess(false), 3000);
+                setLoading(false);
             })
             .catch(err => {
                 console.error('Error updating profile:', err);
-                alert('Failed to update profile');
+                setError('Failed to update profile');
+                setLoading(false);
             });
     };
 
     return (
-        <div className="container rounded bg-white mt-5 mb-5">
+        <div className="container rounded bg-white mt-5 mb-5 profile-page" data-testid="profile-page">
             {loading ? (
                 <div className="text-center p-5">
                     <div className="spinner-border" role="status">
                         <span className="visually-hidden">Loading...</span>
                     </div>
                 </div>
-            ) : error ? (
-                <div className="alert alert-danger m-5" role="alert">
-                    {error}
-                </div>
             ) : (
                 <div className="row">
+                    {saveSuccess && (
+                        <Alert variant="success" className="mt-3">
+                            Perfil actualizado correctamente
+                        </Alert>
+                    )}
+
+                    {error && (
+                        <Alert variant="danger" className="mt-3">
+                            {error}
+                        </Alert>
+                    )}
+
                     <div className="col-md-3 border-right">
                         <div className="d-flex flex-column align-items-center text-center p-3 py-5">
                             <img className="rounded-circle mt-5" width="150px" height="150px"
-                                src={profile?.avatar || "https://www.stockvault.net/data/2011/08/12/126170/preview16.jpg"}
+                                src="https://www.stockvault.net/data/2011/08/12/126170/preview16.jpg"
                                 alt="Profile" />
-                            <span className="font-weight-bold mt-2">{user?.username || 'Usuario'}</span>
-                            <span className="text-black-50">{user?.email || ''}</span>
+                            <span className="font-weight-bold mt-2">{user?.email || 'Usuario'}</span>
+                            <span className="text-black-50">{formData.firstName} {formData.lastName}</span>
                         </div>
                     </div>
                     <div className="col-md-5 border-right">
                         <form onSubmit={handleSubmit}>
                             <div className="p-3 py-5">
                                 <div className="d-flex justify-content-between align-items-center mb-3">
-                                    <h3 className="text-right">Detalles del Perfil</h3>
+                                    <h3>Detalles del Perfil</h3>
                                 </div>
                                 <div className="row mt-2">
                                     <div className="col-md-6">
@@ -194,14 +260,19 @@ const Perfil = () => {
                     </div>
                     <div className="col-md-4">
                         <div className="p-3 py-5">
-                            <div className="d-flex justify-content-between align-items-center experience"><h3>Metodo de pago</h3></div><br />
-                            <div className="col-md-12"><label className="labels">Tarjeta termina en *98</label>
+                            <div className="d-flex justify-content-between align-items-center experience">
+                                <h3>Metodo de pago</h3>
+                            </div><br />
+                            <div className="col-md-12">
+                                <label className="labels">Tarjeta termina en *98</label>
                                 <button
                                     className="btn btn-primary profile-button ms-2"
                                     type="button"
                                     data-bs-toggle="modal"
                                     data-bs-target="#ModalCard">
-                                    Cambiar</button></div> <br />
+                                    Cambiar
+                                </button>
+                            </div> <br />
                         </div>
                     </div>
                 </div>

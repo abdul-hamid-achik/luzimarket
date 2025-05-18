@@ -15,7 +15,7 @@ describe('getProducts', () => {
     const mockData = [{ id: 1 }];
     api.get.mockResolvedValue({ data: mockData });
     const result = await getProducts();
-    expect(api.get).toHaveBeenCalledWith('/products');
+    expect(api.get).toHaveBeenCalledWith('/products', { params: {} });
     expect(result).toEqual(mockData);
   });
 });

@@ -27,10 +27,42 @@ const ProductosHandpicked = ({ filters = {} }) => {
     </div>
   );
 
+  // Show first 4 products in the showcase
+  const showcaseProducts = products.slice(0, 4);
+  const remainingProducts = products.slice(4);
+
   return (
     <div className="products-container">
       <h3 className="mb-4">Productos</h3>
-      <div className="row g-4">
+
+      {/* Featured products showcase - first 4 products */}
+      <div className="cajaProductosMuestra row g-4 mb-5">
+        {showcaseProducts.map((product) => (
+          <div key={product.id} className="col-12 col-sm-6 col-md-6 col-lg-3">
+            <Card className="product-card h-100">
+              <Link to={`/handpicked/productos/${product.id}`}>
+                <Card.Img
+                  variant="top"
+                  src={product.imageUrl || 'https://via.placeholder.com/300x300?text=No+Image'}
+                  alt={product.name}
+                  className="product-image"
+                />
+              </Link>
+              <Card.Body>
+                <Card.Title>{product.name}</Card.Title>
+                <Card.Text className="product-description">{product.description}</Card.Text>
+                <Card.Text className="product-price">${product.price?.toFixed(2) || '0.00'}</Card.Text>
+                <Link to={`/handpicked/productos/${product.id}`} className="btn btn-outline-dark mt-2">
+                  Ver Detalles
+                </Link>
+              </Card.Body>
+            </Card>
+          </div>
+        ))}
+      </div>
+
+      {/* All products section */}
+      <div className="cajaTodosLosProductos row g-4">
         {products.map((product) => (
           <div key={product.id} className="col-12 col-sm-6 col-md-6 col-lg-4">
             <Card className="product-card h-100">

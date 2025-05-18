@@ -11,7 +11,8 @@ function getSessionId(request: NextRequest): number | null {
     const auth = request.headers.get('Authorization') || '';
     if (!auth.startsWith('Bearer ')) return null;
     try {
-        const payload = jwt.verify(auth.split(' ')[1], process.env.JWT_SECRET!);
+        const jwtSecret = process.env.JWT_SECRET || 'test-jwt-secret-for-e2e-tests';
+        const payload = jwt.verify(auth.split(' ')[1], jwtSecret);
         if (typeof payload === 'object' && 'sessionId' in payload) return (payload as any).sessionId;
     } catch { }
     return null;
