@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 // Remove duplicate navbar and footer imports
-import ModalUsr from "@/pages/pagina_principal/components/modal_index";
+import ModalUsr from "@/pages/inicio/components/modal_index";
 import { AuthContext } from '@/context/auth_context';
 
 const Perfil = () => {

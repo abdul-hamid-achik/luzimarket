@@ -1,4 +1,4 @@
-import Usuario from "@/pages/pagina_principal/images/logo_user_luzi_market.png";
+import Usuario from "@/pages/inicio/images/logo_user_luzi_market.png";
 import Logo from "@/assets/images/luzimarket_logo_empleado.png";
 import bandera from "@/assets/images/bandera_mx.png";
 import notificacion from "@/assets/images/notificacion.png";

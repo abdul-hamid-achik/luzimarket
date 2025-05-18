@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import "@/css/login.css";
-import LuziLogoAdmin from "@/pages/pagina_principal/images/new_images_luzi/logo_luzi1.png";
+import LuziLogoAdmin from "@/pages/inicio/images/new_images_luzi/logo_luzi1.png";
 import { useState } from "react";
 import Inicio from "@/layout/inicio";
 

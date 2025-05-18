@@ -1,38 +1,44 @@
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useContext, useState } from 'react';
 import { AuthContext } from "@/context/auth_context";
-import '@/pages/pagina_principal/css/general.css';
+import '@/pages/inicio/css/general.css';
 
-const LoginCustomer = () => {
+const RegisterCustomer = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
-  const { login } = useContext(AuthContext);
+  const { register } = useContext(AuthContext);
   const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from?.pathname || '/';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     try {
-      await login({ email, password });
-      navigate(from, { replace: true });
+      const regResult = await register({ email, password });
+      console.log('Register result:', regResult);
+      // After auto-login, redirect to home or profile
+      navigate('/', { replace: true });
+      setTimeout(() => {
+        if (window.location.pathname !== '/') {
+          setError('Did not redirect to home after registration. Current URL: ' + window.location.pathname);
+        }
+      }, 2000);
     } catch (err) {
       // Show backend/Strapi error message if available
+      console.error('Registration error:', err);
       if (err && err.response && err.response.data && err.response.data.error) {
         setError(err.response.data.error);
       } else if (err && err.message) {
         setError(err.message);
       } else {
-        setError('Login failed');
+        setError('Registration failed');
       }
     }
   };
 
   return (
     <div className="container mt-5">
-      <h2>Login</h2>
+      <h2>Register</h2>
       {error && <div className="alert alert-danger">{error}</div>}
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
@@ -56,14 +62,14 @@ const LoginCustomer = () => {
           />
         </div>
         <button type="submit" className="btn btn-dark">
-          Login
+          Register
         </button>
       </form>
       <p className="mt-3">
-        Don&apos;t have an account? <Link to="/register">Register</Link>
+        Already have an account? <Link to="/login">Login</Link>
       </p>
     </div>
   );
 };
 
-export default LoginCustomer;
+export default RegisterCustomer;

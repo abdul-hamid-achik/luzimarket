@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import { useCreateOrder, useDeliveryZones } from "@/api/hooks";
-import "@/pages/pagina_principal/css/cart_checkout.css";
+import "@/pages/inicio/css/cart_checkout.css";
 import { useState } from 'react';
 
 const Checkout = ({ cartItems }) => {

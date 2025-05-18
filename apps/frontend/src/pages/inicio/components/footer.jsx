@@ -1,11 +1,11 @@
-import "@/pages/pagina_principal/css/footer.css"
-import Tiktok from "@/pages/pagina_principal/images/tik_tok.png";
-import Facebook from "@/pages/pagina_principal/images/facebook.png";
-import X from "@/pages/pagina_principal/images/x.png";
-import Instagram from "@/pages/pagina_principal/images/instagram.png";
-import Whatsapp from "@/pages/pagina_principal/images/whatsapp.png";
-import Youtube from "@/pages/pagina_principal/images/youtube.png";
-import LogoLuziUser from "@/pages/pagina_principal/images/new_images_luzi/logo_luzi_user.png";
+import "@/pages/inicio/css/footer.css"
+import Tiktok from "@/pages/inicio/images/tik_tok.png";
+import Facebook from "@/pages/inicio/images/facebook.png";
+import X from "@/pages/inicio/images/x.png";
+import Instagram from "@/pages/inicio/images/instagram.png";
+import Whatsapp from "@/pages/inicio/images/whatsapp.png";
+import Youtube from "@/pages/inicio/images/youtube.png";
+import LogoLuziUser from "@/pages/inicio/images/new_images_luzi/logo_luzi_user.png";
 
 
 const Footer = () => {

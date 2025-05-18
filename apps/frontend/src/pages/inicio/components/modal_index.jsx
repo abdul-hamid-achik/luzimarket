@@ -1,18 +1,20 @@
-import SelectMetodoPago from "@/pages/pagina_principal/components/select_metodo_pago";
+import SelectEstado from "@/pages/inicio/components/select_estado_modal";
+import SelectCiudad from "@/pages/inicio/components/select_ciudad_modal";
 
-export default function ModalInfoPago() {
+export default function ModalIndex() {
   return (
     <>
-      <div className="modal fade" id="ModalCard" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="ModalCardLabel" aria-hidden="true">
+      <div className="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div className="modal-dialog modal-dialog-centered ">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title text-center" id="ModalCardLabel">SELECCIONE METODO DE PAGO</h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modalB" aria-label="Close"></button>
+              <h5 className="modal-title text-center" id="staticBackdropLabel">SELECCIONE UBICACIÓN DE ENTREGA</h5>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div className="modal-body">
-              <SelectMetodoPago />
+              <SelectEstado />
               <br />
+              <SelectCiudad />
             </div>
             <div className="modal-footer">
               <button type="button"

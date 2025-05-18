@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import FiltrosHandpicked from "@/pages/pagina_principal/components/filtros_handpicked";
-import ProductosHandpicked from "@/pages/pagina_principal/components/productos_handpicked";
-import "@/pages/pagina_principal/css/handpicked.css";
-import "@/pages/pagina_principal/css/general.css";
+import FiltrosHandpicked from "@/pages/inicio/components/filtros_handpicked";
+import ProductosHandpicked from "@/pages/inicio/components/productos_handpicked";
+import "@/pages/inicio/css/handpicked.css";
+import "@/pages/inicio/css/general.css";
 
 const HandpickedProductos = () => {
    // Initialize filters state

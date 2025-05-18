@@ -1,5 +1,5 @@
 import "@/css/fonts.css"
-import "@/pages/pagina_principal/css/filtros_handpicked.css"
+import "@/pages/inicio/css/filtros_handpicked.css"
 import { useState } from "react"
 import { useCategories } from "@/api/hooks"
 

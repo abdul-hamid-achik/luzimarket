@@ -14,19 +14,19 @@ import SucursalesCuerpo from '@/components/peticiones/sucursales/cuerpo_sucursal
 import EditarAdmisiones from '@/pages/editar_admisiones';
 import EditarProductos from '@/pages/editar_producto';
 import EditarSucursales from '@/pages/editar_sucursales';
-import PaginaInicialInicio from '@/pages/pagina_principal/layout/inicio';
-import BodyLuzi from '@/pages/pagina_principal/pages/body_luzi';
-import Handpicked from '@/pages/pagina_principal/pages/hand_picked';
-import HandpickedProductos from '@/pages/pagina_principal/pages/productos';
-import Carrito from '@/pages/pagina_principal/pages/cart';
-import CustomerLogin from '@/pages/pagina_principal/pages/login_customer';
-import CustomerRegister from '@/pages/pagina_principal/pages/register_customer';
-import OrderConfirmation from '@/pages/pagina_principal/pages/order_confirmation';
-import PerfilUsuario from '@/pages/pagina_principal/pages/perfil_usuario';
-import TiendasMarcas from '@/pages/pagina_principal/pages/tiendas_marcas';
-import Ocasiones from '@/pages/pagina_principal/pages/ocasiones';
-import Editorial from '@/pages/pagina_principal/pages/editorial';
-import Favoritos from '@/pages/pagina_principal/pages/favoritos';
+import PaginaInicialInicio from '@/pages/inicio/layout/inicio';
+import BodyLuzi from '@/pages/inicio/pages/body_luzi';
+import Handpicked from '@/pages/inicio/pages/hand_picked';
+import HandpickedProductos from '@/pages/inicio/pages/productos';
+import Carrito from '@/pages/inicio/pages/cart';
+import CustomerLogin from '@/pages/inicio/pages/login_customer';
+import CustomerRegister from '@/pages/inicio/pages/register_customer';
+import OrderConfirmation from '@/pages/inicio/pages/order_confirmation';
+import PerfilUsuario from '@/pages/inicio/pages/perfil_usuario';
+import TiendasMarcas from '@/pages/inicio/pages/tiendas_marcas';
+import Ocasiones from '@/pages/inicio/pages/ocasiones';
+import Editorial from '@/pages/inicio/pages/editorial';
+import Favoritos from '@/pages/inicio/pages/favoritos';
 import RequireAuth from '@/components/require_auth';
 
 // Admin empleados

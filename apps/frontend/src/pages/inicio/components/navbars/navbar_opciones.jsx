@@ -1,4 +1,4 @@
-import "@/pages/pagina_principal/css/navbars.css"
+import "@/pages/inicio/css/navbars.css"
 import { Link } from "react-router-dom";
 
 const NavbarOpciones = () => {

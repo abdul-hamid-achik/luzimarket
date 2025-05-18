@@ -1,113 +1,33 @@
-import { drizzle as drizzlePg } from "drizzle-orm/node-postgres";
-import { drizzle as drizzleHttp } from "drizzle-orm/neon-http";
-import { Pool } from "pg";
-import dotenv from "dotenv";
-import { WebSocket } from 'ws';
-import { neonConfig } from '@neondatabase/serverless';
-import { PGlite } from '@electric-sql/pglite';
+import Database from 'better-sqlite3';
+import { drizzle } from 'drizzle-orm/better-sqlite3';
 import * as schema from './schema';
+import dotenv from 'dotenv';
 import logger from './logger';
 
 dotenv.config();
 
-// Always configure Neon HTTP/WebSocket proxy support
-neonConfig.webSocketConstructor = WebSocket;
-neonConfig.poolQueryViaFetch = true;
-// Configure local HTTP/WebSocket proxy mapping for Drizzle HTTP driver
-neonConfig.wsProxy = (host) => `${host}/v1`;
-neonConfig.useSecureWebSocket = false;
-neonConfig.pipelineTLS = false;
-neonConfig.pipelineConnect = false;
-
-// Create a singleton for the database connection
-let _db: any | null = null;
-let _pool: any | null = null;
-
+let _db: ReturnType<typeof drizzle> | null = null;
+let _client: Database | null = null;
 
 export function getDb() {
-  if (process.env.VITEST) {
-    // Use in-memory Postgres (pglite) for Vitest
-    if (!(global as any)._testDb) {
-      (global as any)._testPglite = new PGlite();
-      (global as any)._testDb = require('drizzle-orm/pglite').drizzle((global as any)._testPglite, { schema });
-    }
-    return (global as any)._testDb;
-  }
   if (!_db) {
-    logger.info('Initializing database connection pool');
-
-    // Set timeout values that respect Vercel serverless constraints
-    const connectionTimeoutMs = 10000; // 10 seconds
-    const idleTimeoutMs = 10000; // 10 seconds
-    const max = 1; // Limit pool size for serverless environment
-
-    const connectionString = process.env.DATABASE_URL ||
-      process.env.POSTGRES_URL ||
-      process.env.LOCAL_POSTGRES_URL;
-    logger.info(`→ connecting to database with ${connectionString}`);
-
-    if (!connectionString) {
-      throw new Error('No database connection string provided');
-    }
-
-    // Decide between HTTP (Neon via proxy) or Postgres driver
-    const useHttpDriver =
-      connectionString.startsWith('http://') ||
-      connectionString.startsWith('https://') ||
-      process.env.USE_NEON_HTTP === 'true';
-    if (useHttpDriver) {
-      // Use HTTP-based Neon driver
-      _db = drizzleHttp(connectionString);
-    } else {
-      // Use Postgres pool
-      const poolConfig: any = {
-        connectionString,
-        max,
-        connectionTimeoutMillis: connectionTimeoutMs,
-        idleTimeoutMillis: idleTimeoutMs,
-        statement_timeout: 15000,
-      };
-      // Fallback SSL for Neon Postgres endpoints if needed
-      if (connectionString.includes('neon.tech')) {
-        poolConfig.ssl = { rejectUnauthorized: false };
-      }
-      _pool = new Pool(poolConfig);
-      _pool.on('error', (err: Error) => {
-        logger.error({ err }, 'Unexpected Postgres pool error');
-      });
-      _db = drizzlePg(_pool);
-    }
+    const file = process.env.DATABASE_URL || '../../tmp/ecommerce.db';
+    logger.info(`\u2192 using sqlite database at ${file}`);
+    _client = new Database(file);
+    _db = drizzle(_client, { schema });
   }
-
   return _db;
 }
 
-// Backwards compatibility for existing code
-export const db = process.env.VITEST
-  ? (global as any)._testDb || getDb()
-  : new Proxy({} as any, {
-    get: (target, prop) => {
-      const dbInstance = getDb();
-      return dbInstance[prop as keyof typeof dbInstance];
-    }
-  });
+export const db = getDb();
 
-// Function to explicitly close the pool (useful for tests)
 export async function closePool() {
-  if (_pool) {
-    logger.info('Closing database connection pool');
-    await _pool.end();
-    _pool = null;
+  if (_client) {
+    _client.close();
+    _client = null;
     _db = null;
   }
 }
 
-// Add graceful shutdown hooks to close the pool when the process exits
-process.on('SIGTERM', async () => {
-  logger.info('SIGTERM received: closing database pool');
-  await closePool();
-});
-process.on('SIGINT', async () => {
-  logger.info('SIGINT received: closing database pool');
-  await closePool();
-});
+process.on('SIGTERM', closePool);
+process.on('SIGINT', closePool);

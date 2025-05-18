@@ -1,10 +1,10 @@
-import ImagenMuestra1 from "@/pages/pagina_principal/images/imagen_muestra1.jpg"
-import ImagenMuestra2 from "@/pages/pagina_principal/images/imagen_muestra2.jpg"
-import ImagenMuestra3 from "@/pages/pagina_principal/images/imagen_muestra3.jpg"
-import ImagenMuestra4 from "@/pages/pagina_principal/images/imagen_muestra4.jpg"
+import ImagenMuestra1 from "@/pages/inicio/images/imagen_muestra1.jpg"
+import ImagenMuestra2 from "@/pages/inicio/images/imagen_muestra2.jpg"
+import ImagenMuestra3 from "@/pages/inicio/images/imagen_muestra3.jpg"
+import ImagenMuestra4 from "@/pages/inicio/images/imagen_muestra4.jpg"
 
 
-import "@/pages/pagina_principal/css/general.css"
+import "@/pages/inicio/css/general.css"
 
 const BannerCards = () => {
    return (

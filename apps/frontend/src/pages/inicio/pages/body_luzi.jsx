@@ -1,15 +1,15 @@
-import ImagenMuestra1 from "@/pages/pagina_principal/images/imagen_muestra1.jpg";
-import ImagenMuestra2 from "@/pages/pagina_principal/images/imagen_muestra2.jpg";
-import ImagenMuestra3 from "@/pages/pagina_principal/images/imagen_muestra3.jpg";
-import ImagenMuestra4 from "@/pages/pagina_principal/images/imagen_muestra4.jpg";
+import ImagenMuestra1 from "@/pages/inicio/images/imagen_muestra1.jpg";
+import ImagenMuestra2 from "@/pages/inicio/images/imagen_muestra2.jpg";
+import ImagenMuestra3 from "@/pages/inicio/images/imagen_muestra3.jpg";
+import ImagenMuestra4 from "@/pages/inicio/images/imagen_muestra4.jpg";
 import React from 'react';
 import { useProducts } from '@/api/hooks';
-import ImagenBanner1 from "@/pages/pagina_principal/images/new_images_luzi/new_banner_luzi.png";
-import ImagenBanner2 from "@/pages/pagina_principal/images/new_images_luzi/new_banner_luzi2.png";
-import ModalIndex from "@/pages/pagina_principal/components/modal_index";
+import ImagenBanner1 from "@/pages/inicio/images/new_images_luzi/new_banner_luzi.png";
+import ImagenBanner2 from "@/pages/inicio/images/new_images_luzi/new_banner_luzi2.png";
+import ModalIndex from "@/pages/inicio/components/modal_index";
 
-import "@/pages/pagina_principal/css/card_index.css";
-import "@/pages/pagina_principal/css/general.css";
+import "@/pages/inicio/css/card_index.css";
+import "@/pages/inicio/css/general.css";
 // import { Button } from "@nextui-org/react"
 
 import Card from "react-bootstrap/Card";

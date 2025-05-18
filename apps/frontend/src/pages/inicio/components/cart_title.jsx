@@ -1,4 +1,4 @@
-import "@/pages/pagina_principal/css/cart_title.css";
+import "@/pages/inicio/css/cart_title.css";
 
 const CartTitle = () => {
   return (

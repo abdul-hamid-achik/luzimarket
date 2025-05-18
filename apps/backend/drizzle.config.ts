@@ -9,9 +9,9 @@ const config: Config = {
   ],
   out: "./drizzle",
   // SQL dialect for migrations: 'postgresql', 'mysql', or 'sqlite'
-  dialect: "postgresql",
+  dialect: "sqlite",
   dbCredentials: {
-    url: process.env.DATABASE_URL as string,
+    url: process.env.DATABASE_URL || "../../tmp/ecommerce.db",
   },
 };
 
