@@ -1,10 +1,7 @@
 import { db } from './index';
 import * as schema from './schema';
-// @ts-ignore: no type declarations for drizzle-seed
 import { reset, seed as drizzleSeed } from 'drizzle-seed';
-// @ts-ignore: Allow bcryptjs import without type declarations
 import bcrypt from 'bcryptjs';
-// @ts-ignore: no type declarations for faker
 import { faker } from '@faker-js/faker';
 
 // Predefined static values
@@ -14,6 +11,32 @@ const petitionTypes = ['Question', 'Complaint', 'Feedback'];
 const petitionStatuses = ['pending', 'approved', 'rejected'];
 const occasionNames = ['Cumpleaños', 'Aniversario', 'Graduación', 'Navidad', 'Día de la Madre', 'Día del Padre', 'San Valentín'];
 const roles = ['user', 'admin'];
+// Gift-specific product names
+const giftItems = [
+    'Bouquet of Roses',
+    'Artisanal Chocolate Box',
+    'Handmade Soap Set',
+    'Light Scented Candle',
+    'Floral Arrangement',
+    'Gift Basket',
+    'Spa Gift Set',
+    'Tea Sampler Box',
+    'Gourmet Cookie Tin',
+    'Succulent Planter',
+];
+// Categories for gift images (Unsplash)
+const imageCategories = [
+    'flowers',
+    'bouquet',
+    'chocolate',
+    'soap',
+    'candle',
+    'gift',
+    'spa',
+    'tea',
+    'cookie',
+    'plant',
+];
 
 // Generate a pool of random variant attributes for JSON column
 const attributeOptions = Array.from({ length: 200 }, () => ({
@@ -87,11 +110,21 @@ async function seed() {
             products: {
                 count: 100,
                 columns: {
-                    name: f.string({ transformer: () => faker.commerce.productName() }),
-                    description: f.string({ transformer: () => faker.commerce.productDescription() }),
+                    name: f.valuesFromArray({ values: giftItems }),
+                    description: f.string({ transformer: () => `Perfect gift: ${faker.lorem.sentence()}` }),
                     price: f.int({ minValue: 1000, maxValue: 20000 }),
                     categoryId: f.int({ minValue: 1, maxValue: 10 }),
                     createdAt: f.timestamp(),
+                },
+                with: {
+                    photos: {
+                        count: [1, 5],
+                        columns: {
+                            url: f.string({ transformer: () => `https://source.unsplash.com/640x480/?${faker.helpers.arrayElement(imageCategories)}` }),
+                            alt: f.string({ transformer: () => faker.lorem.words(3) }),
+                            sortOrder: f.int({ minValue: 0, maxValue: 5 }),
+                        },
+                    },
                 },
             },
             productVariants: {
@@ -101,15 +134,6 @@ async function seed() {
                     sku: f.string({ transformer: () => faker.random.alphaNumeric(8).toUpperCase(), isUnique: true }),
                     attributes: f.valuesFromArray({ values: attributeOptions }),
                     stock: f.int({ minValue: 0, maxValue: 500 }),
-                },
-            },
-            photos: {
-                count: 300,
-                columns: {
-                    url: f.string({ transformer: () => faker.image.url() }),
-                    alt: f.string({ transformer: () => faker.lorem.words(3) }),
-                    sortOrder: f.int({ minValue: 0, maxValue: 10 }),
-                    productId: f.int({ minValue: 1, maxValue: 100 }),
                 },
             },
             sessions: {
