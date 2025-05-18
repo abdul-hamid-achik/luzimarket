@@ -1,42 +1,42 @@
-import { pgTable, varchar, integer, timestamp, numeric, uniqueIndex, index } from "drizzle-orm/pg-core";
+import { sqliteTable, text, integer, numeric, uniqueIndex, index } from "drizzle-orm/sqlite-core";
 import { sql, relations } from "drizzle-orm";
 
-export const carts = pgTable("carts", {
-  id: varchar("id", { length: 26 }).primaryKey(),
+export const carts = sqliteTable("carts", {
+  id: text("id").primaryKey(),
   userId: integer("user_id"),
-  guestId: varchar("guest_id", { length: 36 }),
-  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+  guestId: text("guest_id"),
+  createdAt: integer("created_at", { mode: 'timestamp_ms' }).notNull().defaultNow(),
 }, (table) => [
   index("carts_user_id_idx").on(table.userId),
   uniqueIndex("guest_id_idx").on(table.guestId),
 ]);
 
-export const cartItems = pgTable("cart_items", {
-  id: varchar("id", { length: 26 }).primaryKey(),
-  cartId: varchar("cart_id", { length: 26 }).notNull().references(() => carts.id),
+export const cartItems = sqliteTable("cart_items", {
+  id: text("id").primaryKey(),
+  cartId: text("cart_id").notNull().references(() => carts.id),
   productId: integer("product_id").notNull(),
   variantId: integer("variant_id"),
-  quantity: integer("quantity").notNull().default(sql`1`),
+  quantity: integer("quantity").notNull().default(1),
 }, (table) => [
   index("cart_items_cart_id_idx").on(table.cartId),
   index("cart_items_product_id_idx").on(table.productId),
 ]);
 
-export const orders = pgTable("orders", {
-  id: varchar("id", { length: 26 }).primaryKey(),
+export const orders = sqliteTable("orders", {
+  id: text("id").primaryKey(),
   userId: integer("user_id"),
   total: numeric("total", { precision: 12, scale: 2 }).notNull(),
-  status: varchar("status", { length: 50 }).notNull().default("pending"),
-  createdAt: timestamp("created_at").notNull().default(sql`now()`),
-  updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
+  status: text("status").notNull().default('pending'),
+  createdAt: integer("created_at", { mode: 'timestamp_ms' }).notNull().defaultNow(),
+  updatedAt: integer("updated_at", { mode: 'timestamp_ms' }).notNull().defaultNow(),
 }, (table) => [
   index("orders_user_id_idx").on(table.userId),
   index("orders_status_idx").on(table.status),
 ]);
 
-export const orderItems = pgTable("order_items", {
-  id: varchar("id", { length: 26 }).primaryKey(),
-  orderId: varchar("order_id", { length: 26 }).notNull().references(() => orders.id),
+export const orderItems = sqliteTable("order_items", {
+  id: text("id").primaryKey(),
+  orderId: text("order_id").notNull().references(() => orders.id),
   productId: integer("product_id").notNull(),
   variantId: integer("variant_id"),
   quantity: integer("quantity").notNull(),
@@ -46,20 +46,20 @@ export const orderItems = pgTable("order_items", {
   index("order_items_product_id_idx").on(table.productId),
 ]);
 
-export const coupons = pgTable("coupons", {
-  id: varchar("id", { length: 26 }).primaryKey(),
-  code: varchar("code", { length: 50 }).notNull(),
+export const coupons = sqliteTable("coupons", {
+  id: text("id").primaryKey(),
+  code: text("code").notNull(),
   discountPercent: integer("discount_percent").notNull(),
-  expiresAt: timestamp("expires_at"),
+  expiresAt: integer("expires_at", { mode: 'timestamp_ms' }),
 }, (table) => [
   uniqueIndex("code_idx").on(table.code),
 ]);
 
-export const sales = pgTable("sales", {
-  id: varchar("id", { length: 26 }).primaryKey(),
-  date: timestamp("date").notNull(),
+export const sales = sqliteTable("sales", {
+  id: text("id").primaryKey(),
+  date: integer("date", { mode: 'timestamp_ms' }).notNull(),
   amount: integer("amount").notNull(),
-  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+  createdAt: integer("created_at", { mode: 'timestamp_ms' }).notNull().defaultNow(),
 }, (table) => [
   index("sales_date_idx").on(table.date),
 ]);

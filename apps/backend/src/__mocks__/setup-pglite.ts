@@ -1,15 +1,15 @@
 // Vitest setup file for Drizzle + pglite (in-memory Postgres)
 import { afterAll, afterEach, beforeEach, vi } from 'vitest';
-import { drizzle } from 'drizzle-orm/pglite';
+import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { sql } from 'drizzle-orm';
-import { PGlite } from '@electric-sql/pglite';
+import Database from 'better-sqlite3';
 import * as schema from '../schema';
 
 let db: ReturnType<typeof drizzle>;
-let client: PGlite;
+let client: Database;
 
 vi.mock('../db', async (importOriginal) => {
-  client = new PGlite();
+  client = new Database(':memory:');
   db = drizzle(client, { schema });
   return {
     ...(await importOriginal<typeof import('../db')>()),
@@ -35,7 +35,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   // Dynamically extract only table objects from schema
   const schemaModule = await import('../schema');
-  const DRIZZLE_TABLE = Symbol.for('drizzle:PgTable');
+  const DRIZZLE_TABLE = Symbol.for('drizzle:SQLiteTable');
   const schemaTables = Object.fromEntries(
     Object.entries(schemaModule).filter(([, v]) => v && typeof v === 'object' && DRIZZLE_TABLE in v)
   );

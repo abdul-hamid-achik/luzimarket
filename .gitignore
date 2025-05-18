@@ -40,4 +40,5 @@ playwright-trace
 test-results/
 
 tmp/
+tmp/*.db
 **/coverage/
