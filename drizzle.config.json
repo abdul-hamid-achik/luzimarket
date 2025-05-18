@@ -1,1 +1,0 @@
-{"schema":"./dist/schema.js","out":"./drizzle","dialect":"sqlite","dbCredentials":{"url":"${DATABASE_URL}"}}
