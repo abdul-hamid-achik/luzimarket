@@ -3,18 +3,16 @@
   "private": true,
   "workspaces": [
     "apps/backend",
-    "apps/frontend",
-    "apps/strapi"
+    "apps/frontend"
   ],
   "scripts": {
-    "dev": "concurrently --kill-others --raw \"npm --workspace=apps/backend run dev\" \"npm --workspace=apps/strapi run develop\" \"npm --workspace=apps/frontend run dev\"",
+    "dev": "concurrently --kill-others --raw \"npm --workspace=apps/backend run dev\" \"npm --workspace=apps/frontend run dev\"",
     "dev:frontend": "npm --workspace=apps/frontend run dev",
     "dev:backend": "npm --workspace=apps/backend run dev",
     "deploy": "npx --yes vercel@latest --prod",
     "build": "npm-run-all --parallel build:*",
     "build:frontend": "cd apps/frontend && npm run build",
     "build:backend": "cd apps/backend && npm run build",
-    "build:strapi": "cd apps/strapi && npm run build",
     "preview:frontend": "npm --workspace=apps/frontend run preview",
     "lint": "npm-run-all --parallel lint:*",
     "lint:backend": "cd apps/backend && npm run lint",
@@ -29,14 +27,11 @@
     "migrate:down": "npm --workspace=apps/backend run migrate:down",
     "migrate:push": "npm --workspace=apps/backend run migrate:push",
     "migrate:pull": "npm --workspace=apps/backend run migrate:pull",
-    "seed": "node scripts/seed-all.js",
-    "seed:backend": "npm --workspace=apps/backend run seed",
-    "seed:strapi": "npm --workspace=apps/strapi run seed",
+    "seed": "npm --workspace=apps/backend run seed",
     "start:backend": "npm --workspace=apps/backend run start",
     "start:frontend": "npm --workspace=apps/frontend run preview",
     "start": "concurrently --kill-others --raw --handle-input \"npm run start:backend\" \"npm run start:frontend\"",
-    "migrate": "node ./scripts/migrate.js",
-    "studio": "cd apps/backend && npx --yes drizzle-kit studio"
+    "studio": "npx --workspace=apps/backend --yes drizzle-kit studio"
   },
   "devDependencies": {
     "@playwright/test": "^1.52.0",

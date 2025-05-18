@@ -117,16 +117,20 @@ export const getOrder = async (req: AuthRequest, res: Response) => {
   if (!userId) {
     return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Unauthorized" });
   }
-  const id = req.params.id;
+  const orderIdParam = req.params.id;
+  const orderId = parseInt(orderIdParam, 10);
+  if (isNaN(orderId)) {
+    return res.status(StatusCodes.BAD_REQUEST).json({ error: "Invalid order id" });
+  }
   const orderRec = await db
     .select()
     .from(orders)
-    .where(and(eq(orders.id, id), eq(orders.userId, userId)))
+    .where(and(eq(orders.id, orderId), eq(orders.userId, userId)))
     .limit(1);
   const order = orderRec[0];
   if (!order) {
     return res.status(StatusCodes.NOT_FOUND).json({ error: "Order not found" });
   }
-  const items = await db.select().from(orderItems).where(eq(orderItems.orderId, id));
+  const items = await db.select().from(orderItems).where(eq(orderItems.orderId, orderId));
   res.json({ order, items });
 };

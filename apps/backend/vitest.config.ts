@@ -11,6 +11,5 @@ export default defineConfig({
         environment: 'node',
         globals: true,
         include: ['src/**/*.spec.ts'],
-        setupFiles: [path.resolve(__dirname, 'src', '__mocks__', 'setup-pglite.ts')],
     },
 }) 

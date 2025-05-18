@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: ./tmp/ecommerce.db
+      TURSO_CONNECTION_URL: ${{ secrets.TURSO_CONNECTION_URL }}
+      TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       CORS_ORIGIN: http://localhost:5173
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
@@ -30,8 +32,10 @@ jobs:
       - name: Install dependencies
         run: npm ci --silent --ignore-scripts
       - name: Prepare .env file
-        run: |
+      run: |
           echo "DATABASE_URL=${DATABASE_URL}" > .env
+          echo "TURSO_CONNECTION_URL=${TURSO_CONNECTION_URL}" >> .env
+          echo "TURSO_AUTH_TOKEN=${TURSO_AUTH_TOKEN}" >> .env
           echo "JWT_SECRET=${JWT_SECRET}" >> .env
           echo "CORS_ORIGIN=${CORS_ORIGIN}" >> .env
           echo "STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}" >> .env

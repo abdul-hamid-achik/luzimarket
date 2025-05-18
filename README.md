@@ -42,20 +42,6 @@ GITHUB_OWNER=your_github_username
 GITHUB_REPO=your_github_repository
 GIT_BRANCH=main
 GITHUB_PERSONAL_ACCESS_TOKEN=your_personal_access_token
-
-# Strapi CMS settings (for the Strapi container)
-APP_KEYS=your_strapi_app_keys_comma_separated
-API_TOKEN_SALT=your_api_token_salt
-ADMIN_JWT_SECRET=your_strapi_admin_jwt_secret
-TRANSFER_TOKEN_SALT=your_transfer_token_salt
-ENCRYPTION_KEY=your_encryption_key
-DATABASE_FILENAME=../../tmp/ecommerce.db
-
-# Backend ↔ Strapi connection (for the backend container)
-STRAPI_URL=http://localhost:1337
-STRAPI_API_TOKEN=your_strapi_api_content_token
-# The token above is automatically provisioned by the Strapi `api-token`
-# extension during bootstrap.
 ```
 
 ## Installation

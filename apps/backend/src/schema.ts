@@ -1,9 +1,10 @@
 import { sqliteTable, text, integer, numeric, uniqueIndex, index } from "drizzle-orm/sqlite-core";
-import { sql, relations } from "drizzle-orm";
+import { relations } from "drizzle-orm";
+
 
 export const carts = sqliteTable("carts", {
-  id: text("id").primaryKey(),
-  userId: integer("user_id"),
+  id: integer("id").primaryKey(),
+  userId: text("user_id"),
   guestId: text("guest_id"),
   createdAt: integer("created_at", { mode: 'timestamp_ms' }).notNull().defaultNow(),
 }, (table) => [
@@ -12,10 +13,10 @@ export const carts = sqliteTable("carts", {
 ]);
 
 export const cartItems = sqliteTable("cart_items", {
-  id: text("id").primaryKey(),
-  cartId: text("cart_id").notNull().references(() => carts.id),
-  productId: integer("product_id").notNull(),
-  variantId: integer("variant_id"),
+  id: integer("id").primaryKey(),
+  cartId: integer("cart_id").notNull().references(() => carts.id),
+  productId: text("product_id").notNull(),
+  variantId: text("variant_id"),
   quantity: integer("quantity").notNull().default(1),
 }, (table) => [
   index("cart_items_cart_id_idx").on(table.cartId),
@@ -23,9 +24,9 @@ export const cartItems = sqliteTable("cart_items", {
 ]);
 
 export const orders = sqliteTable("orders", {
-  id: text("id").primaryKey(),
-  userId: integer("user_id"),
-  total: numeric("total", { precision: 12, scale: 2 }).notNull(),
+  id: integer("id").primaryKey(),
+  userId: text("user_id"),
+  total: numeric("total").notNull(),
   status: text("status").notNull().default('pending'),
   createdAt: integer("created_at", { mode: 'timestamp_ms' }).notNull().defaultNow(),
   updatedAt: integer("updated_at", { mode: 'timestamp_ms' }).notNull().defaultNow(),
@@ -35,19 +36,19 @@ export const orders = sqliteTable("orders", {
 ]);
 
 export const orderItems = sqliteTable("order_items", {
-  id: text("id").primaryKey(),
-  orderId: text("order_id").notNull().references(() => orders.id),
-  productId: integer("product_id").notNull(),
-  variantId: integer("variant_id"),
+  id: integer("id").primaryKey(),
+  orderId: integer("order_id").notNull().references(() => orders.id),
+  productId: text("product_id").notNull(),
+  variantId: text("variant_id"),
   quantity: integer("quantity").notNull(),
-  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+  price: numeric("price").notNull(),
 }, (table) => [
   index("order_items_order_id_idx").on(table.orderId),
   index("order_items_product_id_idx").on(table.productId),
 ]);
 
 export const coupons = sqliteTable("coupons", {
-  id: text("id").primaryKey(),
+  id: integer("id").primaryKey(),
   code: text("code").notNull(),
   discountPercent: integer("discount_percent").notNull(),
   expiresAt: integer("expires_at", { mode: 'timestamp_ms' }),
@@ -56,7 +57,7 @@ export const coupons = sqliteTable("coupons", {
 ]);
 
 export const sales = sqliteTable("sales", {
-  id: text("id").primaryKey(),
+  id: integer("id").primaryKey(),
   date: integer("date", { mode: 'timestamp_ms' }).notNull(),
   amount: integer("amount").notNull(),
   createdAt: integer("created_at", { mode: 'timestamp_ms' }).notNull().defaultNow(),

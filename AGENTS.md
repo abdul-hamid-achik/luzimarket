@@ -10,16 +10,15 @@
    ```bash
    docker compose up -d
    ```
-   - If Docker is unavailable, tests fall back to local processes using **pglite** for the backend and SQLite for Strapi. This is handled directly in `playwright.config.js`.
-3. Run database migrations for the backend and strapi:
+   - If Docker is unavailable, tests fall back to local processes using **pglite** for the backend and SQLite. This is handled directly in `playwright.config.js`.
+3. Run database migrations:
    ```bash
    npm run migrate
    ```
-4. Seed the databases for both the backend and Strapi:
+4. Seed the database:
    ```bash
    npm run seed
    ```
-   This script calls the necesary `./scripts/seed-all.js`
 
 ## Testing
 

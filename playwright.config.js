@@ -21,10 +21,10 @@ module.exports = defineConfig({
   webServer: process.env.CI
     ? undefined
     : {
-        command: 'USE_PGLITE=true DATABASE_CLIENT=sqlite DATABASE_FILENAME=.tmp/e2e.sqlite npm run migrate:up && npm run seed && concurrently --kill-others --raw "npm --workspace=apps/backend run dev" "npm --workspace=apps/strapi run develop" "npm --workspace=apps/frontend run dev"',
-        url: 'http://localhost:5173',
-        reuseExistingServer: true,
-      },
+      command: 'npm run migrate:up && npm run seed && concurrently --kill-others --raw "npm --workspace=apps/backend run dev" "npm --workspace=apps/frontend run dev"',
+      url: 'http://localhost:5173',
+      reuseExistingServer: true,
+    },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
