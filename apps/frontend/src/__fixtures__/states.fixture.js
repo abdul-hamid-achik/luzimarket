@@ -2,6 +2,6 @@
  * Mock data for delivery states
  */
 export const states = [
-  { label: 'State A', value: 'a' },
-  { label: 'State B', value: 'b' },
+  { label: 'Coahuila', value: 'coahuila' },
+  { label: 'Nuevo Leon', value: 'nuevo-leon' },
 ];

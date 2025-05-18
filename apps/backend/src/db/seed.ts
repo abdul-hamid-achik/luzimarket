@@ -10,6 +10,17 @@ const orderStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancell
 const petitionTypes = ['Question', 'Complaint', 'Suggestion', 'Feedback', 'Technical Issue'];
 const petitionStatuses = ['pending', 'in-review', 'approved', 'rejected', 'on-hold'];
 
+const statesData = [
+    { label: 'Coahuila', value: 'coahuila' },
+    { label: 'Nuevo Leon', value: 'nuevo-leon' },
+];
+
+const deliveryZonesData = [
+    { name: 'Torreon', fee: 50 },
+    { name: 'Saltillo', fee: 75 },
+    { name: 'Monterrey', fee: 100 },
+];
+
 // Gift-specific categories
 const giftCategories = [
     { name: 'Floral Arrangements', slug: 'floral-arrangements' },
@@ -494,6 +505,20 @@ async function seed() {
                             { weight: 0.1, value: faker.number.int({ min: 3, max: 5 }) },
                         ])
                     }),
+                },
+            },
+            states: {
+                count: statesData.length,
+                columns: {
+                    label: f.valuesFromArray({ values: statesData.map(s => s.label) }),
+                    value: f.valuesFromArray({ values: statesData.map(s => s.value) }),
+                },
+            },
+            deliveryZones: {
+                count: deliveryZonesData.length,
+                columns: {
+                    name: f.valuesFromArray({ values: deliveryZonesData.map(z => z.name) }),
+                    fee: f.valuesFromArray({ values: deliveryZonesData.map(z => z.fee) }),
                 },
             },
         }));
