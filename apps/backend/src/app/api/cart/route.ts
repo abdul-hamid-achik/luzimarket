@@ -202,32 +202,19 @@ export async function DELETE(request: NextRequest) {
     if (!sessionId) return NextResponse.json({ error: 'Unauthorized' }, { status: StatusCodes.UNAUTHORIZED });
 
     try {
-        const { itemId } = await request.json();
-
-        // Validate required fields
-        if (!itemId) {
-            return NextResponse.json(
-                { error: 'itemId is required' },
-                { status: StatusCodes.BAD_REQUEST }
-            );
-        }
-
-        // Delete the cart item
+        // Clear all cart items for this session
         const deleted = await db.delete(cartItems)
-            .where(and(
-                eq(cartItems.id, itemId),
-                eq(cartItems.sessionId, sessionId)
-            ))
+            .where(eq(cartItems.sessionId, sessionId))
             .returning()
             .execute();
 
-        if (deleted.length === 0) {
-            return NextResponse.json({ error: 'Item not found' }, { status: StatusCodes.NOT_FOUND });
-        }
-
-        return NextResponse.json({ success: true }, { status: StatusCodes.OK });
+        return NextResponse.json({
+            success: true,
+            message: 'Cart cleared successfully',
+            itemsRemoved: deleted.length
+        }, { status: StatusCodes.OK });
     } catch (error) {
-        console.error('Error deleting cart item:', error);
-        return NextResponse.json({ error: 'Failed to delete cart item' }, { status: StatusCodes.INTERNAL_SERVER_ERROR });
+        console.error('Error clearing cart:', error);
+        return NextResponse.json({ error: 'Failed to clear cart' }, { status: StatusCodes.INTERNAL_SERVER_ERROR });
     }
 } 

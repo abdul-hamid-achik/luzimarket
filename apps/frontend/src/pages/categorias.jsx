@@ -37,12 +37,14 @@ function Categorias() {
                 <div className="spinner-border" role="status">
                   <span className="visually-hidden">Loading...</span>
                 </div>
+                <div className="mt-2">Loading categories...</div>
               </div>
             )}
 
             {error && (
               <div className="alert alert-danger m-5">
                 Error al cargar las categorías. Por favor intente nuevamente.
+                <div>Error loading categories: {error.message}</div>
               </div>
             )}
           </div>

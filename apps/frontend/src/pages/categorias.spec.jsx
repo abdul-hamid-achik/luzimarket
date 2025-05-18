@@ -10,14 +10,14 @@ describe('Categorias page', () => {
   it('shows loading state when loading', () => {
     vi.spyOn(hooks, 'useCategories').mockReturnValue({ data: [], isLoading: true, error: null });
     renderWithProviders(<Categorias />);
-    expect(screen.getByText('Loading categories...')).toBeInTheDocument();
+    expect(screen.getAllByText('Loading categories...').length).toBeGreaterThan(0);
   });
 
   it('shows error state when error occurred', () => {
     const error = new Error('fail');
     vi.spyOn(hooks, 'useCategories').mockReturnValue({ data: [], isLoading: false, error });
     renderWithProviders(<Categorias />);
-    expect(screen.getByText(`Error loading categories: ${error.message}`)).toBeInTheDocument();
+    expect(screen.getAllByText(`Error loading categories: ${error.message}`).length).toBeGreaterThan(0);
   });
 
   it('renders categories list when data is available', () => {

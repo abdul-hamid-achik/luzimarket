@@ -15,10 +15,18 @@ const fallbackCategories = [
 
 const CatSlider = () => {
   // Fetch categories dynamically
-  const { data: categories = [], isLoading } = useCategories();
+  const { data: categories = [], isLoading, error } = useCategories();
 
   // Determine categories for display: use fetched data when available, otherwise fallback
   const displayCategories = (categories && categories.length > 0) ? categories : fallbackCategories;
+
+  if (isLoading) {
+    return <div className="text-center my-4">Loading categories...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center my-4 text-danger">Error loading categories: {error.message}</div>;
+  }
 
   return (
     <div className="catSliderSection">

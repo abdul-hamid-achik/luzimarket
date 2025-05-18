@@ -2,9 +2,21 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import NavbarAdmin from './navbar';
+import { vi } from 'vitest';
+
+// Mock auth context at the module level
+vi.mock('@/context/auth_context', () => ({
+  useAuth: vi.fn()
+}));
+
+// Import after mocking
+import { useAuth } from '@/context/auth_context';
 
 describe('NavbarAdmin', () => {
   it('renders navigation bar with links and images', () => {
+    // Default mock implementation
+    useAuth.mockReturnValue({ user: null });
+
     render(
       <MemoryRouter>
         <NavbarAdmin />
@@ -14,13 +26,9 @@ describe('NavbarAdmin', () => {
   });
 
   it('shows user email when logged in', () => {
-    jest.mock('@/context/auth_context', () => ({
-      AuthContext: {
-        Provider: ({ children }) => children,
-        Consumer: ({ children }) => children({ user: { email: 'test@example.com' } })
-      },
-      useAuth: () => ({ user: { email: 'test@example.com' } })
-    }));
+    // Mock for this specific test
+    useAuth.mockReturnValue({ user: { email: 'test@example.com' } });
+
     render(
       <MemoryRouter>
         <NavbarAdmin />
@@ -30,13 +38,9 @@ describe('NavbarAdmin', () => {
   });
 
   it('shows Invitado and login/register links when not logged in', () => {
-    jest.mock('@/context/auth_context', () => ({
-      AuthContext: {
-        Provider: ({ children }) => children,
-        Consumer: ({ children }) => children({ user: null })
-      },
-      useAuth: () => ({ user: null })
-    }));
+    // Mock for this specific test
+    useAuth.mockReturnValue({ user: null });
+
     render(
       <MemoryRouter>
         <NavbarAdmin />

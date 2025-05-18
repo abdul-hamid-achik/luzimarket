@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 // Remove duplicate navbar and footer imports
 import ModalUsr from "@/pages/inicio/components/modal_index";
 import { AuthContext } from '@/context/auth_context';
-import { Alert } from 'react-bootstrap';
+import { Alert, Spinner } from 'react-bootstrap';
 
 const Perfil = () => {
     const { user } = useContext(AuthContext);
@@ -99,7 +99,7 @@ const Perfil = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!user) {
             setError('User not authenticated');
@@ -114,43 +114,44 @@ const Perfil = () => {
             ? `/api/profiles/${profile.id}`
             : '/api/profiles';
 
-        // Send the update request
-        fetch(url, {
-            method,
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${sessionStorage.getItem('token')}`
-            },
-            body: JSON.stringify({
-                ...formData,
-                userId: user.userId || user.id,
-                email: user.email
-            })
-        })
-            .then(response => {
-                if (!response.ok) throw new Error('Error updating profile');
-                return response.json();
-            })
-            .then(data => {
-                setProfile(data);
-                setSaveSuccess(true);
-                setTimeout(() => setSaveSuccess(false), 3000);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error('Error updating profile:', err);
-                setError('Failed to update profile');
-                setLoading(false);
+        try {
+            // Send the update request
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                },
+                body: JSON.stringify({
+                    ...formData,
+                    userId: user.userId || user.id,
+                    email: user.email
+                })
             });
+
+            if (!response.ok) {
+                throw new Error('Error updating profile');
+            }
+
+            const data = await response.json();
+            setProfile(data);
+            setSaveSuccess(true);
+            setTimeout(() => setSaveSuccess(false), 3000);
+        } catch (err) {
+            console.error('Error updating profile:', err);
+            setError('Failed to update profile');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <div className="container rounded bg-white mt-5 mb-5 profile-page" data-testid="profile-page">
             {loading ? (
                 <div className="text-center p-5">
-                    <div className="spinner-border" role="status">
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
+                    <Spinner animation="border" role="status">
+                        <span className="visually-hidden">Loading profile...</span>
+                    </Spinner>
                 </div>
             ) : (
                 <div className="row">
@@ -199,21 +200,21 @@ const Perfil = () => {
                                 </div>
                                 <div className="row mt-3">
                                     <div className="col-md-12">
-                                        <label className="labels">Telefono</label>
+                                        <label className="labels">Teléfono</label>
                                         <input type="text" className="form-control"
                                             name="phone"
                                             value={formData.phone}
                                             onChange={handleChange} />
                                     </div>
                                     <div className="col-md-12">
-                                        <label className="labels">Direccion</label>
+                                        <label className="labels">Dirección</label>
                                         <input type="text" className="form-control"
                                             name="address"
                                             value={formData.address}
                                             onChange={handleChange} />
                                     </div>
                                     <div className="col-md-12">
-                                        <label className="labels">Codigo Postal</label>
+                                        <label className="labels">Código Postal</label>
                                         <input type="text" className="form-control"
                                             name="postalCode"
                                             value={formData.postalCode}

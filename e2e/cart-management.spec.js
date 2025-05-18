@@ -121,53 +121,47 @@ test.describe('Cart Management Flow', () => {
     // Go to cart
     await page.goto('/carrito');
 
+    // Wait longer for cart to load
+    await page.waitForTimeout(3000);
+
     try {
-      // Wait for cart item elements with multiple possible selectors
-      await page.waitForSelector('.quantity-display, .cart-item, .cart-quantity', { timeout: 10000 });
+      // Updated selectors to exactly match the cart_item.jsx component
+      const cartItemSelector = '.cart-item.cart-product.cart-item-row';
+      await page.waitForSelector(cartItemSelector, { timeout: 5000 });
 
-      // Find a cart row with more flexible selectors
-      const cartRow = page.locator('.tabla-carrito, .cart-item-row, .cart-product').first();
+      // Find a cart row with the exact selectors from cart_item.jsx
+      const cartRow = page.locator('.cart-item-row').first();
 
-      // Find quantity display with fallbacks
-      const quantityDisplay = cartRow.locator('.quantity-display, .cart-quantity, .item-quantity').first();
+      // Find quantity display with exact selector from cart_item.jsx
+      const quantityDisplay = cartRow.locator('.quantity-display.item-quantity').first();
+      await expect(quantityDisplay).toBeVisible({ timeout: 10000 });
 
-      // Verify we have an item (just check visibility instead of specific text)
-      await expect(quantityDisplay).toBeVisible();
+      // Find increment/decrement buttons with exact selectors from cart_item.jsx
+      const incrementBtn = cartRow.locator('.quantity-button.increment.plus').first();
+      if (await incrementBtn.isVisible()) {
+        await incrementBtn.click();
+        // Brief pause to allow UI to update
+        await page.waitForTimeout(1000);
+      }
 
-      // Try to interact with quantity buttons
-      try {
-        // Look for plus button with multiple possible selectors
-        const plusBtn = cartRow.locator('button.quantity-button, button.increment, button.plus, button:has-text("+")').first();
-        if (await plusBtn.count() > 0) {
-          await plusBtn.click();
-          // Brief pause to allow UI to update
-          await page.waitForTimeout(1000);
-        }
+      const decrementBtn = cartRow.locator('.quantity-button.decrement.minus').first();
+      if (await decrementBtn.isVisible()) {
+        await decrementBtn.click();
+        // Brief pause to allow UI to update
+        await page.waitForTimeout(1000);
+      }
 
-        // Look for minus button with multiple possible selectors
-        const minusBtn = cartRow.locator('button.quantity-button, button.decrement, button.minus, button:has-text("-")').first();
-        if (await minusBtn.count() > 0) {
-          await minusBtn.click();
-          // Brief pause to allow UI to update
-          await page.waitForTimeout(1000);
-        }
-
-        // Try to remove the item
-        const removeBtn = cartRow.locator('button.remove-button, button.delete-item, button.remove').first();
-        if (await removeBtn.count() > 0) {
-          await removeBtn.click();
-          // Wait briefly for UI to update
-          await page.waitForTimeout(1000);
-        }
-      } catch (e) {
-        console.log('Could not interact with cart quantity buttons:', e);
-        // Take screenshot for debugging
-        await page.screenshot({ path: 'cart-interaction-debug.png' });
+      // Try to remove the item with exact selector from cart_item.jsx
+      const removeBtn = cartRow.locator('.remove-button.delete-item.remove').first();
+      if (await removeBtn.isVisible()) {
+        await removeBtn.click();
+        // Wait briefly for UI to update
+        await page.waitForTimeout(1000);
       }
     } catch (e) {
-      console.log('Cart verification failed:', e);
+      console.log('Cart interaction failed:', e);
       // Take screenshot for debugging
-      await page.screenshot({ path: 'cart-verification-debug.png' });
+      await page.screenshot({ path: 'cart-interaction-debug.png' });
     }
   });
 });

@@ -5,6 +5,7 @@ import bandera from "@/assets/images/bandera_mx.png";
 import notificacion from "@/assets/images/notificacion.png";
 import { Link } from "react-router-dom";
 import "@/css/navbar.css";
+import { useAuth } from "@/context/auth_context";
 /*import {
   Container,
   Nav,
@@ -17,6 +18,8 @@ import "@/css/navbar.css";
 } from "react-bootstrap";*/
 
 const NavbarAdmin = () => {
+  const { user } = useAuth() || { user: null };
+
   return (
     <nav className="navbar navbar-expand-lg">
       <div className="container-fluid connav">
@@ -46,25 +49,38 @@ const NavbarAdmin = () => {
                 className="img-usuario rounded-5"
               />
               <span className="ms-3">
-                <strong>Rik Bracho</strong> (Admin)
+                {user ? (
+                  <>
+                    <strong>{user.email}</strong> (Usuario)
+                  </>
+                ) : (
+                  <>
+                    <strong>Invitado</strong>
+                  </>
+                )}
               </span>
             </a>
             <ul className="dropdown-menu">
-              <li>
-                <Link className="dropdown-item" to="/perfil">
-                  Perfil
-                </Link>
-              </li>
-              <li>
-                <Link className="dropdown-item" to="/login">
-                  Login
-                </Link>
-              </li>
-              <li>
-                <Link className="dropdown-item" to="/register">
-                  Register
-                </Link>
-              </li>
+              {user ? (
+                <li>
+                  <Link className="dropdown-item" to="/perfil">
+                    Perfil
+                  </Link>
+                </li>
+              ) : (
+                <>
+                  <li>
+                    <Link className="dropdown-item" to="/login">
+                      Login
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="dropdown-item" to="/register">
+                      Register
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </li>
         </ul>

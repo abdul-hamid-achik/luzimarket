@@ -6,19 +6,40 @@ import { useProductDetails } from "@/api/hooks";
 const CollapseDetails = ({ product }) => {
    // Lookup accordion sections for this product
    const { data: apiSections, isLoading, error } = useProductDetails(product.id);
-   // Use API sections when available, otherwise fallback to local data
+
+   // Default sections as a fallback
+   const defaultSections = [
+      {
+         title: 'Características',
+         content: 'Información del producto no disponible. Las características se mostrarán aquí.'
+      },
+      {
+         title: 'Envío y Devoluciones',
+         content: 'Envío gratuito a domicilio en CDMX. Política de devolución válida por 7 días tras la entrega.'
+      },
+      {
+         title: 'Especificaciones',
+         content: 'Especificaciones del producto no disponibles actualmente.'
+      }
+   ];
+
+   // Use API sections when available, otherwise fallback to local data or default sections
    const sections = (apiSections && apiSections.length > 0)
       ? apiSections
-      : (productDetails[product.id] || []);
+      : (productDetails[product.id] || defaultSections);
+
    const accordionId = `accordion-${product.id}`;
+
    return (
-      <>
-         <div className="card" style={{ width: '30rem' }}>
+      <div className="accordion-container">
+         <div className="card">
             <div className="card-body">
-               <h5 className="card-title">{product.name}</h5>
+               <h5 className="card-title product-title">{product.name}</h5>
                <h6 className="card-subtitle mb-2 text-muted">{product.category || ''}</h6>
-               <h6 className="card-subtitle mb-2 text-muted">${product.price.toFixed(2)}</h6>
-               <p className="card-text">{product.description}</p>
+               <h6 className="card-subtitle mb-2 text-muted product-price">${product.price.toFixed(2)}</h6>
+               <p className="card-text product-description">{product.description}</p>
+
+               {/* Accordion with all necessary class names for test selectors */}
                <div className="accordion accordion-flush" id={accordionId}>
                   {sections.map((sec, idx) => {
                      const hdrId = `heading-${product.id}-${idx}`;
@@ -50,43 +71,37 @@ const CollapseDetails = ({ product }) => {
                         </div>
                      );
                   })}
+
+                  {/* Fallback for when sections are empty */}
+                  {sections.length === 0 && (
+                     <div className="accordion-item">
+                        <h2 className="accordion-header">
+                           <button
+                              className="accordion-button"
+                              type="button"
+                              data-bs-toggle="collapse"
+                              data-bs-target="#collapseDefault"
+                              aria-expanded="true"
+                              aria-controls="collapseDefault"
+                           >
+                              Información del Producto
+                           </button>
+                        </h2>
+                        <div
+                           id="collapseDefault"
+                           className="accordion-collapse collapse show"
+                           data-bs-parent={`#${accordionId}`}
+                        >
+                           <div className="accordion-body">
+                              Información detallada del producto no disponible actualmente.
+                           </div>
+                        </div>
+                     </div>
+                  )}
                </div>
             </div>
          </div>
-         {/* <Card style={{styles, marginLeft: '1.5rem'}}>
-      <Card.Body>
-         <Card.Title>Producto 1</Card.Title>
-         <Card.Subtitle className="mb-2 text-muted">HAY DESIGN</Card.Subtitle>
-         <Card.Subtitle className="mb-2 text-muted">$1,500</Card.Subtitle>
-         <Card.Text className='mt-4'>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-            enim ad minim veniam, quis nostrud exercitation ullamco laboris
-            nisi ut aliquip ex ea commodo consequat.
-         </Card.Text>
-      </Card.Body>
-      <Card.Body>
-         <Collapse.Group>
-               <Collapse title={<span style={{fontSize: '17px'}}>Caracteristicas</span>}>
-                  <Text>
-                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                     eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-                     minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                     aliquip ex ea commodo consequat.
-                  </Text>
-               </Collapse>
-            <Collapse title={<span style={{fontSize: '17px'}}>Eventos y Devoluciones</span>}>
-               <Text>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-                  minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                  aliquip ex ea commodo consequat.
-               </Text>
-            </Collapse>
-         </Collapse.Group>
-      </Card.Body>
-    </Card> */}
-      </>
+      </div>
    );
 }
 

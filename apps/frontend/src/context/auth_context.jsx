@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
 import jwtDecode from 'jwt-decode';
 import { loginUser, registerUser } from "@/api/auth";
 import api from "@/api/client";
@@ -9,6 +9,15 @@ export const AuthContext = createContext({
   register: async () => { },
   logout: () => { },
 });
+
+// Add useAuth hook to easily access the auth context
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
