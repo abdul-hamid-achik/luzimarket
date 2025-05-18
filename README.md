@@ -20,8 +20,8 @@ Luzimarket is a full-stack e-commerce platform with a React/Vite frontend and a 
 - [License](#license)
 
 ## Tech Stack
-- **Frontend**: React, Vite, Chakra UI, MUI, NextUI, React Query, TinaCMS, Jest, Playwright
-- **Backend**: Node.js, TypeScript, Express, Drizzle ORM, Drizzle Seed, Zod, JWT, Stripe, Swagger (OpenAPI), TinaCMS
+- **Frontend**: React, Vite, Chakra UI, MUI, NextUI, React Query, Strapi, Jest, Playwright
+- **Backend**: Node.js, TypeScript, Express, Drizzle ORM, Drizzle Seed, Zod, JWT, Stripe, Swagger (OpenAPI), Strapi
 - **Database**: SQLite (local file)
 - **DevOps**: Vercel
 
@@ -42,6 +42,20 @@ GITHUB_OWNER=your_github_username
 GITHUB_REPO=your_github_repository
 GIT_BRANCH=main
 GITHUB_PERSONAL_ACCESS_TOKEN=your_personal_access_token
+
+# Strapi CMS settings (for the Strapi container)
+APP_KEYS=your_strapi_app_keys_comma_separated
+API_TOKEN_SALT=your_api_token_salt
+ADMIN_JWT_SECRET=your_strapi_admin_jwt_secret
+TRANSFER_TOKEN_SALT=your_transfer_token_salt
+ENCRYPTION_KEY=your_encryption_key
+DATABASE_FILENAME=../../tmp/ecommerce.db
+
+# Backend ↔ Strapi connection (for the backend container)
+STRAPI_URL=http://localhost:1337
+STRAPI_API_TOKEN=your_strapi_api_content_token
+# The token above is automatically provisioned by the Strapi `api-token`
+# extension during bootstrap.
 ```
 
 ## Installation
@@ -126,8 +140,8 @@ npm run deploy
 ## Project Structure
 ```
 apps/
-  backend/   # Express API, migrations, seed scripts, TinaCMS config
-  frontend/  # React/Vite app with TinaCMS integration
+  backend/   # nextjs api 
+  frontend/  # React/Vite app with backend integration
 e2e/          # Playwright end-to-end tests
 drizzle.config.json
 playwright.config.js
@@ -141,7 +155,7 @@ Contributions are welcome! Please fork the project, create a feature branch, and
 
 ## Security
 - JWT tokens are stored in `sessionStorage`; consider using HTTP-only cookies in production.
-- Keep secrets (`JWT_SECRET`, `STRIPE_SECRET_KEY`, `GITHUB_PERSONAL_ACCESS_TOKEN`) secure.
+- Keep secrets (`NEXTAUTH_SECRET`, `STRIPE_SECRET_KEY`, `GITHUB_PERSONAL_ACCESS_TOKEN`) secure.
 
 ## License
 This project is private.

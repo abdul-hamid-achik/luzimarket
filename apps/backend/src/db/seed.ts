@@ -49,12 +49,12 @@ async function seed() {
     await reset(db, schema);
 
     console.log('Seeding fake data with drizzle-seed and Faker...');
-    await drizzleSeed(db, schema, { seed: 1234, disableForeignKeys: true })
+    await drizzleSeed(db, schema, { seed: 1234 })
         .refine((f: any) => ({
             empleados: {
                 count: 10,
                 columns: {
-                    nombre: f.string({ transformer: () => faker.name.findName() }),
+                    nombre: f.string({ transformer: () => faker.person.fullName() }),
                     puesto: f.valuesFromArray({ values: ['Gerente', 'Desarrolladora', 'Analista', 'Asistente', 'Contador'] }),
                     email: f.string({ transformer: () => faker.internet.email(), isUnique: true }),
                     createdAt: f.timestamp(),
@@ -66,8 +66,13 @@ async function seed() {
                 columns: {
                     email: f.string({ transformer: () => faker.internet.email(), isUnique: true }),
                     password: f.string({ transformer: () => bcrypt.hashSync(faker.internet.password(), 10) }),
-                    name: f.string({ transformer: () => faker.name.findName() }),
-                    role: f.valuesFromArray({ values: roles, weights: [90, 10] }),
+                    name: f.string({ transformer: () => faker.person.fullName() }),
+                    role: f.valuesFromArray({
+                        values: [
+                            { weight: 0.9, values: ['user'] },
+                            { weight: 0.1, values: ['admin'] },
+                        ],
+                    }),
                     createdAt: f.timestamp(),
                 },
             },
@@ -87,7 +92,7 @@ async function seed() {
             brands: {
                 count: 15,
                 columns: {
-                    name: f.string({ transformer: () => faker.company.companyName() }),
+                    name: f.string({ transformer: () => faker.company.name() }),
                 },
             },
             editorialArticles: {
@@ -117,22 +122,27 @@ async function seed() {
                     createdAt: f.timestamp(),
                 },
                 with: {
-                    photos: {
-                        count: [1, 5],
-                        columns: {
-                            url: f.string({ transformer: () => `https://source.unsplash.com/640x480/?${faker.helpers.arrayElement(imageCategories)}` }),
-                            alt: f.string({ transformer: () => faker.lorem.words(3) }),
-                            sortOrder: f.int({ minValue: 0, maxValue: 5 }),
-                        },
-                    },
+                    photos: [1, 2, 3, 4, 5].map(count => ({ weight: 0.2, count })),
+                },
+            },
+            photos: {
+                columns: {
+                    url: f.string({ transformer: () => `https://source.unsplash.com/640x480/?${faker.helpers.arrayElement(imageCategories)}` }),
+                    alt: f.string({ transformer: () => faker.lorem.words(3) }),
+                    sortOrder: f.int({ minValue: 0, maxValue: 5 }),
                 },
             },
             productVariants: {
                 count: 200,
                 columns: {
                     productId: f.int({ minValue: 1, maxValue: 100 }),
-                    sku: f.string({ transformer: () => faker.random.alphaNumeric(8).toUpperCase(), isUnique: true }),
-                    attributes: f.valuesFromArray({ values: attributeOptions }),
+                    sku: f.string({ transformer: () => faker.string.alphanumeric(8).toUpperCase(), isUnique: true }),
+                    attributes: f.valuesFromArray({
+                        values: attributeOptions.map(option => ({
+                            weight: 1 / attributeOptions.length,
+                            values: [option],
+                        })),
+                    }),
                     stock: f.int({ minValue: 0, maxValue: 500 }),
                 },
             },

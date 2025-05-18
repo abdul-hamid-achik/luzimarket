@@ -6,11 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "migrate:generate": "drizzle-kit generate",
-    "migrate:up": "drizzle-kit migrate",
-    "migrate:down": "drizzle-kit migrate:down",
-    "migrate:push": "drizzle-kit push",
-    "seed": "ts-node-esm --transpile-only src/db/seed.ts"
+    "migrate:generate": "npx --yes drizzle-kit@latest generate",
+    "migrate:up": "npx --yes drizzle-kit@latest migrate",
+    "migrate:down": "npx --yes drizzle-kit@latest drop",
+    "migrate:push": "npx --yes drizzle-kit@latest push",
+    "seed": "tsx src/db/seed.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.0",
@@ -33,7 +33,7 @@
     "@types/react": "^19",
     "drizzle-kit": "^0.31.1",
     "drizzle-seed": "^0.3.1",
-    "ts-node": "^10.9.1",
+    "tsx": "^4.19.4",
     "typescript": "^5"
   }
 }
