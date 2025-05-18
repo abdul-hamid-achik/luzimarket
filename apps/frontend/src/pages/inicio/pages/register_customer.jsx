@@ -24,7 +24,7 @@ const RegisterCustomer = () => {
         }
       }, 2000);
     } catch (err) {
-      // Show backend/Strapi error message if available
+      // Show backend error message if available
       console.error('Registration error:', err);
       if (err && err.response && err.response.data && err.response.data.error) {
         setError(err.response.data.error);

@@ -19,7 +19,7 @@ const LoginCustomer = () => {
       await login({ email, password });
       navigate(from, { replace: true });
     } catch (err) {
-      // Show backend/Strapi error message if available
+      // Show backend error message if available
       if (err && err.response && err.response.data && err.response.data.error) {
         setError(err.response.data.error);
       } else if (err && err.message) {
