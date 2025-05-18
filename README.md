@@ -49,6 +49,7 @@ API_TOKEN_SALT=your_api_token_salt
 ADMIN_JWT_SECRET=your_strapi_admin_jwt_secret
 TRANSFER_TOKEN_SALT=your_transfer_token_salt
 ENCRYPTION_KEY=your_encryption_key
+DATABASE_FILENAME=../../tmp/ecommerce.db
 
 # Backend ↔ Strapi connection (for the backend container)
 STRAPI_URL=http://localhost:1337
