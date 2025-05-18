@@ -25,8 +25,8 @@ let _pool: any | null = null;
 
 
 export function getDb() {
-  if (process.env.VITEST) {
-    // Use in-memory Postgres (pglite) for Vitest
+  if (process.env.VITEST || process.env.USE_PGLITE === 'true') {
+    // Use in-memory Postgres (pglite) for Vitest and local E2E
     if (!(global as any)._testDb) {
       (global as any)._testPglite = new PGlite();
       (global as any)._testDb = require('drizzle-orm/pglite').drizzle((global as any)._testPglite, { schema });

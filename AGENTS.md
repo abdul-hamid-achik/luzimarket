@@ -6,11 +6,11 @@
    ```bash
    npm install
    ```
-2. Start the required services via Docker but also when run `npm run test:e2e` this will be run:
+2. Start the required services via Docker (e.g. CI). When running `npm run test:e2e` this is attempted:
    ```bash
    docker compose up -d
    ```
-   - If Docker is unavailable, backend tests automatically use an in-memory Postgres database provided by **pglite**.
+   - If Docker is unavailable, tests fall back to local processes using **pglite** for the backend and SQLite for Strapi. This is handled directly in `playwright.config.js`.
 3. Run database migrations for the backend and strapi:
    ```bash
    npm run migrate
@@ -31,9 +31,9 @@
   ```bash
   npm run test:frontend
   ```
-- **End-to-end tests** require the Docker containers to be running and seeded. After performing the steps above, run:
+- **End-to-end tests** will try to use Docker containers if available. When Docker cannot be started, the tests automatically run against local instances started with pglite and SQLite. Run:
   ```bash
   npm run test:e2e
   ```
 
-The `playwright.config.js` file uses the commands above to spin up the services and seed data automatically when running E2E tests.
+The `playwright.config.js` file detects Docker availability and starts the appropriate services before running E2E tests without relying on extra helper scripts.
