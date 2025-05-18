@@ -7,7 +7,7 @@
     "apps/strapi"
   ],
   "scripts": {
-    "dev": "docker compose up --build -d",
+    "dev": "concurrently --kill-others --raw \"npm --workspace=apps/backend run dev\" \"npm --workspace=apps/strapi run develop\" \"npm --workspace=apps/frontend run dev\"",
     "dev:frontend": "npm --workspace=apps/frontend run dev",
     "dev:backend": "npm --workspace=apps/backend run dev",
     "deploy": "npx --yes vercel@latest --prod",
@@ -31,7 +31,7 @@
     "migrate:pull": "npm --workspace=apps/backend run migrate:pull",
     "seed": "node scripts/seed-all.js",
     "seed:backend": "npm --workspace=apps/backend run seed",
-    "seed:strapi": "npm --workspace=apps/strapi run docker-seed",
+    "seed:strapi": "npm --workspace=apps/strapi run seed",
     "start:backend": "npm --workspace=apps/backend run start",
     "start:frontend": "npm --workspace=apps/frontend run preview",
     "start": "concurrently --kill-others --raw --handle-input \"npm run start:backend\" \"npm run start:frontend\"",

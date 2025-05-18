@@ -1,18 +1,20 @@
-// Vitest setup file for Drizzle + pglite (in-memory Postgres)
+// Vitest setup file for Drizzle + better-sqlite3 (in-memory SQLite)
 import { afterAll, afterEach, beforeEach, vi } from 'vitest';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { sql } from 'drizzle-orm';
 import Database from 'better-sqlite3';
 import * as schema from '../schema';
 
+process.env.DATABASE_URL = ':memory:';
+
 let db: ReturnType<typeof drizzle>;
 let client: Database;
 
-vi.mock('../db', async (importOriginal) => {
+vi.mock('@/db', async (importOriginal) => {
   client = new Database(':memory:');
   db = drizzle(client, { schema });
   return {
-    ...(await importOriginal<typeof import('../db')>()),
+    ...(await importOriginal<typeof import('@/db')>()),
     db,
     client,
   };
@@ -27,7 +29,7 @@ beforeAll(async () => {
   const statements = migrationSql.split('--> statement-breakpoint').map(s => s.trim()).filter(Boolean);
   for (const stmt of statements) {
     if (stmt.length > 0) {
-      await client.query(stmt);
+      client.exec(stmt);
     }
   }
 });
@@ -42,7 +44,7 @@ beforeEach(async () => {
   const tableNames = Object.values(schemaTables).map((t: any) => t.name);
   for (const table of tableNames) {
     try {
-      await client.query(`TRUNCATE TABLE "${table}" RESTART IDENTITY CASCADE;`);
+      client.exec(`DELETE FROM "${table}";`);
     } catch (err) {
       // Ignore if table doesn't exist
     }

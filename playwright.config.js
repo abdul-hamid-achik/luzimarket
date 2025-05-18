@@ -19,25 +19,12 @@ module.exports = defineConfig({
     trace: 'on-first-retry',
   },
   webServer: process.env.CI
-    ? undefined // In CI, servers are already running; don't start anything
-    : (() => {
-      const { execSync } = require('child_process');
-      try {
-        execSync('docker compose ps', { stdio: 'ignore' });
-        return {
-          command: 'docker compose up -d && npm run migrate:up && npm run seed && npm run dev:frontend',
-          url: 'http://localhost:5173',
-          reuseExistingServer: true,
-        };
-      } catch {
-        const env = 'USE_PGLITE=true DATABASE_CLIENT=sqlite DATABASE_FILENAME=.tmp/e2e.sqlite';
-        return {
-          command: `${env} npm run migrate:up && ${env} npm run seed && ${env} concurrently --kill-others --raw "npm --workspace=apps/backend run dev" "npm --workspace=apps/strapi run develop" "npm --workspace=apps/frontend run dev"`,
-          url: 'http://localhost:5173',
-          reuseExistingServer: true,
-        };
-      }
-    })(),
+    ? undefined
+    : {
+        command: 'USE_PGLITE=true DATABASE_CLIENT=sqlite DATABASE_FILENAME=.tmp/e2e.sqlite npm run migrate:up && npm run seed && concurrently --kill-others --raw "npm --workspace=apps/backend run dev" "npm --workspace=apps/strapi run develop" "npm --workspace=apps/frontend run dev"',
+        url: 'http://localhost:5173',
+        reuseExistingServer: true,
+      },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
