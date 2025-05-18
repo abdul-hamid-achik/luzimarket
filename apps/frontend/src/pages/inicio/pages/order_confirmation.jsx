@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { useOrder } from "@/api/hooks";
-import '@/pages/pagina_principal/css/general.css';
+import '@/pages/inicio/css/general.css';
 
 const OrderConfirmation = () => {
   const { id } = useParams();

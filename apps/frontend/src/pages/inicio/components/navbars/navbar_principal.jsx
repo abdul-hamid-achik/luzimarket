@@ -1,13 +1,13 @@
 /* CSS */
-import "@/pages/pagina_principal/css/navbars.css";
+import "@/pages/inicio/css/navbars.css";
 
 /* Imagenes para el navbar */
-import LogoLetraLuzimarket from "@/pages/pagina_principal/images/new_images_luzi/logo_luzi1.png";
-import SearchLogo from "@/pages/pagina_principal/images/search_logo_luzimarket.png";
-import LogoluziImagen from "@/pages/pagina_principal/images/logo_luzimarket.png";
-import LogoLikeLuzi from "@/pages/pagina_principal/images/logo_like_luzimarket.png";
-import LogoUserLuzi from "@/pages/pagina_principal/images/logo_user_luzi_market.png";
-import LogoCartLuzi from "@/pages/pagina_principal/images/cart_luzimarket.png";
+import LogoLetraLuzimarket from "@/pages/inicio/images/new_images_luzi/logo_luzi1.png";
+import SearchLogo from "@/pages/inicio/images/search_logo_luzimarket.png";
+import LogoluziImagen from "@/pages/inicio/images/logo_luzimarket.png";
+import LogoLikeLuzi from "@/pages/inicio/images/logo_like_luzimarket.png";
+import LogoUserLuzi from "@/pages/inicio/images/logo_user_luzi_market.png";
+import LogoCartLuzi from "@/pages/inicio/images/cart_luzimarket.png";
 
 /* Librería */
 import { Link } from "react-router-dom";

@@ -18,7 +18,7 @@ module.exports = {
     'import/resolver': {
       alias: {
         map: [
-          ['@/pagina_principal', path.resolve(__dirname, 'src/pages/pagina_principal')],
+          ['@/inicio', path.resolve(__dirname, 'src/pages/inicio')],
           ['@/empleados', path.resolve(__dirname, 'src/pages/empleados')],
           ['@/assets', path.resolve(__dirname, 'src/assets')],
           ['@', path.resolve(__dirname, 'src')]
@@ -37,7 +37,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['src/pagina_principal/**'],
+      files: ['src/inicio/**'],
       rules: {
         'import/no-unresolved': 'off',
         'react/jsx-no-undef': 'off',

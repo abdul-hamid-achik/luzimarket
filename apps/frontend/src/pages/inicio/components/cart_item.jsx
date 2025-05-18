@@ -1,4 +1,4 @@
-import "@/pages/pagina_principal/css/cart_item.css";
+import "@/pages/inicio/css/cart_item.css";
 
 const CartItem = ({ item, onRemove, onQuantityChange }) => {
   // Normalize fields from API

@@ -1,14 +1,14 @@
 // Paginas 
 import { Outlet } from "react-router-dom";
-import Navbars from "@/pages/pagina_principal/components/navbars";
-import Footer from "@/pages/pagina_principal/components/footer";
+import Navbars from "@/pages/inicio/components/navbars";
+import Footer from "@/pages/inicio/components/footer";
 
 // Bootstrap 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.bundle.js';
 
 // CSS
-import "@/pages/pagina_principal/css/general.css"
+import "@/pages/inicio/css/general.css"
 
 const Inicio = () => {
    console.log('Inicio component is rendering...');

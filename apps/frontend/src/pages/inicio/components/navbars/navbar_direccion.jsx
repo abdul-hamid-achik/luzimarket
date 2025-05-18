@@ -1,4 +1,4 @@
-import "@/pages/pagina_principal/css/navbars.css"
+import "@/pages/inicio/css/navbars.css"
 
 import React, { useState } from "react";
 import Container from 'react-bootstrap/Container';

@@ -5,8 +5,8 @@
       "@/*": [
         "src/*"
       ],
-      "@/pagina_principal/*": [
-        "src/pages/pagina_principal/*"
+      "@/inicio/*": [
+        "src/pages/inicio/*"
       ],
       "@/empleados/*": [
         "src/pages/empleados/*"

@@ -3,10 +3,10 @@
 
 //componentes del carrito
 import { useCart, useUpdateCartItem, useRemoveCartItem } from "@/api/hooks";
-import Checkout from "@/pages/pagina_principal/components/cart_checkout";
-import CartTitle from "@/pages/pagina_principal/components/cart_title";
-import CartItem from "@/pages/pagina_principal/components/cart_item";
-import "@/pages/pagina_principal/css/cart.css";
+import Checkout from "@/pages/inicio/components/cart_checkout";
+import CartTitle from "@/pages/inicio/components/cart_title";
+import CartItem from "@/pages/inicio/components/cart_item";
+import "@/pages/inicio/css/cart.css";
 
 const Cart = () => {
   const { data, isLoading, error } = useCart();

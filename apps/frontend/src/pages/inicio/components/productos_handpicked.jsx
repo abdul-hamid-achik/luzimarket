@@ -1,7 +1,7 @@
 import Card from 'react-bootstrap/Card';
 import { Link } from 'react-router-dom';
 import { useProducts } from "@/api/hooks";
-import '@/pages/pagina_principal/css/producto.css';
+import '@/pages/inicio/css/producto.css';
 
 const ProductosHandpicked = ({ filters = {} }) => {
   const { data: products = [], isLoading, error } = useProducts(filters);
