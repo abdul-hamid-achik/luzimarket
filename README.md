@@ -22,20 +22,19 @@ Luzimarket is a full-stack e-commerce platform with a React/Vite frontend and a 
 ## Tech Stack
 - **Frontend**: React, Vite, Chakra UI, MUI, NextUI, React Query, TinaCMS, Jest, Playwright
 - **Backend**: Node.js, TypeScript, Express, Drizzle ORM, Drizzle Seed, Zod, JWT, Stripe, Swagger (OpenAPI), TinaCMS
-- **Database**: PostgreSQL (local via Docker Compose or Neon serverless)
-- **DevOps**: Docker, Docker Compose, Vercel
+- **Database**: SQLite (local file)
+- **DevOps**: Vercel
 
 ## Prerequisites
 - Node.js v22.8.0 or later
 - npm v8 or later
-- Docker & Docker Compose
 
 ## Environment Variables
 Create a `.env` file at the project root with the following variables:
 
 ```dotenv
 PORT=5000
-DATABASE_URL=postgres://postgres:password@localhost:5433/ecommerce
+DATABASE_URL=./tmp/ecommerce.db
 JWT_SECRET=your_jwt_secret
 CORS_ORIGIN=http://localhost:5173
 STRIPE_SECRET_KEY=your_stripe_secret_key
@@ -43,8 +42,6 @@ GITHUB_OWNER=your_github_username
 GITHUB_REPO=your_github_repository
 GIT_BRANCH=main
 GITHUB_PERSONAL_ACCESS_TOKEN=your_personal_access_token
-# Local Postgres URL for e2e test proxy or in-memory DB
-LOCAL_POSTGRES_URL=postgres://postgres:password@localhost:5433/ecommerce
 
 # Strapi CMS settings (for the Strapi container)
 APP_KEYS=your_strapi_app_keys_comma_separated
@@ -145,7 +142,6 @@ apps/
   backend/   # Express API, migrations, seed scripts, TinaCMS config
   frontend/  # React/Vite app with TinaCMS integration
 e2e/          # Playwright end-to-end tests
-docker-compose.yml
 drizzle.config.json
 playwright.config.js
 tsconfig.base.json

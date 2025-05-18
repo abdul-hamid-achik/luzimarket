@@ -4,13 +4,12 @@ This is a Node.js + TypeScript backend API for the e-commerce platform.
 
 ## Features
 
-- PostgreSQL database with Drizzle ORM
+- SQLite database with Drizzle ORM
 - API routes for authentication, categories, products, cart, orders
 - Input validation with Zod
 - JWT-based authentication
 - Payment integration with Stripe
 - Swagger docs at `/api/docs`
-- Docker & Docker Compose setup
 
 ## Setup
 
@@ -29,9 +28,3 @@ This is a Node.js + TypeScript backend API for the e-commerce platform.
    npm run dev
    ```
 5. Visit Swagger UI at `http://localhost:5000/api/docs`
-
-## Docker
-
-```
-docker-compose up --build
-```
