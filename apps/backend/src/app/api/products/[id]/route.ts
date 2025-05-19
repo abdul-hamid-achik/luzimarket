@@ -1,14 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { products, productVariants } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 // @ts-ignore: Allow http-status-codes import without type declarations
 import { StatusCodes } from 'http-status-codes';
 
-export async function GET(
-    request: NextRequest,
-    { params }: { params: { id: string } }
-) {
+export async function GET(request: any, { params }: { params: { id: string } }) {
     const id = Number(params.id);
     const [product] = await db.select().from(products).where(eq(products.id, id));
     if (!product) {
@@ -21,10 +18,7 @@ export async function GET(
 }
 
 // Update an existing product
-export async function PUT(
-    request: NextRequest,
-    { params }: { params: { id: string } }
-) {
+export async function PUT(request: any, { params }: { params: { id: string } }) {
     const id = Number(params.id);
     const data = await request.json();
     const updateFields: any = {};
@@ -44,10 +38,7 @@ export async function PUT(
 }
 
 // Delete a product and its variants
-export async function DELETE(
-    request: NextRequest,
-    { params }: { params: { id: string } }
-) {
+export async function DELETE(request: any, { params }: { params: { id: string } }) {
     const id = Number(params.id);
     // delete associated variants first
     await db.delete(productVariants).where(eq(productVariants.productId, id)).execute();

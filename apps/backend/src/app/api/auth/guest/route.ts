@@ -5,22 +5,12 @@ import { NextResponse } from 'next/server';
 import { StatusCodes } from 'http-status-codes';
 import { db } from '@/db';
 import { sessions } from '@/db/schema';
-import { sql } from 'drizzle-orm';
 
 export async function POST() {
     try {
-        // First, try to get the next available ID to avoid collisions
-        const maxIdResult = await db.execute(sql`SELECT MAX(id) + 1000 as next_id FROM sessions`);
-        const nextId = maxIdResult.rows && maxIdResult.rows.length > 0 && maxIdResult.rows[0].next_id
-            ? Number(maxIdResult.rows[0].next_id)
-            : Math.floor(Math.random() * 100000) + 10000; // Use a random high number if no results
-
-        // Create a guest session with a safely high ID to avoid conflicts
+        // Create a guest session with generated UUID
         const insertResult = await db.insert(sessions)
-            .values({
-                id: nextId,
-                isGuest: true
-            })
+            .values({ isGuest: true })
             .returning({ id: sessions.id })
             .execute();
 

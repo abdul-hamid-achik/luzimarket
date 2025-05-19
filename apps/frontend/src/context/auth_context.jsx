@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
       let token = sessionStorage.getItem('token');
       if (!token) {
         try {
-          const res = await api.post('/auth/guest');
+          const res = await api.post('/api/auth/guest');
           token = res.data.token;
           sessionStorage.setItem('token', token);
         } catch (err) {

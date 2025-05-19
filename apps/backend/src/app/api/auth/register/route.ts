@@ -19,37 +19,28 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Get a safe ID to avoid primary key conflicts for user
-        const maxUserIdResult = await db.execute(sql`SELECT MAX(id) + 1000 as next_id FROM users`);
+        const hashed = await bcrypt.hash(password, 10);
+        // Compute safe ID for new user to avoid primary key conflicts
+        const maxUserIdResult = await db.execute(sql`SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM users`);
         const nextUserId = maxUserIdResult.rows && maxUserIdResult.rows.length > 0 && maxUserIdResult.rows[0].next_id
             ? Number(maxUserIdResult.rows[0].next_id)
-            : Math.floor(Math.random() * 100000) + 10000; // Use a random high number if no results
-
-        const hashed = await bcrypt.hash(password, 10);
+            : Math.floor(Math.random() * 100000) + 10000;
+        // Insert new user with explicit safe ID
         const newUser = await db.insert(users)
-            .values({
-                id: nextUserId,
-                email,
-                password: hashed
-            })
+            .values({ id: nextUserId, email, password: hashed })
             .returning({ id: users.id })
             .execute();
 
         const userId = newUser[0].id;
 
-        // Get a safe ID to avoid primary key conflicts for session
+        // Compute safe ID for new session to avoid primary key conflicts
         const maxSessionIdResult = await db.execute(sql`SELECT MAX(id) + 1000 as next_id FROM sessions`);
         const nextSessionId = maxSessionIdResult.rows && maxSessionIdResult.rows.length > 0 && maxSessionIdResult.rows[0].next_id
             ? Number(maxSessionIdResult.rows[0].next_id)
-            : Math.floor(Math.random() * 100000) + 10000; // Use a random high number if no results
-
-        // create non-guest session
+            : Math.floor(Math.random() * 100000) + 10000;
+        // Insert new session with explicit safe ID
         const session = await db.insert(sessions)
-            .values({
-                id: nextSessionId,
-                userId,
-                isGuest: false
-            })
+            .values({ id: nextSessionId, userId, isGuest: false })
             .returning({ id: sessions.id })
             .execute();
 

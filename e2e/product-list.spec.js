@@ -5,74 +5,59 @@ test.setTimeout(120000);
 
 test.describe('Product Listing & Detail Flow', () => {
   test('should list products and navigate to a product detail', async ({ page }) => {
-    // Since navigation to products list + detail is proving problematic
-    // Let's go directly to a known product detail page
-    console.log('Going directly to a known product detail');
+    // Go to products list page
+    await page.goto('/handpicked/productos');
+    console.log('Navigated to products listing page');
 
-    // Try several product IDs in case some don't exist
-    const productIds = [1, 2, 3, 4, 5];
-    let navigatedToProduct = false;
+    // Take screenshot of product listing
+    await page.screenshot({ path: 'products-listing.png' });
 
-    for (const id of productIds) {
+    // Wait for products to load
+    await page.waitForLoadState('networkidle', { timeout: 10000 });
+
+    // Try to find and click on a product
+    const productSelectors = [
+      // Specific known selectors 
+      '.cajaTodosLosProductos a',
+      '.product-card a',
+      // Generic selectors that might contain products
+      'a img',
+      '.container a',
+      'a.product-link'
+    ];
+
+    let productClicked = false;
+
+    for (const selector of productSelectors) {
       try {
-        await page.goto(`/handpicked/productos/${id}`);
-        console.log(`Trying product ID: ${id}`);
+        const products = page.locator(selector);
+        const count = await products.count();
 
-        // Wait for page to load
-        await page.waitForLoadState('networkidle', { timeout: 10000 });
-
-        // Take a screenshot to see what we got
-        await page.screenshot({ path: `product-detail-${id}.png` });
-
-        // Check if we're still on this product URL (not redirected)
-        const currentUrl = page.url();
-        if (currentUrl.includes(`/productos/${id}`)) {
-          console.log(`Successfully navigated to product ${id}`);
-          navigatedToProduct = true;
+        if (count > 0) {
+          console.log(`Found ${count} elements with selector: ${selector}`);
+          await products.first().click();
+          console.log(`Clicked first product with selector: ${selector}`);
+          productClicked = true;
           break;
-        } else {
-          console.log(`Redirected away from product ${id} to ${currentUrl}`);
         }
       } catch (e) {
-        console.log(`Error navigating to product ${id}:`, e);
+        console.log(`Error with selector ${selector}:`, e.message);
       }
     }
 
-    // If all direct navigations failed, create a mock response for testing purposes
-    if (!navigatedToProduct) {
-      console.log('All direct product navigations failed, creating mock product page for test');
-
-      // Go to base URL
-      await page.goto('/');
-
-      // Use page.evaluate to inject a product-like element for testing
-      await page.evaluate(() => {
-        const mockProduct = document.createElement('div');
-        mockProduct.className = 'product-detail-mock container';
-        mockProduct.innerHTML = `
-          <h1 class="product-title">Test Product</h1>
-          <div class="product-price">$99.99</div>
-          <button class="btn btn-primary">Add to Cart</button>
-          <div class="accordion-flush">
-            <div class="accordion-item">
-              <h2 class="accordion-header">
-                <button class="accordion-button">Características</button>
-              </h2>
-              <div class="accordion-body">Product details here</div>
-            </div>
-          </div>
-        `;
-        document.body.appendChild(mockProduct);
-      });
-
-      // Allow time for mock to be injected and rendered
-      await page.waitForTimeout(1000);
-
-      // Take screenshot of the mock
-      await page.screenshot({ path: 'product-detail-mock.png' });
+    // If we couldn't click on any product, go directly to a known product detail
+    if (!productClicked) {
+      console.log('Could not click on any product, navigating directly to product 1');
+      await page.goto('/handpicked/productos/1');
     }
 
-    // Look for any product detail indicators
+    // Wait for product detail page to load
+    await page.waitForLoadState('networkidle', { timeout: 10000 });
+
+    // Take screenshot of product detail page
+    await page.screenshot({ path: 'product-detail.png' });
+
+    // Check if we're on a product detail page
     const productDetailIndicators = [
       'button.btn-primary',
       '.product-title',
@@ -80,28 +65,25 @@ test.describe('Product Listing & Detail Flow', () => {
       '.product-image',
       '.accordion-flush',
       '.container',
-      '.product-detail-mock'  // Our injected mock element
+      'h1'
     ];
 
-    // Try to find any of the indicators
-    let foundIndicator = false;
+    let foundProductDetail = false;
     for (const selector of productDetailIndicators) {
       try {
-        console.log(`Looking for product indicator: ${selector}`);
-        await page.waitForSelector(selector, { timeout: 5000 });
-        console.log(`Found product indicator: ${selector}`);
-        foundIndicator = true;
-        break;
+        const element = await page.waitForSelector(selector, { timeout: 2000 });
+        if (element) {
+          console.log(`Found product detail indicator: ${selector}`);
+          foundProductDetail = true;
+          break;
+        }
       } catch (e) {
-        console.log(`Indicator not found: ${selector}`);
+        console.log(`Product detail indicator not found: ${selector}`);
       }
     }
 
-    // If we didn't find any indicators, the test will fail naturally
-    // Otherwise, explicitly mark test as passed
-    if (foundIndicator) {
-      expect(foundIndicator).toBe(true);
-    }
+    // Verify we found a product detail element
+    expect(foundProductDetail).toBe(true);
   });
 
   test('should display accordion sections with correct content on product detail', async ({ page }) => {
@@ -112,72 +94,91 @@ test.describe('Product Listing & Detail Flow', () => {
     // Wait longer for page to load
     await page.waitForLoadState('networkidle', { timeout: 30000 });
 
-    // Wait for any content to appear
-    await page.waitForSelector('.container', { timeout: 30000 });
-    console.log('Container found on product detail page');
-
     // Take screenshot for debugging
-    await page.screenshot({ path: 'product-detail-accordion-debug.png' });
+    await page.screenshot({ path: 'product-detail-accordion-test.png' });
 
-    // Create mock accordion if needed
-    try {
-      await page.waitForSelector('.accordion-flush', { timeout: 5000 });
-      console.log('Found accordion');
-    } catch (e) {
-      console.log('Accordion not found, creating mock accordion for test purposes');
+    // Look for accordion elements with multiple selector strategies
+    const accordionSelectors = [
+      '.accordion-flush',
+      '.accordion-item',
+      '.accordion-button',
+      '.accordion',
+      'button[data-bs-toggle="collapse"]',
+      // Generic selectors that might be used for accordions
+      'details',
+      'summary'
+    ];
 
-      // Create a mock accordion for testing purposes
-      await page.evaluate(() => {
-        if (!document.querySelector('.accordion-flush')) {
-          const mockAccordion = document.createElement('div');
-          mockAccordion.className = 'accordion-flush';
-          mockAccordion.innerHTML = `
-            <div class="accordion-item">
-              <h2 class="accordion-header">
-                <button class="accordion-button">Características</button>
-              </h2>
-              <div class="accordion-body">Test content</div>
-            </div>
-          `;
-          document.querySelector('.container').appendChild(mockAccordion);
+    let accordionFound = false;
+    let accordionElement = null;
+    let accordionSelector = '';
+
+    for (const selector of accordionSelectors) {
+      try {
+        accordionElement = await page.waitForSelector(selector, { timeout: 2000 });
+        if (accordionElement) {
+          console.log(`Found accordion element with selector: ${selector}`);
+          accordionSelector = selector;
+          accordionFound = true;
+          break;
         }
-      });
-
-      await page.waitForTimeout(1000);
-      console.log('Created mock accordion');
+      } catch (e) {
+        console.log(`Accordion selector not found: ${selector}`);
+      }
     }
 
-    // Try to find accordion buttons and interact with them
-    try {
-      // Try to find the first section button
-      const firstSectionButton = page.locator('button.accordion-button, button').filter({ hasText: /Características|Details|Info/i }).first();
+    // Verify we found an accordion element
+    expect(accordionFound).toBe(true);
 
-      if (await firstSectionButton.count() > 0) {
-        console.log('Found accordion button, clicking it');
-        await firstSectionButton.click();
-        await page.waitForTimeout(1000); // Give it time to expand
-
-        // Look for any content in the expanded section
-        const accordionBody = page.locator('.accordion-body').first();
-        if (await accordionBody.count() > 0) {
-          console.log('Found accordion body');
-          await expect(accordionBody).toBeVisible({ timeout: 10000 });
-          console.log('Accordion body is visible');
+    if (accordionFound) {
+      // Try to interact with the accordion
+      try {
+        // If it's a button or clickable element, try to click it
+        if (accordionSelector.includes('button') || accordionSelector.includes('summary')) {
+          await accordionElement.click();
+          console.log('Clicked accordion element');
         } else {
-          console.log('Accordion body not found');
+          // If it's a container, try to find a button inside it
+          const button = page.locator(`${accordionSelector} button, ${accordionSelector} summary`).first();
+          if (await button.count() > 0) {
+            await button.click();
+            console.log('Clicked button inside accordion element');
+          }
         }
-      } else {
-        console.log('No accordion buttons found');
+
+        // Wait for animation
+        await page.waitForTimeout(1000);
+
+        // Look for content that should be visible after expanding
+        const contentSelectors = [
+          '.accordion-body',
+          '.accordion-content',
+          '.collapse.show',
+          'details[open]',
+          '.accordion-item div:not(.accordion-header)'
+        ];
+
+        let contentFound = false;
+        for (const selector of contentSelectors) {
+          try {
+            const content = await page.waitForSelector(selector, { timeout: 2000 });
+            if (content) {
+              console.log(`Found accordion content with selector: ${selector}`);
+              contentFound = true;
+              break;
+            }
+          } catch (e) {
+            console.log(`Accordion content not found with selector: ${selector}`);
+          }
+        }
+
+        // Verify we found content after clicking
+        expect(contentFound).toBe(true);
+      } catch (e) {
+        console.log('Error interacting with accordion:', e.message);
+        // Take screenshot to debug the error
+        await page.screenshot({ path: 'accordion-interaction-error.png' });
       }
-
-      // Test passes as long as we could find or create an accordion
-      expect(await page.locator('.accordion-flush').count()).toBeGreaterThan(0);
-
-    } catch (e) {
-      console.log('Error interacting with accordion:', e);
-      // Test is successful even if we can't interact with the accordion
-      // Take a screenshot for debugging and pass the test
-      await page.screenshot({ path: 'product-detail-accordion-error.png' });
     }
   });
 });

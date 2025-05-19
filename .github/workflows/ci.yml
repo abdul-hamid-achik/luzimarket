@@ -14,7 +14,7 @@ jobs:
       NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
       CORS_ORIGIN: http://localhost:5173
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-      VITE_API_URL: http://localhost:5173/api
+      VITE_API_URL: http://localhost:8000
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

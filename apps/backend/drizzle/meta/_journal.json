@@ -5,8 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1747593196964,
-      "tag": "0000_flat_human_torch",
+      "when": 1747615271437,
+      "tag": "0000_slim_the_hunter",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1747628062911,
+      "tag": "0001_brave_rictor",
       "breakpoints": true
     }
   ]

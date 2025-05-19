@@ -5,7 +5,7 @@ import api from "./client";
  * @param {{ email: string, password: string }} payload
  */
 export const registerUser = (payload) =>
-  api.post('/auth/register', payload).then((res) => res.data);
+  api.post('/api/auth/register', payload).then((res) => res.data);
 
 /**
  * Login an existing user
@@ -13,4 +13,4 @@ export const registerUser = (payload) =>
  * @returns {{ token: string }}
  */
 export const loginUser = (payload) =>
-  api.post('/auth/login', payload).then((res) => res.data);
+  api.post('/api/auth/login', payload).then((res) => res.data);

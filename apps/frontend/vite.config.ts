@@ -21,10 +21,11 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': {
+      '^/api': {
         target: apiUrl,
         changeOrigin: true,
         secure: false,
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },

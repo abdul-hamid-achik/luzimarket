@@ -1,6 +1,10 @@
 CREATE TABLE "brands" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"name" text NOT NULL
+	"name" text NOT NULL,
+	"slug" text NOT NULL,
+	"description" text NOT NULL,
+	"website" text NOT NULL,
+	CONSTRAINT "brands_slug_unique" UNIQUE("slug")
 );
 --> statement-breakpoint
 CREATE TABLE "bundle_items" (
@@ -12,9 +16,11 @@ CREATE TABLE "bundle_items" (
 --> statement-breakpoint
 CREATE TABLE "bundles" (
 	"id" serial PRIMARY KEY NOT NULL,
+	"slug" text NOT NULL,
 	"name" text NOT NULL,
 	"description" text NOT NULL,
-	"created_at" timestamp DEFAULT now() NOT NULL
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "bundles_slug_unique" UNIQUE("slug")
 );
 --> statement-breakpoint
 CREATE TABLE "cart_items" (
@@ -28,6 +34,7 @@ CREATE TABLE "categories" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"slug" text NOT NULL,
+	"description" text NOT NULL,
 	CONSTRAINT "categories_name_unique" UNIQUE("name"),
 	CONSTRAINT "categories_slug_unique" UNIQUE("slug")
 );
@@ -41,7 +48,11 @@ CREATE TABLE "delivery_zones" (
 CREATE TABLE "editorial_articles" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"title" text NOT NULL,
-	"content" text NOT NULL
+	"content" text NOT NULL,
+	"author" text NOT NULL,
+	"slug" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "editorial_articles_slug_unique" UNIQUE("slug")
 );
 --> statement-breakpoint
 CREATE TABLE "empleados" (
@@ -62,7 +73,10 @@ CREATE TABLE "favorites" (
 --> statement-breakpoint
 CREATE TABLE "occasions" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"name" text NOT NULL
+	"name" text NOT NULL,
+	"description" text NOT NULL,
+	"slug" text NOT NULL,
+	CONSTRAINT "occasions_slug_unique" UNIQUE("slug")
 );
 --> statement-breakpoint
 CREATE TABLE "order_items" (
@@ -109,11 +123,13 @@ CREATE TABLE "product_variants" (
 --> statement-breakpoint
 CREATE TABLE "products" (
 	"id" serial PRIMARY KEY NOT NULL,
+	"slug" text NOT NULL,
 	"name" text NOT NULL,
 	"description" text NOT NULL,
 	"price" integer NOT NULL,
 	"category_id" integer,
-	"created_at" timestamp DEFAULT now() NOT NULL
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "products_slug_unique" UNIQUE("slug")
 );
 --> statement-breakpoint
 CREATE TABLE "sessions" (

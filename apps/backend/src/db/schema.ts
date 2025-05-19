@@ -30,11 +30,13 @@ export const categories = pgTable('categories', {
     id: serial('id').primaryKey(),
     name: text('name').notNull().unique(),
     slug: text('slug').notNull().unique(),
+    description: text('description').notNull(),
 });
 
 // Products and variants
 export const products = pgTable('products', {
     id: serial('id').primaryKey(),
+    slug: text('slug').notNull().unique(),
     name: text('name').notNull(),
     description: text('description').notNull(),
     price: integer('price').notNull(),
@@ -106,15 +108,23 @@ export const orderItems = pgTable('order_items', {
 export const brands = pgTable('brands', {
     id: serial('id').primaryKey(),
     name: text('name').notNull(),
+    slug: text('slug').notNull().unique(),
+    description: text('description').notNull(),
+    website: text('website').notNull(),
 });
 export const occasions = pgTable('occasions', {
     id: serial('id').primaryKey(),
     name: text('name').notNull(),
+    description: text('description').notNull(),
+    slug: text('slug').notNull().unique(),
 });
 export const editorialArticles = pgTable('editorial_articles', {
     id: serial('id').primaryKey(),
     title: text('title').notNull(),
     content: text('content').notNull(),
+    author: text('author').notNull(),
+    slug: text('slug').notNull().unique(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 export const favorites = pgTable('favorites', {
     id: serial('id').primaryKey(),
@@ -133,6 +143,7 @@ export const petitions = pgTable('petitions', {
 // Bundles for grouping products
 export const bundles = pgTable('bundles', {
     id: serial('id').primaryKey(),
+    slug: text('slug').notNull().unique(),
     name: text('name').notNull(),
     description: text('description').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -155,3 +166,29 @@ export type StateSelect = typeof states.$inferSelect;
 
 export type DeliveryZoneInsert = typeof deliveryZones.$inferInsert;
 export type DeliveryZoneSelect = typeof deliveryZones.$inferSelect;
+
+// Lookup tables for various static values
+export const sizes = pgTable('sizes', {
+    id: serial('id').primaryKey(),
+    size: text('size').notNull().unique(),
+});
+
+export const imageCategories = pgTable('image_categories', {
+    id: serial('id').primaryKey(),
+    name: text('name').notNull().unique(),
+});
+
+export const productTypes = pgTable('product_types', {
+    id: serial('id').primaryKey(),
+    name: text('name').notNull().unique(),
+});
+
+export const materials = pgTable('materials', {
+    id: serial('id').primaryKey(),
+    name: text('name').notNull().unique(),
+});
+
+export const articleTopics = pgTable('article_topics', {
+    id: serial('id').primaryKey(),
+    name: text('name').notNull().unique(),
+});
