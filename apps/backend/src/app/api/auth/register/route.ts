@@ -7,7 +7,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { StatusCodes } from 'http-status-codes';
 import { db } from '@/db';
 import { users, sessions } from '@/db/schema';
-import { sql } from 'drizzle-orm';
 
 export async function POST(request: NextRequest) {
     try {
@@ -20,31 +19,20 @@ export async function POST(request: NextRequest) {
         }
 
         const hashed = await bcrypt.hash(password, 10);
-        // Compute safe ID for new user to avoid primary key conflicts
-        const maxUserIdResult = await db.execute(sql`SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM users`);
-        const nextUserId = maxUserIdResult.rows && maxUserIdResult.rows.length > 0 && maxUserIdResult.rows[0].next_id
-            ? Number(maxUserIdResult.rows[0].next_id)
-            : Math.floor(Math.random() * 100000) + 10000;
-        // Insert new user with explicit safe ID
-        const newUser = await db.insert(users)
-            .values({ id: nextUserId, email, password: hashed })
+        // Insert new user; `id` is auto-assigned by Postgres
+        const newUserResult = await db.insert(users)
+            .values({ email, password: hashed })
             .returning({ id: users.id })
             .execute();
 
-        const userId = newUser[0].id;
+        const userId = newUserResult[0].id;
 
-        // Compute safe ID for new session to avoid primary key conflicts
-        const maxSessionIdResult = await db.execute(sql`SELECT MAX(id) + 1000 as next_id FROM sessions`);
-        const nextSessionId = maxSessionIdResult.rows && maxSessionIdResult.rows.length > 0 && maxSessionIdResult.rows[0].next_id
-            ? Number(maxSessionIdResult.rows[0].next_id)
-            : Math.floor(Math.random() * 100000) + 10000;
-        // Insert new session with explicit safe ID
-        const session = await db.insert(sessions)
-            .values({ id: nextSessionId, userId, isGuest: false })
+        // Insert new session; `id` is auto-assigned by Postgres
+        const newSessionResult = await db.insert(sessions)
+            .values({ userId, isGuest: false })
             .returning({ id: sessions.id })
             .execute();
-
-        const sessionId = session[0].id;
+        const sessionId = newSessionResult[0].id;
         const jwtSecret = process.env.JWT_SECRET || 'test-jwt-secret-for-e2e-tests';
         const token = jwt.sign({ sessionId, userId }, jwtSecret, { expiresIn: '7d' });
         return NextResponse.json({ token }, { status: StatusCodes.CREATED });

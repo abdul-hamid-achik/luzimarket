@@ -2,22 +2,6 @@ const { test, expect } = require('@playwright/test');
 const fs = require('fs');
 const path = require('path');
 
-// Helper to take a screenshot with timestamp and save to screenshots dir
-async function takeScreenshot(page, name) {
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const screenshotDir = path.join(__dirname, '..', 'tmp', 'playwright-screenshots');
-
-  // Ensure the directory exists
-  if (!fs.existsSync(screenshotDir)) {
-    fs.mkdirSync(screenshotDir, { recursive: true });
-  }
-
-  const screenshotPath = path.join(screenshotDir, `${name}-${timestamp}.png`);
-  await page.screenshot({ path: screenshotPath, fullPage: true });
-  console.log(`Screenshot saved: ${path.basename(screenshotPath)}`);
-  return screenshotPath;
-}
-
 test.describe('Cart Management Flow', () => {
   test('user can update quantity and remove item from cart', async ({ page }) => {
     // Register and login new user
@@ -27,7 +11,6 @@ test.describe('Cart Management Flow', () => {
 
     // Go to register page
     await page.goto('/register');
-    await takeScreenshot(page, 'register-page');
 
     // Add client-side listeners for better debugging
     await page.evaluate(() => {
@@ -53,7 +36,6 @@ test.describe('Cart Management Flow', () => {
 
     // Submit registration
     await page.click('button:has-text("Register")');
-    await takeScreenshot(page, 'after-registration');
 
     // Wait for login page to be available
     await page.waitForSelector('input[type="email"]', { timeout: 10000 });
@@ -62,7 +44,6 @@ test.describe('Cart Management Flow', () => {
     await page.fill('input[type="email"]', email);
     await page.fill('input[type="password"]', password);
     await page.click('button[type="submit"]');
-    await takeScreenshot(page, 'after-login');
 
     // Wait for successful login
     try {
@@ -77,7 +58,6 @@ test.describe('Cart Management Flow', () => {
 
     // Add first product to cart
     await page.goto('/handpicked/productos');
-    await takeScreenshot(page, 'products-page');
     await page.waitForLoadState('networkidle', { timeout: 10000 });
 
     // Try to find and click a product using various selectors
@@ -122,7 +102,6 @@ test.describe('Cart Management Flow', () => {
 
     // Wait for product detail page and add to cart
     await page.waitForLoadState('networkidle', { timeout: 10000 });
-    await takeScreenshot(page, 'product-detail');
 
     // Try to find and click the add to cart button
     const addToCartSelectors = [
@@ -175,7 +154,6 @@ test.describe('Cart Management Flow', () => {
     console.log('Navigating to cart page');
     await page.goto('/carrito');
     await page.waitForLoadState('networkidle', { timeout: 15000 });
-    await takeScreenshot(page, 'cart-page');
 
     // Check if the cart has items or is empty
     const cartIsEmpty = await page.evaluate(() => {
@@ -215,7 +193,6 @@ test.describe('Cart Management Flow', () => {
             console.log('Clicked plus button');
           }
 
-          await takeScreenshot(page, 'after-quantity-update');
           break;
         }
       }
@@ -238,7 +215,6 @@ test.describe('Cart Management Flow', () => {
           console.log(`Found remove button: ${selector} (${count} elements)`);
           await page.click(selector);
           console.log('Clicked remove button');
-          await takeScreenshot(page, 'after-remove-item');
           break;
         }
       }

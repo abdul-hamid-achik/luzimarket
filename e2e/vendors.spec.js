@@ -39,9 +39,7 @@ test.describe('Employee (Vendor) Flows', () => {
   });
 
   test('Vendor can access orders (envios) page', async ({ page }) => {
-    // Take screenshots at each step to debug
     await page.goto('/empleados');
-    await page.screenshot({ path: 'vendor-login-page.png' });
     console.log('On vendor login page');
 
     await page.click('a.button:has-text("Entrar")');
@@ -49,13 +47,11 @@ test.describe('Employee (Vendor) Flows', () => {
 
     // Wait for dashboard to load
     await page.waitForURL(/\/InicioEmpleados\/DashboardEmpleados$/);
-    await page.screenshot({ path: 'vendor-dashboard.png' });
     console.log('On vendor dashboard');
 
     // Directly navigate to orders route
     await page.goto('/InicioEmpleados/Envios');
     await page.waitForLoadState('networkidle', { timeout: 30000 });
-    await page.screenshot({ path: 'vendor-orders-page.png' });
     console.log('Navigated to orders page');
 
     // Use the exact selectors that match the component in envios.jsx
@@ -86,8 +82,6 @@ test.describe('Employee (Vendor) Flows', () => {
     expect(url).toContain('Envios');
     console.log('URL contains Envios as expected');
 
-    // Take a detailed screenshot for debugging
-    await page.screenshot({ path: 'vendor-orders-detail.png', fullPage: true });
   });
 
   test('Vendor can view and update schedule', async ({ page }) => {

@@ -9,9 +9,6 @@ test.describe('Product Listing & Detail Flow', () => {
     await page.goto('/handpicked/productos');
     console.log('Navigated to products listing page');
 
-    // Take screenshot of product listing
-    await page.screenshot({ path: 'products-listing.png' });
-
     // Wait for products to load
     await page.waitForLoadState('networkidle', { timeout: 10000 });
 
@@ -54,9 +51,6 @@ test.describe('Product Listing & Detail Flow', () => {
     // Wait for product detail page to load
     await page.waitForLoadState('networkidle', { timeout: 10000 });
 
-    // Take screenshot of product detail page
-    await page.screenshot({ path: 'product-detail.png' });
-
     // Check if we're on a product detail page
     const productDetailIndicators = [
       'button.btn-primary',
@@ -94,8 +88,6 @@ test.describe('Product Listing & Detail Flow', () => {
     // Wait longer for page to load
     await page.waitForLoadState('networkidle', { timeout: 30000 });
 
-    // Take screenshot for debugging
-    await page.screenshot({ path: 'product-detail-accordion-test.png' });
 
     // Look for accordion elements with multiple selector strategies
     const accordionSelectors = [
@@ -131,54 +123,48 @@ test.describe('Product Listing & Detail Flow', () => {
     expect(accordionFound).toBe(true);
 
     if (accordionFound) {
-      // Try to interact with the accordion
-      try {
-        // If it's a button or clickable element, try to click it
-        if (accordionSelector.includes('button') || accordionSelector.includes('summary')) {
-          await accordionElement.click();
-          console.log('Clicked accordion element');
-        } else {
-          // If it's a container, try to find a button inside it
-          const button = page.locator(`${accordionSelector} button, ${accordionSelector} summary`).first();
-          if (await button.count() > 0) {
-            await button.click();
-            console.log('Clicked button inside accordion element');
-          }
+      // If it's a button or clickable element, try to click it
+      if (accordionSelector.includes('button') || accordionSelector.includes('summary')) {
+        await accordionElement.click();
+        console.log('Clicked accordion element');
+      } else {
+        // If it's a container, try to find a button inside it
+        const button = page.locator(`${accordionSelector} button, ${accordionSelector} summary`).first();
+        if (await button.count() > 0) {
+          await button.click();
+          console.log('Clicked button inside accordion element');
         }
-
-        // Wait for animation
-        await page.waitForTimeout(1000);
-
-        // Look for content that should be visible after expanding
-        const contentSelectors = [
-          '.accordion-body',
-          '.accordion-content',
-          '.collapse.show',
-          'details[open]',
-          '.accordion-item div:not(.accordion-header)'
-        ];
-
-        let contentFound = false;
-        for (const selector of contentSelectors) {
-          try {
-            const content = await page.waitForSelector(selector, { timeout: 2000 });
-            if (content) {
-              console.log(`Found accordion content with selector: ${selector}`);
-              contentFound = true;
-              break;
-            }
-          } catch (e) {
-            console.log(`Accordion content not found with selector: ${selector}`);
-          }
-        }
-
-        // Verify we found content after clicking
-        expect(contentFound).toBe(true);
-      } catch (e) {
-        console.log('Error interacting with accordion:', e.message);
-        // Take screenshot to debug the error
-        await page.screenshot({ path: 'accordion-interaction-error.png' });
       }
+
+      // Wait for animation
+      await page.waitForTimeout(1000);
+
+      // Look for content that should be visible after expanding
+      const contentSelectors = [
+        '.accordion-body',
+        '.accordion-content',
+        '.collapse.show',
+        'details[open]',
+        '.accordion-item div:not(.accordion-header)'
+      ];
+
+      let contentFound = false;
+      for (const selector of contentSelectors) {
+        try {
+          const content = await page.waitForSelector(selector, { timeout: 2000 });
+          if (content) {
+            console.log(`Found accordion content with selector: ${selector}`);
+            contentFound = true;
+            break;
+          }
+        } catch (e) {
+          console.log(`Accordion content not found with selector: ${selector}`);
+        }
+      }
+
+      // Verify we found content after clicking
+      expect(contentFound).toBe(true);
+
     }
   });
 });

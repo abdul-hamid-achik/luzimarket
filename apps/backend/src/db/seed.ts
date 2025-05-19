@@ -1,4 +1,5 @@
 import { db } from './index';
+import { sql } from 'drizzle-orm';
 import * as schema from './schema';
 import { reset, seed as drizzleSeed } from 'drizzle-seed';
 import bcrypt from 'bcryptjs';
@@ -97,6 +98,13 @@ async function seed() {
 
     console.log('Resetting database...');
     await reset(db, schema);
+    console.log('Resetting ID sequences...');
+    await db.execute(
+        sql`SELECT setval(pg_get_serial_sequence('users','id'), (SELECT COALESCE(MAX(id),0) + 1 FROM users), false);`
+    );
+    await db.execute(
+        sql`SELECT setval(pg_get_serial_sequence('sessions','id'), (SELECT COALESCE(MAX(id),0) + 1 FROM sessions), false);`
+    );
     const seedId = Math.floor(Math.random() * 1000000);
     console.log('Seeding id:', seedId);
     // Use a random integer seed for each run to generate unique data

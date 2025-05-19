@@ -35,7 +35,7 @@ module.exports = defineConfig({
     ['html', { open: 'never' }],
     ['json', { outputFile: path.join(resultsDir, 'test-results.json') }]
   ],
-  maxFailures: 5,
+  maxFailures: 1,
   use: {
     // Use a precomputed storage state for auth to skip UI login
     storageState: 'tmp/storageState.json',

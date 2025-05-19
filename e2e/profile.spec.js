@@ -33,8 +33,6 @@ test.describe('Customer Profile Page', () => {
     await page.click('button[type="submit"]');
     console.log('Submitted login form');
 
-    // Take screenshot after login
-    await page.screenshot({ path: 'after-login-debug.png' });
 
     // Wait for home page to load - use multiple strategies
     try {
@@ -57,9 +55,6 @@ test.describe('Customer Profile Page', () => {
     // Navigate to profile
     await page.goto('/perfil');
     console.log('Navigated to profile page');
-
-    // Take screenshot of profile page for debugging
-    await page.screenshot({ path: 'profile-page-debug.png' });
 
     // Increase timeout for profile page elements
     const timeout = 20000;

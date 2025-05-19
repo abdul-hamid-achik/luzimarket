@@ -65,10 +65,6 @@ test.describe('Customer End-to-End Purchase Flow', () => {
 
     // Wait for product detail page to load
     await page.waitForLoadState('networkidle', { timeout: 10000 });
-
-    // Take a screenshot of the product page to debug
-    await page.screenshot({ path: 'product-detail-page.png' });
-
     // Add to cart with comprehensive button detection 
     try {
       await page.waitForSelector('button:has-text("Agregar a la bolsa"), button.btn-primary, button.add-to-cart', { timeout: 10000 });
@@ -104,9 +100,6 @@ test.describe('Customer End-to-End Purchase Flow', () => {
     // Wait for cart page to load completely
     await page.waitForLoadState('networkidle', { timeout: 10000 });
     await page.waitForTimeout(3000);
-
-    // Take a screenshot to debug cart page state
-    await page.screenshot({ path: 'cart-page-state.png' });
 
     // Verify cart has items using a wide range of possible selectors
     const cartSelectors = [

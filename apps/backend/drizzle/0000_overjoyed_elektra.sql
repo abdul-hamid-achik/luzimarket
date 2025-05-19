@@ -1,5 +1,11 @@
+CREATE TABLE "article_topics" (
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "article_topics_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"name" text NOT NULL,
+	CONSTRAINT "article_topics_name_unique" UNIQUE("name")
+);
+--> statement-breakpoint
 CREATE TABLE "brands" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "brands_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"name" text NOT NULL,
 	"slug" text NOT NULL,
 	"description" text NOT NULL,
@@ -8,14 +14,14 @@ CREATE TABLE "brands" (
 );
 --> statement-breakpoint
 CREATE TABLE "bundle_items" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "bundle_items_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"bundle_id" integer,
 	"variant_id" integer,
 	"quantity" integer DEFAULT 1 NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "bundles" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "bundles_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"slug" text NOT NULL,
 	"name" text NOT NULL,
 	"description" text NOT NULL,
@@ -24,14 +30,14 @@ CREATE TABLE "bundles" (
 );
 --> statement-breakpoint
 CREATE TABLE "cart_items" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "cart_items_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"session_id" integer,
 	"variant_id" integer,
 	"quantity" integer DEFAULT 1 NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "categories" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "categories_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"name" text NOT NULL,
 	"slug" text NOT NULL,
 	"description" text NOT NULL,
@@ -40,13 +46,13 @@ CREATE TABLE "categories" (
 );
 --> statement-breakpoint
 CREATE TABLE "delivery_zones" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "delivery_zones_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"name" text NOT NULL,
 	"fee" integer DEFAULT 0 NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "editorial_articles" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "editorial_articles_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"title" text NOT NULL,
 	"content" text NOT NULL,
 	"author" text NOT NULL,
@@ -56,7 +62,7 @@ CREATE TABLE "editorial_articles" (
 );
 --> statement-breakpoint
 CREATE TABLE "empleados" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "empleados_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"nombre" text NOT NULL,
 	"puesto" text NOT NULL,
 	"email" text NOT NULL,
@@ -66,13 +72,25 @@ CREATE TABLE "empleados" (
 );
 --> statement-breakpoint
 CREATE TABLE "favorites" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "favorites_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"user_id" integer,
 	"variant_id" integer
 );
 --> statement-breakpoint
+CREATE TABLE "image_categories" (
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "image_categories_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"name" text NOT NULL,
+	CONSTRAINT "image_categories_name_unique" UNIQUE("name")
+);
+--> statement-breakpoint
+CREATE TABLE "materials" (
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "materials_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"name" text NOT NULL,
+	CONSTRAINT "materials_name_unique" UNIQUE("name")
+);
+--> statement-breakpoint
 CREATE TABLE "occasions" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "occasions_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"name" text NOT NULL,
 	"description" text NOT NULL,
 	"slug" text NOT NULL,
@@ -80,7 +98,7 @@ CREATE TABLE "occasions" (
 );
 --> statement-breakpoint
 CREATE TABLE "order_items" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "order_items_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"order_id" integer,
 	"variant_id" integer,
 	"quantity" integer NOT NULL,
@@ -88,7 +106,7 @@ CREATE TABLE "order_items" (
 );
 --> statement-breakpoint
 CREATE TABLE "orders" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "orders_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"user_id" integer,
 	"total" integer NOT NULL,
 	"status" text DEFAULT 'pending' NOT NULL,
@@ -96,7 +114,7 @@ CREATE TABLE "orders" (
 );
 --> statement-breakpoint
 CREATE TABLE "petitions" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "petitions_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"type" text NOT NULL,
 	"title" text NOT NULL,
 	"description" text NOT NULL,
@@ -105,15 +123,21 @@ CREATE TABLE "petitions" (
 );
 --> statement-breakpoint
 CREATE TABLE "photos" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "photos_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"url" text NOT NULL,
 	"alt_text" text,
 	"sort_order" integer DEFAULT 0 NOT NULL,
 	"product_id" integer
 );
 --> statement-breakpoint
+CREATE TABLE "product_types" (
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "product_types_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"name" text NOT NULL,
+	CONSTRAINT "product_types_name_unique" UNIQUE("name")
+);
+--> statement-breakpoint
 CREATE TABLE "product_variants" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "product_variants_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"product_id" integer,
 	"sku" text NOT NULL,
 	"attributes" json NOT NULL,
@@ -122,7 +146,7 @@ CREATE TABLE "product_variants" (
 );
 --> statement-breakpoint
 CREATE TABLE "products" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "products_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"slug" text NOT NULL,
 	"name" text NOT NULL,
 	"description" text NOT NULL,
@@ -133,21 +157,27 @@ CREATE TABLE "products" (
 );
 --> statement-breakpoint
 CREATE TABLE "sessions" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "sessions_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"user_id" integer,
 	"is_guest" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "sizes" (
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "sizes_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"size" text NOT NULL,
+	CONSTRAINT "sizes_size_unique" UNIQUE("size")
+);
+--> statement-breakpoint
 CREATE TABLE "states" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "states_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"label" text NOT NULL,
 	"value" text NOT NULL,
 	CONSTRAINT "states_value_unique" UNIQUE("value")
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "users_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"email" text NOT NULL,
 	"password" text NOT NULL,
 	"name" text,

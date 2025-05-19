@@ -87,9 +87,6 @@ test.describe('UI Guest Cart Flow', () => {
         await page.waitForLoadState('networkidle');
         console.log('Navigated to cart page');
 
-        // Take a screenshot
-        await page.screenshot({ path: 'guest-cart-page.png' });
-
         // Check if our mock cart item is visible
         const mockCartItemVisible = await page.evaluate(() => {
             return document.querySelector('.cart-item.cart-quantity') !== null;
@@ -164,9 +161,6 @@ test.describe('UI Guest Cart Flow', () => {
             // If login worked, we can check the real cart page
             console.log('Login successful, going to cart page');
             await page.goto('/carrito');
-
-            // Take a screenshot for debugging
-            await page.screenshot({ path: 'cart-after-login.png' });
 
             // Check URL contains carrito
             const finalUrl = page.url();

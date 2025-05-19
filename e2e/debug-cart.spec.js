@@ -22,29 +22,12 @@ function logTestStep(message, testInfo) {
     }
 }
 
-// Take a screenshot with a descriptive name
-async function takeDebugScreenshot(page, name, testInfo) {
-    try {
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const screenshotPath = path.join(__dirname, '..', 'tmp', 'playwright-screenshots', `${name}-${timestamp}.png`);
-
-        await page.screenshot({ path: screenshotPath, fullPage: true });
-        logTestStep(`Screenshot saved: ${path.basename(screenshotPath)}`, testInfo);
-
-        return screenshotPath;
-    } catch (e) {
-        console.error(`Failed to take screenshot "${name}":`, e);
-        return null;
-    }
-}
-
 // Test: Debug cart functionality
 test.describe('Debug Cart Flow', () => {
     test('user can register, add product to cart, and manage quantity', async ({ page }, testInfo) => {
         // Step 1: Register a new user
         logTestStep('Starting test - accessing registration page', testInfo);
         await page.goto('/register');
-        await takeDebugScreenshot(page, 'register-page', testInfo);
 
         // Generate unique user credentials
         const timestamp = Date.now();
@@ -89,7 +72,6 @@ test.describe('Debug Cart Flow', () => {
         // Submit registration form
         logTestStep('Submitting registration form', testInfo);
         await page.click('button:has-text("Register")');
-        await takeDebugScreenshot(page, 'after-registration', testInfo);
 
         // Wait for redirect or notification
         await page.waitForTimeout(3000);
@@ -100,13 +82,11 @@ test.describe('Debug Cart Flow', () => {
         await page.fill('input[type="email"]', email);
         await page.fill('input[type="password"]', password);
         await page.click('button[type="submit"]');
-        await takeDebugScreenshot(page, 'after-login', testInfo);
 
         // Step 3: Navigate to products page
         logTestStep('Navigating to products page', testInfo);
         await page.goto('/handpicked/productos');
         await page.waitForLoadState('networkidle', { timeout: 30000 });
-        await takeDebugScreenshot(page, 'products-page', testInfo);
 
         // Step 4: Attempt to click on the first product
         logTestStep('Looking for a product to click', testInfo);
@@ -172,7 +152,6 @@ test.describe('Debug Cart Flow', () => {
 
         // Step 5: On product detail page, add to cart
         await page.waitForLoadState('networkidle', { timeout: 30000 });
-        await takeDebugScreenshot(page, 'product-detail', testInfo);
 
         logTestStep('Looking for Add to Cart button', testInfo);
         // Try to find and click the add to cart button
@@ -233,7 +212,6 @@ test.describe('Debug Cart Flow', () => {
         logTestStep('Navigating to cart page', testInfo);
         await page.goto('/carrito');
         await page.waitForLoadState('networkidle', { timeout: 30000 });
-        await takeDebugScreenshot(page, 'cart-page', testInfo);
 
         // Step 7: Check that items exist in cart
         logTestStep('Looking for cart items', testInfo);
@@ -299,8 +277,6 @@ test.describe('Debug Cart Flow', () => {
                         logTestStep('Clicked plus button to increment quantity', testInfo);
                     }
 
-                    // Take a screenshot after modifying quantity
-                    await takeDebugScreenshot(page, 'after-quantity-change', testInfo);
                     break;
                 }
             }

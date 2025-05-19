@@ -23,9 +23,6 @@ test.describe('Navbar Authentication Display', () => {
     await expect(page.locator('input[type="password"]')).toBeVisible();
     await expect(page.locator('button[type="submit"]')).toBeVisible();
 
-    // Take a screenshot of the registration form
-    await page.screenshot({ path: 'register-form.png' });
-
     // Fill out the form but don't submit to avoid requiring backend integration
     const timestamp = Date.now();
     const email = `testuser+navbar${timestamp}@example.com`;
