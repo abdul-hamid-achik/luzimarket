@@ -5,7 +5,7 @@ CREATE TABLE "article_topics" (
 );
 --> statement-breakpoint
 CREATE TABLE "brands" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"slug" text NOT NULL,
 	"description" text NOT NULL,
@@ -14,14 +14,14 @@ CREATE TABLE "brands" (
 );
 --> statement-breakpoint
 CREATE TABLE "bundle_items" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"bundle_id" integer,
-	"variant_id" integer,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"bundle_id" uuid,
+	"variant_id" uuid,
 	"quantity" integer DEFAULT 1 NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "bundles" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"slug" text NOT NULL,
 	"name" text NOT NULL,
 	"description" text NOT NULL,
@@ -32,12 +32,12 @@ CREATE TABLE "bundles" (
 CREATE TABLE "cart_items" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"session_id" uuid,
-	"variant_id" integer,
+	"variant_id" uuid,
 	"quantity" integer DEFAULT 1 NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "categories" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"slug" text NOT NULL,
 	"description" text NOT NULL,
@@ -46,13 +46,13 @@ CREATE TABLE "categories" (
 );
 --> statement-breakpoint
 CREATE TABLE "delivery_zones" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"fee" integer DEFAULT 0 NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "editorial_articles" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"title" text NOT NULL,
 	"content" text NOT NULL,
 	"author" text NOT NULL,
@@ -62,7 +62,7 @@ CREATE TABLE "editorial_articles" (
 );
 --> statement-breakpoint
 CREATE TABLE "empleados" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"nombre" text NOT NULL,
 	"puesto" text NOT NULL,
 	"email" text NOT NULL,
@@ -72,9 +72,9 @@ CREATE TABLE "empleados" (
 );
 --> statement-breakpoint
 CREATE TABLE "favorites" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" uuid,
-	"variant_id" integer
+	"variant_id" uuid
 );
 --> statement-breakpoint
 CREATE TABLE "image_categories" (
@@ -90,7 +90,7 @@ CREATE TABLE "materials" (
 );
 --> statement-breakpoint
 CREATE TABLE "occasions" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"description" text NOT NULL,
 	"slug" text NOT NULL,
@@ -98,15 +98,15 @@ CREATE TABLE "occasions" (
 );
 --> statement-breakpoint
 CREATE TABLE "order_items" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"order_id" integer,
-	"variant_id" integer,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"order_id" uuid,
+	"variant_id" uuid,
 	"quantity" integer NOT NULL,
 	"price_at_purchase" integer NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "orders" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" uuid,
 	"total" integer NOT NULL,
 	"status" text DEFAULT 'pending' NOT NULL,
@@ -114,7 +114,7 @@ CREATE TABLE "orders" (
 );
 --> statement-breakpoint
 CREATE TABLE "petitions" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"type" text NOT NULL,
 	"title" text NOT NULL,
 	"description" text NOT NULL,
@@ -123,11 +123,11 @@ CREATE TABLE "petitions" (
 );
 --> statement-breakpoint
 CREATE TABLE "photos" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"url" text NOT NULL,
 	"alt_text" text,
 	"sort_order" integer DEFAULT 0 NOT NULL,
-	"product_id" integer
+	"product_id" uuid
 );
 --> statement-breakpoint
 CREATE TABLE "product_types" (
@@ -137,8 +137,8 @@ CREATE TABLE "product_types" (
 );
 --> statement-breakpoint
 CREATE TABLE "product_variants" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"product_id" integer,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"product_id" uuid,
 	"sku" text NOT NULL,
 	"attributes" json NOT NULL,
 	"stock" integer DEFAULT 0 NOT NULL,
@@ -146,12 +146,12 @@ CREATE TABLE "product_variants" (
 );
 --> statement-breakpoint
 CREATE TABLE "products" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"slug" text NOT NULL,
 	"name" text NOT NULL,
 	"description" text NOT NULL,
 	"price" integer NOT NULL,
-	"category_id" integer,
+	"category_id" uuid,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "products_slug_unique" UNIQUE("slug")
 );
@@ -170,7 +170,7 @@ CREATE TABLE "sizes" (
 );
 --> statement-breakpoint
 CREATE TABLE "states" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"label" text NOT NULL,
 	"value" text NOT NULL,
 	CONSTRAINT "states_value_unique" UNIQUE("value")

@@ -6,10 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "migrate:generate": "npx --yes drizzle-kit@latest generate",
-    "migrate:up": "npx --yes drizzle-kit@latest migrate",
-    "migrate:down": "npx --yes drizzle-kit@latest drop",
-    "migrate:push": "npx --yes drizzle-kit@latest push",
+    "migrate:generate": "npx --yes drizzle-kit generate",
+    "migrate:up": "npx --yes drizzle-kit migrate",
+    "migrate:down": "npx --yes drizzle-kit drop",
+    "migrate:push": "npx --yes drizzle-kit push",
     "seed": "tsx src/db/seed.ts"
   },
   "dependencies": {

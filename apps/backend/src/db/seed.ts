@@ -3,6 +3,7 @@ import { sql } from 'drizzle-orm';
 import * as schema from './schema';
 import { reset, seed as drizzleSeed } from 'drizzle-seed';
 import bcrypt from 'bcryptjs';
+import { faker } from '@faker-js/faker/locale/es';
 
 // Predefined static values
 const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
@@ -91,6 +92,17 @@ async function seed() {
 
     const seedId = Math.floor(Math.random() * 1000000);
     console.log('Seeding id:', seedId);
+    faker.seed(seedId);
+    // Pre-generate product data arrays for unique values
+    const productNames = Array.from({ length: 1000 }, () => faker.commerce.productName());
+    const productSlugs = productNames.map((n, i) => `${faker.helpers.slugify(n.toLowerCase())}-${i}`);
+    const productDescriptions = Array.from({ length: 1000 }, () => faker.commerce.productDescription());
+    const productPrices = Array.from({ length: 1000 }, () => parseInt(faker.commerce.price({ min: 10, max: 200, dec: 0 }), 10));
+    // Pre-generate photo URLs array for realistic images
+    const photoUrls = Array.from({ length: 5000 }, () => {
+        const category = imageCategories[Math.floor(Math.random() * imageCategories.length)];
+        return faker.image.urlLoremFlickr({ category, width: 640, height: 640 });
+    });
     // Use a random integer seed for each run to generate unique data
     await drizzleSeed(db, schema, { seed: seedId })
         .refine((f) => ({
@@ -169,10 +181,10 @@ async function seed() {
             products: {
                 count: 1000,
                 columns: {
-                    name: f.string(),
-                    slug: f.string({ isUnique: true }),
-                    description: f.loremIpsum({ sentencesCount: 2 }),
-                    price: f.int({ minValue: 1000, maxValue: 20000 }),
+                    name: f.valuesFromArray({ values: productNames, isUnique: true }),
+                    slug: f.valuesFromArray({ values: productSlugs, isUnique: true }),
+                    description: f.valuesFromArray({ values: productDescriptions, isUnique: true }),
+                    price: f.valuesFromArray({ values: productPrices, isUnique: true }),
                     createdAt: f.date({ minDate: '2023-01-01', maxDate: new Date().toISOString() }),
                 },
                 with: {
@@ -296,12 +308,7 @@ async function seed() {
             },
             photos: {
                 columns: {
-                    url: f.default({
-                        defaultValue: () => {
-                            const category = imageCategories[Math.floor(Math.random() * imageCategories.length)];
-                            return `https://source.unsplash.com/random/640x640?${category}&t=${Date.now()}`;
-                        }
-                    }),
+                    url: f.valuesFromArray({ values: photoUrls }),
                     alt: f.loremIpsum({ sentencesCount: 1 }),
                     sortOrder: f.int({ minValue: 0, maxValue: 10 }),
                 }

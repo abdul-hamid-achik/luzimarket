@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { sessions, orders, cartItems, orderItems, productVariants } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 // @ts-ignore: Allow http-status-codes import without type declarations
 import { StatusCodes } from 'http-status-codes';
 
@@ -41,10 +41,38 @@ export async function POST(request: NextRequest) {
         const [variant] = await db.select().from(productVariants).where(eq(productVariants.id, item.variantId!));
         total += variant.stock * item.quantity; // note: using stock as price? adjust accordingly
     }
-    const newOrderRes = await db.insert(orders).values({ userId: session.userId, total }).returning({ id: orders.id }).execute();
+    let newOrderRes;
+    try {
+        newOrderRes = await db.insert(orders).values({ userId: session.userId, total }).returning({ id: orders.id }).execute();
+    } catch (error: any) {
+        // Handle out-of-sync sequence causing duplicate key on orders.id
+        if (error.code === '23505' && error.constraint === 'orders_pkey') {
+            console.warn('Order ID sequence out-of-sync, resetting sequence and retrying insert');
+            await db.execute(sql`SELECT setval(pg_get_serial_sequence('orders','id'), (SELECT MAX(id) FROM orders))`);
+            newOrderRes = await db.insert(orders).values({ userId: session.userId, total }).returning({ id: orders.id }).execute();
+        } else {
+            console.error('Error creating order:', error);
+            return NextResponse.json({ error: 'Failed to create order' }, { status: StatusCodes.INTERNAL_SERVER_ERROR });
+        }
+    }
     const orderId = newOrderRes[0].id;
     for (const item of cart) {
-        await db.insert(orderItems).values({ orderId, variantId: item.variantId, quantity: item.quantity, price: item.quantity * 0 }).execute();
+        try {
+            await db.insert(orderItems)
+                .values({ orderId, variantId: item.variantId, quantity: item.quantity, price: item.quantity * 0 })
+                .execute();
+        } catch (error: any) {
+            if (error.code === '23505' && error.constraint === 'order_items_pkey') {
+                console.warn('OrderItems ID sequence out-of-sync, resetting sequence and retrying insert');
+                await db.execute(sql`SELECT setval(pg_get_serial_sequence('order_items','id'), (SELECT MAX(id) FROM order_items))`);
+                await db.insert(orderItems)
+                    .values({ orderId, variantId: item.variantId, quantity: item.quantity, price: item.quantity * 0 })
+                    .execute();
+            } else {
+                console.error('Error inserting order item:', error);
+                return NextResponse.json({ error: 'Failed to create order items' }, { status: StatusCodes.INTERNAL_SERVER_ERROR });
+            }
+        }
     }
     // clear cart
     await db.delete(cartItems).where(eq(cartItems.sessionId, sessionId)).execute();
