@@ -1,26 +1,26 @@
 import axios from 'axios';
-import { relatedProjects } from '@vercel/related-projects';
+import { withRelatedProject } from '@vercel/related-projects';
 
 // Determine baseURL: proxy in dev, relatedProjects URL in production
 const isDev = import.meta.env.MODE === 'development';
 console.log('[API CLIENT] MODE:', import.meta.env.MODE, 'isDev:', isDev);
-let baseURL = '/api';
-if (!isDev) {
-  const raw = import.meta.env.VITE_VERCEL_RELATED_PROJECTS;
-  console.log('[API CLIENT] raw VITE_VERCEL_RELATED_PROJECTS:', raw);
-  const projects = relatedProjects({ raw, noThrow: true });
-  console.log('[API CLIENT] relatedProjects:', projects);
-  const backend = projects.find(p => p.project.name === 'luzimarket-backend');
-  console.log('[API CLIENT] Found backend project:', backend);
-  const host = backend?.production.url || backend?.production.alias;
-  console.log('[API CLIENT] backend host:', host);
-  if (host) {
-    // Ensure HTTPS and prepend /api
-    baseURL = `https://${host}/api`;
-    console.log('[API CLIENT] baseURL set to:', baseURL);
-  }
-}
-console.log('[API CLIENT] Final baseURL:', baseURL);
+
+// In production, link to your backend via withRelatedProject
+// Uses VERCEL_RELATED_PROJECTS under the hood; fallback to VITE_API_HOST
+const projectName = 'luzimarket-backend';
+const defaultHost = import.meta.env.VITE_API_HOST;
+const host = isDev
+  ? null
+  : withRelatedProject({ projectName, defaultHost, noThrow: true });
+console.log('[API CLIENT] withRelatedProject host:', host);
+
+// Determine baseURL: dev proxy or production backend URL
+const baseURL = isDev
+  ? '/api'
+  : host
+    ? `https://${host}/api`
+    : '/api';
+console.log('[API CLIENT] baseURL:', baseURL);
 
 // Create axios instance with dynamic baseURL
 const api = axios.create({ baseURL });
