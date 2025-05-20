@@ -9,11 +9,21 @@ import CartItem from "@/pages/inicio/components/cart_item";
 import "@/pages/inicio/css/cart.css";
 import { Alert, Button, Spinner } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/context/auth_context';
+import { useEffect } from 'react';
 
 const Cart = () => {
-  const { data, isLoading, error } = useCart();
+  const { data, isLoading, error, refetch } = useCart();
   const updateItem = useUpdateCartItem();
   const removeItem = useRemoveCartItem();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+
+  // Refetch cart data when authentication state changes
+  useEffect(() => {
+    if (!authLoading) {
+      refetch();
+    }
+  }, [isAuthenticated, authLoading, refetch]);
 
   const handleRemoveItem = (id) => {
     removeItem.mutate(id);
@@ -25,23 +35,15 @@ const Cart = () => {
     updateItem.mutate({ itemId: id, quantity });
   };
 
-  // Use dummy items when data is loading or has error to ensure components render
-  const dummyItems = [
-    {
-      id: 'temp-1',
-      productId: 1,
-      name: 'Loading...',
-      price: 0,
-      quantity: 1
-    }
-  ];
+  // Loading states combined
+  const isPageLoading = isLoading || authLoading;
 
   // Determine which items to display
   const cartItems = data?.items || [];
   const hasItems = cartItems.length > 0;
 
   // Loading state
-  if (isLoading) {
+  if (isPageLoading) {
     return (
       <div className="container text-center py-5 cart-page cart-container">
         <CartTitle />
@@ -82,6 +84,9 @@ const Cart = () => {
         <CartTitle />
         <Alert variant="danger">
           Error al cargar el carrito. Por favor, inténtelo de nuevo.
+          <Button variant="link" onClick={() => refetch()} className="p-0 ms-2">
+            Reintentar
+          </Button>
         </Alert>
 
         {/* Show an empty cart item on error */}
@@ -113,7 +118,7 @@ const Cart = () => {
             Ir a productos
           </Link>
 
-          {/* Even empty cart needs some elements for test selectors */}
+          {/* Empty cart elements for test selectors */}
           <div className="cart-item-container mt-4 d-flex justify-content-center">
             <div className="cart-quantity quantity-display">
               <table className="tabla-carrito">
@@ -153,9 +158,20 @@ const Cart = () => {
           <Checkout cartItems={cartItems} />
 
           <div className="checkout-actions mt-4">
-            <Button variant="success" className="checkout-btn w-100">
-              Proceder al pago
+            <Button
+              variant="success"
+              className="checkout-btn w-100"
+              disabled={!isAuthenticated}
+            >
+              {isAuthenticated ? 'Proceder al pago' : (
+                <Link to="/login" className="text-white">Inicia sesión para continuar</Link>
+              )}
             </Button>
+            {!isAuthenticated && (
+              <div className="text-center mt-2">
+                <small className="text-muted">Debes iniciar sesión para completar la compra</small>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -1,11 +1,26 @@
-import { Card, Container, Spinner, Alert } from "react-bootstrap";
+import { Card, Container, Spinner, Alert, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { useProducts } from "@/api/hooks";
+import { useProducts, useAddToCart } from "@/api/hooks";
 import "@/pages/inicio/css/handpicked.css";
+import { useState } from "react";
 
 const ProductosHandpicked = ({ filters }) => {
   const { data, isLoading, error } = useProducts(filters);
+  const addToCart = useAddToCart();
+  const [addedProducts, setAddedProducts] = useState({});
   const products = data || [];
+
+  const handleAddToCart = (product) => {
+    addToCart.mutate({ productId: product.id, quantity: 1 }, {
+      onSuccess: () => {
+        // Show temporary success message
+        setAddedProducts(prev => ({ ...prev, [product.id]: true }));
+        setTimeout(() => {
+          setAddedProducts(prev => ({ ...prev, [product.id]: false }));
+        }, 3000);
+      }
+    });
+  };
 
   if (isLoading) {
     return (
@@ -70,12 +85,27 @@ const ProductosHandpicked = ({ filters }) => {
                   <Card.Title className="product-title">{product.name}</Card.Title>
                   <Card.Text className="product-description">{product.description}</Card.Text>
                   <Card.Text className="product-price">${product.price?.toFixed(2) || '0.00'}</Card.Text>
-                  <Link
-                    to={`/handpicked/productos/${product.id}`}
-                    className="btn btn-outline-dark mt-2 view-details-btn"
-                  >
-                    Ver Detalles
-                  </Link>
+                  <div className="d-flex justify-content-between">
+                    <Link
+                      to={`/handpicked/productos/${product.id}`}
+                      className="btn btn-outline-dark mt-2 view-details-btn"
+                    >
+                      Ver Detalles
+                    </Link>
+                    <Button
+                      variant="primary"
+                      className="mt-2 add-to-cart"
+                      onClick={() => handleAddToCart(product)}
+                      disabled={addToCart.isLoading || addedProducts[product.id]}
+                    >
+                      {addedProducts[product.id] ? '✓ Agregado' : 'Agregar'}
+                    </Button>
+                  </div>
+                  {addedProducts[product.id] && (
+                    <div className="text-success mt-2 text-center">
+                      ¡Producto agregado al carrito!
+                    </div>
+                  )}
                 </Card.Body>
               </Card>
             </div>

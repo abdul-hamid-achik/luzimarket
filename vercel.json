@@ -1,14 +1,21 @@
 {
   "version": 2,
-  "installCommand": "npm install",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install --no-optional --legacy-peer-deps",
+  "outputDirectory": "apps/frontend/dist",
+  "framework": "vite",
   "env": {
     "CORS_ORIGIN": "https://luzimarket.shop",
     "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1",
-    "LOG_LEVEL": "info"
+    "LOG_LEVEL": "info",
+    "ROLLUP_NATIVE_DISABLE": "1",
+    "NODE_OPTIONS": "--no-experimental-fetch"
   },
   "build": {
     "env": {
-      "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1"
+      "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1",
+      "ROLLUP_NATIVE_DISABLE": "1",
+      "NODE_OPTIONS": "--no-experimental-fetch"
     }
   },
   "builds": [
@@ -16,7 +23,7 @@
       "src": "apps/frontend/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "buildCommand": "npm run build:frontend",
+        "buildCommand": "ROLLUP_NATIVE_DISABLE=1 npm run build:frontend",
         "distDir": "apps/frontend/dist"
       }
     },

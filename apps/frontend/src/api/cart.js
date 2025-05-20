@@ -7,3 +7,4 @@ export const updateCartItem = ({ itemId, quantity }) =>
 export const removeCartItem = (itemId) =>
   api.delete(`/cart/${itemId}`).then(res => res.data);
 export const clearCart = () => api.delete('/cart').then(res => res.data);
+export const mergeCart = () => api.post('/cart/merge').then(res => res.data);

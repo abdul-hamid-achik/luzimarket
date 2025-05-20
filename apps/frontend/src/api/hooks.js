@@ -61,6 +61,15 @@ export const useClearCart = () => {
   });
 };
 
+export const useMergeCart = () => {
+  const queryClient = useQueryClient();
+  return useMutation(cartApi.mergeCart, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['cart']);
+    },
+  });
+};
+
 export const useCreateOrder = () => {
   const queryClient = useQueryClient();
   return useMutation(ordersApi.createOrder, {
