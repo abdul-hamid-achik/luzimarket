@@ -6,7 +6,7 @@ const isDev = process.env.NODE_ENV === 'development';
 let baseURL = '/api';
 if (!isDev) {
   const projects = relatedProjects({ noThrow: true });
-  const backend = projects.find(p => p.project.name === 'backend');
+  const backend = projects.find(p => p.project.name === 'luzimarket-backend');
   const host = backend?.production.url || backend?.production.alias;
   if (host) {
     // Ensure HTTPS and prepend /api
