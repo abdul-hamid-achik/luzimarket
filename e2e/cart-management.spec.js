@@ -2,6 +2,8 @@ const { test, expect } = require('@playwright/test');
 const fs = require('fs');
 const path = require('path');
 
+test.use({ storageState: 'tmp/authenticatedState.json' });
+
 test.describe('Cart Management Flow', () => {
   test('user can update quantity and remove item from cart', async ({ page }) => {
     // Register and login new user

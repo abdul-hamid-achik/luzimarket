@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+test.use({ storageState: 'tmp/authenticatedState.json' });
 
 test.describe('Admin Sales Page', () => {
   test('admin can view sales metrics and charts', async ({ page }) => {

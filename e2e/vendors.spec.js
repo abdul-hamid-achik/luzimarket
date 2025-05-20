@@ -3,7 +3,8 @@ const { test, expect } = require('@playwright/test');
 // Increase timeout for all tests
 test.setTimeout(60000);
 
-test.describe('Employee (Vendor) Flows', () => {
+// Vendor login flow
+test.describe('Employee (Vendor) Login Flow', () => {
   test('Vendor can login and view dashboard cards', async ({ page }) => {
     // Navigate to vendor login
     await page.goto('/empleados');
@@ -22,12 +23,13 @@ test.describe('Employee (Vendor) Flows', () => {
     await expect(page.locator('h4.card-title:has-text("Earnings")')).toBeVisible();
     await expect(page.locator('h4.card-title:has-text("Overview")')).toBeVisible();
   });
+});
+
+// Post-login vendor flows
+test.describe('Employee (Vendor) Post-Login Flows', () => {
+  test.use({ storageState: 'tmp/authenticatedState.json' });
 
   test('Vendor can view alerts page', async ({ page }) => {
-    await page.goto('/empleados');
-    await page.click('a.button:has-text("Entrar")');
-    console.log('Logged in as vendor');
-
     await page.goto('/InicioEmpleados/AlertasEmpleados');
     console.log('Navigated to alerts page');
 
@@ -39,17 +41,6 @@ test.describe('Employee (Vendor) Flows', () => {
   });
 
   test('Vendor can access orders (envios) page', async ({ page }) => {
-    await page.goto('/empleados');
-    console.log('On vendor login page');
-
-    await page.click('a.button:has-text("Entrar")');
-    console.log('Clicked login button');
-
-    // Wait for dashboard to load
-    await page.waitForURL(/\/InicioEmpleados\/DashboardEmpleados$/);
-    console.log('On vendor dashboard');
-
-    // Directly navigate to orders route
     await page.goto('/InicioEmpleados/Envios');
     await page.waitForLoadState('networkidle', { timeout: 30000 });
     console.log('Navigated to orders page');
@@ -78,15 +69,11 @@ test.describe('Employee (Vendor) Flows', () => {
     }
 
     // Verify at minimum we're on the right URL
-    const url = page.url();
-    expect(url).toContain('Envios');
+    expect(page.url()).toContain('Envios');
     console.log('URL contains Envios as expected');
-
   });
 
   test('Vendor can view and update schedule', async ({ page }) => {
-    await page.goto('/empleados');
-    await page.click('a.button:has-text("Entrar")');
     await page.goto('/InicioEmpleados/Horarios');
     console.log('Navigated to schedule page');
 

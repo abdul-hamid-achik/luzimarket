@@ -22,6 +22,8 @@ function logTestStep(message, testInfo) {
     }
 }
 
+test.use({ storageState: 'tmp/authenticatedState.json' });
+
 // Test: Debug cart functionality
 test.describe('Debug Cart Flow', () => {
     test('user can register, add product to cart, and manage quantity', async ({ page }, testInfo) => {

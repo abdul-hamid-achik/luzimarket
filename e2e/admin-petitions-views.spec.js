@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+test.use({ storageState: 'tmp/authenticatedState.json' });
 
 test.describe('Admin Petitions Subpages', () => {
   test.beforeEach(async ({ page }) => {

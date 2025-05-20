@@ -5,8 +5,7 @@
     "CORS_ORIGIN": "https://luzimarket.shop",
     "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1",
     "LOG_LEVEL": "info",
-    "ROLLUP_NATIVE_DISABLE": "1",
-    "NODE_OPTIONS": "--no-experimental-fetch"
+    "ROLLUP_NATIVE_DISABLE": "1"
   },
   "builds": [
     {
@@ -24,11 +23,11 @@
   ],
   "routes": [
     {
-      "handle": "filesystem"
+      "src": "/api/(.*)",
+      "dest": "/apps/backend/api/$1"
     },
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",

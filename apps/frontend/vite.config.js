@@ -34,8 +34,6 @@ export default defineConfig({
         rollupOptions: {
             // Disable experimental features that might cause issues
             experimentalLogSideEffects: false,
-            // Use WASM instead of native code for better compatibility
-            preferBuiltins: false,
             output: {
                 manualChunks: {
                     vendor: ['react', 'react-dom'],

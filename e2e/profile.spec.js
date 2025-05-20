@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+test.use({ storageState: 'tmp/authenticatedState.json' });
 
 // Increase test timeout
 test.setTimeout(60000);

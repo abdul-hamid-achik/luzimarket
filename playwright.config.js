@@ -37,7 +37,6 @@ module.exports = defineConfig({
   ],
   maxFailures: 1,
   use: {
-    storageState: 'tmp/storageState.json',
     baseURL: 'http://localhost:5173',
     actionTimeout: 30000,
     navigationTimeout: 60000,
