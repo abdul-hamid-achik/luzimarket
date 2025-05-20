@@ -4,8 +4,8 @@ import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string }}) {
-  const id = Number(params.id);
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+  const id = params.id;
   const data = await request.json();
   if (data.password !== undefined) delete data.password;
   const updated = await db.update(users).set(data).where(eq(users.id, id)).returning().execute();

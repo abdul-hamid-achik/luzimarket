@@ -7,13 +7,13 @@ import { eq } from 'drizzle-orm';
 // @ts-ignore: Allow http-status-codes import without type declarations
 import { StatusCodes } from 'http-status-codes';
 
-function getSessionId(request: NextRequest): number | null {
+function getSessionId(request: NextRequest): string | null {
     const auth = request.headers.get('Authorization') || '';
     if (!auth.startsWith('Bearer ')) return null;
     try {
         const jwtSecret = process.env.JWT_SECRET || 'test-jwt-secret-for-e2e-tests';
         const payload = jwt.verify(auth.split(' ')[1], jwtSecret);
-        if (typeof payload === 'object' && 'sessionId' in payload) return (payload as any).sessionId;
+        if (typeof payload === 'object' && 'sessionId' in payload) return (payload as any).sessionId as string;
     } catch { }
     return null;
 }

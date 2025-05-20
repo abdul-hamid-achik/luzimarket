@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
                     console.log('Merging guest cart from session:', guestSessionId, 'to user session:', newSessionId);
                     const result = await db.update(cartItems)
                         .set({ sessionId: newSessionId })
-                        .where(eq(cartItems.sessionId, Number(guestSessionId)))
+                        .where(eq(cartItems.sessionId, guestSessionId))
                         .returning()
                         .execute();
                     console.log('Merged cart items:', result.length);

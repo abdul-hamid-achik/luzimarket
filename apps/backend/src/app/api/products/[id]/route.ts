@@ -19,7 +19,7 @@ export async function GET(request: any, { params }: { params: { id: string } }) 
 
 // Update an existing product
 export async function PUT(request: any, { params }: { params: { id: string } }) {
-    const id = Number(params.id);
+    const id = Number(await params.id);
     const data = await request.json();
     const updateFields: any = {};
     if (data.name !== undefined) updateFields.name = data.name;

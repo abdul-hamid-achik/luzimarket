@@ -4,8 +4,8 @@ import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
-export async function GET(request: NextRequest, { params }: { params: { id: string }}) {
-  const id = Number(params.id);
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+  const id = params.id;
   const [user] = await db.select().from(users).where(eq(users.id, id));
   if (!user) {
     return NextResponse.json({ error: 'Not found' }, { status: StatusCodes.NOT_FOUND });

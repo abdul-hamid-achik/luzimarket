@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Missing required fields' }, { status: StatusCodes.BAD_REQUEST });
     }
     const [{ id: productId }] = await db.insert(products)
-        .values({ name, description, price, categoryId })
+        .values({ slug: name.trim().toLowerCase().replace(/\s+/g, '-'), name, description, price, categoryId })
         .returning({ id: products.id })
         .execute();
     if (variants && Array.isArray(variants)) {

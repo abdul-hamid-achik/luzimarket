@@ -37,15 +37,18 @@ module.exports = defineConfig({
   ],
   maxFailures: 1,
   use: {
-    // Use a precomputed storage state for auth to skip UI login
     storageState: 'tmp/storageState.json',
     baseURL: 'http://localhost:5173',
     actionTimeout: 30000,
     navigationTimeout: 60000,
-    headless: process.env.CI ? true : false,
+    headless: true,
     video: 'retain-on-failure',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
+    // Additional setup to handle sessionStorage for tests
+    launchOptions: {
+      args: ['--disable-web-security'] // Required to allow cross-origin access
+    },
     // Save screenshots to the designated folder with timestamp
     screenshotPath: (testInfo) => {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');

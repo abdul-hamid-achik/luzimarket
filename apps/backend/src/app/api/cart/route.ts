@@ -7,7 +7,7 @@ import { eq, and, sql } from 'drizzle-orm';
 // @ts-ignore: Allow http-status-codes import without type declarations
 import { StatusCodes } from 'http-status-codes';
 
-function getSessionId(request: NextRequest): number | null {
+function getSessionId(request: NextRequest): string | null {
     const auth = request.headers.get('Authorization') || '';
     if (!auth.startsWith('Bearer ')) return null;
 
@@ -18,7 +18,7 @@ function getSessionId(request: NextRequest): number | null {
         const payload = jwt.verify(token, jwtSecret);
 
         if (typeof payload === 'object' && 'sessionId' in payload) {
-            return Number(payload.sessionId);
+            return payload.sessionId as string;
         }
     } catch (error) {
         console.error('JWT verification error:', error);
@@ -101,19 +101,12 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Get a safe ID to avoid primary key conflicts
-        const maxIdResult = await db.execute(sql`SELECT COALESCE(MAX(id), 0) + 1000 as next_id FROM cart_items`);
-        const nextId = maxIdResult.rows && maxIdResult.rows.length > 0 && maxIdResult.rows[0].next_id
-            ? Number(maxIdResult.rows[0].next_id)
-            : Math.floor(Math.random() * 100000) + 10000; // Use a random high number if no results
-
         // Use the provided variantId or fall back to productId
         const finalVariantId = variantId || productId;
 
-        // Insert the cart item
+        // Insert the cart item (UUID primary key will be auto-generated)
         const [newItem] = await db.insert(cartItems)
             .values({
-                id: nextId,
                 sessionId,
                 variantId: finalVariantId,
                 quantity: quantity || 1

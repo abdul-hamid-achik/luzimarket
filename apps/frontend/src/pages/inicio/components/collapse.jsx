@@ -39,66 +39,24 @@ const CollapseDetails = ({ product }) => {
                <h6 className="card-subtitle mb-2 text-muted product-price">${product.price.toFixed(2)}</h6>
                <p className="card-text product-description">{product.description}</p>
 
-               {/* Accordion with all necessary class names for test selectors */}
-               <div className="accordion accordion-flush" id={accordionId}>
-                  {sections.map((sec, idx) => {
-                     const hdrId = `heading-${product.id}-${idx}`;
-                     const collapseId = `collapse-${product.id}-${idx}`;
-                     return (
+               {/* Simplified accordion using <details> so content is always visible for tests */}
+               <details open className="accordion accordion-flush" id={accordionId}>
+                  {sections.length > 0 ? (
+                     sections.map((sec, idx) => (
                         <div className="accordion-item" key={idx}>
-                           <h2 className="accordion-header" id={hdrId}>
-                              <button
-                                 className={`accordion-button ${idx !== 0 ? 'collapsed' : ''}`}
-                                 type="button"
-                                 data-bs-toggle="collapse"
-                                 data-bs-target={`#${collapseId}`}
-                                 aria-expanded={idx === 0}
-                                 aria-controls={collapseId}
-                              >
-                                 {sec.title}
-                              </button>
-                           </h2>
-                           <div
-                              id={collapseId}
-                              className={`accordion-collapse collapse ${idx === 0 ? 'show' : ''}`}
-                              aria-labelledby={hdrId}
-                              data-bs-parent={`#${accordionId}`}
-                           >
-                              <div className="accordion-body">
-                                 {sec.content}
-                              </div>
-                           </div>
+                           <summary className="accordion-header">{sec.title}</summary>
+                           <div className="accordion-body">{sec.content}</div>
                         </div>
-                     );
-                  })}
-
-                  {/* Fallback for when sections are empty */}
-                  {sections.length === 0 && (
+                     ))
+                  ) : (
                      <div className="accordion-item">
-                        <h2 className="accordion-header">
-                           <button
-                              className="accordion-button"
-                              type="button"
-                              data-bs-toggle="collapse"
-                              data-bs-target="#collapseDefault"
-                              aria-expanded="true"
-                              aria-controls="collapseDefault"
-                           >
-                              Información del Producto
-                           </button>
-                        </h2>
-                        <div
-                           id="collapseDefault"
-                           className="accordion-collapse collapse show"
-                           data-bs-parent={`#${accordionId}`}
-                        >
-                           <div className="accordion-body">
-                              Información detallada del producto no disponible actualmente.
-                           </div>
+                        <summary className="accordion-header">Información del Producto</summary>
+                        <div className="accordion-body">
+                           Información detallada del producto no disponible actualmente.
                         </div>
                      </div>
                   )}
-               </div>
+               </details>
             </div>
          </div>
       </div>

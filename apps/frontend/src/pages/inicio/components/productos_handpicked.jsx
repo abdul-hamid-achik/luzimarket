@@ -1,22 +1,11 @@
-import { useState, useEffect } from "react";
+import { Card, Container, Spinner, Alert } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { Card, Row, Col, Container, Spinner, Alert } from "react-bootstrap";
-import HandpickedFilters from "@/pages/inicio/components/handpicked_filters";
 import { useProducts } from "@/api/hooks";
 import "@/pages/inicio/css/handpicked.css";
 
-const ProductosHandpicked = () => {
-  const [filterParams, setFilterParams] = useState({});
-  const { data, isLoading, error } = useProducts(filterParams);
+const ProductosHandpicked = ({ filters }) => {
+  const { data, isLoading, error } = useProducts(filters);
   const products = data || [];
-
-  // Handle filter change from child component
-  const handleFilterChange = (newFilters) => {
-    setFilterParams((prevFilters) => ({
-      ...prevFilters,
-      ...newFilters,
-    }));
-  };
 
   if (isLoading) {
     return (
@@ -60,10 +49,6 @@ const ProductosHandpicked = () => {
     <div className="featured-products-container">
       <Container>
         <h1 className="text-center mb-4">Hand Picked Products</h1>
-
-        <div className="my-4">
-          <HandpickedFilters onFilterChange={handleFilterChange} />
-        </div>
 
         <div className="cajaTodosLosProductos row g-4">
           {productsToDisplay.map((product) => (

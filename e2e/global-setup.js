@@ -109,17 +109,23 @@ module.exports = async () => {
         });
         if (!registerRes.ok) throw new Error(`Registration failed: ${registerRes.status}`);
         const { token } = await registerRes.json();
+
+        // Setup storage state for tests - provide both localStorage and sessionStorage
+        // This is required by Playwright but our actual app uses sessionStorage
         const storage = {
             cookies: [],
             origins: [
                 {
                     origin: 'http://localhost:5173',
-                    localStorage: [{ name: 'token', value: token }]
+                    localStorage: [{ name: 'token', value: token }],
+                    sessionStorage: [{ name: 'token', value: token }]
                 }
             ]
         };
+
         const storageDir = path.join(__dirname, '..', 'tmp');
         const storagePath = path.join(storageDir, 'storageState.json');
+
         try {
             if (!fs.existsSync(storageDir)) {
                 fs.mkdirSync(storageDir, { recursive: true });
@@ -129,6 +135,22 @@ module.exports = async () => {
         } catch (e) {
             console.error('Failed to write storage state file:', e);
         }
+
+        // Create a page with this token and visit the site to initialize sessionStorage
+        const authPage = await browser.newPage();
+        await authPage.goto('http://localhost:5173');
+        await authPage.evaluate((authToken) => {
+            sessionStorage.setItem('token', authToken);
+            // Also set it in localStorage for compatibility with tests
+            localStorage.setItem('token', authToken);
+        }, token);
+
+        // Save this state as well
+        const authenticatedStoragePath = path.join(storageDir, 'authenticatedState.json');
+        const authenticatedStorage = await authPage.context().storageState();
+        fs.writeFileSync(authenticatedStoragePath, JSON.stringify(authenticatedStorage));
+        await authPage.close();
+
     } catch (err) {
         console.error('Failed to create storage state:', err);
     }

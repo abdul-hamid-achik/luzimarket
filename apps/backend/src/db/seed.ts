@@ -83,40 +83,22 @@ const articleTopics = [
     'Gift Psychology'
 ];
 
-// Predefined attribute options for productVariants
-const variantAttributesOptions = (() => {
-    const colors = ['Red', 'Blue', 'Green', 'Black', 'White'];
-    const materialsArr = ['Cotton', 'Silk', 'Wool', 'Polyester', 'Linen'];
-    return colors.flatMap(color => materialsArr.map(material => ({
-        color,
-        material,
-        weight: Math.floor(Math.random() * 1000) + 100,
-    })));
-})();
 
 async function seed() {
 
     console.log('Resetting database...');
     await reset(db, schema);
-    console.log('Resetting ID sequences...');
-    await db.execute(
-        sql`SELECT setval(pg_get_serial_sequence('users','id'), (SELECT COALESCE(MAX(id),0) + 1 FROM users), false);`
-    );
-    await db.execute(
-        sql`SELECT setval(pg_get_serial_sequence('sessions','id'), (SELECT COALESCE(MAX(id),0) + 1 FROM sessions), false);`
-    );
+
     const seedId = Math.floor(Math.random() * 1000000);
     console.log('Seeding id:', seedId);
     // Use a random integer seed for each run to generate unique data
     await drizzleSeed(db, schema, { seed: seedId })
         .refine((f) => ({
             empleados: {
-                count: 10,
+                count: 75,
                 columns: {
                     nombre: f.fullName(),
-                    puesto: f.valuesFromArray({
-                        values: ['Gerente', 'Desarrolladora', 'Analista', 'Asistente', 'Contador', 'Director/a', 'Coordinador/a', 'Supervisor/a'],
-                    }),
+                    puesto: f.jobTitle(),
                     email: f.email(),
                     createdAt: f.date({ minDate: '2021-01-01', maxDate: new Date().toISOString() }),
                     updatedAt: f.date({ minDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 60).toISOString(), maxDate: new Date().toISOString() }),
@@ -138,9 +120,18 @@ async function seed() {
                     createdAt: f.date({ minDate: '2022-01-01', maxDate: new Date().toISOString() }),
                 },
                 with: {
-                    sessions: [{ weight: 1, count: [1, 3] }],
-                    favorites: [{ weight: 1, count: [0, 10] }],
-                    orders: [{ weight: 1, count: [1, 5] }],
+                    sessions: [
+                        { weight: 0.60, count: [1, 3] },
+                        { weight: 0.40, count: [4, 6] }, // some users have more sessions
+                    ],
+                    favorites: [
+                        { weight: 0.50, count: [1, 10] },
+                        { weight: 0.50, count: [11, 20] }, // some users have many favorites
+                    ],
+                    orders: [
+                        { weight: 0.60, count: [1, 5] },
+                        { weight: 0.40, count: [6, 10] }, // some users have many orders
+                    ],
                 },
             },
             sessions: {
@@ -156,7 +147,7 @@ async function seed() {
                 count: 1000,
                 columns: {
                     total: f.int({ minValue: 1000, maxValue: 100000 }),
-                    status: f.valuesFromArray({ values: orderStatuses }),
+                    status: f.valuesFromArray({ values: orderStatuses, isUnique: false }),
                     orderNumber: f.string({ isUnique: true }),
                     createdAt: f.date({ minDate: '2023-01-01', maxDate: new Date().toISOString() }),
                 },
@@ -167,8 +158,8 @@ async function seed() {
             categories: {
                 count: giftCategories.length,
                 columns: {
-                    name: f.valuesFromArray({ values: giftCategories.map(c => c.name) }),
-                    slug: f.valuesFromArray({ values: giftCategories.map(c => c.slug) }),
+                    name: f.valuesFromArray({ values: giftCategories.map(c => c.name), isUnique: true }),
+                    slug: f.valuesFromArray({ values: giftCategories.map(c => c.slug), isUnique: true }),
                     description: f.loremIpsum({ sentencesCount: 1 }),
                 },
                 with: {
@@ -206,15 +197,15 @@ async function seed() {
             states: {
                 count: statesData.length,
                 columns: {
-                    label: f.valuesFromArray({ values: statesData.map(s => s.label) }),
-                    value: f.valuesFromArray({ values: statesData.map(s => s.value) }),
+                    label: f.valuesFromArray({ values: statesData.map(s => s.label), isUnique: true }),
+                    value: f.valuesFromArray({ values: statesData.map(s => s.value), isUnique: true }),
                 },
             },
             deliveryZones: {
                 count: deliveryZonesData.length,
                 columns: {
-                    name: f.valuesFromArray({ values: deliveryZonesData.map(z => z.name) }),
-                    fee: f.valuesFromArray({ values: deliveryZonesData.map(z => z.fee) }),
+                    name: f.valuesFromArray({ values: deliveryZonesData.map(z => z.name), isUnique: true }),
+                    fee: f.valuesFromArray({ values: deliveryZonesData.map(z => z.fee), isUnique: true }),
                 },
             },
             brands: {
@@ -229,8 +220,8 @@ async function seed() {
             occasions: {
                 count: occasions.length,
                 columns: {
-                    name: f.valuesFromArray({ values: occasions.map(o => o.name) }),
-                    description: f.valuesFromArray({ values: occasions.map(o => o.description) }),
+                    name: f.valuesFromArray({ values: occasions.map(o => o.name), isUnique: true }),
+                    description: f.valuesFromArray({ values: occasions.map(o => o.description), isUnique: true }),
                     slug: f.string({ isUnique: true }),
                 },
             },
@@ -247,10 +238,10 @@ async function seed() {
             petitions: {
                 count: 50,
                 columns: {
-                    type: f.valuesFromArray({ values: petitionTypes }),
+                    type: f.valuesFromArray({ values: petitionTypes, isUnique: false }),
                     title: f.loremIpsum({ sentencesCount: 1 }),
                     description: f.loremIpsum({ sentencesCount: 2 }),
-                    status: f.valuesFromArray({ values: petitionStatuses }),
+                    status: f.valuesFromArray({ values: petitionStatuses, isUnique: false }),
                     createdAt: f.date({ minDate: '2023-01-01', maxDate: new Date().toISOString() }),
                 },
             },
@@ -291,13 +282,14 @@ async function seed() {
             articleTopics: {
                 count: articleTopics.length,
                 columns: {
-                    name: f.valuesFromArray({ values: articleTopics, isUnique: true }),
+                    name: f.valuesFromArray({
+                        values: articleTopics.map(t => t), isUnique: true
+                    }),
                 },
             },
             productVariants: {
                 columns: {
                     sku: f.uuid(),
-                    // populate attributes initially with random JSON to satisfy not-null
                     attributes: f.json(),
                     stock: f.int({ minValue: 0, maxValue: 200 }),
                 }
@@ -325,22 +317,15 @@ async function seed() {
                     quantity: f.int({ minValue: 1, maxValue: 5 }),
                 }
             },
-            favorites: {
-                columns: {
-                    productId: f.int({ minValue: 1, maxValue: 100 }),
-                    userId: f.int({ minValue: 1, maxValue: 100 }),
-                    createdAt: f.date({ minDate: '2023-01-01', maxDate: new Date().toISOString() }),
-                    updatedAt: f.date({ minDate: '2023-01-01', maxDate: new Date().toISOString() }),
-                }
-            },
+
             bundleItems: {
                 columns: {
                     quantity: f.int({ minValue: 1, maxValue: 3 }),
                 }
             }
-        }));
 
-    console.log('Database seeded successfully');
+        })
+        );
 }
 
 seed().catch((err) => {

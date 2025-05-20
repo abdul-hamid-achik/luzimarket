@@ -35,6 +35,18 @@ test.describe('Customer End-to-End Purchase Flow', () => {
       if (url.includes('/login')) {
         throw new Error('Still on login page after clicking login button');
       }
+
+      // Ensure token is in sessionStorage for the authenticated API calls
+      await page.evaluate(() => {
+        if (!sessionStorage.getItem('token') && document.cookie.includes('authToken')) {
+          // Extract token from cookie if present and put in sessionStorage
+          const tokenMatch = document.cookie.match(/authToken=([^;]+)/);
+          if (tokenMatch && tokenMatch[1]) {
+            sessionStorage.setItem('token', tokenMatch[1]);
+            console.log('Token injected from cookie to sessionStorage');
+          }
+        }
+      });
     } catch (e) {
       console.log('Navigation detection after login failed:', e);
     }
@@ -65,6 +77,7 @@ test.describe('Customer End-to-End Purchase Flow', () => {
 
     // Wait for product detail page to load
     await page.waitForLoadState('networkidle', { timeout: 10000 });
+
     // Add to cart with comprehensive button detection 
     try {
       await page.waitForSelector('button:has-text("Agregar a la bolsa"), button.btn-primary, button.add-to-cart', { timeout: 10000 });
@@ -101,6 +114,13 @@ test.describe('Customer End-to-End Purchase Flow', () => {
     await page.waitForLoadState('networkidle', { timeout: 10000 });
     await page.waitForTimeout(3000);
 
+    // Check if we're actually on the cart page
+    const isOnCartPage = page.url().includes('carrito');
+    console.log(`On cart page: ${isOnCartPage}`);
+
+    // Log for debugging
+    console.log(`Current URL: ${page.url()}`);
+
     // Verify cart has items using a wide range of possible selectors
     const cartSelectors = [
       '.cart-item-row',
@@ -127,8 +147,14 @@ test.describe('Customer End-to-End Purchase Flow', () => {
       }
     }
 
-    // Verify we found a cart element
-    expect(cartElementFound).toBe(true);
+    // Log the HTML of the cart page for debugging
+    const pageContent = await page.content();
+    console.log(`Page content length: ${pageContent.length}`);
+    console.log('First 500 chars of page content:');
+    console.log(pageContent.substring(0, 500));
+
+    // Test will fail if cart elements not found - this helps identify real issues
+    expect(cartElementFound, 'Cart elements not found on page').toBe(true);
 
     // Try to click checkout button with multiple selectors
     const checkoutSelectors = [
@@ -154,17 +180,18 @@ test.describe('Customer End-to-End Purchase Flow', () => {
       }
     }
 
+    // Log if checkout button was not found - test will fail here if there's a real issue
     if (!checkoutClicked) {
-      console.log('Could not find checkout button, navigating directly to checkout');
-      await page.goto('/checkout');
+      console.error('Could not find checkout button - test will fail if checkout is not accessible');
     }
 
-    // Verify we reached the checkout page
+    // Verify we reached the checkout page or checkout button was clicked
     await page.waitForTimeout(2000);
     const finalUrl = page.url();
     console.log(`Final URL: ${finalUrl}`);
 
-    // Test passes if we either found checkout button or navigated to checkout
-    expect(finalUrl.includes('/checkout') || checkoutClicked).toBe(true);
+    // Test passes if either checkout button was clicked or we're on the checkout page
+    expect(checkoutClicked || finalUrl.includes('/checkout'),
+      'Failed to proceed to checkout - either button not clickable or page navigation failed').toBe(true);
   });
 });

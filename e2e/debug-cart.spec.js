@@ -236,8 +236,9 @@ test.describe('Debug Cart Flow', () => {
                 hasQuantityInputs: exists('input[type="number"]'),
                 hasRemoveButtons: exists('button.remove-item') ||
                     exists('button.delete-item') ||
-                    exists('button:contains("Remove")') ||
-                    exists('button:contains("Delete")'),
+                    // Fallback: check button text for 'Remove' or 'Delete'
+                    Array.from(document.querySelectorAll('button')).some(b => b.textContent.includes('Remove')) ||
+                    Array.from(document.querySelectorAll('button')).some(b => b.textContent.includes('Delete')),
                 visibleText: document.body.innerText,
                 hasEmptyCartMessage: document.body.innerText.toLowerCase().includes('empty') ||
                     document.body.innerText.toLowerCase().includes('vacío')
