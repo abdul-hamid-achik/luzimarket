@@ -10,7 +10,7 @@ export async function GET(
     { params }: { params: Promise<{ id: string }> }
 ) {
     const { id } = await params;
-    const productId = Number(id);
+    const productId = id;
     const [product] = await db.select().from(products).where(eq(products.id, productId));
     if (!product) {
         return NextResponse.json(
@@ -27,7 +27,7 @@ export async function PUT(
     { params }: { params: Promise<{ id: string }> }
 ) {
     const { id } = await params;
-    const productId = Number(id);
+    const productId = id;
     const data = await request.json();
     const updateFields: any = {};
     if (data.name !== undefined) updateFields.name = data.name;
@@ -57,7 +57,7 @@ export async function DELETE(
     { params }: { params: Promise<{ id: string }> }
 ) {
     const { id } = await params;
-    const productId = Number(id);
+    const productId = id;
     // delete associated variants first
     await db.delete(productVariants).where(eq(productVariants.productId, productId)).execute();
     await db.delete(products).where(eq(products.id, productId)).execute();

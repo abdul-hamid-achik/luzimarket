@@ -15,8 +15,9 @@ export async function GET(
     { params }: { params: Promise<{ id: string }> }
 ) {
     const { id } = await params;
-    const productId = Number(id);
-    if (isNaN(productId)) {
+    const productId = id;
+    // Validate UUID format
+    if (!/^[0-9a-fA-F-]{36}$/.test(productId)) {
         return NextResponse.json({ error: 'Invalid product id' }, { status: StatusCodes.BAD_REQUEST });
     }
     const items = await db.select().from(photos).where(eq(photos.productId, productId));
@@ -28,8 +29,9 @@ export async function POST(
     { params }: { params: Promise<{ id: string }> }
 ) {
     const { id } = await params;
-    const productId = Number(id);
-    if (isNaN(productId)) {
+    const productId = id;
+    // Validate UUID format
+    if (!/^[0-9a-fA-F-]{36}$/.test(productId)) {
         return NextResponse.json({ error: 'Invalid product id' }, { status: StatusCodes.BAD_REQUEST });
     }
 

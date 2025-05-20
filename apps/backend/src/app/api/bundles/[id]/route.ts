@@ -10,8 +10,8 @@ export async function GET(
     { params }: { params: Promise<{ id: string }> }
 ) {
     const { id } = await params;
-    const numericId = Number(id);
-    const [bundle] = await db.select().from(bundles).where(eq(bundles.id, numericId));
+    const bundleId = id;
+    const [bundle] = await db.select().from(bundles).where(eq(bundles.id, bundleId));
     if (!bundle) {
         return NextResponse.json(
             { error: 'Bundle not found' },
@@ -27,7 +27,7 @@ export async function GET(
     })
         .from(bundleItems)
         .leftJoin(productVariants, eq(bundleItems.variantId, productVariants.id))
-        .where(eq(bundleItems.bundleId, numericId));
+        .where(eq(bundleItems.bundleId, bundleId));
     return NextResponse.json({ bundle, items }, { status: StatusCodes.OK });
 }
 
@@ -37,25 +37,25 @@ export async function PUT(
     { params }: { params: Promise<{ id: string }> }
 ) {
     const { id } = await params;
-    const numericId = Number(id);
+    const bundleId = id;
     const { name, description, items } = await request.json();
     const updateData: any = {};
     if (name !== undefined) updateData.name = name;
     if (description !== undefined) updateData.description = description;
-    await db.update(bundles).set(updateData).where(eq(bundles.id, numericId)).execute();
+    await db.update(bundles).set(updateData).where(eq(bundles.id, bundleId)).execute();
     if (Array.isArray(items)) {
         // delete old items
-        await db.delete(bundleItems).where(eq(bundleItems.bundleId, numericId)).execute();
+        await db.delete(bundleItems).where(eq(bundleItems.bundleId, bundleId)).execute();
         // insert new
         const toInsert = items.map((itm: any) => ({
-            bundleId: numericId,
+            bundleId: bundleId,
             variantId: itm.variantId,
             quantity: itm.quantity,
         }));
         await db.insert(bundleItems).values(toInsert).execute();
     }
     // fetch updated bundle
-    const [bundle] = await db.select().from(bundles).where(eq(bundles.id, numericId));
+    const [bundle] = await db.select().from(bundles).where(eq(bundles.id, bundleId));
     const bundleData = await db.select({
         id: bundleItems.id,
         variantId: bundleItems.variantId,
@@ -65,7 +65,7 @@ export async function PUT(
     })
         .from(bundleItems)
         .leftJoin(productVariants, eq(bundleItems.variantId, productVariants.id))
-        .where(eq(bundleItems.bundleId, numericId));
+        .where(eq(bundleItems.bundleId, bundleId));
     return NextResponse.json({ bundle, items: bundleData }, { status: StatusCodes.OK });
 }
 
@@ -75,8 +75,8 @@ export async function DELETE(
     { params }: { params: Promise<{ id: string }> }
 ) {
     const { id } = await params;
-    const numericId = Number(id);
-    await db.delete(bundleItems).where(eq(bundleItems.bundleId, numericId)).execute();
-    await db.delete(bundles).where(eq(bundles.id, numericId)).execute();
+    const bundleId = id;
+    await db.delete(bundleItems).where(eq(bundleItems.bundleId, bundleId)).execute();
+    await db.delete(bundles).where(eq(bundles.id, bundleId)).execute();
     return NextResponse.json({ success: true }, { status: StatusCodes.OK });
 } 

@@ -10,7 +10,11 @@ export async function GET(request: NextRequest) {
   if (!idParam) {
     return NextResponse.json([], { status: StatusCodes.OK });
   }
-  const productId = Number(idParam);
+  const productId = idParam;
+  // Return empty array for non-UUID productId values
+  if (!/^[0-9a-fA-F-]{36}$/.test(productId)) {
+    return NextResponse.json([], { status: StatusCodes.OK });
+  }
   const variants = await db.select().from(productVariants).where(eq(productVariants.productId, productId));
   return NextResponse.json(variants, { status: StatusCodes.OK });
 }

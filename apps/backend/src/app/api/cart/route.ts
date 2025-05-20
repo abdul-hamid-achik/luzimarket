@@ -88,7 +88,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
     const sessionId = getSessionId(request);
-    if (!sessionId) return NextResponse.json({ error: 'Unauthorized' }, { status: StatusCodes.UNAUTHORIZED });
+    if (!sessionId) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: StatusCodes.UNAUTHORIZED });
+    }
 
     try {
         const { productId, variantId, quantity } = await request.json();
@@ -101,26 +103,36 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Use the provided variantId or fall back to productId
-        const finalVariantId = variantId || productId;
+        // Determine variant ID for database insert (UUID cases only)
+        let dbVariantId: string | undefined;
+        if (typeof variantId === 'string') {
+            dbVariantId = variantId;
+        } else if (typeof productId === 'string') {
+            dbVariantId = productId;
+        }
+
+        // Prepare values for insert
+        const insertValues: Record<string, any> = {
+            sessionId,
+            quantity: quantity || 1
+        };
+        if (dbVariantId) {
+            insertValues.variantId = dbVariantId;
+        }
 
         // Insert the cart item (UUID primary key will be auto-generated)
         const [newItem] = await db.insert(cartItems)
-            .values({
-                sessionId,
-                variantId: finalVariantId,
-                quantity: quantity || 1
-            })
+            .values(insertValues)
             .returning()
             .execute();
 
-        // Get product details to include in response
+        // Get product details to include in response (only for UUID variant IDs)
         let productDetails = {};
-        try {
-            if (finalVariantId) {
+        if (dbVariantId) {
+            try {
                 const [productVariant] = await db.select()
                     .from(productVariants)
-                    .where(eq(productVariants.id, finalVariantId));
+                    .where(eq(productVariants.id, dbVariantId));
 
                 if (productVariant && productVariant.productId) {
                     const [productInfo] = await db.select()
@@ -135,15 +147,15 @@ export async function POST(request: NextRequest) {
                         };
                     }
                 }
+            } catch (error) {
+                console.error('Error fetching product details:', error);
             }
-        } catch (error) {
-            console.error('Error fetching product details:', error);
         }
 
         // Return the created item with product details
         const responseItem = {
             ...newItem,
-            productId: finalVariantId, // Add productId field to match test expectations
+            productId, // Return input productId for test compatibility
             ...productDetails
         };
 

@@ -50,57 +50,12 @@ jobs:
           start: npm run start
           wait-on: 'http://localhost:8000/api/health,http://localhost:5173'
           command: npm run test:e2e
-
-  deploy-preview:
-    if: github.event_name == 'pull_request'
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Upload Playwright Artifacts
+        uses: actions/upload-artifact@v3
         with:
-          node-version: '22'
-      - name: Install dependencies
-        run: npm ci
-      - name: Build frontend
-        run: npm run build --prefix apps/frontend
-      - name: Install Vercel CLI
-        run: npm install --global vercel@latest
-      - name: Deploy to Vercel (Preview)
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: |
-          vercel deploy --token $VERCEL_TOKEN --confirm \
-            --org-id $VERCEL_ORG_ID --project-id $VERCEL_PROJECT_ID \
-            --cwd apps/frontend
-
-  deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Install dependencies
-        run: npm ci
-      - name: Build frontend
-        run: npm run build --prefix apps/frontend
-      - name: Install Vercel CLI
-        run: npm install --global vercel@latest
-      - name: Deploy to Vercel (Production)
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: |
-          vercel deploy --prod --token $VERCEL_TOKEN --confirm \
-            --org-id $VERCEL_ORG_ID --project-id $VERCEL_PROJECT_ID \
-            --cwd apps/frontend
+          name: playwright-artifacts
+          path: |
+            tmp/playwright-logs
+            tmp/playwright-screenshots
+            tmp/playwright-test-results
+            playwright-report

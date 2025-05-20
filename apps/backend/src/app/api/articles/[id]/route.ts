@@ -9,8 +9,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const numericId = Number(id);
-  const [article] = await db.select().from(editorialArticles).where(eq(editorialArticles.id, numericId));
+  const articleId = id;
+  const [article] = await db.select().from(editorialArticles).where(eq(editorialArticles.id, articleId));
   if (!article) {
     return NextResponse.json({ error: 'Not found' }, { status: StatusCodes.NOT_FOUND });
   }

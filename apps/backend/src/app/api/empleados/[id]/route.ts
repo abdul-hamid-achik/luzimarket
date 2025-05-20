@@ -8,7 +8,8 @@ export async function GET(
     { params }: { params: Promise<{ id: string }> }
 ) {
     const { id } = await params;
-    const result = await db.select().from(empleados).where(eq(empleados.id, Number(id)));
+    const empleadoId = id;
+    const result = await db.select().from(empleados).where(eq(empleados.id, empleadoId));
     if (result.length === 0) {
         return NextResponse.json({ error: 'Empleado not found' }, { status: 404 });
     }
@@ -21,7 +22,8 @@ export async function PUT(
 ) {
     const { id } = await params;
     const data = await request.json();
-    const updated = await db.update(empleados).set(data).where(eq(empleados.id, Number(id))).returning();
+    const empleadoId = id;
+    const updated = await db.update(empleados).set(data).where(eq(empleados.id, empleadoId)).returning();
     return NextResponse.json(updated);
 }
 
@@ -30,6 +32,7 @@ export async function DELETE(
     { params }: { params: Promise<{ id: string }> }
 ) {
     const { id } = await params;
-    await db.delete(empleados).where(eq(empleados.id, Number(id))).execute();
+    const empleadoId = id;
+    await db.delete(empleados).where(eq(empleados.id, empleadoId)).execute();
     return NextResponse.json({ success: true });
 } 
