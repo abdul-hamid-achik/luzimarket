@@ -11,12 +11,17 @@ import LogoCartLuzi from "@/pages/inicio/images/cart_luzimarket.png";
 
 /* Librería */
 import { Link } from "react-router-dom";
-
-import { useContext } from "react";
-import { AuthContext } from "@/context/auth_context";
+import { useAuth } from "@/context/auth_context";
+import { Dropdown } from "react-bootstrap";
 
 const NavbarPrincipal = () => {
-  const { user } = useContext(AuthContext);
+  const { user, isAuthenticated, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    // No need to redirect - the auth context will update state
+  };
+
   return (
     <>
       <nav className="navbar navbar-expand-lg" id="NavbarPrincipal">
@@ -24,11 +29,12 @@ const NavbarPrincipal = () => {
           <img
             src={LogoLetraLuzimarket}
             className="ImagenNavbarPrincipalMobile"
+            alt="Logo Luzimarket"
           />
           <div className="collapse navbar-collapse">
             <div className="navbar-nav mx-5 div1NavbarPrincipal">
-              <img src={LogoluziImagen} className="ImagenNavbarLogo" />
-              <img src={SearchLogo} className="ImagenFormSearch" />
+              <img src={LogoluziImagen} className="ImagenNavbarLogo" alt="Logo" />
+              <img src={SearchLogo} className="ImagenFormSearch" alt="Search" />
             </div>
             <div className="navbar-nav mx-auto">
               <Link to="/">
@@ -36,29 +42,45 @@ const NavbarPrincipal = () => {
                   src={LogoLetraLuzimarket}
                   className="ImagenNavbarPrincipal"
                   style={{ cursor: "pointer" }}
+                  alt="Logo Luzimarket"
                 />
               </Link>
             </div>
             <div className="navbar-nav mx-5 align-items-center">
               <div className="cajaLogosLuzi d-flex align-items-center">
-                <Link to="/perfil">
-                  <img src={LogoUserLuzi} className="LogoNavbarPrincipal" />
-                </Link>
-                {/* Show user email or 'Invitado' */}
-                <span className="ms-2 fw-bold" style={{ minWidth: 120 }}>
-                  {user?.email ? user.email : 'Invitado'}
-                </span>
-                {/* Optionally, show login/register if not logged in */}
-                {!user?.email && (
-                  <span className="ms-3">
-                    <Link to="/login">Login</Link> / <Link to="/register">Register</Link>
-                  </span>
+                {isAuthenticated ? (
+                  <Dropdown>
+                    <Dropdown.Toggle variant="link" id="dropdown-user" className="p-0 text-decoration-none">
+                      <img src={LogoUserLuzi} className="LogoNavbarPrincipal" alt="User" />
+                      <span className="ms-2 fw-bold" style={{ minWidth: 120, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {user?.email}
+                      </span>
+                    </Dropdown.Toggle>
+
+                    <Dropdown.Menu>
+                      <Dropdown.Item as={Link} to="/perfil">Mi Perfil</Dropdown.Item>
+                      <Dropdown.Divider />
+                      <Dropdown.Item onClick={handleLogout}>Cerrar Sesión</Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                ) : (
+                  <div className="d-flex align-items-center">
+                    <Link to="/login">
+                      <img src={LogoUserLuzi} className="LogoNavbarPrincipal" alt="User" />
+                    </Link>
+                    <div className="ms-2">
+                      <Link to="/login" className="fw-bold text-decoration-none">Iniciar Sesión</Link>
+                      <span className="mx-1">/</span>
+                      <Link to="/register" className="fw-bold text-decoration-none">Registrarse</Link>
+                    </div>
+                  </div>
                 )}
-                <Link to="/favoritos">
-                  <img src={LogoLikeLuzi} className="LogoNavbarPrincipal" />
+
+                <Link to="/favoritos" className="ms-3">
+                  <img src={LogoLikeLuzi} className="LogoNavbarPrincipal" alt="Favorites" />
                 </Link>
-                <Link to="/carrito">
-                  <img src={LogoCartLuzi} className="LogoNavbarPrincipal" />
+                <Link to="/carrito" className="ms-3">
+                  <img src={LogoCartLuzi} className="LogoNavbarPrincipal" alt="Cart" />
                 </Link>
               </div>
             </div>
@@ -79,4 +101,5 @@ const NavbarPrincipal = () => {
     </>
   );
 };
+
 export default NavbarPrincipal;
