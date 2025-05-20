@@ -12,9 +12,10 @@ const BLOB_TOKEN = process.env.VERCEL_BLOB_TOKEN!;
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
-    const productId = Number(params.id);
+    const { id } = await params;
+    const productId = Number(id);
     if (isNaN(productId)) {
         return NextResponse.json({ error: 'Invalid product id' }, { status: StatusCodes.BAD_REQUEST });
     }
@@ -24,9 +25,10 @@ export async function GET(
 
 export async function POST(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
-    const productId = Number(params.id);
+    const { id } = await params;
+    const productId = Number(id);
     if (isNaN(productId)) {
         return NextResponse.json({ error: 'Invalid product id' }, { status: StatusCodes.BAD_REQUEST });
     }

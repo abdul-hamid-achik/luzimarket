@@ -7,9 +7,10 @@ import { StatusCodes } from 'http-status-codes';
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { slug: string } }
+    { params }: { params: Promise<{ slug: string }> }
 ) {
-    const [category] = await db.select().from(categories).where(eq(categories.slug, params.slug));
+    const { slug } = await params;
+    const [category] = await db.select().from(categories).where(eq(categories.slug, slug));
     if (!category) {
         return NextResponse.json({ error: 'Category not found' }, { status: StatusCodes.NOT_FOUND });
     }
@@ -19,9 +20,9 @@ export async function GET(
 // Update a category by slug
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { slug: string } }
+    { params }: { params: Promise<{ slug: string }> }
 ) {
-    const { slug } = params;
+    const { slug } = await params;
     const data = await request.json();
     const updateFields: any = {};
     if (data.name !== undefined) updateFields.name = data.name;
@@ -40,9 +41,9 @@ export async function PUT(
 // Delete a category by slug
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { slug: string } }
+    { params }: { params: Promise<{ slug: string }> }
 ) {
-    const { slug } = params;
+    const { slug } = await params;
     await db.delete(categories).where(eq(categories.slug, slug)).execute();
     return NextResponse.json({ success: true }, { status: StatusCodes.OK });
 } 

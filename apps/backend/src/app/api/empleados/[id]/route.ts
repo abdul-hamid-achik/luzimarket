@@ -5,9 +5,9 @@ import { eq } from 'drizzle-orm';
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
-    const { id } = params;
+    const { id } = await params;
     const result = await db.select().from(empleados).where(eq(empleados.id, Number(id)));
     if (result.length === 0) {
         return NextResponse.json({ error: 'Empleado not found' }, { status: 404 });
@@ -17,9 +17,9 @@ export async function GET(
 
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
-    const { id } = params;
+    const { id } = await params;
     const data = await request.json();
     const updated = await db.update(empleados).set(data).where(eq(empleados.id, Number(id))).returning();
     return NextResponse.json(updated);
@@ -27,9 +27,9 @@ export async function PUT(
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
-    const { id } = params;
+    const { id } = await params;
     await db.delete(empleados).where(eq(empleados.id, Number(id))).execute();
     return NextResponse.json({ success: true });
 } 

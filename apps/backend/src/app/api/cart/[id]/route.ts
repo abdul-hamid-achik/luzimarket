@@ -6,7 +6,7 @@ import { sessions, cartItems, productVariants, products } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { StatusCodes } from 'http-status-codes';
 
-function getSessionId(request: NextRequest): number | null {
+function getSessionId(request: NextRequest): string | null {
   const auth = request.headers.get('Authorization') || '';
   if (!auth.startsWith('Bearer ')) return null;
 
@@ -17,7 +17,7 @@ function getSessionId(request: NextRequest): number | null {
     const payload = jwt.verify(token, jwtSecret);
 
     if (typeof payload === 'object' && 'sessionId' in payload) {
-      return Number(payload.sessionId);
+      return String(payload.sessionId);
     }
   } catch (error) {
     console.error('JWT verification error:', error);
@@ -28,20 +28,20 @@ function getSessionId(request: NextRequest): number | null {
 // Get a single cart item
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const sessionId = getSessionId(request);
   if (!sessionId) return NextResponse.json({ error: 'Unauthorized' }, { status: StatusCodes.UNAUTHORIZED });
 
-  const itemId = Number(params.id);
-  if (isNaN(itemId)) return NextResponse.json({ error: 'Invalid item ID' }, { status: StatusCodes.BAD_REQUEST });
+  const { id } = await params;
+  if (!id) return NextResponse.json({ error: 'Invalid item ID' }, { status: StatusCodes.BAD_REQUEST });
 
   try {
     // Get the cart item
     const [item] = await db.select()
       .from(cartItems)
       .where(and(
-        eq(cartItems.id, itemId),
+        eq(cartItems.id, id),
         eq(cartItems.sessionId, sessionId)
       ));
 
@@ -90,13 +90,13 @@ export async function GET(
 // Update a cart item
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const sessionId = getSessionId(request);
   if (!sessionId) return NextResponse.json({ error: 'Unauthorized' }, { status: StatusCodes.UNAUTHORIZED });
 
-  const itemId = Number(params.id);
-  if (isNaN(itemId)) return NextResponse.json({ error: 'Invalid item ID' }, { status: StatusCodes.BAD_REQUEST });
+  const { id } = await params;
+  if (!id) return NextResponse.json({ error: 'Invalid item ID' }, { status: StatusCodes.BAD_REQUEST });
 
   try {
     const { quantity } = await request.json();
@@ -112,7 +112,7 @@ export async function PUT(
     const [updated] = await db.update(cartItems)
       .set({ quantity })
       .where(and(
-        eq(cartItems.id, itemId),
+        eq(cartItems.id, id),
         eq(cartItems.sessionId, sessionId)
       ))
       .returning();
@@ -162,19 +162,19 @@ export async function PUT(
 // Delete a cart item
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const sessionId = getSessionId(request);
   if (!sessionId) return NextResponse.json({ error: 'Unauthorized' }, { status: StatusCodes.UNAUTHORIZED });
 
-  const itemId = Number(params.id);
-  if (isNaN(itemId)) return NextResponse.json({ error: 'Invalid item ID' }, { status: StatusCodes.BAD_REQUEST });
+  const { id } = await params;
+  if (!id) return NextResponse.json({ error: 'Invalid item ID' }, { status: StatusCodes.BAD_REQUEST });
 
   try {
     // Delete the cart item
     const [deleted] = await db.delete(cartItems)
       .where(and(
-        eq(cartItems.id, itemId),
+        eq(cartItems.id, id),
         eq(cartItems.sessionId, sessionId)
       ))
       .returning();

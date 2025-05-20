@@ -17,7 +17,15 @@ export async function POST(request: NextRequest) {
             { status: StatusCodes.BAD_REQUEST }
         );
     }
-    const [{ id: bundleId }] = await db.insert(bundles).values({ name, description }).returning({ id: bundles.id }).execute();
+
+    // Generate a slug from the name
+    const slug = name.toLowerCase().replace(/\s+/g, '-');
+
+    const [{ id: bundleId }] = await db.insert(bundles)
+        .values({ name, description, slug })
+        .returning({ id: bundles.id })
+        .execute();
+
     const bundleItemsData = items.map((item: any) => ({
         bundleId,
         variantId: item.variantId,

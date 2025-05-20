@@ -11,10 +11,18 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-    const { name, slug } = await request.json();
+    const { name, slug, description } = await request.json();
     if (!name || !slug) {
         return NextResponse.json({ error: 'Name and slug required' }, { status: StatusCodes.BAD_REQUEST });
     }
-    const [created] = await db.insert(categories).values({ name, slug }).returning().execute();
+
+    // If description is not provided, use an empty string
+    const categoryDescription = description || '';
+
+    const [created] = await db.insert(categories)
+        .values({ name, slug, description: categoryDescription })
+        .returning()
+        .execute();
+
     return NextResponse.json(created, { status: StatusCodes.CREATED });
 } 
