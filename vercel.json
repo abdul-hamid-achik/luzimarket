@@ -10,11 +10,11 @@
   },
   "builds": [
     {
-      "src": "apps/frontend/package.json",
+      "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "buildCommand": "npm --workspace=apps/frontend run build",
-        "distDir": "dist"
+        "buildCommand": "npm run build",
+        "distDir": "apps/frontend/dist"
       }
     },
     {
@@ -22,17 +22,14 @@
       "use": "@vercel/next"
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "source": "/api/:match*",
+      "destination": "/api/:match*"
     },
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "^/(.*)$",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
