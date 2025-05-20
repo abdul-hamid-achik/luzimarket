@@ -2,11 +2,13 @@ import axios from 'axios';
 import { relatedProjects } from '@vercel/related-projects';
 
 // Determine baseURL: proxy in dev, relatedProjects URL in production
-const isDev = process.env.NODE_ENV === 'development';
-console.log('[API CLIENT] NODE_ENV:', process.env.NODE_ENV, 'isDev:', isDev);
+const isDev = import.meta.env.MODE === 'development';
+console.log('[API CLIENT] MODE:', import.meta.env.MODE, 'isDev:', isDev);
 let baseURL = '/api';
 if (!isDev) {
-  const projects = relatedProjects({ noThrow: true });
+  const raw = import.meta.env.VITE_VERCEL_RELATED_PROJECTS;
+  console.log('[API CLIENT] raw VITE_VERCEL_RELATED_PROJECTS:', raw);
+  const projects = relatedProjects({ raw, noThrow: true });
   console.log('[API CLIENT] relatedProjects:', projects);
   const backend = projects.find(p => p.project.name === 'luzimarket-backend');
   console.log('[API CLIENT] Found backend project:', backend);
