@@ -103,12 +103,22 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Determine variant ID for database insert (UUID cases only)
+        // Determine variant ID for database insert
         let dbVariantId: string | undefined;
         if (typeof variantId === 'string') {
             dbVariantId = variantId;
         } else if (typeof productId === 'string') {
-            dbVariantId = productId;
+            // Find a variant associated with this productId
+            const variants = await db.select({ id: productVariants.id })
+                .from(productVariants)
+                .where(eq(productVariants.productId, productId));
+            if (variants.length === 0) {
+                return NextResponse.json(
+                    { error: 'No variant found for product' },
+                    { status: StatusCodes.BAD_REQUEST }
+                );
+            }
+            dbVariantId = variants[0].id;
         }
 
         // Prepare values for insert

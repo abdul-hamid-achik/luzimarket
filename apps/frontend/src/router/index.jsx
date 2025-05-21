@@ -48,7 +48,7 @@ export const router = createBrowserRouter([
       { index: true, element: <BodyLuzi /> },
       { path: "handpicked/productos", element: <HandpickedProductos /> },
       { path: "handpicked/productos/:id", element: <Handpicked /> },
-      { path: "carrito", element: <RequireAuth><Carrito /></RequireAuth> },
+      { path: "carrito", element: <Carrito /> },
       { path: "login", element: <CustomerLogin /> },
       { path: "register", element: <CustomerRegister /> },
       { path: "perfil", element: <RequireAuth><PerfilUsuario /></RequireAuth> },

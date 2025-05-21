@@ -24,7 +24,8 @@ export async function GET(request: NextRequest) {
     const [session] = await db.select().from(sessions).where(eq(sessions.id, sessionId!));
     if (!session?.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: StatusCodes.UNAUTHORIZED });
     const [user] = await db.select().from(users).where(eq(users.id, session.userId!));
-    const { password: _pw, ...safeUser } = user;
+    const { password: _pw, name, ...rest } = user;
+    const safeUser = { firstName: name, ...rest };
     return NextResponse.json({ user: safeUser }, { status: StatusCodes.OK });
 }
 
@@ -35,6 +36,11 @@ export async function PUT(request: NextRequest) {
     if (!session?.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: StatusCodes.UNAUTHORIZED });
     const data = await request.json();
     if (data.password) delete data.password; // disallow password change here
+    // Map API input field to DB column
+    if (data.firstName !== undefined) {
+        data.name = data.firstName;
+        delete data.firstName;
+    }
     // Update user fields
     await db.update(users)
         .set(data)
@@ -42,6 +48,7 @@ export async function PUT(request: NextRequest) {
         .execute();
     // Fetch updated user
     const [updatedUser] = await db.select().from(users).where(eq(users.id, session.userId!));
-    const { password: _pw2, ...safeUpdatedUser } = updatedUser;
+    const { password: _pw2, name: updatedName, ...rest2 } = updatedUser;
+    const safeUpdatedUser = { firstName: updatedName, ...rest2 };
     return NextResponse.json({ user: safeUpdatedUser }, { status: StatusCodes.OK });
 } 

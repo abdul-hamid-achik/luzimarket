@@ -65,14 +65,9 @@ const NavbarPrincipal = () => {
                   </Dropdown>
                 ) : (
                   <div className="d-flex align-items-center">
-                    <Link to="/login">
-                      <img src={LogoUserLuzi} className="LogoNavbarPrincipal" alt="User" />
-                    </Link>
-                    <div className="ms-2">
-                      <Link to="/login" className="fw-bold text-decoration-none">Iniciar Sesión</Link>
-                      <span className="mx-1">/</span>
-                      <Link to="/register" className="fw-bold text-decoration-none">Registrarse</Link>
-                    </div>
+                    <strong className="me-2">Invitado</strong>
+                    <Link to="/login" className="nav-link">Login</Link>
+                    <Link to="/register" className="nav-link ms-2">Register</Link>
                   </div>
                 )}
 

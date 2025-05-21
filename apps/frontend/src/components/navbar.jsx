@@ -18,7 +18,7 @@ import { useAuth } from "@/context/auth_context";
 } from "react-bootstrap";*/
 
 const NavbarAdmin = () => {
-  const { user } = useAuth() || { user: null };
+  const { user, isAuthenticated, logout } = useAuth();
 
   return (
     <nav className="navbar navbar-expand-lg">
@@ -35,53 +35,31 @@ const NavbarAdmin = () => {
         </button>
 
         <ul className="navbar-nav start col-md-3 d-none d-lg-block">
-          <li className="nav-item dropdown">
-            <a
-              href="#"
-              className="nav-link dropdown"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-              tabIndex={0}
-            >
-              <img
-                src={Usuario}
-                alt="Imagen del Usuario"
-                className="img-usuario rounded-5"
-              />
-              <span className="ms-3">
-                {user ? (
-                  <>
-                    <strong>{user.email}</strong> (Usuario)
-                  </>
-                ) : (
-                  <>
-                    <strong>Invitado</strong>
-                  </>
-                )}
-              </span>
-            </a>
-            <ul className="dropdown-menu">
-              {user ? (
-                <li>
-                  <Link className="dropdown-item" to="/perfil">
-                    Perfil
-                  </Link>
-                </li>
-              ) : (
-                <>
+          <li className="nav-item">
+            {isAuthenticated ? (
+              <>
+                <a
+                  href="#"
+                  className="nav-link dropdown"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  <img src={Usuario} alt="Imagen del Usuario" className="img-usuario rounded-5" />
+                  <span className="ms-3"><strong>{user.email}</strong> (Usuario)</span>
+                </a>
+                <ul className="dropdown-menu">
                   <li>
-                    <Link className="dropdown-item" to="/login">
-                      Login
-                    </Link>
+                    <Link className="dropdown-item" to="/perfil">Perfil</Link>
                   </li>
-                  <li>
-                    <Link className="dropdown-item" to="/register">
-                      Register
-                    </Link>
-                  </li>
-                </>
-              )}
-            </ul>
+                </ul>
+              </>
+            ) : (
+              <div className="d-flex align-items-center">
+                <strong className="me-2">Invitado</strong>
+                <Link to="/login" className="nav-link">Login</Link>
+                <Link to="/register" className="nav-link ms-2">Register</Link>
+              </div>
+            )}
           </li>
         </ul>
 

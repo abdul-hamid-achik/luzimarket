@@ -48,7 +48,8 @@ export const AuthProvider = ({ children }) => {
             const decoded = jwtDecode(token);
             setUser(decoded);
             // Check if user has real authentication (not a guest token)
-            setIsAuthenticated(decoded && !decoded.isGuest);
+            // Guest tokens have decoded.guest = true
+            setIsAuthenticated(!!decoded && !decoded.guest);
           } catch (error) {
             console.error('Failed to decode token', error);
             sessionStorage.removeItem('token');
