@@ -1,22 +1,27 @@
 import Select from 'react-select';
+import { useEffect, useState } from 'react';
+import { useStates } from '@/api/hooks';
 
-const SelectCiudadModal = () => {
-  const options = [
-    { value: 'option1', label: 'Nuevo León' },
-    { value: 'option2', label: 'Coahula' },
-    { value: 'option3', label: 'Tamaulipas' },
-    { value: 'option4', label: 'CDMX' },
-    { value: 'option5', label: 'Jalisco' }
-  ];
+const SelectEstadoModal = ({ onSelect }) => {
+  const { data: states = [] } = useStates();
+  const options = states.map((s) => ({ value: s.value, label: s.label }));
+  const [selected, setSelected] = useState(null);
+
+  useEffect(() => {
+    if (selected) {
+      sessionStorage.setItem('selectedState', selected.value);
+      if (onSelect) onSelect(selected.value);
+    }
+  }, [selected, onSelect]);
 
   return (
     <Select
       options={options}
       placeholder="Seleccione un Estado"
-      onChange={(selectedOption) => {
-        // TODO: store selected state and cascade city list accordingly
-      }}
+      value={selected}
+      onChange={(option) => setSelected(option)}
     />
   );
-}
-export default SelectCiudadModal;
+};
+
+export default SelectEstadoModal;

@@ -1,22 +1,27 @@
 import Select from 'react-select';
+import { useEffect, useState } from 'react';
+import { useDeliveryZones } from '@/api/hooks';
 
-const SelectCiudadModal = () => {
-  const options = [
-    { value: 'option1', label: 'Monterrey' },
-    { value: 'option2', label: 'Torreón' },
-    { value: 'option3', label: 'Matamoros' },
-    { value: 'option4', label: 'CDMX' },
-    { value: 'option5', label: 'Guadalajara' }
-  ];
+const SelectCiudadModal = ({ onSelect }) => {
+  const { data: zones = [] } = useDeliveryZones();
+  const options = zones.map((z) => ({ value: z.id, label: z.name }));
+  const [selected, setSelected] = useState(null);
+
+  useEffect(() => {
+    if (selected) {
+      sessionStorage.setItem('selectedCity', String(selected.value));
+      if (onSelect) onSelect(selected.value);
+    }
+  }, [selected, onSelect]);
 
   return (
     <Select
       options={options}
       placeholder="Seleccione una Ciudad"
-      onChange={(selectedOption) => {
-        // TODO: save selected city to form state and update shipping options
-      }}
+      value={selected}
+      onChange={(option) => setSelected(option)}
     />
   );
-}
+};
+
 export default SelectCiudadModal;
