@@ -2,7 +2,7 @@
 import jwt from 'jsonwebtoken';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { sessions, orders, cartItems, orderItems, productVariants } from '@/db/schema';
+import { sessions, orders, cartItems, orderItems, productVariants, products } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
 // @ts-ignore: Allow http-status-codes import without type declarations
 import { StatusCodes } from 'http-status-codes';
@@ -39,7 +39,11 @@ export async function POST(request: NextRequest) {
     for (const item of cart) {
         // @ts-ignore: variantId is guaranteed
         const [variant] = await db.select().from(productVariants).where(eq(productVariants.id, item.variantId!));
-        total += variant.stock * item.quantity; // note: using stock as price? adjust accordingly
+        if (!variant || !variant.productId) continue;
+        // Fetch product price
+        const [productInfo] = await db.select().from(products).where(eq(products.id, variant.productId));
+        if (!productInfo) continue;
+        total += productInfo.price * item.quantity;
     }
     let newOrderRes;
     try {
@@ -58,15 +62,31 @@ export async function POST(request: NextRequest) {
     const orderId = newOrderRes[0].id;
     for (const item of cart) {
         try {
+            // Fetch price at purchase time
+            // @ts-ignore: variantId is guaranteed
+            const [variant] = await db.select().from(productVariants).where(eq(productVariants.id, item.variantId!));
+            let priceAtPurchase = 0;
+            if (variant && variant.productId) {
+                const [productInfo] = await db.select().from(products).where(eq(products.id, variant.productId));
+                if (productInfo) priceAtPurchase = productInfo.price;
+            }
             await db.insert(orderItems)
-                .values({ orderId, variantId: item.variantId, quantity: item.quantity, price: item.quantity * 0 })
+                .values({ orderId, variantId: item.variantId, quantity: item.quantity, price: priceAtPurchase * item.quantity })
                 .execute();
         } catch (error: any) {
             if (error.code === '23505' && error.constraint === 'order_items_pkey') {
                 console.warn('OrderItems ID sequence out-of-sync, resetting sequence and retrying insert');
                 await db.execute(sql`SELECT setval(pg_get_serial_sequence('order_items','id'), (SELECT MAX(id) FROM order_items))`);
+                // Retry with correct price
+                // @ts-ignore: variantId is guaranteed
+                const [variant2] = await db.select().from(productVariants).where(eq(productVariants.id, item.variantId!));
+                let retryPrice = 0;
+                if (variant2 && variant2.productId) {
+                    const [productInfo2] = await db.select().from(products).where(eq(products.id, variant2.productId));
+                    if (productInfo2) retryPrice = productInfo2.price;
+                }
                 await db.insert(orderItems)
-                    .values({ orderId, variantId: item.variantId, quantity: item.quantity, price: item.quantity * 0 })
+                    .values({ orderId, variantId: item.variantId, quantity: item.quantity, price: retryPrice * item.quantity })
                     .execute();
             } else {
                 console.error('Error inserting order item:', error);

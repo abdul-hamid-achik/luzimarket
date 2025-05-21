@@ -42,20 +42,16 @@ jobs:
         run: npm run seed
       - name: Run unit tests
         run: npm run test
-      - name: Run E2E tests
+      - name: Run Playwright Tests
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: BerniWittmann/background-server-action@v1
+        uses: microsoft/playwright-github-action@v1
         with:
           build: npm run build
-          start: npm run start
-          wait-on: 'http://localhost:8000/api/health,http://localhost:5173'
-          command: npm run test:e2e
-      - name: Upload Playwright Artifacts
+          test: npm run test:e2e
+        env:
+          CI: false
+      - name: Upload Playwright Report
         uses: actions/upload-artifact@v3
         with:
-          name: playwright-artifacts
-          path: |
-            tmp/playwright-logs
-            tmp/playwright-screenshots
-            tmp/playwright-test-results
-            playwright-report
+          name: playwright-report
+          path: tmp/playwright-report

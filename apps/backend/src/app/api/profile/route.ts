@@ -35,7 +35,13 @@ export async function PUT(request: NextRequest) {
     if (!session?.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: StatusCodes.UNAUTHORIZED });
     const data = await request.json();
     if (data.password) delete data.password; // disallow password change here
-    const updated = await db.update(users).set(data).where(eq(users.id, session.userId!)).returning().execute();
-    const [{ password: _pw2, ...safeUpdatedUser }] = updated;
+    // Update user fields
+    await db.update(users)
+        .set(data)
+        .where(eq(users.id, session.userId!))
+        .execute();
+    // Fetch updated user
+    const [updatedUser] = await db.select().from(users).where(eq(users.id, session.userId!));
+    const { password: _pw2, ...safeUpdatedUser } = updatedUser;
     return NextResponse.json({ user: safeUpdatedUser }, { status: StatusCodes.OK });
 } 

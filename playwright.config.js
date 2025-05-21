@@ -5,8 +5,9 @@ const fs = require('fs');
 const logsDir = path.join(__dirname, 'tmp', 'playwright-logs');
 const screenshotsDir = path.join(__dirname, 'tmp', 'playwright-screenshots');
 const resultsDir = path.join(__dirname, 'tmp', 'playwright-test-results');
+const reportDir = path.join(__dirname, 'tmp', 'playwright-report');
 
-[logsDir, screenshotsDir, resultsDir].forEach(dir => {
+[logsDir, screenshotsDir, resultsDir, reportDir].forEach(dir => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
@@ -32,7 +33,7 @@ module.exports = defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: [
     ['list'],
-    ['html', { open: 'never' }],
+    ['html', { open: 'never', outputFolder: reportDir }],
     ['json', { outputFile: path.join(resultsDir, 'test-results.json') }]
   ],
   maxFailures: 1,

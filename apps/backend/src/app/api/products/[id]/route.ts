@@ -10,15 +10,30 @@ export async function GET(
     { params }: { params: Promise<{ id: string }> }
 ) {
     const { id } = await params;
-    const productId = id;
-    const [product] = await db.select().from(products).where(eq(products.id, productId));
-    if (!product) {
+    // Validate that id is a UUID, otherwise return not found
+    if (!/^[0-9a-fA-F-]{36}$/.test(id)) {
         return NextResponse.json(
             { error: 'Product not found' },
             { status: StatusCodes.NOT_FOUND }
         );
     }
-    return NextResponse.json(product, { status: StatusCodes.OK });
+    try {
+        const productId = id;
+        const [product] = await db.select().from(products).where(eq(products.id, productId));
+        if (!product) {
+            return NextResponse.json(
+                { error: 'Product not found' },
+                { status: StatusCodes.NOT_FOUND }
+            );
+        }
+        return NextResponse.json(product, { status: StatusCodes.OK });
+    } catch (error) {
+        console.error('Error fetching product:', error);
+        return NextResponse.json(
+            { error: 'Product not found' },
+            { status: StatusCodes.NOT_FOUND }
+        );
+    }
 }
 
 // Update an existing product
