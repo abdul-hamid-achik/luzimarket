@@ -87,11 +87,10 @@ const articleTopics = [
 
 async function seed() {
 
-    console.log('Resetting database...');
+    // Reset database before seeding
     await reset(db, schema);
 
     const seedId = Math.floor(Math.random() * 1000000);
-    console.log('Seeding id:', seedId);
     faker.seed(seedId);
     // Pre-generate product data arrays for unique values
     const productNames = Array.from({ length: 1000 }, () => faker.commerce.productName());

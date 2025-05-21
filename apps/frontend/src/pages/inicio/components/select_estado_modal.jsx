@@ -13,7 +13,9 @@ const SelectCiudadModal = () => {
     <Select
       options={options}
       placeholder="Seleccione un Estado"
-      onChange={(selectedOption) => console.log(selectedOption)}
+      onChange={(selectedOption) => {
+        // TODO: store selected state and cascade city list accordingly
+      }}
     />
   );
 }

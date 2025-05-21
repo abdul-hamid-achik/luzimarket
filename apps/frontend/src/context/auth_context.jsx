@@ -68,7 +68,6 @@ export const AuthProvider = ({ children }) => {
   const login = async ({ email, password }) => {
     try {
       const result = await loginUser({ email, password });
-      console.log('loginUser result:', result);
 
       // Extract token correctly - API returns { token } directly
       const { token } = result;
@@ -98,7 +97,6 @@ export const AuthProvider = ({ children }) => {
   const register = async ({ email, password, skipAutoLogin = false }) => {
     try {
       const result = await registerUser({ email, password });
-      console.log('registerUser result:', result);
 
       // Only set user and token if not skipping auto-login
       if (!skipAutoLogin) {

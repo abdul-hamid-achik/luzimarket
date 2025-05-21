@@ -46,6 +46,20 @@ module.exports = [
     },
   },
   {
+    files: ['*.config.js', '*.config.cjs', '*.config.mjs', 'vite.config.js', 'tailwind.config.js'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'script',
+      globals: {
+        require: 'readonly',
+        module: 'writable',
+        process: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+      },
+    },
+  },
+  {
     files: ['src/pagina_principal/**'],
     rules: {
       'import/no-unresolved': 'off',

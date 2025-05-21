@@ -11,7 +11,6 @@ import 'bootstrap/dist/js/bootstrap.bundle.js';
 import "@/pages/inicio/css/general.css"
 
 const Inicio = () => {
-   console.log('Inicio component is rendering...');
    return (
       <>
          {/* ===== Start Navbar ===== */}

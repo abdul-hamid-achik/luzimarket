@@ -13,7 +13,9 @@ const SelectPagoModal = () => {
     <Select
       options={options}
       placeholder="Seleccione un metodo de Pago"
-      onChange={(selectedOption) => console.log(selectedOption)}
+      onChange={(selectedOption) => {
+        // TODO: handle payment method selection and trigger checkout updates
+      }}
     />
   );
 }

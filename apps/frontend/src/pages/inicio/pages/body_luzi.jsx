@@ -48,7 +48,6 @@ const fallbackProducts = [
 ];
 
 const BodyLuzi = () => {
-  console.log('BodyLuzi component is rendering...');
   // Move hook call to top-level of component
   const { data: apiProducts = [], isLoading, error } = useProducts();
 
