@@ -1,22 +1,32 @@
 import Select from 'react-select';
+import { useState, useEffect } from 'react';
 
-const SelectPagoModal = () => {
+const SelectPagoModal = ({ onSelect }) => {
   const options = [
-    { value: 'option1', label: 'Mi Visa termina en *98' },
-    { value: 'option2', label: 'Visa' },
-    { value: 'option3', label: 'MasterCard' },
-    { value: 'option4', label: 'Paypal' },
-    { value: 'option5', label: 'OXXO' }
+    { value: 'visa-98', label: 'Mi Visa termina en *98' },
+    { value: 'visa', label: 'Visa' },
+    { value: 'mastercard', label: 'MasterCard' },
+    { value: 'paypal', label: 'Paypal' },
+    { value: 'oxxo', label: 'OXXO' }
   ];
+
+  const [selected, setSelected] = useState(null);
+
+  useEffect(() => {
+    if (selected) {
+      sessionStorage.setItem('paymentMethod', selected.value);
+      if (onSelect) onSelect(selected.value);
+    }
+  }, [selected, onSelect]);
 
   return (
     <Select
       options={options}
       placeholder="Seleccione un metodo de Pago"
-      onChange={(selectedOption) => {
-        // TODO: handle payment method selection and trigger checkout updates
-      }}
+      value={selected}
+      onChange={(option) => setSelected(option)}
     />
   );
-}
+};
+
 export default SelectPagoModal;
