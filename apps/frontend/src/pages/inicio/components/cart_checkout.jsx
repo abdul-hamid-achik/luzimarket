@@ -16,7 +16,6 @@ const Checkout = ({ cartItems }) => {
   useEffect(() => {
     if (zones.length > 0 && !selectedZone) {
       setSelectedZone(zones[0]);
-      console.log("Auto-selected delivery zone:", zones[0]);
     }
   }, [zones, selectedZone]);
 
@@ -49,7 +48,6 @@ const Checkout = ({ cartItems }) => {
       // Try to restore from localStorage as fallback
       const backupToken = localStorage.getItem('token');
       if (backupToken) {
-        console.log("Restoring token from localStorage");
         sessionStorage.setItem('token', backupToken);
       } else {
         // Redirect to login if no token can be found

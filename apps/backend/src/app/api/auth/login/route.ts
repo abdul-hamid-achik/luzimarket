@@ -19,12 +19,10 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        console.log('Login attempt:', { email });
 
         // check credentials
         const [user] = await db.select().from(users).where(eq(users.email, email));
         if (!user) {
-            console.log('User not found:', email);
             return NextResponse.json(
                 { error: 'Invalid credentials' },
                 { status: StatusCodes.UNAUTHORIZED }
@@ -33,7 +31,6 @@ export async function POST(request: NextRequest) {
 
         const isValid = await bcrypt.compare(password, user.password);
         if (!isValid) {
-            console.log('Invalid password for user:', email);
             return NextResponse.json(
                 { error: 'Invalid credentials' },
                 { status: StatusCodes.UNAUTHORIZED }
@@ -50,7 +47,6 @@ export async function POST(request: NextRequest) {
             .execute();
 
         const newSessionId = newSessionRes[0].id;
-        console.log('Created new session:', newSessionId);
 
         // attempt to merge guest cart if provided
         const authHeader = request.headers.get('Authorization') || '';
@@ -60,13 +56,11 @@ export async function POST(request: NextRequest) {
                 const payload = jwt.verify(authHeader.split(' ')[1], jwtSecret);
                 if (typeof payload === 'object' && 'sessionId' in payload) {
                     const guestSessionId = (payload as any).sessionId;
-                    console.log('Merging guest cart from session:', guestSessionId, 'to user session:', newSessionId);
                     const result = await db.update(cartItems)
                         .set({ sessionId: newSessionId })
                         .where(eq(cartItems.sessionId, guestSessionId))
                         .returning()
                         .execute();
-                    console.log('Merged cart items:', result.length);
                 }
             } catch (error) {
                 // ignore invalid guest token
@@ -82,7 +76,6 @@ export async function POST(request: NextRequest) {
             role: user.role
         }, jwtSecret, { expiresIn: '7d' });
 
-        console.log('Login successful for:', email);
         return NextResponse.json({ token }, { status: StatusCodes.OK });
     } catch (error) {
         console.error('Error during login:', error);

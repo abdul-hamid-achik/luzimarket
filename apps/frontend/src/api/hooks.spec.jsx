@@ -1,5 +1,5 @@
 vi.mock('./products', () => ({
-  getProducts: () => { console.log('MOCKED PRODUCTS API'); return Promise.resolve([{ name: 'Prod A' }, { name: 'Prod B' }]); },
+  getProducts: () => Promise.resolve([{ name: 'Prod A' }, { name: 'Prod B' }]),
   getProduct: () => Promise.resolve({ name: 'Prod A' }),
 }));
 vi.mock('./cart', () => ({

@@ -13,7 +13,9 @@ const SelectCiudadModal = () => {
     <Select
       options={options}
       placeholder="Seleccione una Ciudad"
-      onChange={(selectedOption) => console.log(selectedOption)}
+      onChange={(selectedOption) => {
+        // TODO: save selected city to form state and update shipping options
+      }}
     />
   );
 }

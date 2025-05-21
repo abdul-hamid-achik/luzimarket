@@ -3,7 +3,6 @@ import { withRelatedProject } from '@vercel/related-projects';
 
 // Determine baseURL: proxy in dev, relatedProjects URL in production
 const isDev = import.meta.env.MODE === 'development';
-console.log('[API CLIENT] MODE:', import.meta.env.MODE, 'isDev:', isDev);
 
 // In production, link to your backend via withRelatedProject
 // Uses VERCEL_RELATED_PROJECTS under the hood; fallback to VITE_API_HOST
@@ -12,7 +11,6 @@ const defaultHost = import.meta.env.VITE_API_HOST;
 const host = isDev
   ? null
   : withRelatedProject({ projectName, defaultHost, noThrow: true });
-console.log('[API CLIENT] withRelatedProject host:', host);
 
 // Determine baseURL: dev proxy or production backend URL
 const baseURL = isDev
@@ -20,7 +18,6 @@ const baseURL = isDev
   : host
     ? `https://${host}/api`
     : '/api';
-console.log('[API CLIENT] baseURL:', baseURL);
 
 // Create axios instance with dynamic baseURL
 const api = axios.create({ baseURL });
@@ -35,14 +32,6 @@ api.interceptors.request.use((config) => {
   // Add request logging
   if (typeof window !== 'undefined') {
     // Only log in browser
-    console.log(
-      `[API REQUEST] ${config.method?.toUpperCase() || 'GET'} ${config.baseURL || ''}${config.url}`,
-      {
-        headers: config.headers,
-        params: config.params,
-        data: config.data,
-      }
-    );
   }
 
   // Track request start time for duration logging
@@ -57,16 +46,9 @@ api.interceptors.response.use(
     const startTime = response.config.metadata?.startTime;
     const duration = startTime ? Date.now() - startTime : undefined;
 
-    if (typeof window !== 'undefined') {
-      // Only log in browser
-      console.log(
-        `[API RESPONSE] ${response.config.method?.toUpperCase() || 'GET'} ${response.config.baseURL || ''}${response.config.url} - ${response.status} (${duration ? duration + 'ms' : 'unknown duration'})`,
-        {
-          data: response.data,
-          headers: response.headers,
-        }
-      );
-    }
+  if (typeof window !== 'undefined') {
+    // Only log in browser
+  }
 
     return response;
   },

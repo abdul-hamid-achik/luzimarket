@@ -83,6 +83,7 @@
     "dev": "vite",
     "test": "vitest run",
     "test:frontend": "vitest run",
+    "lint": "eslint src --ext .js,.jsx --ignore-pattern **/*.spec.*",
     "build": "ROLLUP_NATIVE_DISABLE=1 vite build",
     "preview": "vite preview"
   },

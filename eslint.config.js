@@ -1,7 +1,9 @@
 /** @type {import('eslint').Linter.FlatConfig[]} */
+const next = require('eslint-plugin-next').configs['core-web-vitals'];
+
 module.exports = [
+  next,
   {
-    extends: ['next', 'next/core-web-vitals'],
     rules: {
       'no-restricted-imports': ['error', { patterns: ['../**'] }],
     },

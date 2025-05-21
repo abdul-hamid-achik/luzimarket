@@ -10,7 +10,9 @@
     "migrate:up": "npx --yes drizzle-kit migrate",
     "migrate:down": "npx --yes drizzle-kit drop",
     "migrate:push": "npx --yes drizzle-kit push",
-    "seed": "tsx src/db/seed.ts"
+    "seed": "tsx src/db/seed.ts",
+    "test": "vitest run",
+    "lint": "next lint"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.0",

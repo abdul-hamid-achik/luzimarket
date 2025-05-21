@@ -9,7 +9,6 @@ const disableNativeRollup = process.env.ROLLUP_NATIVE_DISABLE ||
 
 if (disableNativeRollup) {
     process.env.ROLLUP_NATIVE_DISABLE = '1';
-    console.log('Native Rollup plugins disabled due to Node.js 22 compatibility');
 }
 
 // https://vitejs.dev/config/
