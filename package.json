@@ -22,11 +22,6 @@
     "test": "npx --yes dotenv-cli@latest -- npm-run-all test:backend test:frontend",
     "postinstall": "if [ \"$VERCEL\" ]; then echo 'Skipping Playwright install on Vercel'; else playwright install; fi",
     "test:e2e": "npx --yes dotenv-cli@latest -- playwright test",
-    "test:e2e:offline": "DB_MODE=pglite npx --yes dotenv-cli@latest -- playwright test",
-    "test:offline": "DB_MODE=pglite npx --yes dotenv-cli@latest -- npm-run-all test:backend test:frontend",
-    "test:backend:offline": "DB_MODE=pglite npx --yes dotenv-cli@latest -- npm --workspace=apps/backend run test",
-    "pglite:setup": "npm --workspace=apps/backend run pglite:setup",
-    "pglite:seed": "npm --workspace=apps/backend run pglite:seed",
     "migrate:generate": "npx --yes dotenv-cli@latest -- npm --workspace=apps/backend run migrate:generate",
     "migrate:up": "npx --yes dotenv-cli@latest -- npm --workspace=apps/backend run migrate:up",
     "migrate:down": "npx --yes dotenv-cli@latest -- npm --workspace=apps/backend run migrate:down",
@@ -41,7 +36,10 @@
   "devDependencies": {
     "@electric-sql/pglite": "^0.3.2",
     "@playwright/test": "^1.52.0",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/uuid": "^9.0.8",
     "concurrently": "^9.1.2",
+    "drizzle-kit": "^0.31.1",
     "drizzle-orm": "^0.43.1",
     "eslint": "^9.1.0",
     "eslint-import-resolver-alias": "^1.1.2",
@@ -53,5 +51,9 @@
   },
   "engines": {
     "node": ">=18.0.0 <=22.x"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.10.0",
+    "uuid": "^9.0.1"
   }
 }

@@ -1,17 +1,18 @@
 const { defineConfig, devices } = require('@playwright/test');
 const path = require('path');
 const fs = require('fs');
+const { execSync } = require('child_process');
 
 const logsDir = path.join(__dirname, 'tmp', 'playwright-logs');
 const screenshotsDir = path.join(__dirname, 'tmp', 'playwright-screenshots');
 const resultsDir = path.join(__dirname, 'tmp', 'playwright-test-results');
 const reportDir = path.join(__dirname, 'tmp', 'playwright-report');
 
-// Check if we're using PGlite (offline mode) or Neon (online mode)
+// Check if we're using PGLite (offline mode) or Neon (online mode)
 const DB_MODE = process.env.DB_MODE || 'neon';
-const isOfflineMode = DB_MODE === 'pglite';
+const isOfflineMode = DB_MODE === 'offline';
 
-console.log(`Running tests in ${isOfflineMode ? 'OFFLINE' : 'ONLINE'} mode using ${DB_MODE} database`);
+console.log(`Running tests in ${isOfflineMode ? 'OFFLINE (SQLite)' : 'ONLINE (PostgreSQL)'} mode using ${DB_MODE} database`);
 
 [logsDir, screenshotsDir, resultsDir, reportDir].forEach(dir => {
   if (!fs.existsSync(dir)) {
@@ -99,8 +100,10 @@ module.exports = defineConfig({
           DEBUG: 'app:*,api:*',
           // Pass the database mode to the backend
           DB_MODE: DB_MODE,
-          // For PGlite, use in-memory database by default in tests
-          DATABASE_URL: isOfflineMode ? '' : process.env.DATABASE_URL,
+          // For offline (SQLite), db/index.ts will use :memory:.
+          // DATABASE_URL is not strictly needed by the server in offline mode if db/index.ts hardcodes :memory: for SQLite,
+          // but doesn't hurt to keep it consistent with the push step if it were a file.
+          DATABASE_URL: process.env.DATABASE_URL,
         },
         onStdOut: (chunk) => {
           console.log('Backend:', chunk.toString());

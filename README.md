@@ -148,13 +148,14 @@ To use PGlite:
 
 5. Run Playwright E2E tests with PGlite:
    ```bash
-   npm run test:e2e:offline
+   DB_MODE=pglite npm run test:e2e
    ```
 
-You can also manually set the `DB_MODE` environment variable to `pglite` to use PGlite for any command:
+You can set the `DB_MODE` environment variable to `pglite` for any command to use PGlite instead of Neon:
 
 ```bash
 DB_MODE=pglite npm run dev
+DB_MODE=pglite npm run test:e2e
 ```
 
 ## Deployment

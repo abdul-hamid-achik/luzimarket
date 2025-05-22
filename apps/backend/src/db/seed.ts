@@ -1,11 +1,17 @@
 import { db } from './index';
-import { sql } from 'drizzle-orm';
-import * as schema from './schema';
-import { reset, seed as drizzleSeed } from 'drizzle-seed';
 import bcrypt from 'bcryptjs';
 import { faker } from '@faker-js/faker/locale/es';
+import { eq } from 'drizzle-orm';
+import type { NeonDatabase } from 'drizzle-orm/neon-serverless';
+import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 
-// Predefined static values
+// Define types for the dynamically imported schema modules
+type PostgresSchemaModule = typeof import('./schema.postgres');
+type SqliteSchemaModule = typeof import('./schema.sqlite');
+
+const DB_MODE = process.env.DB_MODE || 'neon';
+
+// Predefined static values - restored full arrays
 const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 const orderStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'];
 const petitionTypes = ['Question', 'Complaint', 'Suggestion', 'Feedback', 'Technical Issue'];
@@ -22,7 +28,6 @@ const deliveryZonesData = [
     { name: 'Monterrey', fee: 100 },
 ];
 
-// Gift-specific categories
 const giftCategories = [
     { name: 'Floral Arrangements', slug: 'floral-arrangements' },
     { name: 'Gift Baskets', slug: 'gift-baskets' },
@@ -36,15 +41,14 @@ const giftCategories = [
     { name: 'Eco-Friendly Gifts', slug: 'eco-friendly-gifts' }
 ];
 
-// Specific occasion names with descriptions
 const occasions = [
     { name: 'Cumpleaños', description: 'Celebrate another year of life with our special birthday collection' },
     { name: 'Aniversario', description: 'Commemorate years of love and commitment with our anniversary selections' },
     { name: 'Graduación', description: 'Honor academic achievements with our curated graduation gifts' },
     { name: 'Navidad', description: 'Spread holiday cheer with our festive Christmas collection' },
-    { name: 'Día de la Madre', description: 'Show appreciation to mothers with our thoughtful Mother\'s Day gifts' },
-    { name: 'Día del Padre', description: 'Celebrate fathers with our specially selected Father\'s Day items' },
-    { name: 'San Valentín', description: 'Express your love with our romantic Valentine\'s Day collection' },
+    { name: 'Día de la Madre', description: "Show appreciation to mothers with our thoughtful Mother's Day gifts" },
+    { name: 'Día del Padre', description: "Celebrate fathers with our specially selected Father's Day items" },
+    { name: 'San Valentín', description: "Express your love with our romantic Valentine's Day collection" },
     { name: 'Boda', description: 'Celebrate new beginnings with our elegant wedding gift selection' },
     { name: 'Bautizo', description: 'Mark a special christening with our carefully chosen baptism gifts' },
     { name: 'Baby Shower', description: 'Welcome new arrivals with our adorable baby shower presents' },
@@ -52,289 +56,203 @@ const occasions = [
     { name: 'Jubilación', description: 'Honor career achievements with our thoughtful retirement presents' }
 ];
 
-// Categories for product images (Unsplash)
-const imageCategories = [
-    'gift', 'handmade', 'luxury', 'present', 'celebration',
-    'flowers', 'decoration', 'elegant', 'birthday', 'custom'
-];
+// No overloads needed here, we will use type guards inside the function.
+async function seed(currentDb: NeonDatabase | BetterSQLite3Database, currentSchema: PostgresSchemaModule | SqliteSchemaModule): Promise<void> {
+    try {
+        const seedId = Math.floor(Math.random() * 1000000);
+        faker.seed(seedId);
+        console.log('Starting basic seeding without reset...');
 
-// Product types for more realistic product names
-const productTypes = [
-    'Gift Box', 'Bouquet', 'Arrangement', 'Collection', 'Set',
-    'Basket', 'Sampler', 'Package', 'Assortment', 'Kit'
-];
+        if (DB_MODE === 'offline') {
+            // currentDb is BetterSQLite3Database, currentSchema is SqliteSchemaModule
+            const dbInstance = currentDb as BetterSQLite3Database;
+            const schemaInstance = currentSchema as SqliteSchemaModule;
 
-// Materials for product descriptions
-const materials = [
-    'handcrafted', 'artisanal', 'premium', 'eco-friendly', 'sustainable',
-    'recycled', 'organic', 'locally-sourced', 'fair-trade', 'luxury'
-];
-
-// Editorial article topics specific to gifting
-const articleTopics = [
-    'Gift Guides',
-    'Occasion Ideas',
-    'DIY Gift Wrapping',
-    'Personalization Tips',
-    'Sustainable Gifting',
-    'Corporate Gift Ideas',
-    'Gift Etiquette',
-    'Seasonal Trends',
-    'Artisan Spotlights',
-    'Gift Psychology'
-];
-
-
-async function seed() {
-
-    // Reset database before seeding
-    await reset(db, schema);
-
-    const seedId = Math.floor(Math.random() * 1000000);
-    faker.seed(seedId);
-    // Pre-generate product data arrays for unique values
-    const productNames = Array.from({ length: 1000 }, () => faker.commerce.productName());
-    const productSlugs = productNames.map((n, i) => `${faker.helpers.slugify(n.toLowerCase())}-${i}`);
-    const productDescriptions = Array.from({ length: 1000 }, () => faker.commerce.productDescription());
-    const productPrices = Array.from({ length: 1000 }, () => parseInt(faker.commerce.price({ min: 10, max: 200, dec: 0 }), 10));
-    // Pre-generate photo URLs array for realistic images
-    const photoUrls = Array.from({ length: 5000 }, () => {
-        const category = imageCategories[Math.floor(Math.random() * imageCategories.length)];
-        return faker.image.urlLoremFlickr({ category, width: 640, height: 640 });
-    });
-    // Use a random integer seed for each run to generate unique data
-    await drizzleSeed(db, schema, { seed: seedId })
-        .refine((f) => ({
-            empleados: {
-                count: 75,
-                columns: {
-                    nombre: f.fullName(),
-                    puesto: f.jobTitle(),
-                    email: f.email(),
-                    createdAt: f.date({ minDate: '2021-01-01', maxDate: new Date().toISOString() }),
-                    updatedAt: f.date({ minDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 60).toISOString(), maxDate: new Date().toISOString() }),
-                },
-            },
-            users: {
-                count: 100,
-                columns: {
-                    email: f.email(),
-                    password: f.default({ defaultValue: bcrypt.hashSync('Password123!', 10) }),
-                    name: f.fullName(),
-                    username: f.string({ isUnique: true }),
-                    role: f.weightedRandom([
-                        { weight: 0.85, value: f.default({ defaultValue: 'user' }) },
-                        { weight: 0.05, value: f.default({ defaultValue: 'admin' }) },
-                        { weight: 0.05, value: f.default({ defaultValue: 'editor' }) },
-                        { weight: 0.05, value: f.default({ defaultValue: 'customer_service' }) },
-                    ]),
-                    createdAt: f.date({ minDate: '2022-01-01', maxDate: new Date().toISOString() }),
-                },
-                with: {
-                    sessions: [
-                        { weight: 0.60, count: [1, 3] },
-                        { weight: 0.40, count: [4, 6] }, // some users have more sessions
-                    ],
-                    favorites: [
-                        { weight: 0.50, count: [1, 10] },
-                        { weight: 0.50, count: [11, 20] }, // some users have many favorites
-                    ],
-                    orders: [
-                        { weight: 0.60, count: [1, 5] },
-                        { weight: 0.40, count: [6, 10] }, // some users have many orders
-                    ],
-                },
-            },
-            sessions: {
-                columns: {
-                    isGuest: f.boolean(),
-                    createdAt: f.date({ minDate: '2023-01-01', maxDate: new Date().toISOString() }),
-                },
-                with: {
-                    cartItems: [{ weight: 1, count: [1, 5] }],
-                },
-            },
-            orders: {
-                count: 1000,
-                columns: {
-                    total: f.int({ minValue: 1000, maxValue: 100000 }),
-                    status: f.valuesFromArray({ values: orderStatuses, isUnique: false }),
-                    orderNumber: f.string({ isUnique: true }),
-                    createdAt: f.date({ minDate: '2023-01-01', maxDate: new Date().toISOString() }),
-                },
-                with: {
-                    orderItems: [{ weight: 1, count: [1, 5] }],
-                },
-            },
-            categories: {
-                count: giftCategories.length,
-                columns: {
-                    name: f.valuesFromArray({ values: giftCategories.map(c => c.name), isUnique: true }),
-                    slug: f.valuesFromArray({ values: giftCategories.map(c => c.slug), isUnique: true }),
-                    description: f.loremIpsum({ sentencesCount: 1 }),
-                },
-                with: {
-                    products: [{ weight: 1, count: [5, 15] }],
-                },
-            },
-            products: {
-                count: 1000,
-                columns: {
-                    name: f.valuesFromArray({ values: productNames, isUnique: true }),
-                    slug: f.valuesFromArray({ values: productSlugs, isUnique: true }),
-                    description: f.valuesFromArray({ values: productDescriptions, isUnique: true }),
-                    price: f.valuesFromArray({ values: productPrices, isUnique: true }),
-                    createdAt: f.date({ minDate: '2023-01-01', maxDate: new Date().toISOString() }),
-                },
-                with: {
-                    productVariants: [
-                        { weight: 0.22, count: 1 },
-                        { weight: 0.22, count: 2 },
-                        { weight: 0.18, count: 3 },
-                        { weight: 0.13, count: 4 },
-                        { weight: 0.13, count: 5 },
-                        { weight: 0.06, count: 6 },
-                        { weight: 0.06, count: 7 }
-                    ],
-                    photos: [
-                        { weight: 0.18, count: 1 },
-                        { weight: 0.24, count: 2 },
-                        { weight: 0.24, count: 3 },
-                        { weight: 0.17, count: 4 },
-                        { weight: 0.17, count: 5 }
-                    ]
+            try {
+                for (const size of sizes) {
+                    await dbInstance.insert(schemaInstance.sizes).values({ size }).onConflictDoNothing();
                 }
-            },
-            states: {
-                count: statesData.length,
-                columns: {
-                    label: f.valuesFromArray({ values: statesData.map(s => s.label), isUnique: true }),
-                    value: f.valuesFromArray({ values: statesData.map(s => s.value), isUnique: true }),
-                },
-            },
-            deliveryZones: {
-                count: deliveryZonesData.length,
-                columns: {
-                    name: f.valuesFromArray({ values: deliveryZonesData.map(z => z.name), isUnique: true }),
-                    fee: f.valuesFromArray({ values: deliveryZonesData.map(z => z.fee), isUnique: true }),
-                },
-            },
-            brands: {
-                count: 15,
-                columns: {
-                    name: f.companyName(),
-                    slug: f.string({ isUnique: true }),
-                    description: f.loremIpsum({ sentencesCount: 1 }),
-                    website: f.string(),
-                }
-            },
-            occasions: {
-                count: occasions.length,
-                columns: {
-                    name: f.valuesFromArray({ values: occasions.map(o => o.name), isUnique: true }),
-                    description: f.valuesFromArray({ values: occasions.map(o => o.description), isUnique: true }),
-                    slug: f.string({ isUnique: true }),
-                },
-            },
-            editorialArticles: {
-                count: 30,
-                columns: {
-                    title: f.loremIpsum({ sentencesCount: 1 }),
-                    content: f.loremIpsum({ sentencesCount: 3 }),
-                    author: f.fullName(),
-                    slug: f.string({ isUnique: true }),
-                    createdAt: f.date({ minDate: '2023-01-01', maxDate: new Date().toISOString() })
-                }
-            },
-            petitions: {
-                count: 50,
-                columns: {
-                    type: f.valuesFromArray({ values: petitionTypes, isUnique: false }),
-                    title: f.loremIpsum({ sentencesCount: 1 }),
-                    description: f.loremIpsum({ sentencesCount: 2 }),
-                    status: f.valuesFromArray({ values: petitionStatuses, isUnique: false }),
-                    createdAt: f.date({ minDate: '2023-01-01', maxDate: new Date().toISOString() }),
-                },
-            },
-            bundles: {
-                count: 30,
-                columns: {
-                    name: f.loremIpsum({ sentencesCount: 2 }),
-                    description: f.loremIpsum({ sentencesCount: 2 }),
-                    slug: f.string({ isUnique: true }),
-                    createdAt: f.date({ minDate: '2023-01-01', maxDate: new Date().toISOString() }),
-                },
-                with: { bundleItems: [{ weight: 1, count: [1, 5] }] }
-            },
-            sizes: {
-                count: sizes.length,
-                columns: {
-                    size: f.valuesFromArray({ values: sizes, isUnique: true }),
-                },
-            },
-            imageCategories: {
-                count: imageCategories.length,
-                columns: {
-                    name: f.valuesFromArray({ values: imageCategories, isUnique: true }),
-                },
-            },
-            productTypes: {
-                count: productTypes.length,
-                columns: {
-                    name: f.valuesFromArray({ values: productTypes, isUnique: true }),
-                },
-            },
-            materials: {
-                count: materials.length,
-                columns: {
-                    name: f.valuesFromArray({ values: materials, isUnique: true }),
-                },
-            },
-            articleTopics: {
-                count: articleTopics.length,
-                columns: {
-                    name: f.valuesFromArray({
-                        values: articleTopics.map(t => t), isUnique: true
-                    }),
-                },
-            },
-            productVariants: {
-                columns: {
-                    sku: f.uuid(),
-                    attributes: f.json(),
-                    stock: f.int({ minValue: 0, maxValue: 200 }),
-                }
-            },
-            photos: {
-                columns: {
-                    url: f.valuesFromArray({ values: photoUrls }),
-                    alt: f.loremIpsum({ sentencesCount: 1 }),
-                    sortOrder: f.int({ minValue: 0, maxValue: 10 }),
-                }
-            },
-            orderItems: {
-                columns: {
-                    quantity: f.int({ minValue: 1, maxValue: 5 }),
-                    price: f.int({ minValue: 1000, maxValue: 20000 }),
-                }
-            },
-            cartItems: {
-                columns: {
-                    quantity: f.int({ minValue: 1, maxValue: 5 }),
-                }
-            },
+                console.log('Sizes seeded successfully (SQLite)');
+            } catch (err) { console.log('Error seeding sizes (SQLite):', err); }
 
-            bundleItems: {
-                columns: {
-                    quantity: f.int({ minValue: 1, maxValue: 3 }),
+            try {
+                for (const state of statesData) {
+                    await dbInstance.insert(schemaInstance.states).values(state).onConflictDoNothing();
                 }
-            }
+                console.log('States seeded successfully (SQLite)');
+            } catch (err) { console.log('Error seeding states (SQLite):', err); }
 
-        })
-        );
+            try {
+                for (const zone of deliveryZonesData) {
+                    await dbInstance.insert(schemaInstance.deliveryZones).values(zone).onConflictDoNothing();
+                }
+                console.log('Delivery zones seeded successfully (SQLite)');
+            } catch (err) { console.log('Error seeding delivery zones (SQLite):', err); }
+
+            try {
+                for (const category of giftCategories) {
+                    await dbInstance.insert(schemaInstance.categories).values({ ...category, description: faker.commerce.productDescription() }).onConflictDoNothing();
+                }
+                console.log('Categories seeded successfully (SQLite)');
+            } catch (err) { console.log('Error seeding categories (SQLite):', err); }
+
+            try {
+                for (const occasion of occasions) {
+                    await dbInstance.insert(schemaInstance.occasions).values({ ...occasion, slug: faker.helpers.slugify(occasion.name.toLowerCase()) }).onConflictDoNothing();
+                }
+                console.log('Occasions seeded successfully (SQLite)');
+            } catch (err) { console.log('Error seeding occasions (SQLite):', err); }
+
+            try {
+                await dbInstance.insert(schemaInstance.users).values({
+                    email: 'admin@example.com',
+                    password: bcrypt.hashSync('Password123!', 10),
+                    name: 'Admin User',
+                    role: 'admin'
+                }).onConflictDoNothing();
+                console.log('Admin user seeded successfully (SQLite)');
+            } catch (err) { console.log('Error seeding admin user (SQLite):', err); }
+
+            try {
+                const adminResult = await dbInstance.select().from(schemaInstance.users).where(eq(schemaInstance.users.email, 'admin@example.com')).limit(1);
+                const admin = adminResult[0];
+                if (admin) {
+                    for (const status of orderStatuses) {
+                        await dbInstance.insert(schemaInstance.orders).values({
+                            userId: admin.id,
+                            total: faker.number.int({ min: 1000, max: 50000 }),
+                            status,
+                            createdAt: faker.date.recent()
+                        }).onConflictDoNothing();
+                    }
+                    console.log('Example orders seeded successfully (SQLite)');
+                }
+            } catch (err) { console.log('Error seeding example orders (SQLite):', err); }
+
+            try {
+                for (const type of petitionTypes) {
+                    for (const status of petitionStatuses) {
+                        await dbInstance.insert(schemaInstance.petitions).values({
+                            type,
+                            title: `${type} - ${faker.lorem.sentence(4)}`,
+                            description: faker.lorem.paragraphs(2),
+                            status,
+                            createdAt: faker.date.recent()
+                        }).onConflictDoNothing();
+                    }
+                }
+                console.log('Example petitions seeded successfully (SQLite)');
+            } catch (err) { console.log('Error seeding example petitions (SQLite):', err); }
+
+        } else {
+            // currentDb is NeonDatabase, currentSchema is PostgresSchemaModule
+            const dbInstance = currentDb as NeonDatabase;
+            const schemaInstance = currentSchema as PostgresSchemaModule;
+
+            try {
+                for (const size of sizes) {
+                    await dbInstance.insert(schemaInstance.sizes).values({ size }).onConflictDoNothing();
+                }
+                console.log('Sizes seeded successfully (PostgreSQL)');
+            } catch (err) { console.log('Error seeding sizes (PostgreSQL):', err); }
+
+            try {
+                for (const state of statesData) {
+                    await dbInstance.insert(schemaInstance.states).values(state).onConflictDoNothing();
+                }
+                console.log('States seeded successfully (PostgreSQL)');
+            } catch (err) { console.log('Error seeding states (PostgreSQL):', err); }
+
+            try {
+                for (const zone of deliveryZonesData) {
+                    await dbInstance.insert(schemaInstance.deliveryZones).values(zone).onConflictDoNothing();
+                }
+                console.log('Delivery zones seeded successfully (PostgreSQL)');
+            } catch (err) { console.log('Error seeding delivery zones (PostgreSQL):', err); }
+
+            try {
+                for (const category of giftCategories) {
+                    await dbInstance.insert(schemaInstance.categories).values({ ...category, description: faker.commerce.productDescription() }).onConflictDoNothing();
+                }
+                console.log('Categories seeded successfully (PostgreSQL)');
+            } catch (err) { console.log('Error seeding categories (PostgreSQL):', err); }
+
+            try {
+                for (const occasion of occasions) {
+                    await dbInstance.insert(schemaInstance.occasions).values({ ...occasion, slug: faker.helpers.slugify(occasion.name.toLowerCase()) }).onConflictDoNothing();
+                }
+                console.log('Occasions seeded successfully (PostgreSQL)');
+            } catch (err) { console.log('Error seeding occasions (PostgreSQL):', err); }
+
+            try {
+                await dbInstance.insert(schemaInstance.users).values({
+                    email: 'admin@example.com',
+                    password: bcrypt.hashSync('Password123!', 10),
+                    name: 'Admin User',
+                    role: 'admin'
+                }).onConflictDoNothing();
+                console.log('Admin user seeded successfully (PostgreSQL)');
+            } catch (err) { console.log('Error seeding admin user (PostgreSQL):', err); }
+
+            try {
+                const adminResult = await dbInstance.select().from(schemaInstance.users).where(eq(schemaInstance.users.email, 'admin@example.com')).limit(1);
+                const admin = adminResult[0];
+                if (admin) {
+                    for (const status of orderStatuses) {
+                        await dbInstance.insert(schemaInstance.orders).values({
+                            userId: admin.id,
+                            total: faker.number.int({ min: 1000, max: 50000 }),
+                            status,
+                            createdAt: faker.date.recent()
+                        }).onConflictDoNothing();
+                    }
+                    console.log('Example orders seeded successfully (PostgreSQL)');
+                }
+            } catch (err) { console.log('Error seeding example orders (PostgreSQL):', err); }
+
+            try {
+                for (const type of petitionTypes) {
+                    for (const status of petitionStatuses) {
+                        await dbInstance.insert(schemaInstance.petitions).values({
+                            type,
+                            title: `${type} - ${faker.lorem.sentence(4)}`,
+                            description: faker.lorem.paragraphs(2),
+                            status,
+                            createdAt: faker.date.recent()
+                        }).onConflictDoNothing();
+                    }
+                }
+                console.log('Example petitions seeded successfully (PostgreSQL)');
+            } catch (err) { console.log('Error seeding example petitions (PostgreSQL):', err); }
+        }
+
+        console.log('Basic seed data created successfully!');
+    } catch (err) {
+        console.error('Error seeding database:', err instanceof Error ? err.stack : err);
+        process.exit(1);
+    }
 }
 
-seed().catch((err) => {
-    console.error('Error seeding database:', err.stack || err);
+async function loadSchemaAndRunSeed() {
+    try {
+        if (DB_MODE === 'offline') {
+            console.log('Seed script: Loading SQLite schema.');
+            const sqliteSchema = await import('./schema.sqlite');
+            const sqliteDb = db as BetterSQLite3Database;
+            await seed(sqliteDb, sqliteSchema);
+        } else {
+            console.log('Seed script: Loading PostgreSQL schema.');
+            const postgresSchema = await import('./schema.postgres');
+            const neonDb = db as NeonDatabase;
+            await seed(neonDb, postgresSchema);
+        }
+    } catch (error) {
+        console.error('Failed to load schema or run seed:', error);
+        process.exit(1);
+    }
+}
+
+loadSchemaAndRunSeed().catch((err) => {
+    console.error('Error during schema loading or seeding database:', err.stack || err);
     process.exit(1);
 }); 

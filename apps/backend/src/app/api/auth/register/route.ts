@@ -19,26 +19,43 @@ export async function POST(request: NextRequest) {
         }
 
         const hashed = await bcrypt.hash(password, 10);
-        let stripeCustomerId: string | undefined;
-        if (process.env.STRIPE_SECRET_KEY) {
+        let stripe_customer_id: string | undefined;
+
+        // Skip Stripe API calls in offline mode
+        const isOfflineMode = process.env.DB_MODE === 'pglite';
+
+        if (process.env.STRIPE_SECRET_KEY && !isOfflineMode) {
             try {
-                const res = await fetch('https://api.stripe.com/v1/customers', {
+                // Using string URL to avoid issues with URL objects
+                const stripeUrl = 'https://api.stripe.com/v1/customers';
+                const params = new URLSearchParams({ email });
+
+                const res = await fetch(stripeUrl, {
                     method: 'POST',
-                    headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` },
-                    body: new URLSearchParams({ email })
+                    headers: {
+                        'Authorization': `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: params.toString()
                 });
+
                 if (res.ok) {
                     const data = await res.json();
-                    stripeCustomerId = data.id;
+                    stripe_customer_id = data.id;
                 } else {
                     console.error('Stripe create customer failed', await res.text());
                 }
             } catch (err) {
                 console.error('Stripe error', err);
             }
+        } else if (isOfflineMode) {
+            // Mock Stripe customer ID for offline mode
+            stripe_customer_id = `mock_stripe_${Date.now()}`;
+            console.log('Using mock Stripe customer ID in offline mode:', stripe_customer_id);
         }
+
         const newUserResult = await db.insert(users)
-            .values({ email, password: hashed, stripeCustomerId })
+            .values({ email, password: hashed, stripe_customer_id })
             .returning({ id: users.id })
             .execute();
 
