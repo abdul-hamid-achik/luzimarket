@@ -13,6 +13,7 @@ Luzimarket is a full-stack e-commerce platform with a React/Vite frontend and a 
 - [API Documentation](#api-documentation)
 - [Local URLs](#local-urls)
 - [Testing](#testing)
+  - [Offline Testing with PGlite](#offline-testing-with-pglite)
 - [Deployment](#deployment)
 - [Project Structure](#project-structure)
 - [Contributing](#contributing)
@@ -22,7 +23,7 @@ Luzimarket is a full-stack e-commerce platform with a React/Vite frontend and a 
 ## Tech Stack
 - **Frontend**: React, Vite, Chakra UI, MUI, NextUI, React Query, Jest, Playwright
 - **Backend**: Node.js, TypeScript, Express, Drizzle ORM, Drizzle Seed, Zod, JWT, Stripe, Swagger (OpenAPI)
-- **Database**: SQLite (local file)
+- **Database**: Neon PostgreSQL (primary), PGlite (offline testing)
 - **DevOps**: Vercel
 
 ## Prerequisites
@@ -34,7 +35,8 @@ Create a `.env` file at the project root with the following variables:
 
 ```dotenv
 PORT=5000
-DATABASE_URL=./tmp/ecommerce.db
+DATABASE_URL=your_neon_postgres_url
+DB_MODE=neon # Options: neon (default) or pglite (for offline testing)
 JWT_SECRET=your_jwt_secret
 CORS_ORIGIN=http://localhost:5173
 STRIPE_SECRET_KEY=your_stripe_secret_key
@@ -117,6 +119,43 @@ npm run db:setup  # drop, migrate, and seed
   ```bash
   npm test
   ```
+
+### Offline Testing with PGlite
+
+The project supports running tests in an offline mode using PGlite, a WebAssembly-based PostgreSQL that can run without an internet connection. This is especially useful for AI coding assistants like Codex or Cursor that operate in isolated environments.
+
+To use PGlite:
+
+1. Setup PGlite and apply migrations:
+   ```bash
+   npm run pglite:setup
+   ```
+
+2. Seed the PGlite database:
+   ```bash
+   npm run pglite:seed
+   ```
+
+3. Run backend tests with PGlite:
+   ```bash
+   npm run test:backend:offline
+   ```
+
+4. Run all tests with PGlite:
+   ```bash
+   npm run test:offline
+   ```
+
+5. Run Playwright E2E tests with PGlite:
+   ```bash
+   npm run test:e2e:offline
+   ```
+
+You can also manually set the `DB_MODE` environment variable to `pglite` to use PGlite for any command:
+
+```bash
+DB_MODE=pglite npm run dev
+```
 
 ## Deployment
 Deploy to Vercel:

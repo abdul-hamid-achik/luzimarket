@@ -12,9 +12,14 @@
     "migrate:push": "npx --yes drizzle-kit push",
     "seed": "tsx src/db/seed.ts",
     "test": "vitest run",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:setup": "npm run migrate:push && npm run seed",
+    "pglite:setup": "DB_MODE=pglite tsx src/db/setup-pglite.ts",
+    "pglite:seed": "DB_MODE=pglite tsx src/db/seed.ts",
+    "test:offline": "DB_MODE=pglite npm run test"
   },
   "dependencies": {
+    "@electric-sql/pglite": "^0.3.2",
     "@neondatabase/serverless": "^1.0.0",
     "@vercel/blob": "^1.0.1",
     "bcryptjs": "^2.4.3",

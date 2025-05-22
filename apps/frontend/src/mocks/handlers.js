@@ -18,7 +18,7 @@ export const handlers = [
   http.get('/api/products', (req, res, ctx) => res(ctx.status(200), ctx.json(products ?? []))),
   http.get('/api/products/:id', (req, res, ctx) => {
     const { id } = req.params;
-    const found = (products ?? []).find((p) => p.id === parseInt(id));
+    const found = (products ?? []).find((p) => p.id === id);
     return found ? res(ctx.json(found)) : res(ctx.status(404).json({ error: 'Product not found' }));
   }),
   // Categories

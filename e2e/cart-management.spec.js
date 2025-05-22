@@ -4,7 +4,50 @@ const path = require('path');
 
 test.use({ storageState: 'tmp/authenticatedState.json' });
 
+// Global variable to store a valid product ID
+let validProductId = null;
+
 test.describe('Cart Management Flow', () => {
+  test.beforeAll(async ({ browser }) => {
+    // Get a product ID for the tests
+    const context = await browser.newContext();
+    const page = await context.newPage();
+
+    // Fetch products from the API
+    await page.goto('/handpicked/productos');
+    await page.waitForLoadState('networkidle', { timeout: 10000 });
+
+    // Wait for API response
+    const responsePromise = page.waitForResponse(response => response.url().includes('/api/products') && response.status() === 200);
+
+    // Force API call if needed
+    await page.evaluate(() => {
+      if (window.fetch) {
+        fetch('/api/products').catch(e => console.error('Error fetching products:', e));
+      }
+    });
+
+    try {
+      const response = await responsePromise;
+      const products = await response.json();
+
+      if (products && products.length > 0) {
+        // Get a random product
+        const randomProduct = products[Math.floor(Math.random() * products.length)];
+        validProductId = randomProduct.id;
+        console.log(`Found product ID for tests: ${validProductId}`);
+      } else {
+        console.log('No products found, using fallback ID');
+        validProductId = 'e0c3eba4-2435-4aaf-6174-818f819fd668'; // Fallback to known product ID as last resort
+      }
+    } catch (e) {
+      console.error('Error getting product ID:', e);
+      validProductId = 'e0c3eba4-2435-4aaf-6174-818f819fd668'; // Fallback to known product ID as last resort
+    }
+
+    await context.close();
+  });
+
   test('user can update quantity and remove item from cart', async ({ page }) => {
     // Register and login new user
     const timestamp = Date.now();
@@ -96,9 +139,9 @@ test.describe('Cart Management Flow', () => {
         console.log(`Found ${productLinks.length} product links from DOM analysis`);
         await page.goto(productLinks[0]);
       } else {
-        // Last resort - go to a specific product ID
-        console.log('No product links found, navigating to product ID 1');
-        await page.goto('/handpicked/productos/1');
+        // Last resort - go to a specific product ID that we know exists
+        console.log(`No product links found, navigating to product ${validProductId}`);
+        await page.goto(`/handpicked/productos/${validProductId}`);
       }
     }
 

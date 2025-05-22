@@ -24,8 +24,59 @@ function logTestStep(message, testInfo) {
 
 test.use({ storageState: 'tmp/authenticatedState.json' });
 
+// Global variable to store a valid product ID
+let validProductId = null;
+
 // Test: Debug cart functionality
 test.describe('Debug Cart Flow', () => {
+    test.beforeAll(async ({ browser }) => {
+        // Get a product ID for the tests
+        const context = await browser.newContext();
+        const page = await context.newPage();
+
+        try {
+            // Log the step
+            console.log('Fetching valid product ID for tests');
+
+            // Fetch products from the API
+            await page.goto('/handpicked/productos');
+            await page.waitForLoadState('networkidle', { timeout: 10000 });
+
+            // Wait for API response
+            const responsePromise = page.waitForResponse(response => response.url().includes('/api/products') && response.status() === 200);
+
+            // Force API call if needed
+            await page.evaluate(() => {
+                if (window.fetch) {
+                    fetch('/api/products').catch(e => console.error('Error fetching products:', e));
+                }
+            });
+
+            try {
+                const response = await responsePromise;
+                const products = await response.json();
+
+                if (products && products.length > 0) {
+                    // Get a random product
+                    const randomProduct = products[Math.floor(Math.random() * products.length)];
+                    validProductId = randomProduct.id;
+                    console.log(`Found product ID for tests: ${validProductId}`);
+                } else {
+                    console.log('No products found, using fallback ID');
+                    validProductId = 'e0c3eba4-2435-4aaf-6174-818f819fd668'; // Fallback to known product ID as last resort
+                }
+            } catch (e) {
+                console.error('Error getting product ID:', e);
+                validProductId = 'e0c3eba4-2435-4aaf-6174-818f819fd668'; // Fallback to known product ID as last resort
+            }
+        } catch (e) {
+            console.error('Error in beforeAll hook:', e);
+            validProductId = 'e0c3eba4-2435-4aaf-6174-818f819fd668'; // Fallback to known product ID as last resort
+        } finally {
+            await context.close();
+        }
+    });
+
     test('user can register, add product to cart, and manage quantity', async ({ page }, testInfo) => {
         // Step 1: Register a new user
         logTestStep('Starting test - accessing registration page', testInfo);
@@ -149,7 +200,8 @@ test.describe('Debug Cart Flow', () => {
         } catch (e) {
             logTestStep(`Failed to click on product: ${e.message}`, testInfo);
             // Fall back to navigating directly to a product if we know the URL pattern
-            await page.goto('/handpicked/productos/1');
+            logTestStep(`Navigating directly to product ${validProductId}`, testInfo);
+            await page.goto(`/handpicked/productos/${validProductId}`);
         }
 
         // Step 5: On product detail page, add to cart

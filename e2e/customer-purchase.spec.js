@@ -1,6 +1,49 @@
 const { test, expect } = require('@playwright/test');
 
+// Global variable to store a valid product ID
+let validProductId = null;
+
 test.describe('Customer End-to-End Purchase Flow', () => {
+  test.beforeAll(async ({ browser }) => {
+    // Get a product ID for the tests
+    const context = await browser.newContext();
+    const page = await context.newPage();
+
+    // Fetch products from the API
+    await page.goto('/handpicked/productos');
+    await page.waitForLoadState('networkidle', { timeout: 10000 });
+
+    // Wait for API response
+    const responsePromise = page.waitForResponse(response => response.url().includes('/api/products') && response.status() === 200);
+
+    // Force API call if needed
+    await page.evaluate(() => {
+      if (window.fetch) {
+        fetch('/api/products').catch(e => console.error('Error fetching products:', e));
+      }
+    });
+
+    try {
+      const response = await responsePromise;
+      const products = await response.json();
+
+      if (products && products.length > 0) {
+        // Get a random product
+        const randomProduct = products[Math.floor(Math.random() * products.length)];
+        validProductId = randomProduct.id;
+        console.log(`Found product ID for tests: ${validProductId}`);
+      } else {
+        console.log('No products found, using fallback ID');
+        validProductId = 'e0c3eba4-2435-4aaf-6174-818f819fd668'; // Fallback to known product ID as last resort
+      }
+    } catch (e) {
+      console.error('Error getting product ID:', e);
+      validProductId = 'e0c3eba4-2435-4aaf-6174-818f819fd668'; // Fallback to known product ID as last resort
+    }
+
+    await context.close();
+  });
+
   test('user can register, login, browse products, add to cart, and checkout', async ({ page }) => {
     // Generate unique credentials
     const timestamp = Date.now();
@@ -57,7 +100,7 @@ test.describe('Customer End-to-End Purchase Flow', () => {
       } catch (e2) {
         console.log('Could not find product links, navigating directly to a product ID');
         // Last resort: navigate directly to a product ID
-        await page.goto('/handpicked/productos/1');
+        await page.goto(`/handpicked/productos/${validProductId}`);
       }
     }
 
@@ -76,7 +119,7 @@ test.describe('Customer End-to-End Purchase Flow', () => {
 
     if (!isProductPage) {
       console.log('Not on a proper product page, trying to navigate directly');
-      await page.goto('/handpicked/productos/e0c3eba4-2435-4aaf-6174-818f819fd668');
+      await page.goto(`/handpicked/productos/${validProductId}`);
       await page.waitForLoadState('networkidle', { timeout: 10000 });
     }
 

@@ -3,7 +3,49 @@ const { test, expect } = require('@playwright/test');
 // Increase the test timeout for all tests in this file
 test.setTimeout(120000);
 
+let productId = null; // Store the product ID between tests
+
 test.describe('Product Listing & Detail Flow', () => {
+  test.beforeAll(async ({ browser }) => {
+    // Get a product ID for the tests
+    const context = await browser.newContext();
+    const page = await context.newPage();
+
+    // Fetch products from the API
+    await page.goto('/handpicked/productos');
+    await page.waitForLoadState('networkidle', { timeout: 10000 });
+
+    // Wait for API response
+    const responsePromise = page.waitForResponse(response => response.url().includes('/api/products') && response.status() === 200);
+
+    // Force API call if needed
+    await page.evaluate(() => {
+      if (window.fetch) {
+        fetch('/api/products').catch(e => console.error('Error fetching products:', e));
+      }
+    });
+
+    try {
+      const response = await responsePromise;
+      const products = await response.json();
+
+      if (products && products.length > 0) {
+        // Get a random product
+        const randomProduct = products[Math.floor(Math.random() * products.length)];
+        productId = randomProduct.id;
+        console.log(`Found product ID for tests: ${productId}`);
+      } else {
+        console.log('No products found, using fallback ID');
+        productId = 'e0c3eba4-2435-4aaf-6174-818f819fd668'; // Fallback to known product ID as last resort
+      }
+    } catch (e) {
+      console.error('Error getting product ID:', e);
+      productId = 'e0c3eba4-2435-4aaf-6174-818f819fd668'; // Fallback to known product ID as last resort
+    }
+
+    await context.close();
+  });
+
   test('should list products and navigate to a product detail', async ({ page }) => {
     // Go to products list page
     await page.goto('/handpicked/productos');
@@ -44,8 +86,8 @@ test.describe('Product Listing & Detail Flow', () => {
 
     // If we couldn't click on any product, go directly to a known product detail
     if (!productClicked) {
-      console.log('Could not click on any product, navigating directly to product 1');
-      await page.goto('/handpicked/productos/1');
+      console.log(`Could not click on any product, navigating directly to product ${productId}`);
+      await page.goto(`/handpicked/productos/${productId}`);
     }
 
     // Wait for product detail page to load
@@ -81,9 +123,9 @@ test.describe('Product Listing & Detail Flow', () => {
   });
 
   test('should display accordion sections with correct content on product detail', async ({ page }) => {
-    // Directly visit the detail page for product ID 1
-    await page.goto('/handpicked/productos/1');
-    console.log('Navigated to product detail page');
+    // Directly visit the detail page for a real product ID
+    await page.goto(`/handpicked/productos/${productId}`);
+    console.log(`Navigated to product detail page for product ${productId}`);
 
     // Wait longer for page to load
     await page.waitForLoadState('networkidle', { timeout: 30000 });
@@ -164,7 +206,6 @@ test.describe('Product Listing & Detail Flow', () => {
 
       // Verify we found content after clicking
       expect(contentFound).toBe(true);
-
     }
   });
 });

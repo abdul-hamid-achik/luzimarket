@@ -7,6 +7,12 @@ const screenshotsDir = path.join(__dirname, 'tmp', 'playwright-screenshots');
 const resultsDir = path.join(__dirname, 'tmp', 'playwright-test-results');
 const reportDir = path.join(__dirname, 'tmp', 'playwright-report');
 
+// Check if we're using PGlite (offline mode) or Neon (online mode)
+const DB_MODE = process.env.DB_MODE || 'neon';
+const isOfflineMode = DB_MODE === 'pglite';
+
+console.log(`Running tests in ${isOfflineMode ? 'OFFLINE' : 'ONLINE'} mode using ${DB_MODE} database`);
+
 [logsDir, screenshotsDir, resultsDir, reportDir].forEach(dir => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
@@ -91,6 +97,10 @@ module.exports = defineConfig({
           NODE_ENV: 'test',
           LOG_LEVEL: 'debug',
           DEBUG: 'app:*,api:*',
+          // Pass the database mode to the backend
+          DB_MODE: DB_MODE,
+          // For PGlite, use in-memory database by default in tests
+          DATABASE_URL: isOfflineMode ? '' : process.env.DATABASE_URL,
         },
         onStdOut: (chunk) => {
           console.log('Backend:', chunk.toString());
