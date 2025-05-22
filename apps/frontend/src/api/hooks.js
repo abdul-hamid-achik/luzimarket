@@ -15,6 +15,7 @@ import * as articlesApi from "@/api/articles";
 import * as brandsApi from "@/api/brands";
 import * as favoritesApi from "@/api/favorites";
 import * as deliveryZonesApi from "@/api/deliveryZones";
+import * as paymentMethodsApi from "@/api/paymentMethods";
 
 export const useProducts = (filters = {}) =>
   useQuery(['products', filters], () => productsApi.getProducts(filters));
@@ -128,3 +129,6 @@ export const useFavorites = () =>
 
 export const useDeliveryZones = () =>
   useQuery(['deliveryZones'], deliveryZonesApi.getDeliveryZones);
+
+export const usePaymentMethods = () =>
+  useQuery(['paymentMethods'], paymentMethodsApi.getPaymentMethods);
