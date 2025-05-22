@@ -19,9 +19,26 @@ export async function POST(request: NextRequest) {
         }
 
         const hashed = await bcrypt.hash(password, 10);
-        // Insert new user; `id` is auto-assigned by Postgres
+        let stripeCustomerId: string | undefined;
+        if (process.env.STRIPE_SECRET_KEY) {
+            try {
+                const res = await fetch('https://api.stripe.com/v1/customers', {
+                    method: 'POST',
+                    headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` },
+                    body: new URLSearchParams({ email })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    stripeCustomerId = data.id;
+                } else {
+                    console.error('Stripe create customer failed', await res.text());
+                }
+            } catch (err) {
+                console.error('Stripe error', err);
+            }
+        }
         const newUserResult = await db.insert(users)
-            .values({ email, password: hashed })
+            .values({ email, password: hashed, stripeCustomerId })
             .returning({ id: users.id })
             .execute();
 

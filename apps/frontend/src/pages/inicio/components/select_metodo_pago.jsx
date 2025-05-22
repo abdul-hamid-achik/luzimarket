@@ -1,14 +1,10 @@
 import Select from 'react-select';
 import { useState, useEffect } from 'react';
+import { usePaymentMethods } from '@/api/hooks';
 
 const SelectPagoModal = ({ onSelect }) => {
-  const options = [
-    { value: 'visa-98', label: 'Mi Visa termina en *98' },
-    { value: 'visa', label: 'Visa' },
-    { value: 'mastercard', label: 'MasterCard' },
-    { value: 'paypal', label: 'Paypal' },
-    { value: 'oxxo', label: 'OXXO' }
-  ];
+  const { data: methods = [] } = usePaymentMethods();
+  const options = methods.map((m) => ({ value: m.id, label: m.label }));
 
   const [selected, setSelected] = useState(null);
 
