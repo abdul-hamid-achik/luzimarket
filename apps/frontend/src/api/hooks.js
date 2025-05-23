@@ -17,6 +17,8 @@ import * as favoritesApi from "@/api/favorites";
 import * as deliveryZonesApi from "@/api/deliveryZones";
 import * as paymentMethodsApi from "@/api/paymentMethods";
 import * as bestSellersApi from "@/api/bestSellers";
+import * as vendorsApi from "@/api/vendors";
+import * as photosApi from "@/api/photos";
 
 export const useProducts = (filters = {}) =>
   useQuery(['products', filters], () => productsApi.getProducts(filters));
@@ -158,3 +160,99 @@ export const useDeliveryZones = () =>
 
 export const usePaymentMethods = () =>
   useQuery(['paymentMethods'], paymentMethodsApi.getPaymentMethods);
+
+// =============== CMS HOOKS ===============
+
+// Vendors
+export const useVendors = () =>
+  useQuery(['vendors'], vendorsApi.getVendors);
+
+export const useVendor = (vendorId) =>
+  useQuery(['vendor', vendorId], () => vendorsApi.getVendor(vendorId), {
+    enabled: !!vendorId
+  });
+
+export const useCreateVendor = () => {
+  const queryClient = useQueryClient();
+  return useMutation(vendorsApi.createVendor, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['vendors']);
+    },
+  });
+};
+
+export const useUpdateVendor = () => {
+  const queryClient = useQueryClient();
+  return useMutation(vendorsApi.updateVendor, {
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries(['vendors']);
+      queryClient.invalidateQueries(['vendor', variables.vendorId]);
+    },
+  });
+};
+
+export const useDeleteVendor = () => {
+  const queryClient = useQueryClient();
+  return useMutation(vendorsApi.deleteVendor, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['vendors']);
+    },
+  });
+};
+
+// Enhanced Products for CMS
+export const useCMSProducts = (filters = {}) =>
+  useQuery(['cms-products', filters], () => productsApi.getProducts(filters));
+
+export const useCreateProduct = () => {
+  const queryClient = useQueryClient();
+  return useMutation(productsApi.createProduct, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['cms-products']);
+      queryClient.invalidateQueries(['products']);
+    },
+  });
+};
+
+export const useUpdateProduct = () => {
+  const queryClient = useQueryClient();
+  return useMutation(productsApi.updateProduct, {
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries(['cms-products']);
+      queryClient.invalidateQueries(['products']);
+      queryClient.invalidateQueries(['product', variables.productId]);
+    },
+  });
+};
+
+export const useDeleteProduct = () => {
+  const queryClient = useQueryClient();
+  return useMutation(productsApi.deleteProduct, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['cms-products']);
+      queryClient.invalidateQueries(['products']);
+    },
+  });
+};
+
+// Photos
+export const usePhotos = (filters = {}) =>
+  useQuery(['photos', filters], () => photosApi.getPhotos(filters));
+
+export const useUploadPhoto = () => {
+  const queryClient = useQueryClient();
+  return useMutation(photosApi.uploadPhoto, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['photos']);
+    },
+  });
+};
+
+export const useDeletePhoto = () => {
+  const queryClient = useQueryClient();
+  return useMutation(photosApi.deletePhoto, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['photos']);
+    },
+  });
+};

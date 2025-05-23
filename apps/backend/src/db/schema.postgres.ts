@@ -7,8 +7,10 @@ export const users = pgTable('users', {
     password: text('password').notNull(),
     name: text('name'),
     stripe_customer_id: text('stripe_customer_id'),
-    role: text('role').default('user').notNull(),
+    role: text('role', { enum: ['customer', 'employee', 'admin', 'vendor'] }).default('customer').notNull(),
+    isActive: boolean('is_active').default(true).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull().$onUpdate(() => new Date()),
 });
 
 export type UserInsert = typeof users.$inferInsert;
@@ -42,7 +44,11 @@ export const products = pgTable('products', {
     description: text('description').notNull(),
     price: integer('price').notNull(),
     categoryId: uuid('category_id').references(() => categories.id),
+    vendorId: uuid('vendor_id').references(() => vendors.id),
+    status: text('status', { enum: ['draft', 'active', 'inactive', 'out_of_stock'] }).default('draft').notNull(),
+    featured: boolean('featured').default(false).notNull(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),
 });
 
 export const productVariants = pgTable('product_variants', {
@@ -196,4 +202,22 @@ export const materials = pgTable('materials', {
 export const articleTopics = pgTable('article_topics', {
     id: serial('id').primaryKey(),
     name: text('name').notNull().unique(),
-}); 
+});
+
+// Add vendors table after empleados
+export const vendors = pgTable('vendors', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => users.id).notNull(),
+    businessName: text('business_name').notNull(),
+    contactPerson: text('contact_person').notNull(),
+    phone: text('phone').notNull(),
+    address: text('address').notNull(),
+    taxId: text('tax_id'),
+    commissionRate: integer('commission_rate').default(10).notNull(), // percentage
+    status: text('status', { enum: ['pending', 'approved', 'suspended', 'rejected'] }).default('pending').notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),
+});
+
+export type VendorInsert = typeof vendors.$inferInsert;
+export type VendorSelect = typeof vendors.$inferSelect; 

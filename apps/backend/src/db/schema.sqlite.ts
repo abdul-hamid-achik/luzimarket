@@ -9,8 +9,10 @@ export const users = sqliteTable('users', {
     password: text('password').notNull(),
     name: text('name'),
     stripe_customer_id: text('stripe_customer_id'),
-    role: text('role').default('user').notNull(),
+    role: text('role', { enum: ['customer', 'employee', 'admin', 'vendor'] }).default('customer').notNull(),
+    isActive: integer('is_active', { mode: 'boolean' }).default(true).notNull(),
     createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(strftime('%s', 'now'))`).notNull(),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).default(sql`(strftime('%s', 'now'))`).notNull(),
 });
 
 export type UserInsert = typeof users.$inferInsert;
@@ -42,7 +44,11 @@ export const products = sqliteTable('products', {
     description: text('description').notNull(),
     price: integer('price').notNull(),
     categoryId: text('category_id').references(() => categories.id),
+    vendorId: text('vendor_id').references(() => vendors.id),
+    status: text('status', { enum: ['draft', 'active', 'inactive', 'out_of_stock'] }).default('draft').notNull(),
+    featured: integer('featured', { mode: 'boolean' }).default(false).notNull(),
     createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(strftime('%s', 'now'))`).notNull(),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).default(sql`(strftime('%s', 'now'))`).notNull(),
 });
 
 export const productVariants = sqliteTable('product_variants', {
@@ -196,4 +202,22 @@ export const materials = sqliteTable('materials', {
 export const articleTopics = sqliteTable('article_topics', {
     id: integer('id').primaryKey({ autoIncrement: true }),
     name: text('name').notNull().unique(),
-}); 
+});
+
+// Add vendors table after empleados
+export const vendors = sqliteTable('vendors', {
+    id: text('id').primaryKey().$defaultFn(() => uuidv4()),
+    userId: text('user_id').references(() => users.id).notNull(),
+    businessName: text('business_name').notNull(),
+    contactPerson: text('contact_person').notNull(),
+    phone: text('phone').notNull(),
+    address: text('address').notNull(),
+    taxId: text('tax_id'),
+    commissionRate: integer('commission_rate').default(10).notNull(), // percentage
+    status: text('status', { enum: ['pending', 'approved', 'suspended', 'rejected'] }).default('pending').notNull(),
+    createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(strftime('%s', 'now'))`).notNull(),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
+});
+
+export type VendorInsert = typeof vendors.$inferInsert;
+export type VendorSelect = typeof vendors.$inferSelect; 

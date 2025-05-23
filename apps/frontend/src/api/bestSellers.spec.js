@@ -1,13 +1,18 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { getBestSellers } from './bestSellers';
 
-// Mock fetch globally
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+// Mock the API client
+vi.mock('./client.js', () => ({
+    default: {
+        get: vi.fn()
+    }
+}));
+
+import api from './client.js';
 
 describe('bestSellers API', () => {
     beforeEach(() => {
-        mockFetch.mockClear();
+        vi.clearAllMocks();
     });
 
     afterEach(() => {
@@ -44,36 +49,33 @@ describe('bestSellers API', () => {
             }
         ];
 
-        mockFetch.mockResolvedValueOnce({
-            ok: true,
-            json: async () => mockBestSellers,
+        vi.mocked(api.get).mockResolvedValueOnce({
+            data: mockBestSellers
         });
 
         const result = await getBestSellers();
 
-        expect(mockFetch).toHaveBeenCalledWith('http://localhost:3000/api/products/best-sellers');
+        expect(api.get).toHaveBeenCalledWith('/products/best-sellers');
         expect(result).toEqual(mockBestSellers);
     });
 
-    it('handles HTTP errors', async () => {
-        mockFetch.mockResolvedValueOnce({
-            ok: false,
-            status: 500,
-        });
+    it('handles API errors', async () => {
+        const error = new Error('API Error');
+        vi.mocked(api.get).mockRejectedValueOnce(error);
 
-        await expect(getBestSellers()).rejects.toThrow('Failed to fetch best sellers: 500');
+        await expect(getBestSellers()).rejects.toThrow('API Error');
     });
 
     it('handles network errors', async () => {
-        mockFetch.mockRejectedValueOnce(new Error('Network error'));
+        const networkError = new Error('Network error');
+        vi.mocked(api.get).mockRejectedValueOnce(networkError);
 
         await expect(getBestSellers()).rejects.toThrow('Network error');
     });
 
     it('handles empty response', async () => {
-        mockFetch.mockResolvedValueOnce({
-            ok: true,
-            json: async () => [],
+        vi.mocked(api.get).mockResolvedValueOnce({
+            data: []
         });
 
         const result = await getBestSellers();
@@ -82,44 +84,60 @@ describe('bestSellers API', () => {
     });
 
     it('makes request to correct endpoint', async () => {
-        mockFetch.mockResolvedValueOnce({
-            ok: true,
-            json: async () => [],
+        vi.mocked(api.get).mockResolvedValueOnce({
+            data: []
         });
 
         await getBestSellers();
 
-        expect(mockFetch).toHaveBeenCalledWith('http://localhost:3000/api/products/best-sellers');
-        expect(mockFetch).toHaveBeenCalledTimes(1);
+        expect(api.get).toHaveBeenCalledWith('/products/best-sellers');
+        expect(api.get).toHaveBeenCalledTimes(1);
     });
 
-    it('handles malformed JSON response', async () => {
-        mockFetch.mockResolvedValueOnce({
-            ok: true,
-            json: async () => {
-                throw new Error('Invalid JSON');
-            },
+    it('handles axios response structure correctly', async () => {
+        const mockData = [
+            {
+                id: '1',
+                name: 'Test Product',
+                price: 50000
+            }
+        ];
+
+        vi.mocked(api.get).mockResolvedValueOnce({
+            data: mockData,
+            status: 200,
+            statusText: 'OK'
         });
 
-        await expect(getBestSellers()).rejects.toThrow('Invalid JSON');
+        const result = await getBestSellers();
+
+        expect(result).toEqual(mockData);
     });
 
-    it('handles 404 not found error', async () => {
-        mockFetch.mockResolvedValueOnce({
-            ok: false,
-            status: 404,
-        });
-
-        await expect(getBestSellers()).rejects.toThrow('Failed to fetch best sellers: 404');
-    });
-
-    it('handles timeout errors', async () => {
-        mockFetch.mockImplementationOnce(() =>
-            new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Request timeout')), 100)
-            )
-        );
+    it('handles API timeout errors', async () => {
+        const timeoutError = new Error('Request timeout');
+        timeoutError.code = 'ECONNABORTED';
+        vi.mocked(api.get).mockRejectedValueOnce(timeoutError);
 
         await expect(getBestSellers()).rejects.toThrow('Request timeout');
+    });
+
+    it('propagates API client errors correctly', async () => {
+        const apiError = {
+            message: 'Server Error',
+            response: {
+                status: 500,
+                data: { error: 'Internal Server Error' }
+            }
+        };
+        vi.mocked(api.get).mockRejectedValueOnce(apiError);
+
+        await expect(getBestSellers()).rejects.toMatchObject({
+            message: 'Server Error',
+            response: {
+                status: 500,
+                data: { error: 'Internal Server Error' }
+            }
+        });
     });
 }); 

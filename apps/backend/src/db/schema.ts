@@ -14,6 +14,7 @@ const schema = effectiveMode === 'offline' ? sqliteSchema : postgresSchema;
 export const {
     users,
     empleados,
+    vendors,
     categories,
     products,
     productVariants,
