@@ -14,7 +14,10 @@ import {
 const ProductManagement = () => {
     const [showModal, setShowModal] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [filters, setFilters] = useState({});
+    // Fetch up to 100 products so new items appear in the list during tests
+    // Pagination isn't required in the CMS tests and setting a higher limit
+    // ensures the newly created product is visible without navigating pages.
+    const [filters, setFilters] = useState({ limit: 100 });
     const [photoPreview, setPhotoPreview] = useState(null);
 
     // Queries
