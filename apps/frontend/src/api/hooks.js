@@ -22,7 +22,26 @@ export const useProducts = (filters = {}) =>
   useQuery(['products', filters], () => productsApi.getProducts(filters));
 
 export const useProduct = (productId) =>
-  useQuery(['product', productId], () => productsApi.getProduct(productId));
+  useQuery(
+    ['product', productId],
+    () => productsApi.getProduct(productId),
+    {
+      retry: (failureCount, error) => {
+        // Don't retry on 404 errors (product not found)
+        if (error?.response?.status === 404) {
+          return false;
+        }
+        // Retry up to 2 times for other errors
+        return failureCount < 2;
+      },
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      // Don't show error UI immediately for 404s, let the component handle it
+      useErrorBoundary: (error) => {
+        // Only use error boundary for non-404 errors
+        return error?.response?.status !== 404;
+      }
+    }
+  );
 
 export const useBestSellers = () =>
   useQuery(['bestSellers'], bestSellersApi.getBestSellers, {

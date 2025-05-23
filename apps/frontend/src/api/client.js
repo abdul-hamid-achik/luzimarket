@@ -4,14 +4,27 @@ import axios from 'axios';
 const isDev = import.meta.env.MODE === 'development';
 
 // Use environment variable for backend URL in production
-const defaultHost = import.meta.env.VITE_API_HOST;
+// Support both VITE_API_HOST (just the host) and VITE_API_URL (full URL)
+const apiHost = import.meta.env.VITE_API_HOST;
+const apiUrl = import.meta.env.VITE_API_URL;
 
 // Determine baseURL: dev proxy or production backend URL
 const baseURL = isDev
   ? '/api'
-  : defaultHost
-    ? `https://${defaultHost}/api`
-    : '/api';
+  : apiHost
+    ? `https://${apiHost}/api`
+    : apiUrl
+      ? apiUrl
+      : '/api';
+
+// Log API configuration for debugging
+console.log('API Configuration:', {
+  isDev,
+  apiHost,
+  apiUrl,
+  baseURL,
+  mode: import.meta.env.MODE
+});
 
 // Create axios instance with dynamic baseURL
 const api = axios.create({ baseURL });

@@ -14,6 +14,7 @@ const nextConfig = {
             },
         ];
     },
+
     // Configure images for Vercel Blob and fallbacks
     images: {
         remotePatterns: [
@@ -43,6 +44,7 @@ const nextConfig = {
         dangerouslyAllowSVG: false,
         contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     },
+
     // Configure webpack to properly handle Headers
     webpack: (config, { isServer }) => {
         if (isServer) {

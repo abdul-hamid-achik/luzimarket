@@ -172,7 +172,16 @@ describe('BestSellersSection', () => {
     });
 
     it('handles retry button click', () => {
-        const reloadSpy = vi.spyOn(window.location, 'reload').mockImplementation(() => { });
+        // Mock window.location.reload properly
+        const originalReload = window.location.reload;
+        const reloadSpy = vi.fn();
+
+        // Replace the reload function instead of spying on it
+        Object.defineProperty(window.location, 'reload', {
+            value: reloadSpy,
+            writable: true,
+            configurable: true
+        });
 
         vi.mocked(useBestSellers).mockReturnValue({
             data: [],
@@ -187,7 +196,12 @@ describe('BestSellersSection', () => {
 
         expect(reloadSpy).toHaveBeenCalledTimes(1);
 
-        reloadSpy.mockRestore();
+        // Restore original function
+        Object.defineProperty(window.location, 'reload', {
+            value: originalReload,
+            writable: true,
+            configurable: true
+        });
     });
 
     it('renders section with correct styling classes', () => {

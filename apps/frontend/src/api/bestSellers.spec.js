@@ -2,11 +2,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { getBestSellers } from './bestSellers';
 
 // Mock fetch globally
-global.fetch = vi.fn();
+const mockFetch = vi.fn();
+global.fetch = mockFetch;
 
 describe('bestSellers API', () => {
     beforeEach(() => {
-        vi.clearAllMocks();
+        mockFetch.mockClear();
     });
 
     afterEach(() => {
@@ -43,19 +44,19 @@ describe('bestSellers API', () => {
             }
         ];
 
-        global.fetch.mockResolvedValueOnce({
+        mockFetch.mockResolvedValueOnce({
             ok: true,
             json: async () => mockBestSellers,
         });
 
         const result = await getBestSellers();
 
-        expect(global.fetch).toHaveBeenCalledWith('http://localhost:3000/api/products/best-sellers');
+        expect(mockFetch).toHaveBeenCalledWith('http://localhost:3000/api/products/best-sellers');
         expect(result).toEqual(mockBestSellers);
     });
 
     it('handles HTTP errors', async () => {
-        global.fetch.mockResolvedValueOnce({
+        mockFetch.mockResolvedValueOnce({
             ok: false,
             status: 500,
         });
@@ -64,13 +65,13 @@ describe('bestSellers API', () => {
     });
 
     it('handles network errors', async () => {
-        global.fetch.mockRejectedValueOnce(new Error('Network error'));
+        mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
         await expect(getBestSellers()).rejects.toThrow('Network error');
     });
 
     it('handles empty response', async () => {
-        global.fetch.mockResolvedValueOnce({
+        mockFetch.mockResolvedValueOnce({
             ok: true,
             json: async () => [],
         });
@@ -81,19 +82,19 @@ describe('bestSellers API', () => {
     });
 
     it('makes request to correct endpoint', async () => {
-        global.fetch.mockResolvedValueOnce({
+        mockFetch.mockResolvedValueOnce({
             ok: true,
             json: async () => [],
         });
 
         await getBestSellers();
 
-        expect(global.fetch).toHaveBeenCalledWith('http://localhost:3000/api/products/best-sellers');
-        expect(global.fetch).toHaveBeenCalledTimes(1);
+        expect(mockFetch).toHaveBeenCalledWith('http://localhost:3000/api/products/best-sellers');
+        expect(mockFetch).toHaveBeenCalledTimes(1);
     });
 
     it('handles malformed JSON response', async () => {
-        global.fetch.mockResolvedValueOnce({
+        mockFetch.mockResolvedValueOnce({
             ok: true,
             json: async () => {
                 throw new Error('Invalid JSON');
@@ -104,7 +105,7 @@ describe('bestSellers API', () => {
     });
 
     it('handles 404 not found error', async () => {
-        global.fetch.mockResolvedValueOnce({
+        mockFetch.mockResolvedValueOnce({
             ok: false,
             status: 404,
         });
@@ -113,7 +114,7 @@ describe('bestSellers API', () => {
     });
 
     it('handles timeout errors', async () => {
-        global.fetch.mockImplementationOnce(() =>
+        mockFetch.mockImplementationOnce(() =>
             new Promise((_, reject) =>
                 setTimeout(() => reject(new Error('Request timeout')), 100)
             )

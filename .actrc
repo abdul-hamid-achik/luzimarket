@@ -2,6 +2,7 @@
 --container-architecture linux/amd64 
 --env-file .env
 --env DB_MODE=offline
+--env DATABASE_URL=./tmp/db.sqlite
 --env CI=true
 --env NODE_ENV=test
 --env SKIP_STRIPE_CLI=true
