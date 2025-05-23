@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
+import { dbService, eq } from '@/db/service';
 import { categories } from '@/db/schema';
-import { eq } from 'drizzle-orm';
-// @ts-ignore: Allow http-status-codes import without type declarations
 import { StatusCodes } from 'http-status-codes';
 
 export async function GET(
@@ -10,7 +8,7 @@ export async function GET(
     { params }: { params: Promise<{ slug: string }> }
 ) {
     const { slug } = await params;
-    const [category] = await db.select().from(categories).where(eq(categories.slug, slug));
+    const category = await dbService.findFirst(categories, eq(categories.slug, slug));
     if (!category) {
         return NextResponse.json({ error: 'Category not found' }, { status: StatusCodes.NOT_FOUND });
     }
@@ -27,15 +25,15 @@ export async function PUT(
     const updateFields: any = {};
     if (data.name !== undefined) updateFields.name = data.name;
     if (data.slug !== undefined) updateFields.slug = data.slug;
-    const updated = await db.update(categories)
-        .set(updateFields)
-        .where(eq(categories.slug, slug))
-        .returning()
-        .execute();
-    if (updated.length === 0) {
+
+    await dbService.update(categories, updateFields, eq(categories.slug, slug));
+
+    // Get the updated category
+    const updated = await dbService.findFirst(categories, eq(categories.slug, data.slug || slug));
+    if (!updated) {
         return NextResponse.json({ error: 'Category not found' }, { status: StatusCodes.NOT_FOUND });
     }
-    return NextResponse.json(updated[0], { status: StatusCodes.OK });
+    return NextResponse.json(updated, { status: StatusCodes.OK });
 }
 
 // Delete a category by slug
@@ -44,6 +42,6 @@ export async function DELETE(
     { params }: { params: Promise<{ slug: string }> }
 ) {
     const { slug } = await params;
-    await db.delete(categories).where(eq(categories.slug, slug)).execute();
+    await dbService.delete(categories, eq(categories.slug, slug));
     return NextResponse.json({ success: true }, { status: StatusCodes.OK });
 } 

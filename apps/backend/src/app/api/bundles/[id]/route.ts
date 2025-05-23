@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
+import { dbService, eq } from '@/db/service';
 import { bundles, bundleItems, productVariants } from '@/db/schema';
-import { eq } from 'drizzle-orm';
-// @ts-ignore: Allow http-status-codes import without type declarations
 import { StatusCodes } from 'http-status-codes';
 
 export async function GET(
@@ -11,23 +9,20 @@ export async function GET(
 ) {
     const { id } = await params;
     const bundleId = id;
-    const [bundle] = await db.select().from(bundles).where(eq(bundles.id, bundleId));
+    const bundle = await dbService.findFirst(bundles, eq(bundles.id, bundleId));
     if (!bundle) {
         return NextResponse.json(
             { error: 'Bundle not found' },
             { status: StatusCodes.NOT_FOUND }
         );
     }
-    const items = await db.select({
+    const items = await dbService.selectFields({
         id: bundleItems.id,
         variantId: bundleItems.variantId,
         quantity: bundleItems.quantity,
         sku: productVariants.sku,
         attributes: productVariants.attributes,
-    })
-        .from(bundleItems)
-        .leftJoin(productVariants, eq(bundleItems.variantId, productVariants.id))
-        .where(eq(bundleItems.bundleId, bundleId));
+    }, bundleItems);
     return NextResponse.json({ bundle, items }, { status: StatusCodes.OK });
 }
 
@@ -42,30 +37,27 @@ export async function PUT(
     const updateData: any = {};
     if (name !== undefined) updateData.name = name;
     if (description !== undefined) updateData.description = description;
-    await db.update(bundles).set(updateData).where(eq(bundles.id, bundleId)).execute();
+    await dbService.update(bundles, updateData, eq(bundles.id, bundleId));
     if (Array.isArray(items)) {
         // delete old items
-        await db.delete(bundleItems).where(eq(bundleItems.bundleId, bundleId)).execute();
+        await dbService.delete(bundleItems, eq(bundleItems.bundleId, bundleId));
         // insert new
         const toInsert = items.map((itm: any) => ({
             bundleId: bundleId,
             variantId: itm.variantId,
             quantity: itm.quantity,
         }));
-        await db.insert(bundleItems).values(toInsert).execute();
+        await dbService.insert(bundleItems, toInsert);
     }
     // fetch updated bundle
-    const [bundle] = await db.select().from(bundles).where(eq(bundles.id, bundleId));
-    const bundleData = await db.select({
+    const bundle = await dbService.findFirst(bundles, eq(bundles.id, bundleId));
+    const bundleData = await dbService.selectFields({
         id: bundleItems.id,
         variantId: bundleItems.variantId,
         quantity: bundleItems.quantity,
         sku: productVariants.sku,
         attributes: productVariants.attributes,
-    })
-        .from(bundleItems)
-        .leftJoin(productVariants, eq(bundleItems.variantId, productVariants.id))
-        .where(eq(bundleItems.bundleId, bundleId));
+    }, bundleItems);
     return NextResponse.json({ bundle, items: bundleData }, { status: StatusCodes.OK });
 }
 
@@ -76,7 +68,7 @@ export async function DELETE(
 ) {
     const { id } = await params;
     const bundleId = id;
-    await db.delete(bundleItems).where(eq(bundleItems.bundleId, bundleId)).execute();
-    await db.delete(bundles).where(eq(bundles.id, bundleId)).execute();
+    await dbService.delete(bundleItems, eq(bundleItems.bundleId, bundleId));
+    await dbService.delete(bundles, eq(bundles.id, bundleId));
     return NextResponse.json({ success: true }, { status: StatusCodes.OK });
 } 

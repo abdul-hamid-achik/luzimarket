@@ -1,9 +1,8 @@
 // @ts-ignore
 import jwt from 'jsonwebtoken';
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
+import { dbService, eq, and } from '@/db/service';
 import { sessions, cartItems, productVariants, products } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
 import { StatusCodes } from 'http-status-codes';
 
 function getSessionId(request: NextRequest): string | null {
@@ -38,12 +37,10 @@ export async function GET(
 
   try {
     // Get the cart item
-    const [item] = await db.select()
-      .from(cartItems)
-      .where(and(
-        eq(cartItems.id, id),
-        eq(cartItems.sessionId, sessionId)
-      ));
+    const item = await dbService.findFirst(cartItems, and(
+      eq(cartItems.id, id),
+      eq(cartItems.sessionId, sessionId)
+    ));
 
     if (!item) {
       return NextResponse.json({ error: 'Item not found' }, { status: StatusCodes.NOT_FOUND });
@@ -53,14 +50,10 @@ export async function GET(
     let productDetails = {};
     if (item.variantId) {
       try {
-        const [productVariant] = await db.select()
-          .from(productVariants)
-          .where(eq(productVariants.id, item.variantId));
+        const productVariant = await dbService.findFirst(productVariants, eq(productVariants.id, item.variantId));
 
         if (productVariant && productVariant.productId) {
-          const [productInfo] = await db.select()
-            .from(products)
-            .where(eq(products.id, productVariant.productId));
+          const productInfo = await dbService.findFirst(products, eq(products.id, productVariant.productId));
 
           if (productInfo) {
             productDetails = {
@@ -109,13 +102,16 @@ export async function PUT(
     }
 
     // Update the cart item
-    const [updated] = await db.update(cartItems)
-      .set({ quantity })
-      .where(and(
-        eq(cartItems.id, id),
-        eq(cartItems.sessionId, sessionId)
-      ))
-      .returning();
+    await dbService.update(cartItems, { quantity }, and(
+      eq(cartItems.id, id),
+      eq(cartItems.sessionId, sessionId)
+    ));
+
+    // Get the updated item
+    const updated = await dbService.findFirst(cartItems, and(
+      eq(cartItems.id, id),
+      eq(cartItems.sessionId, sessionId)
+    ));
 
     if (!updated) {
       return NextResponse.json({ error: 'Item not found' }, { status: StatusCodes.NOT_FOUND });
@@ -125,14 +121,10 @@ export async function PUT(
     let productDetails = {};
     if (updated.variantId) {
       try {
-        const [productVariant] = await db.select()
-          .from(productVariants)
-          .where(eq(productVariants.id, updated.variantId));
+        const productVariant = await dbService.findFirst(productVariants, eq(productVariants.id, updated.variantId));
 
         if (productVariant && productVariant.productId) {
-          const [productInfo] = await db.select()
-            .from(products)
-            .where(eq(products.id, productVariant.productId));
+          const productInfo = await dbService.findFirst(products, eq(products.id, productVariant.productId));
 
           if (productInfo) {
             productDetails = {
@@ -171,22 +163,26 @@ export async function DELETE(
   if (!id) return NextResponse.json({ error: 'Invalid item ID' }, { status: StatusCodes.BAD_REQUEST });
 
   try {
-    // Delete the cart item
-    const [deleted] = await db.delete(cartItems)
-      .where(and(
-        eq(cartItems.id, id),
-        eq(cartItems.sessionId, sessionId)
-      ))
-      .returning();
+    // Get the item before deleting
+    const itemToDelete = await dbService.findFirst(cartItems, and(
+      eq(cartItems.id, id),
+      eq(cartItems.sessionId, sessionId)
+    ));
 
-    if (!deleted) {
+    if (!itemToDelete) {
       return NextResponse.json({ error: 'Item not found' }, { status: StatusCodes.NOT_FOUND });
     }
+
+    // Delete the cart item
+    await dbService.delete(cartItems, and(
+      eq(cartItems.id, id),
+      eq(cartItems.sessionId, sessionId)
+    ));
 
     return NextResponse.json({
       success: true,
       message: 'Item deleted successfully',
-      id: deleted.id
+      id: itemToDelete.id
     }, { status: StatusCodes.OK });
   } catch (error) {
     console.error('Error deleting cart item:', error);

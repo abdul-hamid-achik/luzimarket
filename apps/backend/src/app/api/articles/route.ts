@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { StatusCodes } from 'http-status-codes';
-import { db } from '@/db';
+import { dbService } from '@/db/service';
 import { editorialArticles } from '@/db/schema';
 
 export async function GET() {
-  const items = await db.select().from(editorialArticles);
+  const items = await dbService.select(editorialArticles);
   return NextResponse.json(items, { status: StatusCodes.OK });
 }

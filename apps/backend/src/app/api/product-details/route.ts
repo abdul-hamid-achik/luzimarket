@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { StatusCodes } from 'http-status-codes';
-import { db } from '@/db';
+import { dbService, eq } from '@/db/service';
 import { productVariants } from '@/db/schema';
-import { eq } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
@@ -15,6 +14,6 @@ export async function GET(request: NextRequest) {
   if (!/^[0-9a-fA-F-]{36}$/.test(productId)) {
     return NextResponse.json([], { status: StatusCodes.OK });
   }
-  const variants = await db.select().from(productVariants).where(eq(productVariants.productId, productId));
+  const variants = await dbService.select(productVariants, eq(productVariants.productId, productId));
   return NextResponse.json(variants, { status: StatusCodes.OK });
 }

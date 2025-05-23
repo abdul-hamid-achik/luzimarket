@@ -1,10 +1,8 @@
 // @ts-ignore: Allow necessary imports without type declarations
 import jwt from 'jsonwebtoken';
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
+import { dbService, eq, and } from '@/db/service';
 import { sessions, cartItems, productVariants, products } from '@/db/schema';
-import { eq, and, sql } from 'drizzle-orm';
-// @ts-ignore: Allow http-status-codes import without type declarations
 import { StatusCodes } from 'http-status-codes';
 
 function getSessionId(request: NextRequest): string | null {
@@ -31,32 +29,19 @@ export async function GET(request: NextRequest) {
     if (!sessionId) return NextResponse.json({ error: 'Unauthorized' }, { status: StatusCodes.UNAUTHORIZED });
 
     try {
-        // Join with products to get product details with the cart items
-        const items = await db.select({
-            id: cartItems.id,
-            sessionId: cartItems.sessionId,
-            variantId: cartItems.variantId,
-            quantity: cartItems.quantity,
-            // Include these fields for the tests
-            productId: cartItems.variantId
-        })
-            .from(cartItems)
-            .where(eq(cartItems.sessionId, sessionId));
+        // Get cart items for the session
+        const items = await dbService.select(cartItems, eq(cartItems.sessionId, sessionId));
 
         // Fetch product details for each cart item
         const cartWithProducts = await Promise.all(
-            items.map(async (item) => {
+            items.map(async (item: any) => {
                 try {
                     if (item.variantId) {
-                        // Get variant or product details
-                        const [productVariant] = await db.select()
-                            .from(productVariants)
-                            .where(eq(productVariants.id, item.variantId));
+                        // Get variant details
+                        const productVariant = await dbService.findFirst(productVariants, eq(productVariants.id, item.variantId));
 
                         if (productVariant && productVariant.productId) {
-                            const [productInfo] = await db.select()
-                                .from(products)
-                                .where(eq(products.id, productVariant.productId));
+                            const productInfo = await dbService.findFirst(products, eq(products.id, productVariant.productId));
 
                             if (productInfo) {
                                 return {
@@ -109,9 +94,11 @@ export async function POST(request: NextRequest) {
             dbVariantId = variantId;
         } else if (typeof productId === 'string') {
             // Find a variant associated with this productId
-            const variants = await db.select({ id: productVariants.id })
-                .from(productVariants)
-                .where(eq(productVariants.productId, productId));
+            const variants = await dbService.selectFields(
+                { id: productVariants.id },
+                productVariants,
+                eq(productVariants.productId, productId)
+            );
             if (variants.length === 0) {
                 return NextResponse.json(
                     { error: 'No variant found for product' },
@@ -130,24 +117,18 @@ export async function POST(request: NextRequest) {
             insertValues.variantId = dbVariantId;
         }
 
-        // Insert the cart item (UUID primary key will be auto-generated)
-        const [newItem] = await db.insert(cartItems)
-            .values(insertValues)
-            .returning()
-            .execute();
+        // Insert the cart item
+        const newItemResult = await dbService.insertReturning(cartItems, insertValues);
+        const newItem = newItemResult[0];
 
-        // Get product details to include in response (only for UUID variant IDs)
+        // Get product details to include in response
         let productDetails = {};
         if (dbVariantId) {
             try {
-                const [productVariant] = await db.select()
-                    .from(productVariants)
-                    .where(eq(productVariants.id, dbVariantId));
+                const productVariant = await dbService.findFirst(productVariants, eq(productVariants.id, dbVariantId));
 
                 if (productVariant && productVariant.productId) {
-                    const [productInfo] = await db.select()
-                        .from(products)
-                        .where(eq(products.id, productVariant.productId));
+                    const productInfo = await dbService.findFirst(products, eq(products.id, productVariant.productId));
 
                     if (productInfo) {
                         productDetails = {
@@ -192,20 +173,22 @@ export async function PUT(request: NextRequest) {
         }
 
         // Update the cart item
-        const updated = await db.update(cartItems)
-            .set({ quantity })
-            .where(and(
-                eq(cartItems.id, itemId),
-                eq(cartItems.sessionId, sessionId)
-            ))
-            .returning()
-            .execute();
+        await dbService.update(cartItems, { quantity }, and(
+            eq(cartItems.id, itemId),
+            eq(cartItems.sessionId, sessionId)
+        ));
 
-        if (updated.length === 0) {
+        // Get the updated item
+        const updated = await dbService.findFirst(cartItems, and(
+            eq(cartItems.id, itemId),
+            eq(cartItems.sessionId, sessionId)
+        ));
+
+        if (!updated) {
             return NextResponse.json({ error: 'Item not found' }, { status: StatusCodes.NOT_FOUND });
         }
 
-        return NextResponse.json(updated[0], { status: StatusCodes.OK });
+        return NextResponse.json(updated, { status: StatusCodes.OK });
     } catch (error) {
         console.error('Error updating cart item:', error);
         return NextResponse.json({ error: 'Failed to update cart item' }, { status: StatusCodes.INTERNAL_SERVER_ERROR });
@@ -217,16 +200,16 @@ export async function DELETE(request: NextRequest) {
     if (!sessionId) return NextResponse.json({ error: 'Unauthorized' }, { status: StatusCodes.UNAUTHORIZED });
 
     try {
+        // Get items before deleting to count them
+        const itemsToDelete = await dbService.select(cartItems, eq(cartItems.sessionId, sessionId));
+
         // Clear all cart items for this session
-        const deleted = await db.delete(cartItems)
-            .where(eq(cartItems.sessionId, sessionId))
-            .returning()
-            .execute();
+        await dbService.delete(cartItems, eq(cartItems.sessionId, sessionId));
 
         return NextResponse.json({
             success: true,
             message: 'Cart cleared successfully',
-            itemsRemoved: deleted.length
+            itemsRemoved: itemsToDelete.length
         }, { status: StatusCodes.OK });
     } catch (error) {
         console.error('Error clearing cart:', error);

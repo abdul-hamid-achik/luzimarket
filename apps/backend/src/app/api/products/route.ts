@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
+import { dbService, eq } from '@/db/service';
 import { products, productVariants } from '@/db/schema';
-import { eq } from 'drizzle-orm';
-// @ts-ignore: Allow http-status-codes import without type declarations
 import { StatusCodes } from 'http-status-codes';
 
 export async function GET() {
-    // @ts-ignore: Drizzle query returns a Promise of products
-    const items = await db.select().from(products);
+    const items = await dbService.select(products);
     return NextResponse.json(items, { status: StatusCodes.OK });
 }
 
@@ -16,10 +13,17 @@ export async function POST(request: NextRequest) {
     if (!name || !description || price == null || !categoryId) {
         return NextResponse.json({ error: 'Missing required fields' }, { status: StatusCodes.BAD_REQUEST });
     }
-    const [{ id: productId }] = await db.insert(products)
-        .values({ slug: name.trim().toLowerCase().replace(/\s+/g, '-'), name, description, price, categoryId })
-        .returning({ id: products.id })
-        .execute();
+
+    const productResult = await dbService.insertReturning(products, {
+        slug: name.trim().toLowerCase().replace(/\s+/g, '-'),
+        name,
+        description,
+        price,
+        categoryId
+    }, { id: products.id });
+
+    const productId = productResult[0].id;
+
     if (variants && Array.isArray(variants)) {
         const variantData = variants.map((v: any) => ({
             productId,
@@ -27,8 +31,9 @@ export async function POST(request: NextRequest) {
             attributes: JSON.stringify(v.attributes),
             stock: v.stock ?? 0,
         }));
-        await db.insert(productVariants).values(variantData).execute();
+        await dbService.insert(productVariants, variantData);
     }
-    const [created] = await db.select().from(products).where(eq(products.id, productId));
+
+    const created = await dbService.findFirst(products, eq(products.id, productId));
     return NextResponse.json(created, { status: StatusCodes.CREATED });
 } 

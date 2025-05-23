@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
+import { dbService, eq } from '@/db/service';
 import { products, productVariants } from '@/db/schema';
-import { eq } from 'drizzle-orm';
-// @ts-ignore: Allow http-status-codes import without type declarations
 import { StatusCodes } from 'http-status-codes';
 
 export async function GET(
@@ -19,7 +17,7 @@ export async function GET(
     }
     try {
         const productId = id;
-        const [product] = await db.select().from(products).where(eq(products.id, productId));
+        const product = await dbService.findFirst(products, eq(products.id, productId));
         if (!product) {
             return NextResponse.json(
                 { error: 'Product not found' },
@@ -50,20 +48,17 @@ export async function PUT(
     if (data.price !== undefined) updateFields.price = data.price;
     if (data.categoryId !== undefined) updateFields.categoryId = data.categoryId;
 
-    const updated = await db
-        .update(products)
-        .set(updateFields)
-        .where(eq(products.id, productId))
-        .returning()
-        .execute();
+    await dbService.update(products, updateFields, eq(products.id, productId));
 
-    if (updated.length === 0) {
+    // Get the updated product
+    const updated = await dbService.findFirst(products, eq(products.id, productId));
+    if (!updated) {
         return NextResponse.json(
             { error: 'Product not found' },
             { status: StatusCodes.NOT_FOUND }
         );
     }
-    return NextResponse.json(updated[0], { status: StatusCodes.OK });
+    return NextResponse.json(updated, { status: StatusCodes.OK });
 }
 
 // Delete a product and its variants
@@ -74,7 +69,7 @@ export async function DELETE(
     const { id } = await params;
     const productId = id;
     // delete associated variants first
-    await db.delete(productVariants).where(eq(productVariants.productId, productId)).execute();
-    await db.delete(products).where(eq(products.id, productId)).execute();
+    await dbService.delete(productVariants, eq(productVariants.productId, productId));
+    await dbService.delete(products, eq(products.id, productId));
     return NextResponse.json({ success: true }, { status: StatusCodes.OK });
 }

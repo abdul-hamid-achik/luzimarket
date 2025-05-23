@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { randomUUID } from 'crypto';
-import { db } from '@/db';
+import { dbService, eq } from '@/db/service';
 import { photos } from '@/db/schema';
-import { eq } from 'drizzle-orm';
-// @ts-ignore: Allow http-status-codes import without type declarations
 import { StatusCodes } from 'http-status-codes';
 
 // These environment variables should point to your Vercel Blob service
@@ -16,11 +14,14 @@ export async function GET(
 ) {
     const { id } = await params;
     const productId = id;
-    // Validate UUID format
-    if (!/^[0-9a-fA-F-]{36}$/.test(productId)) {
+
+    // Validate productId is a valid UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(productId)) {
         return NextResponse.json({ error: 'Invalid product id' }, { status: StatusCodes.BAD_REQUEST });
     }
-    const items = await db.select().from(photos).where(eq(photos.productId, productId));
+
+    const items = await dbService.select(photos, eq(photos.productId, productId));
     return NextResponse.json(items, { status: StatusCodes.OK });
 }
 
@@ -67,10 +68,10 @@ export async function POST(
     const { url } = await uploadRes.json();
 
     // Save photo record
-    const [created] = await db.insert(photos)
-        .values({ url, alt, sortOrder, productId })
-        .returning({ id: photos.id, url: photos.url, alt: photos.alt, sortOrder: photos.sortOrder, productId: photos.productId })
-        .execute();
+    const created = await dbService.insertReturning(photos,
+        { url, alt, sortOrder, productId },
+        { id: photos.id, url: photos.url, alt: photos.alt, sortOrder: photos.sortOrder, productId: photos.productId }
+    );
 
-    return NextResponse.json(created, { status: StatusCodes.CREATED });
+    return NextResponse.json(created[0], { status: StatusCodes.CREATED });
 } 

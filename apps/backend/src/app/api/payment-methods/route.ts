@@ -1,8 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
+import { dbService, eq } from '@/db/service';
 import { sessions, users } from '@/db/schema';
-import { eq } from 'drizzle-orm';
 
 function getSessionId(request: NextRequest): string | null {
   const auth = request.headers.get('Authorization') || '';
@@ -12,7 +11,7 @@ function getSessionId(request: NextRequest): string | null {
     const payload = jwt.verify(auth.split(' ')[1], jwtSecret);
     if (typeof payload === 'object' && 'sessionId' in payload)
       return (payload as any).sessionId as string;
-  } catch {}
+  } catch { }
   return null;
 }
 
@@ -22,10 +21,10 @@ export async function GET(request: NextRequest) {
   let customerId: string | undefined;
 
   if (sessionId) {
-    const [session] = await db.select().from(sessions).where(eq(sessions.id, sessionId));
+    const session = await dbService.findFirst(sessions, eq(sessions.id, sessionId));
     if (session?.userId) {
-      const [user] = await db.select().from(users).where(eq(users.id, session.userId));
-      customerId = user?.stripeCustomerId ?? undefined;
+      const user = await dbService.findFirst(users, eq(users.id, session.userId));
+      customerId = user?.stripe_customer_id ?? undefined;
     }
   }
 

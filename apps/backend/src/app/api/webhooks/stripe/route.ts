@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
-import { db } from '@/db';
+import { dbService, eq } from '@/db/service';
 import { orders, users } from '@/db/schema';
-import { eq } from 'drizzle-orm';
 import fs from 'fs';
 import path from 'path';
 
 // Import Stripe - you'll need to install this: npm install stripe
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+const stripe = STRIPE_SECRET_KEY ? require('stripe')(STRIPE_SECRET_KEY) : null;
 
 // Get webhook secret - prioritize test secret for local development
 function getWebhookSecret(): string | null {
@@ -44,91 +44,68 @@ function getWebhookSecret(): string | null {
 }
 
 export async function POST(request: NextRequest) {
-    const body = await request.text();
-    const headersList = await headers();
-    const sig = headersList.get('stripe-signature');
-
-    let event;
-    const endpointSecret = getWebhookSecret();
-
-    try {
-        if (!endpointSecret) {
-            console.error('❌ Webhook secret not configured');
-            return NextResponse.json(
-                { error: 'Webhook secret not configured' },
-                { status: 500 }
-            );
-        }
-
-        if (!sig) {
-            console.error('❌ Missing Stripe signature');
-            return NextResponse.json(
-                { error: 'Missing Stripe signature' },
-                { status: 400 }
-            );
-        }
-
-        event = stripe.webhooks.constructEvent(body, sig, endpointSecret);
-        console.log('✅ Webhook signature verified successfully');
-    } catch (err: any) {
-        console.error('❌ Webhook signature verification failed:', err.message);
+    if (!stripe) {
         return NextResponse.json(
-            { error: `Webhook Error: ${err.message}` },
-            { status: 400 }
+            { error: 'Stripe not configured' },
+            { status: 503 }
         );
     }
 
-    // Handle the event
-    console.log(`🎯 Processing webhook event: ${event.type}`);
-
     try {
+        const body = await request.text();
+        const signature = request.headers.get('stripe-signature')!;
+
+        let event;
+        try {
+            event = stripe.webhooks.constructEvent(
+                body,
+                signature,
+                process.env.STRIPE_WEBHOOK_SECRET!
+            );
+        } catch (err) {
+            console.error('Webhook signature verification failed:', err);
+            return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+        }
+
+        // Handle the event
         switch (event.type) {
             case 'payment_intent.succeeded':
-                await handlePaymentIntentSucceeded(event.data.object);
+                const paymentIntent = event.data.object;
+                const orderId = paymentIntent.metadata.order_id;
+
+                if (orderId) {
+                    await dbService.update(orders, {
+                        payment_status: 'completed',
+                        status: 'confirmed',
+                        updatedAt: new Date(),
+                    }, eq(orders.id, orderId));
+                }
                 break;
+
             case 'payment_intent.payment_failed':
-                await handlePaymentIntentFailed(event.data.object);
+                const failedPayment = event.data.object;
+                const failedOrderId = failedPayment.metadata.order_id;
+
+                if (failedOrderId) {
+                    await dbService.update(orders, {
+                        payment_status: 'failed',
+                        updatedAt: new Date(),
+                    }, eq(orders.id, failedOrderId));
+                }
                 break;
-            case 'payment_intent.created':
-                await handlePaymentIntentCreated(event.data.object);
-                break;
-            case 'charge.succeeded':
-                await handleChargeSucceeded(event.data.object);
-                break;
-            case 'charge.failed':
-                await handleChargeFailed(event.data.object);
-                break;
-            case 'charge.dispute.created':
-                await handleChargeDisputeCreated(event.data.object);
-                break;
-            case 'invoice.payment_succeeded':
-                await handleInvoicePaymentSucceeded(event.data.object);
-                break;
-            case 'invoice.payment_failed':
-                await handleInvoicePaymentFailed(event.data.object);
-                break;
-            case 'customer.subscription.created':
-                await handleSubscriptionCreated(event.data.object);
-                break;
-            case 'customer.subscription.updated':
-                await handleSubscriptionUpdated(event.data.object);
-                break;
-            case 'customer.subscription.deleted':
-                await handleSubscriptionDeleted(event.data.object);
-                break;
+
             default:
-                console.log(`⚠️ Unhandled event type: ${event.type}`);
+                console.log(`Unhandled event type ${event.type}`);
         }
+
+        return NextResponse.json({ received: true });
     } catch (error) {
-        console.error('❌ Error processing webhook event:', error);
+        console.error('Webhook error:', error);
         return NextResponse.json(
-            { error: 'Error processing webhook event' },
+            { error: 'Webhook handler failed' },
             { status: 500 }
         );
     }
-
-    // Return a 200 response to acknowledge receipt of the event
-    return NextResponse.json({ received: true });
 }
 
 // Handler functions for different event types
@@ -141,7 +118,7 @@ async function handlePaymentIntentSucceeded(paymentIntent: any) {
     if (orderId) {
         try {
             // Update order status to 'paid' or 'processing'
-            const result = await (db as any)
+            const result = await (dbService as any)
                 .update(orders)
                 .set({
                     status: 'processing',
@@ -169,7 +146,7 @@ async function handlePaymentIntentFailed(paymentIntent: any) {
 
     if (orderId) {
         try {
-            await (db as any)
+            await (dbService as any)
                 .update(orders)
                 .set({
                     status: 'payment_failed',
@@ -195,7 +172,7 @@ async function handlePaymentIntentCreated(paymentIntent: any) {
 
     if (orderId) {
         try {
-            await (db as any)
+            await (dbService as any)
                 .update(orders)
                 .set({
                     payment_intent_id: paymentIntent.id,

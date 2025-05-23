@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import { db } from '@/db';
+import { dbService, eq } from '@/db/service';
 import { sessions, orders, users } from '@/db/schema';
-import { eq } from 'drizzle-orm';
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+// Check if Stripe is configured, and only initialize if it is
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+const stripe = STRIPE_SECRET_KEY ? require('stripe')(STRIPE_SECRET_KEY) : null;
 
 function getSessionId(request: NextRequest): string | null {
     const auth = request.headers.get('Authorization') || '';
@@ -24,18 +25,26 @@ function isValidUUID(str: string): boolean {
 
 export async function POST(request: NextRequest) {
     try {
+        // Check if Stripe is configured
+        if (!stripe) {
+            return NextResponse.json(
+                { error: 'Payment service not configured' },
+                { status: 503 }
+            );
+        }
+
         const sessionId = getSessionId(request);
         if (!sessionId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         // Get session and user info
-        const [session] = await (db as any).select().from(sessions).where(eq(sessions.id, sessionId));
+        const session = await dbService.findFirst(sessions, eq(sessions.id, sessionId));
         if (!session || !session.userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const [user] = await (db as any).select().from(users).where(eq(users.id, session.userId));
+        const user = await dbService.findFirst(users, eq(users.id, session.userId));
         if (!user) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
@@ -52,7 +61,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Verify the order belongs to the user
-        const [order] = await (db as any).select().from(orders).where(eq(orders.id, orderId));
+        const order = await dbService.findFirst(orders, eq(orders.id, orderId));
         if (!order || order.userId !== session.userId) {
             return NextResponse.json({ error: 'Order not found' }, { status: 404 });
         }
@@ -72,15 +81,12 @@ export async function POST(request: NextRequest) {
         });
 
         // Update order with payment intent ID
-        await (db as any)
-            .update(orders)
-            .set({
-                payment_intent_id: paymentIntent.id,
-                payment_status: 'processing',
-                stripe_customer_id: user.stripe_customer_id,
-                updatedAt: new Date(),
-            })
-            .where(eq(orders.id, orderId));
+        await dbService.update(orders, {
+            payment_intent_id: paymentIntent.id,
+            payment_status: 'processing',
+            stripe_customer_id: user.stripe_customer_id,
+            updatedAt: new Date(),
+        }, eq(orders.id, orderId));
 
         return NextResponse.json({
             clientSecret: paymentIntent.client_secret,

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
+import { dbService, eq } from '@/db/service';
 import { empleados } from '@/db/schema';
-import { eq } from 'drizzle-orm';
 
 export async function GET(
     request: NextRequest,
@@ -9,11 +8,11 @@ export async function GET(
 ) {
     const { id } = await params;
     const empleadoId = id;
-    const result = await db.select().from(empleados).where(eq(empleados.id, empleadoId));
-    if (result.length === 0) {
+    const result = await dbService.findFirst(empleados, eq(empleados.id, empleadoId));
+    if (!result) {
         return NextResponse.json({ error: 'Empleado not found' }, { status: 404 });
     }
-    return NextResponse.json(result[0]);
+    return NextResponse.json(result);
 }
 
 export async function PUT(
@@ -23,7 +22,10 @@ export async function PUT(
     const { id } = await params;
     const data = await request.json();
     const empleadoId = id;
-    const updated = await db.update(empleados).set(data).where(eq(empleados.id, empleadoId)).returning();
+    await dbService.update(empleados, data, eq(empleados.id, empleadoId));
+
+    // Get the updated empleado
+    const updated = await dbService.findFirst(empleados, eq(empleados.id, empleadoId));
     return NextResponse.json(updated);
 }
 
@@ -33,6 +35,6 @@ export async function DELETE(
 ) {
     const { id } = await params;
     const empleadoId = id;
-    await db.delete(empleados).where(eq(empleados.id, empleadoId)).execute();
+    await dbService.delete(empleados, eq(empleados.id, empleadoId));
     return NextResponse.json({ success: true });
 } 

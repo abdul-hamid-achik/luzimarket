@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server';
 import { StatusCodes } from 'http-status-codes';
-import { db } from '@/db';
+import { dbService } from '@/db/service';
 import { orders } from '@/db/schema';
 
 export async function GET() {
   try {
-    // Get orders from database
-    const dbOrders = await db.select().from(orders);
+    // Get orders from database using the type-safe service
+    const dbOrders = await dbService.select(orders);
 
     // Map database orders to the format expected by the frontend
-    const formattedOrders = dbOrders.map(order => ({
+    const formattedOrders = dbOrders.map((order: any) => ({
       OrderID: order.id,
       Total: order.total?.toString() || "0.00",
       Cliente: order.userId ? `Customer #${order.userId}` : "Guest Customer",

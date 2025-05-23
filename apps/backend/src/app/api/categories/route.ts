@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
+import { dbService } from '@/db/service';
 import { categories } from '@/db/schema';
 // @ts-ignore: Allow http-status-codes import without type declarations
 import { StatusCodes } from 'http-status-codes';
 
 export async function GET() {
-    // @ts-ignore
-    const items = await db.select().from(categories);
+    const items = await dbService.select(categories);
     return NextResponse.json(items, { status: StatusCodes.OK });
 }
 
@@ -19,10 +18,7 @@ export async function POST(request: NextRequest) {
     // If description is not provided, use an empty string
     const categoryDescription = description || '';
 
-    const [created] = await db.insert(categories)
-        .values({ name, slug, description: categoryDescription })
-        .returning()
-        .execute();
+    const created = await dbService.insert(categories, { name, slug, description: categoryDescription });
 
     return NextResponse.json(created, { status: StatusCodes.CREATED });
 } 

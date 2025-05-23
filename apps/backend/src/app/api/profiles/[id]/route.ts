@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { StatusCodes } from 'http-status-codes';
-import { db } from '@/db';
+import { dbService, eq } from '@/db/service';
 import { users } from '@/db/schema';
-import { eq } from 'drizzle-orm';
 
 export async function PUT(
   request: NextRequest,
@@ -11,10 +10,15 @@ export async function PUT(
   const { id } = await params;
   const data = await request.json();
   if (data.password !== undefined) delete data.password;
-  const updated = await db.update(users).set(data).where(eq(users.id, id)).returning().execute();
-  if (updated.length === 0) {
+
+  await dbService.update(users, data, eq(users.id, id));
+
+  // Get the updated user
+  const updated = await dbService.findFirst(users, eq(users.id, id));
+  if (!updated) {
     return NextResponse.json({ error: 'Not found' }, { status: StatusCodes.NOT_FOUND });
   }
-  const { password: _pw, ...rest } = updated[0];
+
+  const { password: _pw, ...rest } = updated;
   return NextResponse.json(rest, { status: StatusCodes.OK });
 }

@@ -1,10 +1,8 @@
 // @ts-ignore: Allow necessary imports without type declarations
 import jwt from 'jsonwebtoken';
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
+import { dbService, eq, and } from '@/db/service';
 import { sessions, orders } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
-// @ts-ignore: Allow http-status-codes import without type declarations
 import { StatusCodes } from 'http-status-codes';
 
 function getSessionId(request: NextRequest): string | null {
@@ -33,7 +31,7 @@ export async function GET(
         return NextResponse.json({ error: 'Unauthorized' }, { status: StatusCodes.UNAUTHORIZED });
     }
 
-    const [session] = await db.select().from(sessions).where(eq(sessions.id, sessionId));
+    const session = await dbService.findFirst(sessions, eq(sessions.id, sessionId));
     if (!session || !session.userId) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: StatusCodes.UNAUTHORIZED });
     }
@@ -41,11 +39,10 @@ export async function GET(
     const { id } = await params;
     const orderId = id;
     try {
-        const [order] = await db.select().from(orders)
-            .where(and(
-                eq(orders.id, orderId),
-                eq(orders.userId, session.userId)
-            ));
+        const order = await dbService.findFirst(orders, and(
+            eq(orders.id, orderId),
+            eq(orders.userId, session.userId)
+        ));
 
         if (!order) {
             return NextResponse.json({ error: 'Order not found' }, { status: StatusCodes.NOT_FOUND });
