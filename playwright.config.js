@@ -1,7 +1,7 @@
 const { defineConfig, devices } = require('@playwright/test');
 const path = require('path');
 const fs = require('fs');
-const { execSync } = require('child_process');
+const { execSync, spawn } = require('child_process');
 
 const logsDir = path.join(__dirname, 'tmp', 'playwright-logs');
 const screenshotsDir = path.join(__dirname, 'tmp', 'playwright-screenshots');
@@ -21,13 +21,27 @@ console.log(`Running tests in ${isOfflineMode ? 'OFFLINE (SQLite)' : 'ONLINE (Po
 });
 
 // Clean up and initialize log files
-['api-requests.log', 'api-errors.log', 'console-errors.log', 'backend.log'].forEach(file => {
+['api-requests.log', 'api-errors.log', 'console-errors.log', 'backend.log', 'stripe-webhook.log'].forEach(file => {
   const logFile = path.join(logsDir, file);
   fs.writeFileSync(logFile, `--- Log started at ${new Date().toISOString()} ---\n\n`, { flag: 'w' });
 });
 
 // Backend port - matches the port in vite.config.ts
 const BACKEND_PORT = process.env.PORT || 8000;
+
+// Check if Stripe CLI is available
+function checkStripeCLI() {
+  try {
+    execSync('stripe --version', { stdio: 'ignore' });
+    return true;
+  } catch (error) {
+    console.warn('⚠️  Stripe CLI not found. Webhook testing will be limited.');
+    console.warn('   Install Stripe CLI: https://stripe.com/docs/stripe-cli');
+    return false;
+  }
+}
+
+const hasStripeCLI = checkStripeCLI();
 
 // Playwright Test configuration for root-level E2E tests.
 // See: https://playwright.dev/docs/test-configuration
@@ -136,7 +150,58 @@ module.exports = defineConfig({
           VITE_API_URL: `http://localhost:${BACKEND_PORT}`,
           DEBUG: 'app:*,api:*',
         }
-      }
+      },
+      // Start Stripe CLI webhook listener (if available)
+      ...(hasStripeCLI ? [{
+        command: `stripe listen --forward-to localhost:${BACKEND_PORT}/api/webhooks/stripe --events payment_intent.succeeded,payment_intent.payment_failed,payment_intent.created,charge.succeeded,charge.failed`,
+        url: null, // No health check URL for Stripe CLI
+        reuseExistingServer: false,
+        timeout: 30000,
+        stdout: 'pipe',
+        stderr: 'pipe',
+        env: {
+          ...process.env,
+        },
+        onStdOut: (chunk) => {
+          const output = chunk.toString();
+          console.log('Stripe CLI:', output);
+
+          // Extract webhook secret from Stripe CLI output
+          const secretMatch = output.match(/Your webhook signing secret is '([^']+)'/);
+          if (secretMatch) {
+            const webhookSecret = secretMatch[1];
+            console.log('🔑 Stripe webhook secret captured for testing');
+
+            // Store the webhook secret for tests to use
+            process.env.STRIPE_WEBHOOK_SECRET_TEST = webhookSecret;
+
+            // Write to a file that tests can read
+            try {
+              fs.writeFileSync(
+                path.join(__dirname, 'tmp', 'stripe-webhook-secret.txt'),
+                webhookSecret
+              );
+            } catch (e) {
+              console.error('Failed to write webhook secret:', e);
+            }
+          }
+
+          try {
+            fs.appendFileSync(path.join(logsDir, 'stripe-webhook.log'), output);
+          } catch (e) {
+            console.error('Failed to write Stripe log:', e);
+          }
+        },
+        onStdErr: (chunk) => {
+          const error = chunk.toString();
+          console.error('Stripe CLI Error:', error);
+          try {
+            fs.appendFileSync(path.join(logsDir, 'stripe-webhook.log'), `ERROR: ${error}`);
+          } catch (e) {
+            console.error('Failed to write Stripe error log:', e);
+          }
+        }
+      }] : [])
     ],
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },

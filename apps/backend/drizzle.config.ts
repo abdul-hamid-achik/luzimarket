@@ -2,11 +2,15 @@ import { defineConfig, type Config } from "drizzle-kit";
 import * as dotenv from 'dotenv';
 import path from 'path';
 
-dotenv.config();
+// Load .env from root directory
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const DB_MODE = process.env.DB_MODE || 'online'; // Default to 'online' for postgresql
 // Load DATABASE_URL for Postgres or SQLite if provided
 const DATABASE_URL = process.env.DATABASE_URL || '';
+
+console.log(`DB_MODE: ${DB_MODE}`);
+console.log(`DATABASE_URL: ${DATABASE_URL ? 'Set' : 'Not set'}`);
 
 let config: Config;
 
@@ -24,6 +28,7 @@ if (DB_MODE === 'offline') {
     };
 } else {
     // PostgreSQL configuration for 'neon' or any other mode
+    console.log(`Using PostgreSQL database`);
     config = {
         dialect: 'postgresql',
         schema: "./src/db/schema.postgres.ts", // Point to PostgreSQL schema

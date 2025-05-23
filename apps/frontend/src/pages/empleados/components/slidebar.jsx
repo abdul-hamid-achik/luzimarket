@@ -24,17 +24,17 @@ const Sidebar = () => {
               </Link>
             </li>
             <li className="nav-item mb-3">
-              <Link to="#" className="nav-link link-body-emphasis">
+              <Link to="/InicioEmpleados/Productos" className="nav-link link-body-emphasis">
                 Productos
               </Link>
             </li>
             <li className="nav-item mb-3">
-              <Link to="/InicioEmpleados/Ordenes" className="nav-link link-body-emphasis">
+              <Link to="/InicioEmpleados/Envios" className="nav-link link-body-emphasis">
                 Envíos
               </Link>
             </li>
             <li className="nav-item mb-3">
-              <Link to="#" className="nav-link link-body-emphasis">
+              <Link to="/InicioEmpleados/Dinero" className="nav-link link-body-emphasis">
                 Dinero
               </Link>
             </li>

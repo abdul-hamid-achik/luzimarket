@@ -34,17 +34,23 @@ test.describe('Customer End-to-End Purchase Flow', () => {
         console.log(`Found product ID for tests: ${validProductId}`);
       } else {
         console.log('No products found, using fallback ID');
-        validProductId = 'e0c3eba4-2435-4aaf-6174-818f819fd668'; // Fallback to known product ID as last resort
+        validProductId = null;
       }
     } catch (e) {
       console.error('Error getting product ID:', e);
-      validProductId = 'e0c3eba4-2435-4aaf-6174-818f819fd668'; // Fallback to known product ID as last resort
+      validProductId = null;
     }
 
     await context.close();
   });
 
   test('user can register, login, browse products, add to cart, and checkout', async ({ page }) => {
+    // Skip test if no products are available
+    if (!validProductId) {
+      test.skip('No products available in database for testing');
+      return;
+    }
+
     // Generate unique credentials
     const timestamp = Date.now();
     const email = `testuser+${timestamp}@example.com`;

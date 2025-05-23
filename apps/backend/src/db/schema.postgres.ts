@@ -94,7 +94,11 @@ export const orders = pgTable('orders', {
     userId: uuid('user_id').references(() => users.id),
     total: integer('total').notNull(),
     status: text('status').notNull().default('pending'),
+    payment_status: text('payment_status').default('pending'), // pending, processing, succeeded, failed, canceled
+    payment_intent_id: text('payment_intent_id'), // Stripe Payment Intent ID
+    stripe_customer_id: text('stripe_customer_id'), // Stripe Customer ID
     createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),
 });
 
 export const orderItems = pgTable('order_items', {

@@ -7,6 +7,7 @@ import Alertas from '@/pages/alertas';
 import Peticiones from '@/pages/peticiones';
 import Ventas from '@/pages/ventas';
 import Categorias from '@/pages/categorias';
+import CategoriasCustomer from '@/pages/inicio/pages/categorias';
 import Locaciones from '@/pages/locaciones';
 import AdmisionesCuerpo from '@/components/peticiones/admisiones/cuerpo_admisiones';
 import ProductosCuerpo from '@/components/peticiones/productos/cuerpo_producto';
@@ -28,6 +29,7 @@ import Ocasiones from '@/pages/inicio/pages/ocasiones';
 import Editorial from '@/pages/inicio/pages/editorial';
 import Favoritos from '@/pages/inicio/pages/favoritos';
 import RequireAuth from '@/components/require_auth';
+import CheckoutPage from '@/pages/inicio/pages/checkout';
 
 // Admin empleados
 import Login2 from '@/pages/empleados/pages/login';
@@ -36,6 +38,9 @@ import Dashboard2 from '@/pages/empleados/pages/dashboard';
 import Alertas2 from '@/pages/empleados/pages/alertas';
 import Envios from '@/pages/empleados/pages/envios';
 import Horarios from '@/pages/empleados/pages/horarios';
+import Productos from '@/pages/empleados/pages/productos';
+import Dinero from '@/pages/empleados/pages/dinero';
+import { StripeProvider } from '@/context/StripeContext';
 
 export const router = createBrowserRouter([
   /*PAGINA PRINCIPAL*/
@@ -49,11 +54,13 @@ export const router = createBrowserRouter([
       { path: "handpicked/productos", element: <HandpickedProductos /> },
       { path: "handpicked/productos/:id", element: <Handpicked /> },
       { path: "carrito", element: <Carrito /> },
+      { path: "checkout", element: <RequireAuth><StripeProvider><CheckoutPage /></StripeProvider></RequireAuth> },
       { path: "login", element: <CustomerLogin /> },
       { path: "register", element: <CustomerRegister /> },
       { path: "perfil", element: <RequireAuth><PerfilUsuario /></RequireAuth> },
       { path: "order-confirmation/:id", element: <RequireAuth><OrderConfirmation /></RequireAuth> },
       { path: "tiendas-marcas", element: <TiendasMarcas /> },
+      { path: "categorias", element: <CategoriasCustomer /> },
       { path: "ocasiones", element: <Ocasiones /> },
       { path: "editorial", element: <Editorial /> },
       { path: "favoritos", element: <Favoritos /> },
@@ -149,8 +156,16 @@ export const router = createBrowserRouter([
         element: <Alertas2 />,
       },
       {
+        path: "Productos",
+        element: <Productos />,
+      },
+      {
         path: "Envios",
         element: <Envios />,
+      },
+      {
+        path: "Dinero",
+        element: <Dinero />,
       },
       {
         path: "Horarios",

@@ -56,6 +56,20 @@ const occasions = [
     { name: 'Jubilación', description: 'Honor career achievements with our thoughtful retirement presents' }
 ];
 
+// Sample products data
+const sampleProducts = [
+    { name: 'Ramo de Rosas Rojas', description: 'Hermoso ramo de 12 rosas rojas frescas', price: 45000, categorySlug: 'floral-arrangements' },
+    { name: 'Canasta de Frutas Premium', description: 'Selección de frutas frescas y gourmet', price: 65000, categorySlug: 'gift-baskets' },
+    { name: 'Chocolates Artesanales', description: 'Caja de chocolates hechos a mano', price: 35000, categorySlug: 'gourmet-treats' },
+    { name: 'Vela Aromática Lavanda', description: 'Vela de cera natural con aroma a lavanda', price: 25000, categorySlug: 'aromatherapy-wellness' },
+    { name: 'Marco de Fotos Personalizado', description: 'Marco elegante con grabado personalizado', price: 40000, categorySlug: 'personalized-gifts' },
+    { name: 'Arreglo Floral Primavera', description: 'Colorido arreglo con flores de temporada', price: 55000, categorySlug: 'floral-arrangements' },
+    { name: 'Cesta de Vinos y Quesos', description: 'Selección de vinos y quesos gourmet', price: 85000, categorySlug: 'gourmet-treats' },
+    { name: 'Difusor de Aceites Esenciales', description: 'Difusor ultrasónico con aceites incluidos', price: 60000, categorySlug: 'aromatherapy-wellness' },
+    { name: 'Jarrón de Cerámica Artesanal', description: 'Jarrón único hecho por artesanos locales', price: 70000, categorySlug: 'handcrafted-items' },
+    { name: 'Set de Té Orgánico', description: 'Colección de tés orgánicos premium', price: 45000, categorySlug: 'eco-friendly-gifts' }
+];
+
 // No overloads needed here, we will use type guards inside the function.
 async function seed(currentDb: NeonDatabase | BetterSQLite3Database, currentSchema: PostgresSchemaModule | SqliteSchemaModule): Promise<void> {
     try {
@@ -95,6 +109,44 @@ async function seed(currentDb: NeonDatabase | BetterSQLite3Database, currentSche
                 }
                 console.log('Categories seeded successfully (SQLite)');
             } catch (err) { console.log('Error seeding categories (SQLite):', err); }
+
+            // Seed products after categories
+            try {
+                // Get categories to link products
+                const categoriesResult = await dbInstance.select().from(schemaInstance.categories);
+                const categoryMap = new Map(categoriesResult.map(cat => [cat.slug, cat.id]));
+
+                for (const product of sampleProducts) {
+                    const categoryId = categoryMap.get(product.categorySlug);
+                    if (categoryId) {
+                        const productData = {
+                            slug: faker.helpers.slugify(product.name.toLowerCase()),
+                            name: product.name,
+                            description: product.description,
+                            price: product.price,
+                            categoryId
+                        };
+
+                        const insertedProduct = await dbInstance.insert(schemaInstance.products)
+                            .values(productData)
+                            .returning({ id: schemaInstance.products.id })
+                            .onConflictDoNothing();
+
+                        if (insertedProduct.length > 0) {
+                            const productId = insertedProduct[0].id;
+
+                            // Create a default variant for each product
+                            await dbInstance.insert(schemaInstance.productVariants).values({
+                                productId,
+                                sku: `SKU-${faker.string.alphanumeric(8).toUpperCase()}`,
+                                attributes: JSON.stringify({ size: 'Standard', color: 'Default' }),
+                                stock: faker.number.int({ min: 5, max: 50 })
+                            }).onConflictDoNothing();
+                        }
+                    }
+                }
+                console.log('Products and variants seeded successfully (SQLite)');
+            } catch (err) { console.log('Error seeding products (SQLite):', err); }
 
             try {
                 for (const occasion of occasions) {
@@ -176,6 +228,44 @@ async function seed(currentDb: NeonDatabase | BetterSQLite3Database, currentSche
                 }
                 console.log('Categories seeded successfully (PostgreSQL)');
             } catch (err) { console.log('Error seeding categories (PostgreSQL):', err); }
+
+            // Seed products after categories
+            try {
+                // Get categories to link products
+                const categoriesResult = await dbInstance.select().from(schemaInstance.categories);
+                const categoryMap = new Map(categoriesResult.map(cat => [cat.slug, cat.id]));
+
+                for (const product of sampleProducts) {
+                    const categoryId = categoryMap.get(product.categorySlug);
+                    if (categoryId) {
+                        const productData = {
+                            slug: faker.helpers.slugify(product.name.toLowerCase()),
+                            name: product.name,
+                            description: product.description,
+                            price: product.price,
+                            categoryId
+                        };
+
+                        const insertedProduct = await dbInstance.insert(schemaInstance.products)
+                            .values(productData)
+                            .returning({ id: schemaInstance.products.id })
+                            .onConflictDoNothing();
+
+                        if (insertedProduct.length > 0) {
+                            const productId = insertedProduct[0].id;
+
+                            // Create a default variant for each product
+                            await dbInstance.insert(schemaInstance.productVariants).values({
+                                productId,
+                                sku: `SKU-${faker.string.alphanumeric(8).toUpperCase()}`,
+                                attributes: { size: 'Standard', color: 'Default' }, // JSON for PostgreSQL
+                                stock: faker.number.int({ min: 5, max: 50 })
+                            }).onConflictDoNothing();
+                        }
+                    }
+                }
+                console.log('Products and variants seeded successfully (PostgreSQL)');
+            } catch (err) { console.log('Error seeding products (PostgreSQL):', err); }
 
             try {
                 for (const occasion of occasions) {

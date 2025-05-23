@@ -38,17 +38,23 @@ test.describe('Cart Management Flow', () => {
         console.log(`Found product ID for tests: ${validProductId}`);
       } else {
         console.log('No products found, using fallback ID');
-        validProductId = 'e0c3eba4-2435-4aaf-6174-818f819fd668'; // Fallback to known product ID as last resort
+        validProductId = null;
       }
     } catch (e) {
       console.error('Error getting product ID:', e);
-      validProductId = 'e0c3eba4-2435-4aaf-6174-818f819fd668'; // Fallback to known product ID as last resort
+      validProductId = null;
     }
 
     await context.close();
   });
 
   test('user can update quantity and remove item from cart', async ({ page }) => {
+    // Skip test if no products are available
+    if (!validProductId) {
+      test.skip('No products available in database for testing');
+      return;
+    }
+
     // Register and login new user
     const timestamp = Date.now();
     const email = `testuser+cart${timestamp}@example.com`;

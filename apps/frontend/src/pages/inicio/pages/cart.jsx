@@ -8,7 +8,7 @@ import CartTitle from "@/pages/inicio/components/cart_title";
 import CartItem from "@/pages/inicio/components/cart_item";
 import "@/pages/inicio/css/cart.css";
 import { Alert, Button, Spinner } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth_context';
 import { useEffect } from 'react';
 
@@ -17,6 +17,7 @@ const Cart = () => {
   const updateItem = useUpdateCartItem();
   const removeItem = useRemoveCartItem();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const navigate = useNavigate();
 
   // Refetch cart data when authentication state changes
   useEffect(() => {
@@ -35,12 +36,23 @@ const Cart = () => {
     updateItem.mutate({ itemId: id, quantity });
   };
 
+  const handleCheckout = () => {
+    if (!isAuthenticated) {
+      navigate('/login', { state: { returnTo: '/checkout' } });
+      return;
+    }
+    navigate('/checkout');
+  };
+
   // Loading states combined
   const isPageLoading = isLoading || authLoading;
 
   // Determine which items to display
   const cartItems = data?.items || [];
   const hasItems = cartItems.length > 0;
+
+  // Calculate totals
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   // Loading state
   if (isPageLoading) {
@@ -161,17 +173,24 @@ const Cart = () => {
             <Button
               variant="success"
               className="checkout-btn w-100"
-              disabled={!isAuthenticated}
+              onClick={handleCheckout}
+              disabled={!hasItems}
             >
-              {isAuthenticated ? 'Proceder al pago' : (
-                <Link to="/login" className="text-white">Inicia sesión para continuar</Link>
-              )}
+              {isAuthenticated ? 'Proceder al pago' : 'Inicia sesión para continuar'}
             </Button>
             {!isAuthenticated && (
               <div className="text-center mt-2">
                 <small className="text-muted">Debes iniciar sesión para completar la compra</small>
               </div>
             )}
+
+            {/* Show total for quick reference */}
+            <div className="mt-3 p-3 bg-light rounded">
+              <div className="d-flex justify-content-between fw-bold">
+                <span>Total del carrito:</span>
+                <span>${subtotal.toFixed(2)} MXN</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
