@@ -104,9 +104,7 @@ module.exports = defineConfig({
       }
     }
   },
-  webServer: process.env.CI
-    ? undefined
-    : [
+  webServer: [
       // Start backend server
       {
         command: `npm run dev:backend`,

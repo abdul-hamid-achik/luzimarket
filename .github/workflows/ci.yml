@@ -26,7 +26,6 @@ jobs:
       STRIPE_WEBHOOK_SECRET: whsec_test_ci_webhook_secret_for_testing_only
       
       # CI environment flags
-      CI: true
       NODE_ENV: test
       SKIP_STRIPE_CLI: true
       
@@ -61,7 +60,6 @@ jobs:
           echo "STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}" >> .env
           echo "STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}" >> .env
           echo "VITE_API_URL=${VITE_API_URL}" >> .env
-          echo "CI=${CI}" >> .env
           echo "NODE_ENV=${NODE_ENV}" >> .env
           echo "SKIP_STRIPE_CLI=${SKIP_STRIPE_CLI}" >> .env
           echo "" >> .env
@@ -73,7 +71,6 @@ jobs:
           echo "=== Environment Variables ==="
           echo "DB_MODE: $DB_MODE"
           echo "NODE_ENV: $NODE_ENV"
-          echo "CI: $CI"
           echo "SKIP_STRIPE_CLI: $SKIP_STRIPE_CLI"
           echo "DATABASE_URL: $DATABASE_URL"
           echo "============================="
@@ -114,10 +111,9 @@ jobs:
       - name: Run E2E tests (offline mode)
         run: |
           echo "Running E2E tests in offline mode..."
-          DB_MODE=offline CI=true SKIP_STRIPE_CLI=true npm run test:e2e
+          DB_MODE=offline SKIP_STRIPE_CLI=true npm run test:e2e
         env:
           DB_MODE: offline
-          CI: true
           SKIP_STRIPE_CLI: true
           
       - name: Upload Playwright Report
