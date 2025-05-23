@@ -158,27 +158,46 @@ module.exports = async () => {
         const testEmail = `e2e+${Date.now()}@example.com`;
         const testPassword = 'TestPass123!';
 
-        const apiUrl = `http://localhost:${process.env.PORT || 8000}/api/auth/register`;
-        console.log(`Calling register API at: ${apiUrl}`);
+        const registerUrl = `http://localhost:${process.env.PORT || 8000}/api/auth/register`;
+        const loginUrl = `http://localhost:${process.env.PORT || 8000}/api/auth/login`;
+        console.log(`Calling register API at: ${registerUrl}`);
 
-        const registerRes = await fetch(apiUrl, {
+        const registerRes = await fetch(registerUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: testEmail, password: testPassword })
         });
 
+        let token;
+
         if (!registerRes.ok) {
             const errorText = await registerRes.text();
             console.error(`Registration failed with status: ${registerRes.status}, Error: ${errorText}`);
-            throw new Error(`Registration failed: ${registerRes.status}`);
+
+            // Attempt login if user already exists
+            console.log('Attempting login with same credentials...');
+            const loginRes = await fetch(loginUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: testEmail, password: testPassword })
+            });
+
+            if (!loginRes.ok) {
+                const loginError = await loginRes.text();
+                console.error(`Login after registration failure failed with status: ${loginRes.status}, Error: ${loginError}`);
+                throw new Error(`Login fallback failed: ${loginRes.status}`);
+            }
+
+            const loginData = await loginRes.json();
+            token = loginData.token;
+        } else {
+            const registerData = await registerRes.json();
+            token = registerData.token;
         }
 
-        const registerData = await registerRes.json();
-        const token = registerData.token;
-
         if (!token) {
-            console.error('No token returned from registration API');
-            throw new Error('No token in registration response');
+            console.error('No token received from auth API');
+            throw new Error('No token in authentication response');
         }
 
         // Setup storage state for tests - provide both localStorage and sessionStorage
