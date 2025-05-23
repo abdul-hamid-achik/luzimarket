@@ -1,7 +1,7 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import BestSellersSection from './best_sellers_section';
 
 // Mock the hooks
@@ -72,6 +72,10 @@ describe('BestSellersSection', () => {
         vi.clearAllMocks();
     });
 
+    afterEach(() => {
+        cleanup();
+    });
+
     it('renders loading state correctly', () => {
         vi.mocked(useBestSellers).mockReturnValue({
             data: [],
@@ -139,7 +143,7 @@ describe('BestSellersSection', () => {
 
         renderWithProviders(<BestSellersSection />);
 
-        expect(screen.getByText('Próximamente')).toBeInTheDocument();
+        expect(screen.getAllByText('Próximamente')).toHaveLength(1);
         expect(screen.getByText('Estamos preparando una selección increíble de productos para ti')).toBeInTheDocument();
         expect(screen.getByText('📦')).toBeInTheDocument();
     });
@@ -219,6 +223,6 @@ describe('BestSellersSection', () => {
         renderWithProviders(<BestSellersSection />);
 
         // Should show empty state
-        expect(screen.getByText('Próximamente')).toBeInTheDocument();
+        expect(screen.getAllByText('Próximamente')).toHaveLength(1);
     });
 }); 

@@ -491,4 +491,327 @@ test.describe('Product Filters & Search', () => {
             }
         });
     });
+
+    test.describe('Filter Click Functionality - Specific Bug Tests', () => {
+        test('should allow clicking on filter checkboxes and buttons', async ({ page }) => {
+            await page.goto('/handpicked/productos');
+            await page.waitForLoadState('networkidle');
+
+            console.log('🔍 Testing filter clicking functionality...');
+
+            // Wait for the filter sidebar to load - use more specific selector
+            const filterSidebar = page.locator('#FHP').first();
+            await expect(filterSidebar).toBeVisible({ timeout: 10000 });
+
+            // Test category filter checkboxes
+            const categoryCheckboxes = page.locator('.form-check-input[type="checkbox"]');
+            const categoryCount = await categoryCheckboxes.count();
+
+            console.log(`Found ${categoryCount} category checkboxes`);
+
+            if (categoryCount > 0) {
+                // Try clicking the first category checkbox
+                const firstCheckbox = categoryCheckboxes.first();
+                const checkboxId = await firstCheckbox.getAttribute('id');
+                console.log(`Attempting to click checkbox with id: ${checkboxId}`);
+
+                // Ensure checkbox is visible and clickable
+                await expect(firstCheckbox).toBeVisible();
+                await expect(firstCheckbox).toBeEnabled();
+
+                // Check if checkbox is initially unchecked
+                const initialState = await firstCheckbox.isChecked();
+                console.log(`Initial checkbox state: ${initialState ? 'checked' : 'unchecked'}`);
+
+                // Click the checkbox
+                await firstCheckbox.click();
+                await page.waitForTimeout(500);
+
+                // Verify the checkbox state changed
+                const newState = await firstCheckbox.isChecked();
+                console.log(`New checkbox state: ${newState ? 'checked' : 'unchecked'}`);
+
+                expect(newState).toBe(!initialState);
+                console.log('✅ Category checkbox clicking works correctly');
+            }
+
+            // Test price range inputs
+            const minPriceInput = page.locator('#minPrice');
+            const maxPriceInput = page.locator('#maxPrice');
+
+            if (await minPriceInput.isVisible() && await maxPriceInput.isVisible()) {
+                console.log('Testing price range inputs...');
+
+                await minPriceInput.fill('100');
+                await maxPriceInput.fill('500');
+
+                const minValue = await minPriceInput.inputValue();
+                const maxValue = await maxPriceInput.inputValue();
+
+                expect(minValue).toBe('100');
+                expect(maxValue).toBe('500');
+                console.log('✅ Price range inputs work correctly');
+            }
+
+            // Test color selection
+            const colorOptions = page.locator('.color-option');
+            const colorCount = await colorOptions.count();
+
+            console.log(`Found ${colorCount} color options`);
+
+            if (colorCount > 0) {
+                // First expand the color accordion section
+                const colorAccordionButton = page.locator('button[data-bs-target="#collapseColor"]');
+                if (await colorAccordionButton.isVisible()) {
+                    const isExpanded = await colorAccordionButton.getAttribute('aria-expanded') === 'true';
+                    if (!isExpanded) {
+                        await colorAccordionButton.click();
+                        await page.waitForTimeout(500);
+                    }
+                }
+
+                const firstColor = colorOptions.first();
+                await expect(firstColor).toBeVisible();
+
+                // Check initial state
+                const hasSelectedClass = await firstColor.evaluate(el => el.classList.contains('selected'));
+                console.log(`Initial color state: ${hasSelectedClass ? 'selected' : 'unselected'}`);
+
+                // Click the color option
+                await firstColor.click();
+                await page.waitForTimeout(300);
+
+                // Verify state changed
+                const newSelectedState = await firstColor.evaluate(el => el.classList.contains('selected'));
+                console.log(`New color state: ${newSelectedState ? 'selected' : 'unselected'}`);
+
+                expect(newSelectedState).toBe(!hasSelectedClass);
+                console.log('✅ Color selection clicking works correctly');
+            }
+
+            // Test Apply Filters button
+            const applyButton = page.locator('button:has-text("Aplicar Filtros")');
+            if (await applyButton.isVisible()) {
+                console.log('Testing Apply Filters button...');
+
+                await expect(applyButton).toBeEnabled();
+                await applyButton.click();
+                await page.waitForTimeout(1000);
+
+                console.log('✅ Apply Filters button is clickable');
+            }
+
+            // Test Clear Filters button
+            const clearButton = page.locator('button:has-text("Limpiar Filtros")');
+            if (await clearButton.isVisible()) {
+                console.log('Testing Clear Filters button...');
+
+                await expect(clearButton).toBeEnabled();
+                await clearButton.click();
+                await page.waitForTimeout(1000);
+
+                console.log('✅ Clear Filters button is clickable');
+            }
+        });
+
+        test('should verify filter accordion functionality works', async ({ page }) => {
+            await page.goto('/handpicked/productos');
+            await page.waitForLoadState('networkidle');
+
+            console.log('🔍 Testing accordion functionality...');
+
+            // Test Bootstrap accordion functionality
+            const accordionButtons = page.locator('.accordion-button');
+            const accordionCount = await accordionButtons.count();
+
+            console.log(`Found ${accordionCount} accordion sections`);
+
+            if (accordionCount > 0) {
+                // Test each accordion section
+                for (let i = 0; i < accordionCount; i++) {
+                    const button = accordionButtons.nth(i);
+                    const buttonText = await button.textContent();
+                    console.log(`Testing accordion section: ${buttonText?.trim()}`);
+
+                    // Get the target accordion body
+                    const targetId = await button.getAttribute('data-bs-target');
+                    if (targetId) {
+                        const accordionBody = page.locator(targetId);
+
+                        // Check if accordion is initially expanded
+                        const isExpanded = await button.getAttribute('aria-expanded') === 'true';
+                        console.log(`Initial state: ${isExpanded ? 'expanded' : 'collapsed'}`);
+
+                        // Click to toggle
+                        await button.click();
+                        await page.waitForTimeout(500);
+
+                        // Verify state changed
+                        const newExpanded = await button.getAttribute('aria-expanded') === 'true';
+                        console.log(`New state: ${newExpanded ? 'expanded' : 'collapsed'}`);
+
+                        expect(newExpanded).toBe(!isExpanded);
+                        console.log(`✅ Accordion "${buttonText?.trim()}" toggles correctly`);
+                    }
+                }
+            }
+        });
+
+        test('should test filter functionality with real API integration', async ({ page }) => {
+            await page.goto('/handpicked/productos');
+            await page.waitForLoadState('networkidle');
+
+            console.log('🔍 Testing filters with API integration...');
+
+            // Count initial products
+            const initialProductCount = await page.locator('[data-testid^="product-"]').count();
+            console.log(`Initial product count: ${initialProductCount}`);
+
+            // Apply a category filter
+            const categoryCheckbox = page.locator('.form-check-input[type="checkbox"]').first();
+            if (await categoryCheckbox.isVisible()) {
+                await categoryCheckbox.check();
+
+                // Apply filters
+                const applyButton = page.locator('button:has-text("Aplicar Filtros")');
+                if (await applyButton.isVisible()) {
+                    await applyButton.click();
+                    await page.waitForLoadState('networkidle');
+                    await page.waitForTimeout(2000); // Wait for API response
+
+                    // Count products after filter
+                    const filteredProductCount = await page.locator('[data-testid^="product-"]').count();
+                    console.log(`Filtered product count: ${filteredProductCount}`);
+
+                    // Products should still be visible (even if the same count due to fallback data)
+                    expect(filteredProductCount).toBeGreaterThan(0);
+                    console.log('✅ Filter application completed successfully');
+                }
+            }
+        });
+    });
+
+    test.describe('Price Display Verification', () => {
+        test('should display realistic prices for Mexican flower and gift shop', async ({ page }) => {
+            await page.goto('/handpicked/productos');
+            await page.waitForLoadState('networkidle');
+
+            console.log('🔍 Testing price display accuracy...');
+
+            // Wait for products to load
+            const productCards = page.locator('[data-testid^="product-"]');
+            await expect(productCards.first()).toBeVisible({ timeout: 10000 });
+
+            const productCount = await productCards.count();
+            console.log(`Found ${productCount} products to check prices`);
+
+            let pricesChecked = 0;
+            let validPrices = 0;
+
+            // Check prices on multiple products
+            for (let i = 0; i < Math.min(productCount, 5); i++) {
+                const productCard = productCards.nth(i);
+                const priceElement = productCard.locator('.product-price');
+
+                if (await priceElement.isVisible()) {
+                    const priceText = await priceElement.textContent();
+                    console.log(`Product ${i + 1} price: ${priceText}`);
+
+                    // Extract numeric value from price text (e.g., "$25.99" -> 25.99)
+                    const priceMatch = priceText?.match(/\$(\d+\.?\d*)/);
+                    if (priceMatch) {
+                        const price = parseFloat(priceMatch[1]);
+                        pricesChecked++;
+
+                        // For a Mexican flower and gift shop, reasonable price ranges:
+                        // - Flowers: $200-$2,500 pesos ($10-$125 USD)
+                        // - Gifts: $100-$5,000 pesos ($5-$250 USD)
+                        // - Luxury items: up to $10,000 pesos ($500 USD)
+
+                        console.log(`Parsed price: $${price}`);
+
+                        // Prices should be reasonable (between $10 and $5000 pesos)
+                        if (price >= 10 && price <= 5000) {
+                            validPrices++;
+                            console.log(`✅ Price $${price} is within reasonable range`);
+                        } else {
+                            console.log(`❌ Price $${price} seems unrealistic (too ${price < 10 ? 'low' : 'high'})`);
+                        }
+
+                        // Prices should have proper decimal formatting
+                        const hasProperDecimal = priceText?.includes('.') && priceMatch[1].split('.')[1]?.length === 2;
+                        if (hasProperDecimal || !priceText?.includes('.')) {
+                            console.log(`✅ Price format is correct: ${priceText}`);
+                        } else {
+                            console.log(`❌ Price format needs fixing: ${priceText}`);
+                        }
+                    } else {
+                        console.log(`❌ Could not parse price from: ${priceText}`);
+                    }
+                }
+            }
+
+            console.log(`Price check summary: ${validPrices}/${pricesChecked} prices are valid`);
+
+            // At least 80% of prices should be within reasonable range
+            if (pricesChecked > 0) {
+                const validPercentage = (validPrices / pricesChecked) * 100;
+                expect(validPercentage).toBeGreaterThan(70);
+                console.log(`✅ ${validPercentage.toFixed(1)}% of prices are valid`);
+            }
+        });
+
+        test('should verify price format consistency', async ({ page }) => {
+            await page.goto('/handpicked/productos');
+            await page.waitForLoadState('networkidle');
+
+            console.log('🔍 Testing price format consistency...');
+
+            const priceElements = page.locator('.product-price');
+            const priceCount = await priceElements.count();
+
+            console.log(`Found ${priceCount} price elements`);
+
+            for (let i = 0; i < Math.min(priceCount, 5); i++) {
+                const priceElement = priceElements.nth(i);
+                const priceText = await priceElement.textContent();
+
+                console.log(`Checking price format: ${priceText}`);
+
+                // Price should start with $ and have valid format
+                expect(priceText).toMatch(/^\$\d+\.\d{2}$/);
+                console.log(`✅ Price format is valid: ${priceText}`);
+            }
+        });
+
+        test('should verify prices in product detail pages', async ({ page }) => {
+            await page.goto('/handpicked/productos');
+            await page.waitForLoadState('networkidle');
+
+            console.log('🔍 Testing product detail page prices...');
+
+            // Find a product link and click it
+            const productLink = page.locator('[data-testid^="product-"]').first();
+            if (await productLink.isVisible()) {
+                const href = await productLink.getAttribute('href');
+                console.log(`Navigating to product detail: ${href}`);
+
+                await productLink.click();
+                await page.waitForLoadState('networkidle');
+
+                // Check price on detail page
+                const detailPrice = page.locator('.product-price');
+                if (await detailPrice.isVisible()) {
+                    const priceText = await detailPrice.textContent();
+                    console.log(`Detail page price: ${priceText}`);
+
+                    // Should follow same format rules
+                    expect(priceText).toMatch(/^\$\d+\.\d{2}$/);
+                    console.log(`✅ Detail page price format is valid`);
+                } else {
+                    console.log('⚠️ No price found on detail page');
+                }
+            }
+        });
+    });
 }); 

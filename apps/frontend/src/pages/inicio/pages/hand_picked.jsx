@@ -115,7 +115,7 @@ const Handpicked = () => {
             {product.category || "Category"}
           </h5>
           <h3 className="mb-4 product-price">
-            ${product.price ? product.price.toFixed(2) : '0.00'}
+            ${(product.price && typeof product.price === 'number') ? (product.price / 100).toFixed(2) : '0.00'}
           </h3>
           <div className="description mb-4">
             <h5>Description:</h5>

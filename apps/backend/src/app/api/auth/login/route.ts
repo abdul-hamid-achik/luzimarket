@@ -6,7 +6,8 @@ import { NextRequest, NextResponse } from 'next/server';
 // @ts-ignore: Allow http-status-codes import without type declarations
 import { StatusCodes } from 'http-status-codes';
 import { dbService, eq } from '@/db/service';
-import { users, sessions, cartItems } from '@/db/schema';
+import { users, sessions, cartItems, refreshTokens } from '@/db/schema';
+import { randomBytes } from 'crypto';
 
 /**
  * @swagger
@@ -43,10 +44,14 @@ import { users, sessions, cartItems } from '@/db/schema';
  *             schema:
  *               type: object
  *               properties:
- *                 token:
+ *                 accessToken:
  *                   type: string
  *                   description: JWT authentication token
  *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                 refreshToken:
+ *                   type: string
+ *                   description: Refresh token for obtaining new access tokens
+ *                   example: abc123def456...
  *       400:
  *         description: Missing email or password
  *         content:
@@ -128,6 +133,10 @@ export async function POST(request: NextRequest) {
             }
         }
 
+        // Get token durations from environment variables
+        const accessTokenDuration: string = process.env.ACCESS_TOKEN_DURATION || '1m';
+        const refreshTokenDuration = parseInt(process.env.REFRESH_TOKEN_DURATION_HOURS || '168') * 60 * 60 * 1000; // Default 7 days in ms
+
         const jwtSecret = process.env.JWT_SECRET || 'test-jwt-secret-for-e2e-tests';
         const token = jwt.sign({
             sessionId: newSessionId,
@@ -136,7 +145,18 @@ export async function POST(request: NextRequest) {
             role: user.role
         }, jwtSecret, { expiresIn: '7d' });
 
-        return NextResponse.json({ token }, { status: StatusCodes.OK });
+        // Generate refresh token
+        const refreshToken = randomBytes(64).toString('hex');
+        const refreshTokenExpiry = new Date(Date.now() + refreshTokenDuration);
+
+        await dbService.insert(refreshTokens, {
+            userId: user.id,
+            token: refreshToken,
+            expiresAt: refreshTokenExpiry,
+            isRevoked: false
+        });
+
+        return NextResponse.json({ accessToken: token, refreshToken }, { status: StatusCodes.OK });
     } catch (error) {
         console.error('Error during login:', error);
         return NextResponse.json({ error: 'Login failed' }, { status: StatusCodes.INTERNAL_SERVER_ERROR });

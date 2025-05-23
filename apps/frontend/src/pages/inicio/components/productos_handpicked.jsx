@@ -84,7 +84,9 @@ const ProductosHandpicked = ({ filters }) => {
                 <Card.Body>
                   <Card.Title className="product-title">{product.name}</Card.Title>
                   <Card.Text className="product-description">{product.description}</Card.Text>
-                  <Card.Text className="product-price">${product.price?.toFixed(2) || '0.00'}</Card.Text>
+                  <Card.Text className="product-price">
+                    ${(product.price && typeof product.price === 'number') ? (product.price / 100).toFixed(2) : '0.00'}
+                  </Card.Text>
                   <div className="d-flex justify-content-between">
                     <Link
                       to={`/handpicked/productos/${product.id}`}

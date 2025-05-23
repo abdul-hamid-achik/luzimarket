@@ -36,5 +36,6 @@ export const {
     imageCategories,
     productTypes,
     materials,
-    articleTopics
+    articleTopics,
+    refreshTokens
 } = schema;

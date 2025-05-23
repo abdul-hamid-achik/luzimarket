@@ -189,10 +189,10 @@ module.exports = async () => {
             }
 
             const loginData = await loginRes.json();
-            token = loginData.token;
+            token = loginData.accessToken || loginData.token; // Support both old and new field names
         } else {
             const registerData = await registerRes.json();
-            token = registerData.token;
+            token = registerData.accessToken || registerData.token; // Support both old and new field names
         }
 
         if (!token) {
@@ -201,14 +201,21 @@ module.exports = async () => {
         }
 
         // Setup storage state for tests - provide both localStorage and sessionStorage
-        // This is required by Playwright but our actual app uses sessionStorage
+        // This is required by Playwright but our actual app uses sessionStorage with obfuscated keys
+        const obfuscatedAccessTokenKey = Buffer.from('_luzi_auth_access').toString('base64');
         const storage = {
             cookies: [],
             origins: [
                 {
                     origin: 'http://localhost:5173',
-                    localStorage: [{ name: 'token', value: token }],
-                    sessionStorage: [{ name: 'token', value: token }]
+                    localStorage: [
+                        { name: 'token', value: token }, // Legacy compatibility
+                        { name: obfuscatedAccessTokenKey, value: token }
+                    ],
+                    sessionStorage: [
+                        { name: 'token', value: token }, // Legacy compatibility  
+                        { name: obfuscatedAccessTokenKey, value: token }
+                    ]
                 }
             ]
         };
@@ -224,8 +231,12 @@ module.exports = async () => {
         const authPage = await browser.newPage();
         await authPage.goto('http://localhost:5173');
         await authPage.evaluate((authToken) => {
+            const obfuscatedAccessTokenKey = btoa('_luzi_auth_access');
+            // Set tokens with obfuscated keys for production app
+            sessionStorage.setItem(obfuscatedAccessTokenKey, authToken);
+            localStorage.setItem(obfuscatedAccessTokenKey, authToken);
+            // Also set legacy keys for compatibility
             sessionStorage.setItem('token', authToken);
-            // Also set it in localStorage for compatibility with tests
             localStorage.setItem('token', authToken);
         }, token);
 
@@ -244,14 +255,21 @@ module.exports = async () => {
 
             // Create a simple mock token for testing
             const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uSWQiOiJmYWtlLXNlc3Npb24taWQiLCJ1c2VySWQiOiJmYWtlLXVzZXItaWQiLCJpYXQiOjE2MjM0NTY3ODksImV4cCI6MTYyMzQ1Njc4OX0.fake-signature';
+            const obfuscatedAccessTokenKey = Buffer.from('_luzi_auth_access').toString('base64');
 
             const storage = {
                 cookies: [],
                 origins: [
                     {
                         origin: 'http://localhost:5173',
-                        localStorage: [{ name: 'token', value: mockToken }],
-                        sessionStorage: [{ name: 'token', value: mockToken }]
+                        localStorage: [
+                            { name: 'token', value: mockToken },
+                            { name: obfuscatedAccessTokenKey, value: mockToken }
+                        ],
+                        sessionStorage: [
+                            { name: 'token', value: mockToken },
+                            { name: obfuscatedAccessTokenKey, value: mockToken }
+                        ]
                     }
                 ]
             };

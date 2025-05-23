@@ -158,10 +158,10 @@ test.describe('CMS Product Management', () => {
             await expect(slugInput).toHaveAttribute('placeholder', 'amazing-test-product');
         });
 
-        test('should upload product image', async ({ page }) => {
+        test('should upload product image successfully', async ({ page }) => {
             await page.click('button:has-text("Add New Product")');
 
-            // Create a test image file
+            // Use the real test image
             const testImagePath = path.join(__dirname, '..', 'fixtures', 'test-image.jpg');
 
             // Upload file (if test image exists)

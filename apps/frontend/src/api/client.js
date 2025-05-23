@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { secureStorage } from '@/utils/storage';
 
 // Determine baseURL: proxy in dev, static backend URL in production
 const isDev = import.meta.env.MODE === 'development';
@@ -29,11 +30,53 @@ console.log('API Configuration:', {
 // Create axios instance with dynamic baseURL
 const api = axios.create({ baseURL });
 
-// Attach JWT token from sessionStorage to headers if present
+// Track ongoing refresh request to prevent multiple simultaneous refresh attempts
+let isRefreshing = false;
+let failedQueue = [];
+
+// Process the queue of failed requests after token refresh
+const processQueue = (error, accessToken = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(accessToken);
+    }
+  });
+
+  failedQueue = [];
+};
+
+// Refresh token function
+const refreshAuthToken = async () => {
+  const refreshToken = secureStorage.getRefreshToken();
+  if (!refreshToken) {
+    throw new Error('No refresh token available');
+  }
+
+  try {
+    const response = await axios.post(`${baseURL}/auth/refresh`, {
+      refreshToken
+    });
+
+    const { accessToken, refreshToken: newRefreshToken } = response.data;
+
+    // Store new tokens using secure storage
+    secureStorage.setTokens({ accessToken, refreshToken: newRefreshToken });
+
+    return accessToken;
+  } catch (error) {
+    // Clear tokens if refresh fails
+    secureStorage.clearTokens();
+    throw error;
+  }
+};
+
+// Attach JWT token from secure storage to headers if present
 api.interceptors.request.use((config) => {
-  const token = sessionStorage.getItem('token');
-  if (token && config.headers) {
-    config.headers.Authorization = `Bearer ${token}`;
+  const accessToken = secureStorage.getAccessToken();
+  if (accessToken && config.headers) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
   }
 
   // Add request logging
@@ -46,7 +89,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Log responses and handle token expiration
+// Log responses and handle token expiration with automatic refresh
 api.interceptors.response.use(
   (response) => {
     // Calculate request duration
@@ -59,7 +102,7 @@ api.interceptors.response.use(
 
     return response;
   },
-  (error) => {
+  async (error) => {
     // Calculate request duration if possible
     const startTime = error.config?.metadata?.startTime;
     const duration = startTime ? Date.now() - startTime : undefined;
@@ -82,13 +125,46 @@ api.interceptors.response.use(
       }
     }
 
-    // Handle token expiration (401 Unauthorized)
-    if (error.response && error.response.status === 401) {
-      // Optionally clear token and redirect to login, or emit an event
-      sessionStorage.removeItem('token');
-      // Optionally, you could dispatch a logout event or redirect here
-      // window.location.href = '/login'; // Uncomment if you want to force redirect
-      console.warn('JWT token expired or invalid. User has been logged out.');
+    const originalRequest = error.config;
+
+    // Handle token expiration (401 Unauthorized) with automatic refresh
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        // If already refreshing, queue this request
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(accessToken => {
+          originalRequest.headers['Authorization'] = 'Bearer ' + accessToken;
+          return api(originalRequest);
+        }).catch(err => {
+          return Promise.reject(err);
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const newAccessToken = await refreshAuthToken();
+        processQueue(null, newAccessToken);
+
+        // Retry the original request with the new token
+        originalRequest.headers['Authorization'] = 'Bearer ' + newAccessToken;
+        return api(originalRequest);
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+
+        // Clear tokens and optionally redirect to login
+        secureStorage.clearTokens();
+        console.warn('Token refresh failed. User has been logged out.');
+
+        // Optionally trigger logout event or redirect
+        // window.location.href = '/login'; // Uncomment if you want to force redirect
+
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
     }
 
     return Promise.reject(error);

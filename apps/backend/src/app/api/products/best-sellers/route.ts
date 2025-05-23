@@ -43,53 +43,79 @@ interface BestSellerProduct {
  */
 export async function GET() {
     try {
-        // Query to get best-selling products with their details and photos
-        const result = await dbService.execute(sql`
-            SELECT 
-                p.id,
-                p.slug,
-                p.name,
-                p.description,
-                p.price,
-                p."category_id" as "categoryId",
-                c.name as "categoryName",
-                c.slug as "categorySlug",
-                COALESCE(ph.url, '') as "imageUrl",
-                COALESCE(ph.alt_text, p.name) as "imageAlt",
-                COALESCE(SUM(oi.quantity), 0) as "totalSold"
-            FROM products p
-            LEFT JOIN order_items oi ON oi."variant_id" IN (
-                SELECT pv.id FROM product_variants pv WHERE pv."product_id" = p.id
-            )
-            LEFT JOIN categories c ON c.id = p."category_id"
-            LEFT JOIN (
-                SELECT DISTINCT ON ("product_id") 
-                    "product_id", url, alt_text
-                FROM photos
-                ORDER BY "product_id", "sort_order" ASC
-            ) ph ON ph."product_id" = p.id
-            GROUP BY p.id, p.slug, p.name, p.description, p.price, p."category_id", c.name, c.slug, ph.url, ph.alt_text
-            ORDER BY "totalSold" DESC, p."created_at" DESC
-            LIMIT 10
-        `);
+        // Use Drizzle ORM for cross-database compatibility
+        // First, get products with their order counts using Drizzle
+        const productsWithSales = await dbService.selectFields(
+            {
+                id: products.id,
+                slug: products.slug,
+                name: products.name,
+                description: products.description,
+                price: products.price,
+                categoryId: products.categoryId,
+                createdAt: products.createdAt,
+            },
+            products
+        );
 
-        // Handle the database result - it might be { rows: [...] } or just [...]
-        const bestSellers = Array.isArray(result) ? result : (result as any).rows || [];
+        // Get categories
+        const allCategories = await dbService.select(categories);
+        const categoryMap = new Map(allCategories.map((cat: any) => [cat.id, cat]));
 
-        // Format the response
-        const formattedBestSellers: BestSellerProduct[] = bestSellers.map((product: any) => ({
-            id: product.id,
-            slug: product.slug,
-            name: product.name,
-            description: product.description,
-            price: product.price,
-            categoryId: product.categoryId,
-            categoryName: product.categoryName,
-            categorySlug: product.categorySlug,
-            imageUrl: product.imageUrl,
-            imageAlt: product.imageAlt,
-            totalSold: Number(product.totalSold)
-        }));
+        // Get photos
+        const allPhotos = await dbService.select(photos);
+        const photoMap = new Map();
+        allPhotos.forEach((photo: any) => {
+            if (!photoMap.has(photo.productId) || photo.sortOrder === 0) {
+                photoMap.set(photo.productId, photo);
+            }
+        });
+
+        // Get sales data
+        const allOrderItems = await dbService.select(orderItems);
+        const allVariants = await dbService.select(productVariants);
+
+        // Create variant to product mapping
+        const variantToProduct = new Map(allVariants.map((variant: any) => [variant.id, variant.productId]));
+
+        // Calculate sales per product
+        const salesMap = new Map();
+        allOrderItems.forEach((item: any) => {
+            const productId = variantToProduct.get(item.variantId);
+            if (productId) {
+                salesMap.set(productId, (salesMap.get(productId) || 0) + item.quantity);
+            }
+        });
+
+        // Combine all data and format
+        const formattedBestSellers: BestSellerProduct[] = productsWithSales
+            .map((product: any) => {
+                const category = categoryMap.get(product.categoryId) as any;
+                const photo = photoMap.get(product.id) as any;
+                const totalSold = salesMap.get(product.id) || 0;
+
+                return {
+                    id: product.id,
+                    slug: product.slug,
+                    name: product.name,
+                    description: product.description,
+                    price: product.price,
+                    categoryId: product.categoryId,
+                    categoryName: category?.name || '',
+                    categorySlug: category?.slug || '',
+                    imageUrl: photo?.url || '',
+                    imageAlt: photo?.alt || product.name,
+                    totalSold: Number(totalSold)
+                };
+            })
+            .sort((a: any, b: any) => {
+                // Sort by total sold descending, then by creation date descending
+                if (b.totalSold !== a.totalSold) {
+                    return b.totalSold - a.totalSold;
+                }
+                return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            })
+            .slice(0, 10); // Get top 10
 
         return NextResponse.json(formattedBestSellers, { status: StatusCodes.OK });
     } catch (error) {

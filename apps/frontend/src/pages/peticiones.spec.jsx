@@ -1,5 +1,5 @@
 import React from 'react';
-import { renderWithProviders, screen } from '../test-utils.jsx';
+import { renderWithProviders, screen, within } from '../test-utils.jsx';
 import Peticiones from './peticiones';
 import { vi } from 'vitest';
 import * as hooks from '@/api/hooks';
@@ -15,14 +15,19 @@ describe('Peticiones page', () => {
   });
 
   it('renders petition cards', () => {
-    renderWithProviders(<Peticiones />);
-    expect(screen.getByTestId('breadcrumb')).toHaveTextContent('Peticiones');
-    const card = screen.getByTestId('petition-card');
+    const { container } = renderWithProviders(<Peticiones />);
+
+    expect(within(container).getByTestId('breadcrumb')).toHaveTextContent('Peticiones');
+
+    // Find the specific petition card within the page container
+    const card = within(container).getByTestId('petition-card');
     expect(card).toHaveTextContent('Pet A');
     expect(card).toHaveTextContent('Desc A');
     expect(card).toHaveTextContent('2');
     expect(card).toHaveTextContent('Entrar');
-    const link = screen.getByRole('link', { name: /Entrar/ });
+
+    // Find the link within the card
+    const link = within(card).getByRole('link', { name: /Entrar/ });
     expect(link).toHaveAttribute('href', '/a');
   });
 });

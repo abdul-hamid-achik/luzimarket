@@ -1,8 +1,8 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Dinero from './dinero';
-import { vi } from 'vitest';
+import { vi, afterEach } from 'vitest';
 
 // Mock the breadcrumb component
 vi.mock('@/components/breadcrumb', () => ({
@@ -20,6 +20,11 @@ vi.mock('react-icons/bs', () => ({
     BsWallet: () => <div data-testid="wallet-icon">👛</div>,
     BsCreditCard: () => <div data-testid="credit-card-icon">💳</div>,
 }));
+
+// Cleanup after each test
+afterEach(() => {
+    cleanup();
+});
 
 const renderDinero = () => {
     return render(
@@ -55,9 +60,9 @@ describe('Dinero Page', () => {
     it('displays period selector with correct default selection', () => {
         renderDinero();
 
-        const weekButton = screen.getByText('Semana');
-        const monthButton = screen.getByText('Mes');
-        const yearButton = screen.getByText('Año');
+        const weekButton = screen.getByRole('button', { name: 'Semana' });
+        const monthButton = screen.getByRole('button', { name: 'Mes' });
+        const yearButton = screen.getByRole('button', { name: 'Año' });
 
         expect(weekButton).toBeInTheDocument();
         expect(monthButton).toBeInTheDocument();
@@ -72,8 +77,8 @@ describe('Dinero Page', () => {
     it('changes period selection when buttons are clicked', () => {
         renderDinero();
 
-        const weekButton = screen.getByText('Semana');
-        const monthButton = screen.getByText('Mes');
+        const weekButton = screen.getByRole('button', { name: 'Semana' });
+        const monthButton = screen.getByRole('button', { name: 'Mes' });
 
         // Click week button
         fireEvent.click(weekButton);
@@ -97,11 +102,11 @@ describe('Dinero Page', () => {
 
         expect(screen.getByText('Transacciones Recientes')).toBeInTheDocument();
 
-        // Check table headers
-        expect(screen.getByText('Fecha')).toBeInTheDocument();
-        expect(screen.getByText('Tipo')).toBeInTheDocument();
-        expect(screen.getByText('Monto')).toBeInTheDocument();
-        expect(screen.getByText('Estado')).toBeInTheDocument();
+        // Check table headers using more specific queries
+        expect(screen.getByRole('columnheader', { name: 'Fecha' })).toBeInTheDocument();
+        expect(screen.getByRole('columnheader', { name: 'Tipo' })).toBeInTheDocument();
+        expect(screen.getByRole('columnheader', { name: 'Monto' })).toBeInTheDocument();
+        expect(screen.getByRole('columnheader', { name: 'Estado' })).toBeInTheDocument();
 
         // Check for transaction data
         expect(screen.getByText('2024-01-15')).toBeInTheDocument();
@@ -113,8 +118,8 @@ describe('Dinero Page', () => {
     it('displays action buttons', () => {
         renderDinero();
 
-        expect(screen.getByText('Exportar Reporte')).toBeInTheDocument();
-        expect(screen.getByText('Solicitar Pago')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Exportar Reporte' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Solicitar Pago' })).toBeInTheDocument();
     });
 
     it('displays all transaction types and statuses correctly', () => {
@@ -132,10 +137,10 @@ describe('Dinero Page', () => {
     it('renders all icons correctly', () => {
         renderDinero();
 
-        expect(screen.getByTestId('currency-icon')).toBeInTheDocument();
-        expect(screen.getByTestId('wallet-icon')).toBeInTheDocument();
-        expect(screen.getByTestId('credit-card-icon')).toBeInTheDocument();
-        expect(screen.getByTestId('graph-icon')).toBeInTheDocument();
+        expect(screen.getAllByTestId('currency-icon')).toHaveLength(1);
+        expect(screen.getAllByTestId('wallet-icon')).toHaveLength(1);
+        expect(screen.getAllByTestId('credit-card-icon')).toHaveLength(1);
+        expect(screen.getAllByTestId('graph-icon')).toHaveLength(1);
     });
 
     it('has responsive layout classes', () => {
@@ -151,6 +156,6 @@ describe('Dinero Page', () => {
         renderDinero();
 
         // 45250 / 127 = 356.30
-        expect(screen.getByText('$356.30')).toBeInTheDocument();
+        expect(screen.getAllByText('$356.30')).toHaveLength(1);
     });
 }); 

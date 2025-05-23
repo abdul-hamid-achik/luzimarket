@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import NavbarAdmin from './navbar';
 import { vi } from 'vitest';
@@ -21,12 +21,12 @@ describe('NavbarAdmin', () => {
       logout: vi.fn()
     });
 
-    render(
+    const { container } = render(
       <MemoryRouter>
         <NavbarAdmin />
       </MemoryRouter>
     );
-    expect(screen.getByRole('navigation')).toBeInTheDocument();
+    expect(within(container).getByRole('navigation')).toBeInTheDocument();
   });
 
   it('shows user email when logged in', () => {
@@ -37,12 +37,12 @@ describe('NavbarAdmin', () => {
       logout: vi.fn()
     });
 
-    render(
+    const { container } = render(
       <MemoryRouter>
         <NavbarAdmin />
       </MemoryRouter>
     );
-    expect(screen.getByText('test@example.com')).toBeInTheDocument();
+    expect(within(container).getByText('test@example.com')).toBeInTheDocument();
   });
 
   it('shows Invitado and login/register links when not logged in', () => {
@@ -53,13 +53,13 @@ describe('NavbarAdmin', () => {
       logout: vi.fn()
     });
 
-    render(
+    const { container } = render(
       <MemoryRouter>
         <NavbarAdmin />
       </MemoryRouter>
     );
-    expect(screen.getByText('Invitado')).toBeInTheDocument();
-    expect(screen.getByText('Login')).toBeInTheDocument();
-    expect(screen.getByText('Register')).toBeInTheDocument();
+    expect(within(container).getByText('Invitado')).toBeInTheDocument();
+    expect(within(container).getByText('Login')).toBeInTheDocument();
+    expect(within(container).getByText('Register')).toBeInTheDocument();
   });
 });

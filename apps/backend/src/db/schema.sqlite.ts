@@ -220,4 +220,17 @@ export const vendors = sqliteTable('vendors', {
 });
 
 export type VendorInsert = typeof vendors.$inferInsert;
-export type VendorSelect = typeof vendors.$inferSelect; 
+export type VendorSelect = typeof vendors.$inferSelect;
+
+// Refresh tokens table for JWT token refresh functionality
+export const refreshTokens = sqliteTable('refresh_tokens', {
+    id: text('id').primaryKey().$defaultFn(() => uuidv4()),
+    userId: text('user_id').references(() => users.id).notNull(),
+    token: text('token').notNull().unique(),
+    expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
+    isRevoked: integer('is_revoked', { mode: 'boolean' }).default(false).notNull(),
+    createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(strftime('%s', 'now'))`).notNull(),
+});
+
+export type RefreshTokenInsert = typeof refreshTokens.$inferInsert;
+export type RefreshTokenSelect = typeof refreshTokens.$inferSelect; 

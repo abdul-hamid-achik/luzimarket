@@ -3,6 +3,7 @@ import jwtDecode from 'jwt-decode';
 import { loginUser, registerUser } from "@/api/auth";
 import api from "@/api/client";
 import { useMergeCart } from "@/api/hooks";
+import { secureStorage } from "@/utils/storage";
 
 export const AuthContext = createContext({
   user: null,
@@ -32,27 +33,27 @@ export const AuthProvider = ({ children }) => {
     const initAuth = async () => {
       setIsLoading(true);
       try {
-        let token = sessionStorage.getItem('token');
-        if (!token) {
+        let accessToken = secureStorage.getAccessToken();
+        if (!accessToken) {
           try {
             const res = await api.post('/auth/guest');
-            token = res.data.token;
-            sessionStorage.setItem('token', token);
+            accessToken = res.data.token; // Guest endpoint still returns 'token' field
+            secureStorage.setAccessToken(accessToken);
           } catch (err) {
             console.error('Failed to fetch guest token', err);
           }
         }
 
-        if (token) {
+        if (accessToken) {
           try {
-            const decoded = jwtDecode(token);
+            const decoded = jwtDecode(accessToken);
             setUser(decoded);
             // Check if user has real authentication (not a guest token)
             // Guest tokens have decoded.guest = true
             setIsAuthenticated(!!decoded && !decoded.guest);
           } catch (error) {
             console.error('Failed to decode token', error);
-            sessionStorage.removeItem('token');
+            secureStorage.clearTokens();
             setUser(null);
             setIsAuthenticated(false);
           }
@@ -69,14 +70,16 @@ export const AuthProvider = ({ children }) => {
     try {
       const result = await loginUser({ email, password });
 
-      // Extract token correctly - API returns { token } directly
-      const { token } = result;
-      if (!token) {
-        throw new Error('No token returned from backend');
+      // Extract both accessToken and refreshToken - API now returns accessToken
+      const { accessToken, refreshToken } = result;
+      if (!accessToken) {
+        throw new Error('No access token returned from backend');
       }
 
-      sessionStorage.setItem('token', token);
-      const decoded = jwtDecode(token);
+      // Store tokens using secure storage
+      secureStorage.setTokens({ accessToken, refreshToken });
+
+      const decoded = jwtDecode(accessToken);
       setUser(decoded);
       setIsAuthenticated(true);
 
@@ -100,12 +103,16 @@ export const AuthProvider = ({ children }) => {
 
       // Only set user and token if not skipping auto-login
       if (!skipAutoLogin) {
-        const { token } = result;
-        if (!token) {
-          throw new Error('No token returned from backend');
+        const { accessToken, refreshToken } = result;
+
+        if (!accessToken) {
+          throw new Error('No access token returned from backend');
         }
-        sessionStorage.setItem('token', token);
-        const decoded = jwtDecode(token);
+
+        // Store tokens using secure storage
+        secureStorage.setTokens({ accessToken, refreshToken });
+
+        const decoded = jwtDecode(accessToken);
         setUser(decoded);
         setIsAuthenticated(true);
 
@@ -125,7 +132,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    sessionStorage.removeItem('token');
+    secureStorage.clearTokens();
     setUser(null);
     setIsAuthenticated(false);
   };

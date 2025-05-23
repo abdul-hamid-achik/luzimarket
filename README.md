@@ -34,7 +34,7 @@ Luzimarket is a full-stack e-commerce platform with a React/Vite frontend and a 
 Create a `.env` file at the project root with the following variables:
 
 ```dotenv
-PORT=5000
+PORT=8000
 DATABASE_URL=your_neon_postgres_url
 DB_MODE=neon # Options: neon (default) or pglite (for offline testing)
 JWT_SECRET=your_jwt_secret

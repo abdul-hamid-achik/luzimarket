@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -15,4 +15,4 @@ export function renderWithProviders(ui) {
   );
 }
 
-export { screen, waitFor };
+export { screen, waitFor, within };

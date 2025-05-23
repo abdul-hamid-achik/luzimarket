@@ -1,4 +1,4 @@
-import { eq, and, or, isNull, SQL } from 'drizzle-orm';
+import { eq, and, or, isNull, gt, SQL } from 'drizzle-orm';
 import { db } from './index';
 import * as schema from './schema';
 
@@ -73,7 +73,27 @@ class DatabaseService {
 
     // Execute raw SQL
     async execute(sql: SQL<unknown>) {
-        return await (db as any).execute(sql);
+        const dbInstance = db as any;
+        // Check if the database instance has an execute method (Neon/PostgreSQL)
+        if (dbInstance.execute && typeof dbInstance.execute === 'function') {
+            return await dbInstance.execute(sql);
+        } else {
+            // For SQLite, we need to use run() method or handle differently
+            // Since SQLite with better-sqlite3 doesn't support execute for raw SQL,
+            // we'll use all() for SELECT queries or run() for other queries
+            try {
+                return await dbInstance.all(sql);
+            } catch (error) {
+                // If all() fails, try run() for non-SELECT queries
+                try {
+                    return await dbInstance.run(sql);
+                } catch (runError) {
+                    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+                    console.error('Database execute error:', error, runError);
+                    throw new Error(`Database execute failed: ${errorMessage}`);
+                }
+            }
+        }
     }
 
     // Convenient method to get a single record
@@ -92,4 +112,4 @@ class DatabaseService {
 }
 
 export const dbService = new DatabaseService();
-export { eq, and, or, isNull }; 
+export { eq, and, or, isNull, gt }; 

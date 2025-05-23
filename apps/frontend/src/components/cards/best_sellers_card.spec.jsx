@@ -1,10 +1,14 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import BestSellersCard from './best_sellers_card';
 
 // Mock CSS imports
 vi.mock('./best_sellers_card.css', () => ({}));
+
+afterEach(() => {
+    cleanup();
+});
 
 const mockProduct = {
     id: '1',
@@ -35,7 +39,7 @@ describe('BestSellersCard', () => {
         expect(screen.getByText('Flores')).toBeInTheDocument();
         expect(screen.getByText('#1')).toBeInTheDocument();
         expect(screen.getByText('Best Seller')).toBeInTheDocument();
-        expect(screen.getByText('25 vendidos')).toBeInTheDocument();
+        expect(screen.getAllByText('25 vendidos')).toHaveLength(1);
     });
 
     it('formats price correctly in Mexican pesos', () => {
@@ -91,7 +95,7 @@ describe('BestSellersCard', () => {
     it('displays sales count with fire emoji', () => {
         renderWithRouter(<BestSellersCard product={mockProduct} rank={1} />);
 
-        const salesSection = screen.getByText('25 vendidos');
+        const salesSection = screen.getAllByText('25 vendidos')[0];
         expect(salesSection).toBeInTheDocument();
 
         // Check for fire emoji
@@ -101,15 +105,17 @@ describe('BestSellersCard', () => {
     it('has add to cart button', () => {
         renderWithRouter(<BestSellersCard product={mockProduct} rank={1} />);
 
-        const addToCartButton = screen.getByRole('button', { name: /agregar al carrito/i });
-        expect(addToCartButton).toBeInTheDocument();
+        const addToCartButtons = screen.getAllByRole('button', { name: /agregar al carrito/i });
+        expect(addToCartButtons).toHaveLength(1);
+        expect(addToCartButtons[0]).toBeInTheDocument();
     });
 
     it('has quick view button in overlay', () => {
         renderWithRouter(<BestSellersCard product={mockProduct} rank={1} />);
 
-        const quickViewButton = screen.getByRole('button', { name: /ver producto/i });
-        expect(quickViewButton).toBeInTheDocument();
+        const quickViewButtons = screen.getAllByRole('button', { name: /ver producto/i });
+        expect(quickViewButtons).toHaveLength(1);
+        expect(quickViewButtons[0]).toBeInTheDocument();
     });
 
     it('truncates long descriptions appropriately', () => {
@@ -142,7 +148,8 @@ describe('BestSellersCard', () => {
     it('applies correct CSS classes', () => {
         renderWithRouter(<BestSellersCard product={mockProduct} rank={1} />);
 
-        const card = screen.getByText('Ramo de Rosas Premium').closest('.best-seller-card');
+        const cards = screen.getAllByText('Ramo de Rosas Premium');
+        const card = cards[0].closest('.best-seller-card');
         expect(card).toHaveClass('best-seller-card');
     });
 }); 

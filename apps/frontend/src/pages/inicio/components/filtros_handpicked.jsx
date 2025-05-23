@@ -10,7 +10,7 @@ const Filtros = ({ onApply, onClear }) => {
    const [selectedColors, setSelectedColors] = useState([])
 
    const handleCategoryChange = (e) => {
-      const value = parseInt(e.target.value, 10)
+      const value = e.target.value
       if (e.target.checked) setSelectedCategories((prev) => [...prev, value])
       else setSelectedCategories((prev) => prev.filter((id) => id !== value))
    }

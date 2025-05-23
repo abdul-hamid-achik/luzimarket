@@ -6,7 +6,8 @@ import { NextRequest, NextResponse } from 'next/server';
 // @ts-ignore: Allow http-status-codes import without type declarations
 import { StatusCodes } from 'http-status-codes';
 import { dbService, eq } from '@/db/service';
-import { users, sessions } from '@/db/schema';
+import { users, sessions, refreshTokens } from '@/db/schema';
+import { randomBytes } from 'crypto';
 
 /**
  * @swagger
@@ -48,10 +49,14 @@ import { users, sessions } from '@/db/schema';
  *             schema:
  *               type: object
  *               properties:
- *                 token:
+ *                 accessToken:
  *                   type: string
  *                   description: JWT authentication token
  *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                 refreshToken:
+ *                   type: string
+ *                   description: Refresh token for future authentication
+ *                   example: 1234567890abcdef1234567890abcdef1234567890
  *       400:
  *         description: Missing email or password
  *         content:
@@ -126,7 +131,19 @@ export async function POST(request: NextRequest) {
             email: email
         }, jwtSecret, { expiresIn: '7d' });
 
-        return NextResponse.json({ token }, { status: StatusCodes.CREATED });
+        // Generate refresh token
+        const refreshTokenDuration = parseInt(process.env.REFRESH_TOKEN_DURATION_HOURS || '168') * 60 * 60 * 1000; // Default 7 days in ms
+        const refreshToken = randomBytes(64).toString('hex');
+        const refreshTokenExpiry = new Date(Date.now() + refreshTokenDuration);
+
+        await dbService.insert(refreshTokens, {
+            userId: newUserId,
+            token: refreshToken,
+            expiresAt: refreshTokenExpiry,
+            isRevoked: false
+        });
+
+        return NextResponse.json({ accessToken: token, refreshToken }, { status: StatusCodes.CREATED });
     } catch (error) {
         console.error('Error during registration:', error);
         return NextResponse.json(

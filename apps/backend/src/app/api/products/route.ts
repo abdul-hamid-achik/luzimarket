@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { dbService, eq, and } from '@/db/service';
 import { products, productVariants, categories, vendors, photos } from '@/db/schema';
-import { sql } from 'drizzle-orm';
+import { sql, inArray } from 'drizzle-orm';
 // @ts-ignore: Allow http-status-codes import without type declarations
 import { StatusCodes } from 'http-status-codes';
 
@@ -148,7 +148,7 @@ export async function GET(request: NextRequest) {
                 count: sql<number>`count(*)`.as('count')
             })
             .from(photos)
-            .where(sql`${photos.productId} IN (${productIds.map((id: string) => `'${id}'`).join(',')})`)
+            .where(inArray(photos.productId, productIds))
             .groupBy(photos.productId) : [];
 
         const photoCountMap = Object.fromEntries(

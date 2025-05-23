@@ -5,13 +5,23 @@ import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 // Mock the database service
 vi.mock('@/db/service', () => ({
     dbService: {
+        selectFields: vi.fn(),
+        select: vi.fn(),
         execute: vi.fn()
     }
 }));
 
 // Mock the schema
 vi.mock('@/db/schema', () => ({
-    products: {},
+    products: {
+        id: 'products.id',
+        slug: 'products.slug',
+        name: 'products.name',
+        description: 'products.description',
+        price: 'products.price',
+        categoryId: 'products.categoryId',
+        createdAt: 'products.createdAt'
+    },
     orderItems: {},
     productVariants: {},
     photos: {},
@@ -36,8 +46,8 @@ describe('/api/products/best-sellers', () => {
     });
 
     it('should return best sellers with proper format', async () => {
-        // Mock data that would come from the database
-        const mockBestSellers = [
+        // Mock products data
+        const mockProducts = [
             {
                 id: '1',
                 slug: 'ramo-rosas',
@@ -45,11 +55,7 @@ describe('/api/products/best-sellers', () => {
                 description: 'Hermoso ramo de rosas frescas',
                 price: 75000,
                 categoryId: 'cat-1',
-                categoryName: 'Flores',
-                categorySlug: 'flores',
-                imageUrl: 'https://blob.vercel-storage.com/test-image.jpg',
-                imageAlt: 'Ramo de Rosas',
-                totalSold: 25
+                createdAt: new Date('2024-01-01')
             },
             {
                 id: '2',
@@ -58,16 +64,41 @@ describe('/api/products/best-sellers', () => {
                 description: 'Selección premium de chocolates',
                 price: 45000,
                 categoryId: 'cat-2',
-                categoryName: 'Dulces',
-                categorySlug: 'dulces',
-                imageUrl: 'https://blob.vercel-storage.com/chocolates.jpg',
-                imageAlt: 'Chocolates Gourmet',
-                totalSold: 18
+                createdAt: new Date('2024-01-02')
             }
         ];
 
-        // Mock the database execution
-        vi.mocked(dbService.execute).mockResolvedValue(mockBestSellers);
+        // Mock categories data
+        const mockCategories = [
+            { id: 'cat-1', name: 'Flores', slug: 'flores' },
+            { id: 'cat-2', name: 'Dulces', slug: 'dulces' }
+        ];
+
+        // Mock photos data
+        const mockPhotos = [
+            { id: '1', productId: '1', url: 'https://blob.vercel-storage.com/test-image.jpg', alt: 'Ramo de Rosas', sortOrder: 0 },
+            { id: '2', productId: '2', url: 'https://blob.vercel-storage.com/chocolates.jpg', alt: 'Chocolates Gourmet', sortOrder: 0 }
+        ];
+
+        // Mock variants data
+        const mockVariants = [
+            { id: 'var-1', productId: '1' },
+            { id: 'var-2', productId: '2' }
+        ];
+
+        // Mock order items data
+        const mockOrderItems = [
+            { id: '1', variantId: 'var-1', quantity: 25 },
+            { id: '2', variantId: 'var-2', quantity: 18 }
+        ];
+
+        // Setup the mocks
+        vi.mocked(dbService.selectFields).mockResolvedValue(mockProducts);
+        vi.mocked(dbService.select)
+            .mockResolvedValueOnce(mockCategories)  // categories call
+            .mockResolvedValueOnce(mockPhotos)      // photos call
+            .mockResolvedValueOnce(mockOrderItems)  // orderItems call
+            .mockResolvedValueOnce(mockVariants);   // productVariants call
 
         const response = await GET();
         const data = await response.json();
@@ -93,8 +124,13 @@ describe('/api/products/best-sellers', () => {
     });
 
     it('should handle empty results', async () => {
-        // Mock empty results
-        vi.mocked(dbService.execute).mockResolvedValue([]);
+        // Mock empty results for all tables
+        vi.mocked(dbService.selectFields).mockResolvedValue([]);
+        vi.mocked(dbService.select)
+            .mockResolvedValueOnce([])  // categories
+            .mockResolvedValueOnce([])  // photos
+            .mockResolvedValueOnce([])  // orderItems
+            .mockResolvedValueOnce([]); // productVariants
 
         const response = await GET();
         const data = await response.json();
@@ -106,7 +142,7 @@ describe('/api/products/best-sellers', () => {
 
     it('should handle database errors gracefully', async () => {
         // Mock database error
-        vi.mocked(dbService.execute).mockRejectedValue(new Error('Database connection failed'));
+        vi.mocked(dbService.selectFields).mockRejectedValue(new Error('Database connection failed'));
 
         const response = await GET();
         const data = await response.json();
@@ -118,7 +154,7 @@ describe('/api/products/best-sellers', () => {
     });
 
     it('should return products ordered by totalSold descending', async () => {
-        const mockBestSellers = [
+        const mockProducts = [
             {
                 id: '1',
                 slug: 'product-1',
@@ -126,11 +162,7 @@ describe('/api/products/best-sellers', () => {
                 description: 'Description 1',
                 price: 50000,
                 categoryId: 'cat-1',
-                categoryName: 'Category 1',
-                categorySlug: 'category-1',
-                imageUrl: '',
-                imageAlt: 'Product 1',
-                totalSold: 100
+                createdAt: new Date('2024-01-01')
             },
             {
                 id: '2',
@@ -139,11 +171,7 @@ describe('/api/products/best-sellers', () => {
                 description: 'Description 2',
                 price: 60000,
                 categoryId: 'cat-2',
-                categoryName: 'Category 2',
-                categorySlug: 'category-2',
-                imageUrl: '',
-                imageAlt: 'Product 2',
-                totalSold: 50
+                createdAt: new Date('2024-01-02')
             },
             {
                 id: '3',
@@ -152,27 +180,52 @@ describe('/api/products/best-sellers', () => {
                 description: 'Description 3',
                 price: 70000,
                 categoryId: 'cat-3',
-                categoryName: 'Category 3',
-                categorySlug: 'category-3',
-                imageUrl: '',
-                imageAlt: 'Product 3',
-                totalSold: 75
+                createdAt: new Date('2024-01-03')
             }
         ];
 
-        vi.mocked(dbService.execute).mockResolvedValue(mockBestSellers);
+        const mockCategories = [
+            { id: 'cat-1', name: 'Category 1', slug: 'category-1' },
+            { id: 'cat-2', name: 'Category 2', slug: 'category-2' },
+            { id: 'cat-3', name: 'Category 3', slug: 'category-3' }
+        ];
+
+        const mockPhotos = [
+            { id: '1', productId: '1', url: '', alt: 'Product 1', sortOrder: 0 },
+            { id: '2', productId: '2', url: '', alt: 'Product 2', sortOrder: 0 },
+            { id: '3', productId: '3', url: '', alt: 'Product 3', sortOrder: 0 }
+        ];
+
+        const mockVariants = [
+            { id: 'var-1', productId: '1' },
+            { id: 'var-2', productId: '2' },
+            { id: 'var-3', productId: '3' }
+        ];
+
+        const mockOrderItems = [
+            { id: '1', variantId: 'var-1', quantity: 100 },
+            { id: '2', variantId: 'var-2', quantity: 50 },
+            { id: '3', variantId: 'var-3', quantity: 75 }
+        ];
+
+        vi.mocked(dbService.selectFields).mockResolvedValue(mockProducts);
+        vi.mocked(dbService.select)
+            .mockResolvedValueOnce(mockCategories)
+            .mockResolvedValueOnce(mockPhotos)
+            .mockResolvedValueOnce(mockOrderItems)
+            .mockResolvedValueOnce(mockVariants);
 
         const response = await GET();
         const data = await response.json();
 
         expect(response.status).toBe(200);
         expect(data[0].totalSold).toBe(100);
-        expect(data[1].totalSold).toBe(50);
-        expect(data[2].totalSold).toBe(75);
+        expect(data[1].totalSold).toBe(75);
+        expect(data[2].totalSold).toBe(50);
     });
 
     it('should convert totalSold to number', async () => {
-        const mockBestSellers = [
+        const mockProducts = [
             {
                 id: '1',
                 slug: 'product-1',
@@ -180,15 +233,32 @@ describe('/api/products/best-sellers', () => {
                 description: 'Description 1',
                 price: 50000,
                 categoryId: 'cat-1',
-                categoryName: 'Category 1',
-                categorySlug: 'category-1',
-                imageUrl: '',
-                imageAlt: 'Product 1',
-                totalSold: '42' // String from database
+                createdAt: new Date('2024-01-01')
             }
         ];
 
-        vi.mocked(dbService.execute).mockResolvedValue(mockBestSellers);
+        const mockCategories = [
+            { id: 'cat-1', name: 'Category 1', slug: 'category-1' }
+        ];
+
+        const mockPhotos = [
+            { id: '1', productId: '1', url: '', alt: 'Product 1', sortOrder: 0 }
+        ];
+
+        const mockVariants = [
+            { id: 'var-1', productId: '1' }
+        ];
+
+        const mockOrderItems = [
+            { id: '1', variantId: 'var-1', quantity: 42 }
+        ];
+
+        vi.mocked(dbService.selectFields).mockResolvedValue(mockProducts);
+        vi.mocked(dbService.select)
+            .mockResolvedValueOnce(mockCategories)
+            .mockResolvedValueOnce(mockPhotos)
+            .mockResolvedValueOnce(mockOrderItems)
+            .mockResolvedValueOnce(mockVariants);
 
         const response = await GET();
         const data = await response.json();

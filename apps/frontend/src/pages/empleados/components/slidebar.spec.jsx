@@ -1,7 +1,12 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, cleanup } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { afterEach } from 'vitest';
 import Sidebar from './slidebar';
+
+afterEach(() => {
+    cleanup();
+});
 
 const renderSidebar = () => {
     return render(
@@ -26,12 +31,19 @@ describe('Employee Sidebar', () => {
     it('has correct navigation links', () => {
         renderSidebar();
 
-        const dashboardLink = screen.getByText('Dashboard').closest('a');
-        const alertasLink = screen.getByText('Alertas').closest('a');
-        const productosLink = screen.getByText('Productos').closest('a');
-        const enviosLink = screen.getByText('Envíos').closest('a');
-        const dineroLink = screen.getByText('Dinero').closest('a');
-        const horariosLink = screen.getByText('Horarios').closest('a');
+        const dashboardLinks = screen.getAllByText('Dashboard');
+        const alertasLinks = screen.getAllByText('Alertas');
+        const productosLinks = screen.getAllByText('Productos');
+        const enviosLinks = screen.getAllByText('Envíos');
+        const dineroLinks = screen.getAllByText('Dinero');
+        const horariosLinks = screen.getAllByText('Horarios');
+
+        const dashboardLink = dashboardLinks.find(link => link.closest('a')?.getAttribute('href') === '/InicioEmpleados/DashboardEmpleados')?.closest('a');
+        const alertasLink = alertasLinks.find(link => link.closest('a')?.getAttribute('href') === '/InicioEmpleados/AlertasEmpleados')?.closest('a');
+        const productosLink = productosLinks.find(link => link.closest('a')?.getAttribute('href') === '/InicioEmpleados/Productos')?.closest('a');
+        const enviosLink = enviosLinks.find(link => link.closest('a')?.getAttribute('href') === '/InicioEmpleados/Envios')?.closest('a');
+        const dineroLink = dineroLinks.find(link => link.closest('a')?.getAttribute('href') === '/InicioEmpleados/Dinero')?.closest('a');
+        const horariosLink = horariosLinks.find(link => link.closest('a')?.getAttribute('href') === '/InicioEmpleados/Horarios')?.closest('a');
 
         expect(dashboardLink).toHaveAttribute('href', '/InicioEmpleados/DashboardEmpleados');
         expect(alertasLink).toHaveAttribute('href', '/InicioEmpleados/AlertasEmpleados');
@@ -50,15 +62,18 @@ describe('Employee Sidebar', () => {
         const navList = document.querySelector('.nav.nav-pills.flex-column.mb-auto');
         expect(navList).toBeInTheDocument();
 
-        const navItems = document.querySelectorAll('.nav-item.mb-3');
+        const sidebarContainer = document.querySelector('.sidebar');
+        const navItems = sidebarContainer?.querySelectorAll('.nav-item.mb-3') || [];
         expect(navItems).toHaveLength(6);
     });
 
     it('all links have correct CSS classes', () => {
         renderSidebar();
 
-        const links = screen.getAllByRole('link');
-        links.forEach(link => {
+        const sidebarContainer = document.querySelector('.sidebar');
+        const sidebarLinks = sidebarContainer?.querySelectorAll('a.nav-link') || [];
+
+        Array.from(sidebarLinks).forEach(link => {
             expect(link).toHaveClass('nav-link', 'link-body-emphasis');
         });
     });
@@ -66,8 +81,9 @@ describe('Employee Sidebar', () => {
     it('renders in correct order', () => {
         renderSidebar();
 
-        const links = screen.getAllByRole('link');
-        const linkTexts = links.map(link => link.textContent);
+        const sidebarContainer = document.querySelector('.sidebar');
+        const sidebarLinks = sidebarContainer?.querySelectorAll('a.nav-link') || [];
+        const linkTexts = Array.from(sidebarLinks).map(link => link.textContent);
 
         expect(linkTexts).toEqual([
             'Dashboard',
@@ -82,8 +98,10 @@ describe('Employee Sidebar', () => {
     it('has no broken links (no # hrefs)', () => {
         renderSidebar();
 
-        const links = screen.getAllByRole('link');
-        links.forEach(link => {
+        const sidebarContainer = document.querySelector('.sidebar');
+        const sidebarLinks = sidebarContainer?.querySelectorAll('a.nav-link') || [];
+
+        Array.from(sidebarLinks).forEach(link => {
             expect(link.getAttribute('href')).not.toBe('#');
             expect(link.getAttribute('href')).not.toBe('');
             expect(link.getAttribute('href')).toBeTruthy();

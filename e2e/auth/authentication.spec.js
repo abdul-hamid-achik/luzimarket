@@ -60,15 +60,22 @@ test.describe('Authentication Flow', () => {
             await page.fill('input[type="password"]', password);
             await page.click('button[type="submit"]');
 
-            // Wait for login to complete and verify token is set
+            // Wait for login to complete
             await page.waitForFunction(() => {
-                const token = sessionStorage.getItem('token');
-                return token !== null && token.length > 10;
+                const keys = {
+                    accessToken: btoa('_luzi_auth_access')
+                };
+                return sessionStorage.getItem(keys.accessToken) !== null;
             }, null, { timeout: 10000 });
 
             // Verify user is logged in by checking session storage
-            const token = await page.evaluate(() => sessionStorage.getItem('token'));
-            expect(token).toBeTruthy();
+            const accessToken = await page.evaluate(() => {
+                const keys = {
+                    accessToken: btoa('_luzi_auth_access')
+                };
+                return sessionStorage.getItem(keys.accessToken);
+            });
+            expect(accessToken).toBeTruthy();
         });
 
         test('should handle login errors gracefully', async ({ page }) => {
@@ -144,15 +151,23 @@ test.describe('Authentication Flow', () => {
 
             // Wait for login to complete
             await page.waitForFunction(() => {
-                return sessionStorage.getItem('token') !== null;
+                const keys = {
+                    accessToken: btoa('_luzi_auth_access')
+                };
+                return sessionStorage.getItem(keys.accessToken) !== null;
             }, null, { timeout: 10000 });
 
             // Refresh the page
             await page.reload();
 
             // Token should still exist after refresh
-            const tokenAfterRefresh = await page.evaluate(() => sessionStorage.getItem('token'));
-            expect(tokenAfterRefresh).toBeTruthy();
+            const accessTokenAfterRefresh = await page.evaluate(() => {
+                const keys = {
+                    accessToken: btoa('_luzi_auth_access')
+                };
+                return sessionStorage.getItem(keys.accessToken);
+            });
+            expect(accessTokenAfterRefresh).toBeTruthy();
         });
 
         test('should handle logout functionality if available', async ({ page }) => {
@@ -168,8 +183,13 @@ test.describe('Authentication Flow', () => {
                 await page.waitForTimeout(2000);
 
                 // Should clear session
-                const tokenAfterLogout = await page.evaluate(() => sessionStorage.getItem('token'));
-                expect(tokenAfterLogout).toBeFalsy();
+                const accessTokenAfterLogout = await page.evaluate(() => {
+                    const keys = {
+                        accessToken: btoa('_luzi_auth_access')
+                    };
+                    return sessionStorage.getItem(keys.accessToken);
+                });
+                expect(accessTokenAfterLogout).toBeFalsy();
             } else {
                 console.log('Logout functionality not yet implemented');
             }
