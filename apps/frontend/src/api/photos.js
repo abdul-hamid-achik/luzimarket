@@ -1,10 +1,10 @@
 import api from "./client";
 
 /**
- * Upload photo with FormData
+ * Upload a photo for a product
  */
 export const uploadPhoto = (formData) => {
-    return api.post('/api/upload/photos', formData, {
+    return api.post('/upload/photos', formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
@@ -12,23 +12,18 @@ export const uploadPhoto = (formData) => {
 };
 
 /**
- * Get photos with optional filtering
+ * Get photos for a product or all photos
  */
-export const getPhotos = (params = {}) => {
-    const searchParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-            searchParams.append(key, value);
-        }
-    });
-
-    const queryString = searchParams.toString();
-    const url = queryString ? `/api/upload/photos?${queryString}` : '/api/upload/photos';
-
+export const getPhotos = (filters = {}) => {
+    const params = new URLSearchParams();
+    if (filters.productId) {
+        params.append('productId', filters.productId);
+    }
+    const url = `/upload/photos${params.toString() ? '?' + params.toString() : ''}`;
     return api.get(url).then(res => res.data);
 };
 
 /**
  * Delete photo by ID
  */
-export const deletePhoto = (photoId) => api.delete(`/api/upload/photos/${photoId}`).then(res => res.data); 
+export const deletePhoto = (photoId) => api.delete(`/upload/photos/${photoId}`).then(res => res.data); 

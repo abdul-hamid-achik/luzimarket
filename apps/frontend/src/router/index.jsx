@@ -42,6 +42,11 @@ import Productos from '@/pages/empleados/pages/productos';
 import Dinero from '@/pages/empleados/pages/dinero';
 import { StripeProvider } from '@/context/StripeContext';
 
+// CMS Components
+import AdminLayout from '@/components/cms/admin_layout';
+import ProductManagement from '@/components/cms/product_management';
+import VendorManagement from '@/components/cms/vendor_management';
+
 export const router = createBrowserRouter([
   /*PAGINA PRINCIPAL*/
   /*---------------------------------------*/
@@ -74,6 +79,26 @@ export const router = createBrowserRouter([
     element: <Login />,
     errorElement: <NotFound />,
   },
+
+  /*---------------------------------------*/
+  /* CMS ADMIN ROUTES */
+  {
+    path: "/admin/cms",
+    element: <AdminLayout />,
+    errorElement: <NotFound />,
+    children: [
+      { path: "products", element: <ProductManagement /> },
+      { path: "vendors", element: <VendorManagement /> },
+      // Add more CMS routes as components are created
+      // { path: "dashboard", element: <CMSDashboard /> },
+      // { path: "categories", element: <CategoryManagement /> },
+      // { path: "orders", element: <OrderManagement /> },
+      // { path: "users", element: <UserManagement /> },
+      // { path: "photos", element: <MediaLibrary /> },
+      // { path: "settings", element: <CMSSettings /> },
+    ],
+  },
+
   {
     path: "/inicio",
     element: <Inicio />,

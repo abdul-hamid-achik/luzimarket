@@ -4,17 +4,19 @@ test.describe('Homepage Public View', () => {
   test('should display banners and handpicked products', async ({ page }) => {
     await page.goto('/');
 
-    // Check main banners are visible
-    const mainBanner = page.locator('.Banners .BannerPrincipal img');
-    await expect(mainBanner).toBeVisible();
+    // Check main banners are visible (updated selector for actual homepage structure)
+    const mainBanner = page.locator('.cajaTitulo .ImagenBanner');
+    await expect(mainBanner.first()).toBeVisible();
 
-    // Wait for Handpicked section to render and verify the title
-    await page.waitForSelector('.titulosHandpicked h5');
-    await expect(page.locator('.titulosHandpicked h5')).toHaveText(/Handpicked/);
+    // Check that we have multiple banners
+    await expect(mainBanner).toHaveCount(2); // Should have 2 banner images
 
-    // Ensure at least four products are shown in the preview
-    await page.waitForSelector('.cajaProductosMuestra img');
-    const productCards = page.locator('.cajaProductosMuestra img');
-    await expect(productCards).toHaveCount(4);
+    // Wait for and check best sellers section
+    await page.waitForSelector('.best-sellers-section', { timeout: 10000 });
+    await expect(page.locator('.best-sellers-section')).toBeVisible();
+
+    // Check that at least some product cards are visible
+    const productCards = page.locator('.best-seller-card');
+    await expect(productCards.first()).toBeVisible({ timeout: 10000 });
   });
 });

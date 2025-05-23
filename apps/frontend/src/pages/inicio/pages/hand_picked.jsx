@@ -1,23 +1,26 @@
 import { useParams, Link } from 'react-router-dom';
-import { useProduct, useAddToCart } from "@/api/hooks";
+import { useProduct, useAddToCart, usePhotos } from "@/api/hooks";
 import CollapseDetails from "@/pages/inicio/components/collapse";
 import LogoLikeLuzimarket from "@/pages/inicio/images/logo_like_luzimarket.png";
 import "@/pages/inicio/css/handpicked.css";
 import "@/pages/inicio/css/general.css";
-import { Card, Button, ButtonGroup, Alert, Container } from "react-bootstrap";
+import { Card, Button, Alert, Container, Carousel, Badge } from "react-bootstrap";
 import { useState } from 'react';
 
 const Handpicked = () => {
   const { id } = useParams();
   const { data: fetchedProduct, isLoading, error } = useProduct(id);
+  const { data: productPhotos = [] } = usePhotos({ productId: id });
   const addToCartMutation = useAddToCart();
   const [addedToCart, setAddedToCart] = useState(false);
+  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
 
   // Loading state
   if (isLoading) return (
-    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '300px' }}>
-      <div className="spinner-border" role="status">
-        <span className="visually-hidden">Loading product...</span>
+    <div className="modern-loading-container">
+      <div className="modern-spinner">
+        <div className="spinner-ring"></div>
+        <div className="spinner-text">Loading product...</div>
       </div>
     </div>
   );
@@ -25,144 +28,211 @@ const Handpicked = () => {
   // Error state - product not found
   if (error || !fetchedProduct) {
     return (
-      <Container className="text-center my-5">
-        <div className="row justify-content-center">
-          <div className="col-md-8">
-            <div className="product-not-found-container">
-              <h1 className="display-4 mb-4">Product Not Found</h1>
-              <p className="lead mb-4">
-                The product you're looking for doesn't exist or has been removed from our catalog.
-              </p>
-              <p className="text-muted mb-4">
-                This might happen if:
-                <ul className="list-unstyled mt-3">
-                  <li>• The product has been discontinued</li>
-                  <li>• The link is outdated</li>
-                  <li>• There was a typo in the URL</li>
-                </ul>
-              </p>
-              <div className="d-flex gap-3 justify-content-center flex-wrap">
-                <Link to="/handpicked/productos" className="btn btn-primary btn-lg">
-                  Browse All Products
-                </Link>
-                <Link to="/" className="btn btn-outline-secondary btn-lg">
-                  Go to Homepage
-                </Link>
-              </div>
-            </div>
+      <Container className="modern-error-container">
+        <div className="error-content">
+          <div className="error-icon">🛍️</div>
+          <h1 className="error-title">Product Not Found</h1>
+          <p className="error-description">
+            The product you're looking for doesn't exist or has been removed from our catalog.
+          </p>
+          <div className="error-actions">
+            <Link to="/handpicked/productos" className="btn-modern btn-primary">
+              Browse All Products
+            </Link>
+            <Link to="/" className="btn-modern btn-secondary">
+              Go to Homepage
+            </Link>
           </div>
         </div>
       </Container>
     );
   }
 
-  // Define fallback product when API returns no data but no error
-  const fallbackProduct = {
-    id: Number(id),
-    name: `Featured Product ${id}`,
-    description: 'Product details are currently being updated. Please check back soon.',
-    price: 0,
-    imageUrl: undefined,
-    category: undefined
-  };
+  const product = fetchedProduct;
 
-  const product = fetchedProduct || fallbackProduct;
+  // Combine product.imageUrl with photos from photos API
+  const allPhotos = [];
+  if (product.imageUrl) {
+    allPhotos.push({ url: product.imageUrl, alt: product.name });
+  }
+  if (productPhotos && productPhotos.length > 0) {
+    allPhotos.push(...productPhotos.map(photo => ({
+      url: photo.url,
+      alt: photo.alt || product.name
+    })));
+  }
+
+  // Remove duplicates based on URL
+  const uniquePhotos = allPhotos.filter((photo, index, self) =>
+    index === self.findIndex(p => p.url === photo.url)
+  );
+
+  // Fallback to placeholder if no photos
+  const displayPhotos = uniquePhotos.length > 0 ? uniquePhotos : [
+    { url: "https://via.placeholder.com/600x600?text=Product+Image+Coming+Soon", alt: product.name }
+  ];
 
   const handleAddToCart = () => {
-    if (product && fetchedProduct) { // Only allow adding real products to cart
-      addToCartMutation.mutate({ productId: product.id, quantity: 1 }, {
-        onSuccess: () => {
-          setAddedToCart(true);
-          setTimeout(() => setAddedToCart(false), 3000);
-        }
-      });
-    }
+    addToCartMutation.mutate({ productId: product.id, quantity: 1 }, {
+      onSuccess: () => {
+        setAddedToCart(true);
+        setTimeout(() => setAddedToCart(false), 3000);
+      }
+    });
   };
 
-  const isFallbackProduct = !fetchedProduct;
+  const formatPrice = (price) => {
+    return (price && typeof price === 'number') ? (price / 100).toFixed(2) : '0.00';
+  };
 
   return (
-    <div className="container product-detail-container">
-      {isFallbackProduct && (
-        <Alert variant="warning" className="mb-4">
-          <Alert.Heading>Product information unavailable</Alert.Heading>
-          This product is currently being updated. Some information may not be accurate.
-        </Alert>
-      )}
-
-      <div className="row my-4">
-        <div className="col-md-6">
-          <Card className="border-0">
-            <Card.Img
-              variant="top"
-              src={product.imageUrl || "https://via.placeholder.com/500?text=Product+Image+Coming+Soon"}
-              alt={product.name}
-              className="product-image"
-            />
-            <Card.ImgOverlay className="d-flex align-items-start">
-              <Card.Img
-                src={LogoLikeLuzimarket}
-                alt="Logo like"
-                style={{ width: "11%" }}
-                className="ms-2 mt-2"
-              />
-            </Card.ImgOverlay>
-          </Card>
+    <div className="modern-product-container">
+      <Container fluid className="px-0">
+        {/* Breadcrumb */}
+        <div className="modern-breadcrumb">
+          <Container>
+            <nav aria-label="breadcrumb">
+              <ol className="breadcrumb">
+                <li className="breadcrumb-item"><Link to="/">Home</Link></li>
+                <li className="breadcrumb-item"><Link to="/handpicked/productos">Products</Link></li>
+                <li className="breadcrumb-item active">{product.name}</li>
+              </ol>
+            </nav>
+          </Container>
         </div>
-        <div className="col-md-6">
-          <h1 className="mb-4 product-title">{product.name}</h1>
-          <h5 className="mb-4 text-muted product-category">
-            {product.category || "Category"}
-          </h5>
-          <h3 className="mb-4 product-price">
-            ${(product.price && typeof product.price === 'number') ? (product.price / 100).toFixed(2) : '0.00'}
-          </h3>
-          <div className="description mb-4">
-            <h5>Description:</h5>
-            <p className="product-description">
-              {product.description || 'Product description will be available soon.'}
-            </p>
-          </div>
 
-          {!isFallbackProduct ? (
-            <div className="d-grid gap-2">
-              <Button
-                variant="outline-dark"
-                size="lg"
-                onClick={handleAddToCart}
-                className="btn-primary add-to-cart"
-                disabled={addToCartMutation.isLoading}
-              >
-                {addToCartMutation.isLoading ? 'Adding...' : 'Add to Cart'}
-              </Button>
-              {addedToCart && (
-                <Alert variant="success" className="mt-2">
-                  ¡Product added to cart!
-                </Alert>
-              )}
-            </div>
-          ) : (
-            <div className="d-grid gap-2">
-              <Button variant="secondary" size="lg" disabled>
-                Product Currently Unavailable
-              </Button>
-              <div className="mt-3">
-                <Link to="/handpicked/productos" className="btn btn-primary">
-                  Browse Similar Products
-                </Link>
+        {/* Main Product Section */}
+        <Container className="product-main-section">
+          <div className="row g-0">
+            {/* Photo Gallery */}
+            <div className="col-lg-7">
+              <div className="photo-gallery-container">
+                {/* Main Photo Display */}
+                <div className="main-photo-container">
+                  <img
+                    src={displayPhotos[activePhotoIndex]?.url}
+                    alt={displayPhotos[activePhotoIndex]?.alt}
+                    className="main-product-photo"
+                  />
+                  <div className="photo-overlay">
+                    <img
+                      src={LogoLikeLuzimarket}
+                      alt="Luzi Market"
+                      className="luzi-watermark"
+                    />
+                  </div>
+                  {displayPhotos.length > 1 && (
+                    <div className="photo-navigation">
+                      <button
+                        className="nav-btn prev-btn"
+                        onClick={() => setActivePhotoIndex(prev =>
+                          prev === 0 ? displayPhotos.length - 1 : prev - 1
+                        )}
+                      >
+                        ‹
+                      </button>
+                      <button
+                        className="nav-btn next-btn"
+                        onClick={() => setActivePhotoIndex(prev =>
+                          prev === displayPhotos.length - 1 ? 0 : prev + 1
+                        )}
+                      >
+                        ›
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Photo Thumbnails */}
+                {displayPhotos.length > 1 && (
+                  <div className="photo-thumbnails">
+                    {displayPhotos.map((photo, index) => (
+                      <div
+                        key={index}
+                        className={`thumbnail ${index === activePhotoIndex ? 'active' : ''}`}
+                        onClick={() => setActivePhotoIndex(index)}
+                      >
+                        <img src={photo.url} alt={photo.alt} />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
-          )}
-        </div>
-      </div>
 
-      {!isFallbackProduct && (
-        <div className="row my-4 accordion-container">
-          <div className="col-md-12">
-            <CollapseDetails product={product} />
+            {/* Product Info */}
+            <div className="col-lg-5">
+              <div className="product-info-container">
+                <div className="product-header">
+                  <h1 className="product-title">{product.name}</h1>
+                  {product.category && (
+                    <Badge bg="light" text="dark" className="category-badge">
+                      {product.category}
+                    </Badge>
+                  )}
+                </div>
+
+                <div className="price-section">
+                  <span className="price-label">Price</span>
+                  <span className="price-value">${formatPrice(product.price)}</span>
+                </div>
+
+                <div className="description-section">
+                  <h3 className="section-title">Description</h3>
+                  <p className="product-description">
+                    {product.description || 'Product description will be available soon.'}
+                  </p>
+                </div>
+
+                <div className="action-section">
+                  <Button
+                    className="add-to-cart-btn"
+                    size="lg"
+                    onClick={handleAddToCart}
+                    disabled={addToCartMutation.isLoading}
+                  >
+                    {addToCartMutation.isLoading ? (
+                      <>
+                        <div className="btn-spinner"></div>
+                        Adding...
+                      </>
+                    ) : (
+                      <>
+                        <span>Add to Cart</span>
+                        <i className="cart-icon">🛒</i>
+                      </>
+                    )}
+                  </Button>
+
+                  {addedToCart && (
+                    <Alert variant="success" className="success-alert">
+                      <i className="success-icon">✓</i>
+                      Product added to cart successfully!
+                    </Alert>
+                  )}
+                </div>
+
+                {/* Product Stats */}
+                <div className="product-stats">
+                  <div className="stat-item">
+                    <span className="stat-label">Photos</span>
+                    <span className="stat-value">{displayPhotos.length}</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Product ID</span>
+                    <span className="stat-value">{product.id.slice(0, 8)}...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        </Container>
+
+        {/* Product Details Collapse */}
+        <Container className="details-section">
+          <CollapseDetails product={product} />
+        </Container>
+      </Container>
     </div>
   );
 };

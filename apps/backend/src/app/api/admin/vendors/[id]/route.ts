@@ -4,7 +4,7 @@ import { dbService, eq } from '@/db/service';
 import { vendors, users } from '@/db/schema';
 
 interface RouteParams {
-    params: { id: string };
+    params: Promise<{ id: string }>;
 }
 
 /**
@@ -31,7 +31,7 @@ interface RouteParams {
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
     try {
-        const { id } = params;
+        const { id } = await params;
 
         const vendor = await dbService.raw
             .select({
@@ -117,7 +117,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  */
 export async function PUT(request: NextRequest, { params }: RouteParams) {
     try {
-        const { id } = params;
+        const { id } = await params;
         const body = await request.json();
 
         // Check if vendor exists
@@ -175,7 +175,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
  */
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
     try {
-        const { id } = params;
+        const { id } = await params;
 
         // Check if vendor exists
         const existingVendor = await dbService.findFirst(vendors, eq(vendors.id, id));

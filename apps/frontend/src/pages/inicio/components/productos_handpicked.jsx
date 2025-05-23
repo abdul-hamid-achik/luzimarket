@@ -8,7 +8,7 @@ const ProductosHandpicked = ({ filters }) => {
   const { data, isLoading, error } = useProducts(filters);
   const addToCart = useAddToCart();
   const [addedProducts, setAddedProducts] = useState({});
-  const products = data || [];
+  const products = data?.products || [];
 
   const handleAddToCart = (product) => {
     addToCart.mutate({ productId: product.id, quantity: 1 }, {
@@ -42,23 +42,16 @@ const ProductosHandpicked = ({ filters }) => {
     );
   }
 
-  // Ensure we always have at least some fallback products for tests
-  const productsToDisplay = products.length > 0 ? products : [
-    {
-      id: 1,
-      name: "Featured Product 1",
-      description: "This is a featured product for testing",
-      price: 99.99,
-      imageUrl: "https://via.placeholder.com/300x300?text=Product+1"
-    },
-    {
-      id: 2,
-      name: "Featured Product 2",
-      description: "Another great product for you",
-      price: 79.99,
-      imageUrl: "https://via.placeholder.com/300x300?text=Product+2"
-    }
-  ];
+  if (products.length === 0) {
+    return (
+      <Container className="my-5 text-center">
+        <Alert variant="info">
+          <h4>No products available</h4>
+          <p>We're currently updating our product catalog. Please check back soon!</p>
+        </Alert>
+      </Container>
+    );
+  }
 
   return (
     <div className="featured-products-container">
@@ -66,7 +59,7 @@ const ProductosHandpicked = ({ filters }) => {
         <h1 className="text-center mb-4">Hand Picked Products</h1>
 
         <div className="cajaTodosLosProductos row g-4">
-          {productsToDisplay.map((product) => (
+          {products.map((product) => (
             <div key={product.id} className="col-12 col-sm-6 col-md-6 col-lg-4">
               <Card className="product-card h-100">
                 <Link

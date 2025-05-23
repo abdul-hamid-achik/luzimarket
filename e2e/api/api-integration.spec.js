@@ -64,7 +64,7 @@ test.describe('API Integration Tests', () => {
                 { headers: { Authorization: `Bearer ${guestToken}` }, validateStatus: () => true }
             );
             expect(loginRes.status).toBe(200);
-            userToken = loginRes.data.token;
+            userToken = loginRes.data.accessToken;
             expect(userToken).toBeTruthy();
 
             // Verify merged cart contains items
@@ -82,10 +82,10 @@ test.describe('API Integration Tests', () => {
         test('should fetch products and product details', async () => {
             const listRes = await axios.get(`${API_URL}/products`, { validateStatus: () => true });
             expect(listRes.status).toBe(200);
-            expect(Array.isArray(listRes.data)).toBe(true);
+            expect(Array.isArray(listRes.data.products)).toBe(true);
 
-            if (listRes.data.length > 0) {
-                const id = listRes.data[0].id;
+            if (listRes.data.products.length > 0) {
+                const id = listRes.data.products[0].id;
                 const getRes = await axios.get(`${API_URL}/products/${id}`, { validateStatus: () => true });
                 expect(getRes.status).toBe(200);
                 expect(getRes.data.id).toBe(id);

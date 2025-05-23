@@ -15,84 +15,23 @@ import "@/pages/inicio/css/general.css";
 import Card from "react-bootstrap/Card";
 import { Link } from "react-router-dom";
 
-// Fallback product data in case API fails
-const fallbackProducts = [
-  {
-    id: 1,
-    name: "Bouquet de Rosas",
-    description: "Hermoso ramo de rosas frescas para momentos especiales.",
-    price: 650,
-    imageUrl: ImagenMuestra1
-  },
-  {
-    id: 2,
-    name: "Caja de Donas",
-    description: "Selección de donas artesanales (6 piezas).",
-    price: 150,
-    imageUrl: ImagenMuestra2
-  },
-  {
-    id: 3,
-    name: "Experiencia Cena",
-    description: "Cena para dos con decoración especial y menú de 3 tiempos.",
-    price: 2500,
-    imageUrl: ImagenMuestra3
-  },
-  {
-    id: 4,
-    name: "Juego de Tazas",
-    description: "Set de 4 tazas cerámicas coloridas.",
-    price: 350,
-    imageUrl: ImagenMuestra4
-  }
-];
-
 const BodyLuzi = () => {
-  // Move hook call to top-level of component
-  const { data: apiProducts = [], isLoading, error } = useProducts();
-
-  // Use API products if available, otherwise use fallback products
-  const products = apiProducts.length > 0 ? apiProducts : fallbackProducts;
+  const { data, isLoading, error } = useProducts();
+  const products = data?.products || [];
 
   return (
     <div className="cajaBody">
-      {/* Banners */}
-      <div className="Banners">
-        <div className="BannerPrincipal">
-          <img src={ImagenBanner1} />
-        </div>
-        <div className="BannerSecundario">
-          <img src={ImagenBanner2} className="ImagenTextoBanner" />
-          <p>
-            Experiencias y productos seleccionados a mano para momentos
-            especiales
-          </p>
-          <button
-            type="button"
-            className="btn no-rounded"
-            style={{
-              backgroundColor: "black",
-              padding: "10px",
-              paddingLeft: "20px",
-              paddingRight: "20px",
-              color: "white",
-              border: "0px",
-              borderRadius: "0px",
-            }}
-          >
-            Ver Handpicked
-          </button>
-        </div>
-      </div>
-      <div className="bannerOferta">
-        <div className="botonBannerOferta">
-          <h4>10% off en tu primer compra al suscribirte gratis</h4>
-          <button className="botonBanner4">Suscribirse</button>
-        </div>
+      {/* Banner LUZI MARKET */}
+      <div className="cajaTitulo">
+        <img className="ImagenBanner" src={ImagenBanner1} />
       </div>
 
-      {/* Cards */}
+      {/* Segundo banner */}
+      <div className="cajaTitulo">
+        <img className="ImagenBanner" src={ImagenBanner2} />
+      </div>
 
+      {/* Imagenes banner opciones */}
       <div className="cajaImagenesBanner">
         <div className="cardImage">
           <img src={ImagenMuestra1} className="image" />
@@ -151,19 +90,19 @@ const BodyLuzi = () => {
         {isLoading ? (
           <div>Loading products...</div>
         ) : error ? (
-          // Show fallback products if there's an error
-          fallbackProducts.map((product) => (
-            <Card style={{ width: '18rem' }} key={product.id}>
-              <Link to={`handpicked/productos/${product.id}`}>
-                <Card.Img variant="top" src={product.imageUrl} />
-              </Link>
-              <Card.Body>
-                <Card.Title>{product.name}</Card.Title>
-                <Card.Text>{product.description}</Card.Text>
-                <Card.Text>${product.price.toFixed(2)}</Card.Text>
-              </Card.Body>
-            </Card>
-          ))
+          <div className="text-center text-muted">
+            <p>Products will be available soon</p>
+            <Link to="/handpicked/productos" className="btn btn-primary">
+              Browse Products
+            </Link>
+          </div>
+        ) : products.length === 0 ? (
+          <div className="text-center text-muted">
+            <p>No products available</p>
+            <Link to="/handpicked/productos" className="btn btn-primary">
+              Check Back Soon
+            </Link>
+          </div>
         ) : (
           products.slice(0, 4).map((product) => (
             <Card style={{ width: '18rem' }} key={product.id}>
@@ -173,7 +112,7 @@ const BodyLuzi = () => {
               <Card.Body>
                 <Card.Title>{product.name}</Card.Title>
                 <Card.Text>{product.description}</Card.Text>
-                <Card.Text>${product.price.toFixed(2)}</Card.Text>
+                <Card.Text>${((product.price || 0) / 100).toFixed(2)}</Card.Text>
               </Card.Body>
             </Card>
           ))

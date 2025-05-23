@@ -111,12 +111,20 @@ test.describe('CMS Vendor Management', () => {
         test('should validate commission rate range', async ({ page }) => {
             await page.click('button:has-text("Add New Vendor")');
 
+            // Fill required fields first so commission rate validation can trigger
+            await page.fill('input[name="businessName"]', 'Test Vendor Commission');
+            await page.fill('input[name="contactPerson"]', 'Test Person');
+            await page.fill('input[name="email"]', 'test@commission.com');
+            await page.fill('input[name="phone"]', '+1-555-0000');
+            await page.fill('textarea[name="address"]', '123 Test Street');
+            await page.fill('input[name="password"]', 'TestPass123!');
+
             // Test negative value
             await page.fill('input[name="commissionRate"]', '-5');
             await page.click('button[type="submit"]');
             await expect(page.locator('.invalid-feedback:has-text("Commission rate must be at least 0")')).toBeVisible();
 
-            // Test value over 100
+            // Clear the invalid value and test value over 100
             await page.fill('input[name="commissionRate"]', '150');
             await page.click('button[type="submit"]');
             await expect(page.locator('.invalid-feedback:has-text("Commission rate cannot exceed 100")')).toBeVisible();

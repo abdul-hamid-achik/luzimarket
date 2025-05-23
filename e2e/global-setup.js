@@ -8,7 +8,7 @@ const logsDir = path.join(__dirname, '..', 'tmp', 'playwright-logs');
 const screenshotsDir = path.join(__dirname, '..', 'tmp', 'playwright-screenshots');
 
 // Check if we're using PGlite (offline mode)
-const DB_MODE = process.env.DB_MODE || 'neon';
+const DB_MODE = process.env.DB_MODE || 'online';
 const isOfflineMode = DB_MODE === 'offline';
 
 console.log(`Global setup running in ${isOfflineMode ? 'OFFLINE (SQLite)' : 'ONLINE (PostgreSQL)'} mode`);

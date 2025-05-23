@@ -38,6 +38,7 @@
     "swagger-ui-react": "^5.22.0"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.0.0",
     "@faker-js/faker": "^9.8.0",
     "@types/bcryptjs": "^2.4.2",
     "@types/better-sqlite3": "^7.6.13",

@@ -46,25 +46,27 @@ test.describe('CMS Product Management', () => {
         });
 
         test('should filter products by status', async ({ page }) => {
-            // Test status filter
-            await page.selectOption('select[aria-label="Status"]', 'active');
+            // Test status filter (first select in filters section)
+            const statusSelect = page.locator('.card .row .col-md-3:nth-child(1) select.form-select');
+            await statusSelect.selectOption('active');
 
             // Wait for filter to apply (table should update)
             await page.waitForTimeout(500);
 
             // Reset filter
-            await page.selectOption('select[aria-label="Status"]', '');
+            await statusSelect.selectOption('');
         });
 
         test('should filter products by featured status', async ({ page }) => {
-            // Test featured filter
-            await page.selectOption('select[aria-label="Featured"]', 'true');
+            // Test featured filter (fourth select in filters section)
+            const featuredSelect = page.locator('.card .row .col-md-3:nth-child(4) select.form-select');
+            await featuredSelect.selectOption('true');
 
             // Wait for filter to apply
             await page.waitForTimeout(500);
 
             // Reset filter
-            await page.selectOption('select[aria-label="Featured"]', '');
+            await featuredSelect.selectOption('');
         });
     });
 
