@@ -6,6 +6,36 @@ import { StatusCodes } from 'http-status-codes';
 import { dbService } from '@/db/service';
 import { sessions } from '@/db/schema';
 
+/**
+ * @swagger
+ * /api/auth/guest:
+ *   post:
+ *     summary: Create guest session
+ *     description: Create a temporary guest session for anonymous users to browse and use cart functionality before registering
+ *     tags: [Authentication]
+ *     responses:
+ *       200:
+ *         description: Guest session created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: JWT token for guest session
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *       500:
+ *         description: Failed to create guest session
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Failed to create guest session
+ */
 export async function POST() {
     try {
         // Create a guest session with generated UUID

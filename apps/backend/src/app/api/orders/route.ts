@@ -5,6 +5,91 @@ import { dbService, eq } from '@/db/service';
 import { sessions, orders, cartItems, orderItems, productVariants, products } from '@/db/schema';
 import { StatusCodes } from 'http-status-codes';
 
+/**
+ * @swagger
+ * /api/orders:
+ *   get:
+ *     summary: Get user orders
+ *     description: Retrieve all orders for the authenticated user
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of user orders
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     description: Order ID
+ *                   userId:
+ *                     type: string
+ *                     description: User ID
+ *                   total:
+ *                     type: number
+ *                     description: Order total amount
+ *                   status:
+ *                     type: string
+ *                     description: Order status
+ *                   createdAt:
+ *                     type: string
+ *                     format: date-time
+ *                     description: Order creation date
+ *       401:
+ *         description: Unauthorized - invalid or missing token
+ *       500:
+ *         description: Failed to fetch orders
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *   post:
+ *     summary: Create order from cart
+ *     description: Create a new order from the current cart items, calculates total and clears cart after order creation
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Order created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 orderId:
+ *                   type: string
+ *                   description: ID of the created order
+ *                   example: "123e4567-e89b-12d3-a456-426614174000"
+ *       400:
+ *         description: Cart is empty or invalid data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Cart empty
+ *       401:
+ *         description: Unauthorized - invalid session or user
+ *       500:
+ *         description: Failed to create order
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Failed to create order
+ */
+
 function getSessionId(request: NextRequest): string | null {
     const auth = request.headers.get('Authorization') || '';
     if (!auth.startsWith('Bearer ')) return null;

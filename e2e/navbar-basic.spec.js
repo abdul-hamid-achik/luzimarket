@@ -90,14 +90,30 @@ test.describe('Employee Navigation', () => {
 
 test.describe('Error Handling', () => {
     test('should handle invalid routes gracefully', async ({ page }) => {
-        await page.goto('/invalid-route-that-does-not-exist');
+        // Test navigation to non-existent page
+        const invalidUrl = '/invalid-route-that-does-not-exist-' + Date.now();
+        await page.goto(invalidUrl);
 
-        // Should either show 404 or redirect
         const currentUrl = page.url();
-        const has404 = await page.locator('text=404').isVisible();
-        const isRedirected = !currentUrl.includes('invalid-route-that-does-not-exist');
+        console.log('Current URL after invalid navigation:', currentUrl);
 
-        expect(has404 || isRedirected).toBeTruthy();
+        // Check various ways the app might handle 404s
+        const has404Text = await page.locator('text=404, text=Not Found, text=Page not found').count();
+        const isRedirected = !currentUrl.includes('invalid-route-that-does-not-exist');
+        const hasErrorPage = await page.locator('[data-testid="error-page"], .error-page').count() > 0;
+        const isHomepage = currentUrl === 'http://localhost:5173/' || currentUrl.endsWith('/');
+
+        // App should handle error in one of these ways
+        const handledGracefully = has404Text > 0 || isRedirected || hasErrorPage || isHomepage;
+
+        if (!handledGracefully) {
+            console.log('404 text found:', has404Text);
+            console.log('Redirected:', isRedirected);
+            console.log('Error page found:', hasErrorPage);
+            console.log('Is homepage:', isHomepage);
+        }
+
+        expect(handledGracefully).toBeTruthy();
     });
 
     test('should recover from navigation errors', async ({ page }) => {

@@ -129,15 +129,20 @@ test.describe('Complete E-commerce Flow with Stripe Integration', () => {
         console.log('=== STEP 4: Add Product to Cart ===');
         const addToCartSelectors = [
             'button:has-text("Agregar a la bolsa")',
-            'button:has-text("Add to Cart")',
             'button.add-to-cart',
+            'button:has-text("Add to Cart")',
             'button.btn-primary'
         ];
 
         let addedToCart = false;
         for (const selector of addToCartSelectors) {
             try {
-                if (await page.locator(selector).count() > 0) {
+                const buttonCount = await page.locator(selector).count();
+                console.log(`Checking selector ${selector}: found ${buttonCount} buttons`);
+
+                if (buttonCount > 0) {
+                    // Wait for button to be clickable
+                    await page.waitForTimeout(1000);
                     await page.click(selector);
                     console.log(`Added to cart with selector: ${selector}`);
                     addedToCart = true;
@@ -145,6 +150,33 @@ test.describe('Complete E-commerce Flow with Stripe Integration', () => {
                 }
             } catch (e) {
                 console.log(`Could not add to cart with selector ${selector}:`, e.message);
+            }
+        }
+
+        // If still not found, try clicking any visible button
+        if (!addedToCart) {
+            console.log('Trying to find any button on the page...');
+            const allButtons = await page.locator('button').all();
+            console.log(`Found ${allButtons.length} buttons total`);
+
+            for (let i = 0; i < allButtons.length; i++) {
+                try {
+                    const buttonText = await allButtons[i].textContent();
+                    console.log(`Button ${i}: "${buttonText}"`);
+
+                    if (buttonText && (
+                        buttonText.toLowerCase().includes('agregar') ||
+                        buttonText.toLowerCase().includes('cart') ||
+                        buttonText.toLowerCase().includes('bolsa')
+                    )) {
+                        await allButtons[i].click();
+                        console.log(`Successfully clicked button with text: "${buttonText}"`);
+                        addedToCart = true;
+                        break;
+                    }
+                } catch (e) {
+                    console.log(`Could not click button ${i}:`, e.message);
+                }
             }
         }
 

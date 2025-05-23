@@ -5,6 +5,194 @@ import { dbService, eq, and } from '@/db/service';
 import { sessions, cartItems, productVariants, products } from '@/db/schema';
 import { StatusCodes } from 'http-status-codes';
 
+/**
+ * @swagger
+ * /api/cart:
+ *   get:
+ *     summary: Get cart items
+ *     description: Retrieve all items in the user's shopping cart with product details
+ *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Cart items retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         description: Cart item ID
+ *                       sessionId:
+ *                         type: string
+ *                         description: Session ID
+ *                       variantId:
+ *                         type: string
+ *                         description: Product variant ID
+ *                       quantity:
+ *                         type: integer
+ *                         description: Quantity of item
+ *                       productId:
+ *                         type: string
+ *                         description: Product ID
+ *                       name:
+ *                         type: string
+ *                         description: Product name
+ *                       description:
+ *                         type: string
+ *                         description: Product description
+ *                       price:
+ *                         type: number
+ *                         description: Product price
+ *       401:
+ *         description: Unauthorized - invalid or missing token
+ *       500:
+ *         description: Failed to fetch cart
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *   post:
+ *     summary: Add item to cart
+ *     description: Add a product or variant to the shopping cart
+ *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               productId:
+ *                 type: string
+ *                 description: Product ID (required if variantId not provided)
+ *               variantId:
+ *                 type: string
+ *                 description: Product variant ID (required if productId not provided)
+ *               quantity:
+ *                 type: integer
+ *                 description: Quantity to add
+ *                 default: 1
+ *                 minimum: 1
+ *             oneOf:
+ *               - required: [productId]
+ *               - required: [variantId]
+ *     responses:
+ *       201:
+ *         description: Item added to cart successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   description: Cart item ID
+ *                 sessionId:
+ *                   type: string
+ *                 variantId:
+ *                   type: string
+ *                 quantity:
+ *                   type: integer
+ *                 productId:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 description:
+ *                   type: string
+ *                 price:
+ *                   type: number
+ *       400:
+ *         description: Bad request - missing required fields
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Failed to add item to cart
+ *   put:
+ *     summary: Update cart item quantity
+ *     description: Update the quantity of an existing cart item
+ *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - itemId
+ *               - quantity
+ *             properties:
+ *               itemId:
+ *                 type: string
+ *                 description: Cart item ID to update
+ *               quantity:
+ *                 type: integer
+ *                 description: New quantity
+ *                 minimum: 1
+ *     responses:
+ *       200:
+ *         description: Cart item updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 sessionId:
+ *                   type: string
+ *                 variantId:
+ *                   type: string
+ *                 quantity:
+ *                   type: integer
+ *       400:
+ *         description: Bad request - missing required fields
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Cart item not found
+ *       500:
+ *         description: Failed to update cart item
+ *   delete:
+ *     summary: Clear cart
+ *     description: Remove all items from the shopping cart
+ *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Cart cleared successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Cart cleared successfully
+ *                 itemsRemoved:
+ *                   type: integer
+ *                   description: Number of items removed
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Failed to clear cart
+ */
+
 function getSessionId(request: NextRequest): string | null {
     const auth = request.headers.get('Authorization') || '';
     if (!auth.startsWith('Bearer ')) return null;

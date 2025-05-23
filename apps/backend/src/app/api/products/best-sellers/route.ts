@@ -18,37 +18,63 @@ interface BestSellerProduct {
     totalSold: number;
 }
 
+/**
+ * @swagger
+ * /api/products/best-sellers:
+ *   get:
+ *     summary: Get best selling products
+ *     description: Returns a list of the top 10 best-selling products with their details, categories, and sales information
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: List of best selling products
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/BestSellerProduct'
+ *       500:
+ *         description: Failed to fetch best sellers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 export async function GET() {
     try {
         // Query to get best-selling products with their details and photos
-        const bestSellers = await dbService.execute(sql`
+        const result = await dbService.execute(sql`
             SELECT 
                 p.id,
                 p.slug,
                 p.name,
                 p.description,
                 p.price,
-                p."categoryId",
+                p."category_id" as "categoryId",
                 c.name as "categoryName",
                 c.slug as "categorySlug",
                 COALESCE(ph.url, '') as "imageUrl",
-                COALESCE(ph.alt, p.name) as "imageAlt",
+                COALESCE(ph.alt_text, p.name) as "imageAlt",
                 COALESCE(SUM(oi.quantity), 0) as "totalSold"
             FROM products p
-            LEFT JOIN order_items oi ON oi."variantId" IN (
-                SELECT pv.id FROM product_variants pv WHERE pv."productId" = p.id
+            LEFT JOIN order_items oi ON oi."variant_id" IN (
+                SELECT pv.id FROM product_variants pv WHERE pv."product_id" = p.id
             )
-            LEFT JOIN categories c ON c.id = p."categoryId"
+            LEFT JOIN categories c ON c.id = p."category_id"
             LEFT JOIN (
-                SELECT DISTINCT ON ("productId") 
-                    "productId", url, alt
+                SELECT DISTINCT ON ("product_id") 
+                    "product_id", url, alt_text
                 FROM photos
-                ORDER BY "productId", "sortOrder" ASC
-            ) ph ON ph."productId" = p.id
-            GROUP BY p.id, p.slug, p.name, p.description, p.price, p."categoryId", c.name, c.slug, ph.url, ph.alt
-            ORDER BY "totalSold" DESC, p."createdAt" DESC
+                ORDER BY "product_id", "sort_order" ASC
+            ) ph ON ph."product_id" = p.id
+            GROUP BY p.id, p.slug, p.name, p.description, p.price, p."category_id", c.name, c.slug, ph.url, ph.alt_text
+            ORDER BY "totalSold" DESC, p."created_at" DESC
             LIMIT 10
         `);
+
+        // Handle the database result - it might be { rows: [...] } or just [...]
+        const bestSellers = Array.isArray(result) ? result : (result as any).rows || [];
 
         // Format the response
         const formattedBestSellers: BestSellerProduct[] = bestSellers.map((product: any) => ({

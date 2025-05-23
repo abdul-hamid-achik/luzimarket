@@ -3,6 +3,54 @@ import { StatusCodes } from 'http-status-codes';
 import { dbService } from '@/db/service';
 import { orders } from '@/db/schema';
 
+/**
+ * @swagger
+ * /api/admin/orders:
+ *   get:
+ *     summary: Get all orders for admin
+ *     description: Retrieve all orders for administrative management and dashboard display
+ *     tags: [Admin]
+ *     responses:
+ *       200:
+ *         description: List of orders with admin details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   OrderID:
+ *                     type: string
+ *                     description: Order ID
+ *                   Total:
+ *                     type: string
+ *                     description: Order total amount
+ *                   Cliente:
+ *                     type: string
+ *                     description: Customer name or identifier
+ *                   EstadoPago:
+ *                     type: string
+ *                     description: Payment status in Spanish
+ *                     enum: [pagado, pendiente, fallido]
+ *                   EstadoOrden:
+ *                     type: string
+ *                     description: Order status in Spanish
+ *                     enum: [procesando, enviado, entregado, cancelado]
+ *                   TipoEnvio:
+ *                     type: string
+ *                     description: Shipping type
+ *                   Fecha:
+ *                     type: string
+ *                     format: date
+ *                     description: Order date
+ *       500:
+ *         description: Failed to fetch admin orders (returns fallback data)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 export async function GET() {
   try {
     // Get orders from database using the type-safe service

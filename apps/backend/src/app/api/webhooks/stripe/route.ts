@@ -11,7 +11,13 @@ const stripe = STRIPE_SECRET_KEY ? require('stripe')(STRIPE_SECRET_KEY) : null;
 
 // Get webhook secret - prioritize test secret for local development
 function getWebhookSecret(): string | null {
-    // 1. Check for test secret from Stripe CLI (for local testing)
+    // 1. Check for CI environment with static test secret
+    if (process.env.CI === 'true' && process.env.STRIPE_WEBHOOK_SECRET) {
+        console.log('🔑 Using CI static webhook secret for testing');
+        return process.env.STRIPE_WEBHOOK_SECRET;
+    }
+
+    // 2. Check for test secret from Stripe CLI (for local testing)
     if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
         // Try environment variable first
         if (process.env.STRIPE_WEBHOOK_SECRET_TEST) {
@@ -33,7 +39,7 @@ function getWebhookSecret(): string | null {
         }
     }
 
-    // 2. Fall back to production webhook secret
+    // 3. Fall back to production webhook secret
     const productionSecret = process.env.STRIPE_WEBHOOK_SECRET;
     if (productionSecret) {
         console.log('🔑 Using production webhook secret');
@@ -53,45 +59,75 @@ export async function POST(request: NextRequest) {
 
     try {
         const body = await request.text();
-        const signature = request.headers.get('stripe-signature')!;
+        const signature = request.headers.get('stripe-signature');
+
+        if (!signature) {
+            console.error('Missing Stripe signature');
+            return NextResponse.json({ error: 'Webhook Error: Missing Stripe signature' }, { status: 400 });
+        }
+
+        const webhookSecret = getWebhookSecret();
+        if (!webhookSecret) {
+            console.error('Webhook secret not configured');
+            return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });
+        }
 
         let event;
         try {
             event = stripe.webhooks.constructEvent(
                 body,
                 signature,
-                process.env.STRIPE_WEBHOOK_SECRET!
+                webhookSecret
             );
         } catch (err) {
             console.error('Webhook signature verification failed:', err);
-            return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+            return NextResponse.json({ error: 'Webhook Error: Invalid signature' }, { status: 400 });
         }
 
         // Handle the event
         switch (event.type) {
             case 'payment_intent.succeeded':
-                const paymentIntent = event.data.object;
-                const orderId = paymentIntent.metadata.order_id;
-
-                if (orderId) {
-                    await dbService.update(orders, {
-                        payment_status: 'completed',
-                        status: 'confirmed',
-                        updatedAt: new Date(),
-                    }, eq(orders.id, orderId));
-                }
+                await handlePaymentIntentSucceeded(event.data.object);
                 break;
 
             case 'payment_intent.payment_failed':
-                const failedPayment = event.data.object;
-                const failedOrderId = failedPayment.metadata.order_id;
+                await handlePaymentIntentFailed(event.data.object);
+                break;
 
-                if (failedOrderId) {
-                    await dbService.update(orders, {
-                        payment_status: 'failed',
-                        updatedAt: new Date(),
-                    }, eq(orders.id, failedOrderId));
-                }
+            case 'payment_intent.created':
+                await handlePaymentIntentCreated(event.data.object);
+                break;
+
+            case 'charge.succeeded':
+                await handleChargeSucceeded(event.data.object);
+                break;
+
+            case 'charge.failed':
+                await handleChargeFailed(event.data.object);
+                break;
+
+            case 'charge.dispute.created':
+                await handleChargeDisputeCreated(event.data.object);
+                break;
+
+            case 'invoice.payment_succeeded':
+                await handleInvoicePaymentSucceeded(event.data.object);
+                break;
+
+            case 'invoice.payment_failed':
+                await handleInvoicePaymentFailed(event.data.object);
+                break;
+
+            case 'customer.subscription.created':
+                await handleSubscriptionCreated(event.data.object);
+                break;
+
+            case 'customer.subscription.updated':
+                await handleSubscriptionUpdated(event.data.object);
+                break;
+
+            case 'customer.subscription.deleted':
+                await handleSubscriptionDeleted(event.data.object);
                 break;
 
             default:

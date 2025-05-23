@@ -5,6 +5,71 @@ import { dbService, eq, and } from '@/db/service';
 import { sessions, orders } from '@/db/schema';
 import { StatusCodes } from 'http-status-codes';
 
+/**
+ * @swagger
+ * /api/orders/{id}:
+ *   get:
+ *     summary: Get order by ID
+ *     description: Retrieve a specific order by ID for the authenticated user
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Order ID
+ *         example: 123e4567-e89b-12d3-a456-426614174000
+ *     responses:
+ *       200:
+ *         description: Order details retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   description: Order ID
+ *                 userId:
+ *                   type: string
+ *                   description: User ID
+ *                 total:
+ *                   type: number
+ *                   description: Order total amount
+ *                 status:
+ *                   type: string
+ *                   description: Order status
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                   description: Order creation date
+ *       401:
+ *         description: Unauthorized - invalid or missing token
+ *       404:
+ *         description: Order not found or not owned by user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Order not found
+ *       500:
+ *         description: Failed to fetch order
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Failed to fetch order
+ */
+
 function getSessionId(request: NextRequest): string | null {
     const auth = request.headers.get('Authorization') || '';
     if (!auth.startsWith('Bearer ')) return null;

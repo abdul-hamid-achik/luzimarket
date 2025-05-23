@@ -34,7 +34,6 @@
     "studio": "npx --yes dotenv-cli -- npx --workspace=apps/backend --yes drizzle-kit studio"
   },
   "devDependencies": {
-    "@electric-sql/pglite": "^0.3.2",
     "@playwright/test": "^1.52.0",
     "concurrently": "^9.1.2",
     "dotenv-cli": "^8.0.0",

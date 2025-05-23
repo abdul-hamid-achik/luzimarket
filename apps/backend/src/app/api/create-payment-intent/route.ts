@@ -3,6 +3,91 @@ import jwt from 'jsonwebtoken';
 import { dbService, eq } from '@/db/service';
 import { sessions, orders, users } from '@/db/schema';
 
+/**
+ * @swagger
+ * /api/create-payment-intent:
+ *   post:
+ *     summary: Create Stripe payment intent
+ *     description: Create a payment intent for processing order payments through Stripe
+ *     tags: [Payments]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - orderId
+ *               - amount
+ *             properties:
+ *               orderId:
+ *                 type: string
+ *                 format: uuid
+ *                 description: Order ID to create payment for
+ *                 example: 123e4567-e89b-12d3-a456-426614174000
+ *               amount:
+ *                 type: number
+ *                 description: Payment amount in the specified currency
+ *                 example: 299.99
+ *               currency:
+ *                 type: string
+ *                 description: Payment currency code
+ *                 default: mxn
+ *                 example: mxn
+ *     responses:
+ *       200:
+ *         description: Payment intent created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 clientSecret:
+ *                   type: string
+ *                   description: Stripe client secret for payment confirmation
+ *                   example: pi_1234567890_secret_abcdefghijklmnop
+ *                 paymentIntentId:
+ *                   type: string
+ *                   description: Stripe payment intent ID
+ *                   example: pi_1234567890abcdefghijklmnop
+ *       400:
+ *         description: Missing required fields
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Missing orderId or amount
+ *       401:
+ *         description: Unauthorized - invalid or missing token
+ *       404:
+ *         description: Order not found or user not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Order not found
+ *       500:
+ *         description: Failed to create payment intent
+ *       503:
+ *         description: Payment service not configured
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Payment service not configured
+ */
+
 // Check if Stripe is configured, and only initialize if it is
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 const stripe = STRIPE_SECRET_KEY ? require('stripe')(STRIPE_SECRET_KEY) : null;

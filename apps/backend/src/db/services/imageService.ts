@@ -1,22 +1,23 @@
 import { randomUUID } from 'crypto';
 import { put, head } from '@vercel/blob';
+import { eq, sql } from 'drizzle-orm';
 
 // Environment variables
 const VERCEL_BLOB_TOKEN = process.env.VERCEL_BLOB_TOKEN;
 const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY; // Optional
 
-// Image categories mapped to search terms
+// Image categories mapped to search terms for Mexican market
 const IMAGE_SEARCH_TERMS: Record<string, string[]> = {
-    'floral-arrangements': ['flowers', 'bouquet', 'roses', 'floral arrangement'],
-    'gift-baskets': ['gift basket', 'hamper', 'gift box', 'present'],
-    'gourmet-treats': ['chocolates', 'gourmet food', 'sweets', 'treats'],
-    'home-decor-gifts': ['home decor', 'vase', 'candles', 'decoration'],
-    'personalized-gifts': ['personalized gift', 'custom gift', 'engraved'],
-    'aromatherapy-wellness': ['aromatherapy', 'essential oils', 'spa', 'wellness'],
-    'seasonal-specials': ['seasonal gifts', 'holiday', 'celebration'],
-    'luxury-gifts': ['luxury', 'premium', 'elegant gift'],
-    'handcrafted-items': ['handmade', 'artisan', 'craft', 'handcrafted'],
-    'eco-friendly-gifts': ['eco friendly', 'sustainable', 'natural', 'organic']
+    'floral-arrangements': ['flowers', 'bouquet', 'roses', 'mexican flowers', 'gerberas', 'sunflowers', 'orchids', 'floral arrangement', 'rosas mexicanas', 'arreglo floral'],
+    'gift-baskets': ['gift basket', 'hamper', 'gift box', 'present', 'canasta regalo', 'fruit basket', 'gourmet basket', 'mexican gifts', 'wicker basket'],
+    'gourmet-treats': ['mexican chocolates', 'artisan chocolates', 'gourmet food', 'sweets', 'treats', 'honey', 'traditional sweets', 'truffles', 'cacao', 'dulces mexicanos'],
+    'home-decor-gifts': ['mexican pottery', 'talavera', 'home decor', 'vase', 'candles', 'decoration', 'ceramic vase', 'handmade pottery', 'artisan decor'],
+    'personalized-gifts': ['personalized gift', 'custom gift', 'engraved', 'photo frame', 'custom mug', 'silver keychain', 'photo album', 'engraved jewelry'],
+    'aromatherapy-wellness': ['essential oils', 'aromatherapy', 'spa', 'wellness', 'bath salts', 'candle massage', 'diffuser', 'relaxation', 'mexican herbs'],
+    'seasonal-specials': ['christmas wreath', 'seasonal gifts', 'holiday', 'celebration', 'dia de muertos', 'easter basket', 'mexican traditions', 'cempasuchil'],
+    'luxury-gifts': ['luxury flowers', 'premium gifts', 'elegant gift', 'crystal glasses', 'jewelry box', 'luxury roses', 'fine wood', 'premium chocolate'],
+    'handcrafted-items': ['mexican crafts', 'artisan', 'handmade', 'oaxacan crafts', 'alebrije', 'talavera pottery', 'mexican textiles', 'traditional masks', 'folk art'],
+    'eco-friendly-gifts': ['organic products', 'sustainable', 'natural', 'eco friendly', 'bamboo', 'cotton bags', 'natural soap', 'organic herbs', 'plant kit']
 };
 
 interface ImageUploadResult {
@@ -109,11 +110,13 @@ export class ImageService {
     }
 
     /**
-     * Generate placeholder image URL
+     * Generate placeholder image URL with better variety
      */
     private generatePlaceholderImage(searchTerm: string, width = 800, height = 600): { url: string; alt: string } {
-        // Use Lorem Picsum with seed for consistent images
-        const seed = searchTerm.replace(/\s+/g, '-').toLowerCase();
+        // Create a more varied seed using search term and current timestamp
+        const baseImage = Math.floor(Math.random() * 1000) + 1; // Random number between 1-1000
+        const seed = `${searchTerm.replace(/\s+/g, '-').toLowerCase()}-${baseImage}`;
+
         return {
             url: `https://picsum.photos/seed/${seed}/${width}/${height}`,
             alt: `Imagen de ${searchTerm}`
@@ -233,14 +236,20 @@ export class ImageService {
         console.log(`📸 Creando nueva imagen: ${pathname}`);
 
         const searchTerms = IMAGE_SEARCH_TERMS[categorySlug] || ['gift'];
-        const searchTerm = searchTerms[0];
+
+        // Use product ID to deterministically select different search terms for variety
+        const productIdHash = parseInt(productId.toString().slice(-2), 10) || 0;
+        const searchTermIndex = productIdHash % searchTerms.length;
+        const searchTerm = searchTerms[searchTermIndex];
+
+        console.log(`🔍 Usando término de búsqueda: "${searchTerm}" para ${productName}`);
 
         let imageData: { url: string; alt: string } | null = null;
 
         // Try Unsplash first
         imageData = await this.fetchFromUnsplash(searchTerm);
 
-        // Fallback to placeholder
+        // Fallback to placeholder with same search term for consistency
         if (!imageData) {
             imageData = this.generatePlaceholderImage(searchTerm);
         }
@@ -271,14 +280,36 @@ export class ImageService {
      */
     async checkExistingImages(db: any, schema: any, productId: string): Promise<boolean> {
         try {
-            const existingPhotos = await db.select()
-                .from(schema.photos)
-                .where(schema.photos.productId.eq ? schema.photos.productId.eq(productId) : schema.photos.productId === productId)
-                .limit(1);
+            let result;
 
-            return existingPhotos.length > 0;
+            // Check if we have raw access (PostgreSQL)
+            if (db.raw && db.raw.execute) {
+                result = await db.raw.execute({
+                    sql: 'SELECT COUNT(*) as count FROM photos WHERE product_id = $1',
+                    args: [productId]
+                });
+            } else {
+                // SQLite fallback - use direct query
+                try {
+                    result = await db.select({ count: sql`COUNT(*)` })
+                        .from(schema.photos)
+                        .where(eq(schema.photos.productId, productId));
+                } catch (sqliteError) {
+                    // If Drizzle query fails, return false to be safe
+                    console.error('SQLite query error:', sqliteError);
+                    return false;
+                }
+            }
+
+            // Handle both PostgreSQL and SQLite response formats
+            const count = Array.isArray(result) ?
+                result[0]?.count :
+                (result.rows?.[0]?.count || result[0]?.count || 0);
+
+            return Number(count) > 0;
         } catch (error) {
             console.error('Error checking existing images:', error);
+            // If we can't check, assume no images to be safe
             return false;
         }
     }

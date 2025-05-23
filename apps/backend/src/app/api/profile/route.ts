@@ -5,6 +5,98 @@ import { dbService, eq } from '@/db/service';
 import { sessions, users } from '@/db/schema';
 import { StatusCodes } from 'http-status-codes';
 
+/**
+ * @swagger
+ * /api/profile:
+ *   get:
+ *     summary: Get user profile
+ *     description: Retrieve the authenticated user's profile information
+ *     tags: [Profiles]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       description: User ID
+ *                     email:
+ *                       type: string
+ *                       format: email
+ *                       description: User email
+ *                     firstName:
+ *                       type: string
+ *                       description: User first name
+ *                     role:
+ *                       type: string
+ *                       description: User role
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       description: Account creation date
+ *       401:
+ *         description: Unauthorized - invalid or missing token
+ *       404:
+ *         description: User not found
+ *       500:
+ *         $ref: '#/components/schemas/Error'
+ *   put:
+ *     summary: Update user profile
+ *     description: Update the authenticated user's profile information
+ *     tags: [Profiles]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *                 description: Updated first name
+ *                 example: John
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Updated email address
+ *                 example: john.doe@example.com
+ *     responses:
+ *       200:
+ *         description: Profile updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     firstName:
+ *                       type: string
+ *                     role:
+ *                       type: string
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ *       500:
+ *         $ref: '#/components/schemas/Error'
+ */
+
 function getSessionId(request: NextRequest): string | null {
     const auth = request.headers.get('Authorization') || '';
     if (!auth.startsWith('Bearer ')) return null;

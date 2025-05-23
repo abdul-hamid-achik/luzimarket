@@ -4,6 +4,35 @@ import * as path from 'path';
 import * as os from 'os';
 
 /**
+ * @swagger
+ * /api/health:
+ *   get:
+ *     summary: Health check endpoint
+ *     description: Returns system status, resource usage, and log information for monitoring
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: System health information
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/HealthCheck'
+ *       500:
+ *         description: Health check failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *   head:
+ *     summary: Simple availability check
+ *     description: Simple HEAD request for checking if the service is available
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: Service is available
+ */
+
+/**
  * Health check endpoint returns system status and resource usage
  */
 export async function GET() {

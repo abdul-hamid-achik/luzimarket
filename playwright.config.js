@@ -29,8 +29,17 @@ console.log(`Running tests in ${isOfflineMode ? 'OFFLINE (SQLite)' : 'ONLINE (Po
 // Backend port - matches the port in vite.config.ts
 const BACKEND_PORT = process.env.PORT || 8000;
 
+// Check if we're in CI environment
+const isCI = process.env.CI === 'true';
+const skipStripeCLI = process.env.SKIP_STRIPE_CLI === 'true' || isCI;
+
 // Check if Stripe CLI is available
 function checkStripeCLI() {
+  if (skipStripeCLI) {
+    console.log('⏭️  Skipping Stripe CLI setup (CI environment or explicitly disabled)');
+    return false;
+  }
+
   try {
     execSync('stripe --version', { stdio: 'ignore' });
     return true;
@@ -57,7 +66,6 @@ module.exports = defineConfig({
     ['html', { open: 'never', outputFolder: reportDir }],
     ['json', { outputFile: path.join(resultsDir, 'test-results.json') }]
   ],
-  maxFailures: 1,
   use: {
     baseURL: 'http://localhost:5173',
     actionTimeout: 30000,
@@ -153,10 +161,10 @@ module.exports = defineConfig({
       },
       // Start Stripe CLI webhook listener (if available)
       ...(hasStripeCLI ? [{
-        command: `stripe listen --forward-to localhost:${BACKEND_PORT}/api/webhooks/stripe --events payment_intent.succeeded,payment_intent.payment_failed,payment_intent.created,charge.succeeded,charge.failed`,
+        command: `stripe listen --forward-to localhost:${BACKEND_PORT}/api/webhooks/stripe --events payment_intent.succeeded,payment_intent.payment_failed,payment_intent.created,charge.succeeded,charge.failed,invoice.payment_succeeded,invoice.payment_failed,customer.subscription.created,customer.subscription.updated,customer.subscription.deleted`,
         url: null, // No health check URL for Stripe CLI
         reuseExistingServer: false,
-        timeout: 30000,
+        timeout: 60000, // Increased timeout for Stripe CLI to start
         stdout: 'pipe',
         stderr: 'pipe',
         env: {
@@ -167,10 +175,10 @@ module.exports = defineConfig({
           console.log('Stripe CLI:', output);
 
           // Extract webhook secret from Stripe CLI output
-          const secretMatch = output.match(/Your webhook signing secret is '([^']+)'/);
+          const secretMatch = output.match(/Your webhook signing secret is ([^ \n\r]+)/);
           if (secretMatch) {
             const webhookSecret = secretMatch[1];
-            console.log('🔑 Stripe webhook secret captured for testing');
+            console.log('🔑 Stripe webhook secret captured:', webhookSecret.substring(0, 10) + '...');
 
             // Store the webhook secret for tests to use
             process.env.STRIPE_WEBHOOK_SECRET_TEST = webhookSecret;
@@ -181,9 +189,15 @@ module.exports = defineConfig({
                 path.join(__dirname, 'tmp', 'stripe-webhook-secret.txt'),
                 webhookSecret
               );
+              console.log('📝 Webhook secret saved to file');
             } catch (e) {
               console.error('Failed to write webhook secret:', e);
             }
+          }
+
+          // Log webhook events for debugging
+          if (output.includes('payment_intent.') || output.includes('charge.') || output.includes('invoice.')) {
+            console.log('🎯 Stripe webhook event received:', output.trim());
           }
 
           try {

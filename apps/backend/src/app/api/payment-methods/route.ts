@@ -3,6 +3,47 @@ import { NextRequest, NextResponse } from 'next/server';
 import { dbService, eq } from '@/db/service';
 import { sessions, users } from '@/db/schema';
 
+/**
+ * @swagger
+ * /api/payment-methods:
+ *   get:
+ *     summary: Get user payment methods
+ *     description: Retrieve saved payment methods for the authenticated user from Stripe
+ *     tags: [Payments]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of payment methods
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     description: Payment method ID
+ *                     example: pm_1234567890abcdef
+ *                   label:
+ *                     type: string
+ *                     description: Display label for the payment method
+ *                     example: VISA ****4242
+ *       401:
+ *         description: Unauthorized - authentication required for stored payment methods
+ *       500:
+ *         description: Failed to fetch payment methods
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Failed to fetch payment methods
+ */
+
 function getSessionId(request: NextRequest): string | null {
   const auth = request.headers.get('Authorization') || '';
   if (!auth.startsWith('Bearer ')) return null;
