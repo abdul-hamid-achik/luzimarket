@@ -1,22 +1,16 @@
 import axios from 'axios';
-import { withRelatedProject } from '@vercel/related-projects';
 
-// Determine baseURL: proxy in dev, relatedProjects URL in production
+// Determine baseURL: proxy in dev, static backend URL in production
 const isDev = import.meta.env.MODE === 'development';
 
-// In production, link to your backend via withRelatedProject
-// Uses VERCEL_RELATED_PROJECTS under the hood; fallback to VITE_API_HOST
-const projectName = 'luzimarket-backend';
+// Use environment variable for backend URL in production
 const defaultHost = import.meta.env.VITE_API_HOST;
-const host = isDev
-  ? null
-  : withRelatedProject({ projectName, defaultHost, noThrow: true });
 
 // Determine baseURL: dev proxy or production backend URL
 const baseURL = isDev
   ? '/api'
-  : host
-    ? `https://${host}/api`
+  : defaultHost
+    ? `https://${defaultHost}/api`
     : '/api';
 
 // Create axios instance with dynamic baseURL
@@ -46,9 +40,9 @@ api.interceptors.response.use(
     const startTime = response.config.metadata?.startTime;
     const duration = startTime ? Date.now() - startTime : undefined;
 
-  if (typeof window !== 'undefined') {
-    // Only log in browser
-  }
+    if (typeof window !== 'undefined') {
+      // Only log in browser
+    }
 
     return response;
   },

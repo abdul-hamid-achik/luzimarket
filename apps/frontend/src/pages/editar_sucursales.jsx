@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Button } from "@nextui-org/react";
+import { Button } from "react-bootstrap";
 import '@/css/sucursal_form.css';
 
 export default function App() {
@@ -63,43 +63,24 @@ export default function App() {
 
       <div className="contenedor__button__Suc">
         <Button
-          css={{
-            background: "white",
-            color: "Black",
-            border: "1px solid",
-            width: "5%",
-          }}
-          className="boton1"
+          variant="outline-dark"
+          className="boton1 me-2"
+          as={Link}
+          to="/inicio/peticiones/sucursales"
         >
-          <Link to="/inicio/peticiones/sucursales" className="boton_linkP1">
-            Regresar
-          </Link>
+          Regresar
         </Button>
         <Button
-          css={{
-            background: "black",
-            color: "white",
-            border: "1px solid",
-            width: "5%",
-          }}
-          className="boton2"
+          variant="dark"
+          className="boton2 me-2"
         >
-          <Link to="#" className="boton_linkP2">
-            Enviar Feedback
-          </Link>
+          Enviar Feedback
         </Button>
         <Button
-          css={{
-            background: "primary",
-            color: "white",
-            border: "1px solid",
-            width: "5%",
-          }}
+          variant="primary"
           className="boton3"
         >
-          <Link to="#" className="boton_linkP3">
-            Aceptar
-          </Link>
+          Aceptar
         </Button>
       </div>
     </>

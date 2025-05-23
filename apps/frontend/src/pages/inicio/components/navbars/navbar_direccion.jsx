@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import { Button } from "@nextui-org/react";
+import { Button } from "react-bootstrap";
 import Select from "react-select";
 
 // Array of all options
@@ -80,7 +80,11 @@ function NavbarDireccion() {
               />
             </div>
             <Button
-              css={{ borderRadius: '0px', background: '#000' }}>ACEPTAR</Button>
+              variant="dark"
+              style={{ borderRadius: '0px' }}
+            >
+              ACEPTAR
+            </Button>
           </Nav>
         </Navbar.Collapse>
       </Container>

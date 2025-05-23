@@ -1,5 +1,5 @@
 import "@/css/index.css";
-import { Button, Checkbox } from "@nextui-org/react";
+import { Button, Form } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 export default function App() {
@@ -36,8 +36,21 @@ export default function App() {
             <div>
                <h4 className="texto_editarAdmin">¿Cuenta con servicio a domicilio?</h4>
                <div className="contenedor_radio">
-                  <Checkbox isRounded id="label" defaultSelected color="success">Si</Checkbox>
-                  <Checkbox isRounded id="label" defaultSelected color="error">No</Checkbox>
+                  <Form.Check
+                     type="radio"
+                     id="delivery-yes"
+                     name="delivery"
+                     label="Si"
+                     defaultChecked
+                     className="text-success me-3"
+                  />
+                  <Form.Check
+                     type="radio"
+                     id="delivery-no"
+                     name="delivery"
+                     label="No"
+                     className="text-danger"
+                  />
                </div>
             </div>
             <div className="col-2">
@@ -52,34 +65,26 @@ export default function App() {
                <input type="text" className="col-corta22" placeholder="Twitter" />
             </div>
             <div className="content__button">
-               <Button css={{
-                  background: "white",
-                  color: "Black",
-                  border: "1px solid",
-                  width: "5%"
-               }} className="boton1">
-                  <Link to="/inicio/peticiones/admisiones" className="boton_linkP1">Regresar</Link>
+               <Button
+                  variant="outline-dark"
+                  className="boton1 me-2"
+                  as={Link}
+                  to="/inicio/peticiones/admisiones"
+               >
+                  Regresar
                </Button>
-               <Link to="#" className="boton_link2">
-                  <Button css={{
-                     background: "black",
-                     color: "white",
-                     border: "1px solid",
-                     width: "5%"
-                  }} className="boton2">
-                     Enviar Feedback
-                  </Button>
-               </Link>
-               <Link to="#" className="boton_link3">
-                  <Button css={{
-                     background: "primary",
-                     color: "white",
-                     border: "1px solid",
-                     width: "5%"
-                  }} className="boton3">
-                     Aceptar
-                  </Button>
-               </Link>
+               <Button
+                  variant="dark"
+                  className="boton2 me-2"
+               >
+                  Enviar Feedback
+               </Button>
+               <Button
+                  variant="primary"
+                  className="boton3"
+               >
+                  Aceptar
+               </Button>
             </div>
          </div>
       </>

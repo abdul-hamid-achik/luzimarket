@@ -15,7 +15,11 @@ import { useAuth } from '@/context/auth_context';
 describe('NavbarAdmin', () => {
   it('renders navigation bar with links and images', () => {
     // Default mock implementation
-    useAuth.mockReturnValue({ user: null });
+    useAuth.mockReturnValue({
+      user: null,
+      isAuthenticated: false,
+      logout: vi.fn()
+    });
 
     render(
       <MemoryRouter>
@@ -27,7 +31,11 @@ describe('NavbarAdmin', () => {
 
   it('shows user email when logged in', () => {
     // Mock for this specific test
-    useAuth.mockReturnValue({ user: { email: 'test@example.com' } });
+    useAuth.mockReturnValue({
+      user: { email: 'test@example.com' },
+      isAuthenticated: true,
+      logout: vi.fn()
+    });
 
     render(
       <MemoryRouter>
@@ -39,7 +47,11 @@ describe('NavbarAdmin', () => {
 
   it('shows Invitado and login/register links when not logged in', () => {
     // Mock for this specific test
-    useAuth.mockReturnValue({ user: null });
+    useAuth.mockReturnValue({
+      user: null,
+      isAuthenticated: false,
+      logout: vi.fn()
+    });
 
     render(
       <MemoryRouter>

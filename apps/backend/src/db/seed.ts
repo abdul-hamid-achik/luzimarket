@@ -127,6 +127,18 @@ async function seed(currentDb: NeonDatabase | BetterSQLite3Database, currentSche
                                 stock: faker.number.int({ min: 5, max: 50 })
                             }).onConflictDoNothing();
 
+                            // Check if product already has images in the database
+                            const hasExistingImages = await imageService.checkExistingImages(
+                                dbInstance,
+                                schemaInstance,
+                                productId
+                            );
+
+                            if (hasExistingImages) {
+                                console.log(`♻️  Producto ${product.name} ya tiene imágenes, saltando...`);
+                                continue;
+                            }
+
                             // Upload images for the product
                             try {
                                 console.log(`🖼️  Cargando imágenes para: ${product.name}`);
@@ -143,7 +155,12 @@ async function seed(currentDb: NeonDatabase | BetterSQLite3Database, currentSche
                                         sortOrder: 0,
                                         productId
                                     }).onConflictDoNothing();
-                                    console.log(`✅ Imagen cargada exitosamente para: ${product.name}`);
+
+                                    if (imageResult.isExisting) {
+                                        console.log(`♻️  Imagen existente reutilizada para: ${product.name}`);
+                                    } else {
+                                        console.log(`✅ Nueva imagen cargada exitosamente para: ${product.name}`);
+                                    }
                                 } else {
                                     console.log(`⚠️  Imagen con fallback para: ${product.name} - ${imageResult.error}`);
                                     // Still save the image even if upload failed
@@ -294,6 +311,18 @@ async function seed(currentDb: NeonDatabase | BetterSQLite3Database, currentSche
                                 stock: faker.number.int({ min: 5, max: 50 })
                             }).onConflictDoNothing();
 
+                            // Check if product already has images in the database
+                            const hasExistingImages = await imageService.checkExistingImages(
+                                dbInstance,
+                                schemaInstance,
+                                productId
+                            );
+
+                            if (hasExistingImages) {
+                                console.log(`♻️  Producto ${product.name} ya tiene imágenes, saltando...`);
+                                continue;
+                            }
+
                             // Upload images for the product
                             try {
                                 console.log(`🖼️  Cargando imágenes para: ${product.name}`);
@@ -310,7 +339,12 @@ async function seed(currentDb: NeonDatabase | BetterSQLite3Database, currentSche
                                         sortOrder: 0,
                                         productId
                                     }).onConflictDoNothing();
-                                    console.log(`✅ Imagen cargada exitosamente para: ${product.name}`);
+
+                                    if (imageResult.isExisting) {
+                                        console.log(`♻️  Imagen existente reutilizada para: ${product.name}`);
+                                    } else {
+                                        console.log(`✅ Nueva imagen cargada exitosamente para: ${product.name}`);
+                                    }
                                 } else {
                                     console.log(`⚠️  Imagen con fallback para: ${product.name} - ${imageResult.error}`);
                                     // Still save the image even if upload failed

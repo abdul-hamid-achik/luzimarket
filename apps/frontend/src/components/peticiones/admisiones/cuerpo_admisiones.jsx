@@ -3,7 +3,7 @@ import React from 'react';
 import { useAdmissionPetitions } from '@/api/hooks';
 import { GoArrowRight } from "react-icons/go";
 import { Link } from "react-router-dom";
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@nextui-org/react";
+import { Dropdown, Button } from "react-bootstrap";
 
 // Fix: Component name should start with uppercase, and useAdmissionPetitions should only be called in a component
 function TablaAdmisiones() {
@@ -85,18 +85,20 @@ function TablaAdmisiones() {
                   </td>
                   <td>
                     <Dropdown>
-                      <DropdownTrigger>
-                        <Button variant="bordered">Acciones</Button>
-                      </DropdownTrigger>
-                      <DropdownMenu aria-label="Static Actions">
-                        <DropdownItem key="Aceptar" to="#">
+                      <Dropdown.Toggle variant="outline-secondary">
+                        Acciones
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        <Dropdown.Item href="#">
                           Aceptar
-                        </DropdownItem>
-                        <DropdownItem key="Editar">
-                          <Link to={`/inicio/peticiones/productos/${admission.id || ""}`}>Editar</Link>
-                        </DropdownItem>
-                        <DropdownItem key="Borrar">Borrar</DropdownItem>
-                      </DropdownMenu>
+                        </Dropdown.Item>
+                        <Dropdown.Item as={Link} to={`/inicio/peticiones/productos/${admission.id || ""}`}>
+                          Editar
+                        </Dropdown.Item>
+                        <Dropdown.Item href="#">
+                          Borrar
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
                     </Dropdown>
                   </td>
                 </tr>

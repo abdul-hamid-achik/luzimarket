@@ -1,6 +1,4 @@
 import "./style.css";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import { useCategories } from '@/api/hooks';
 import CategoryItem from './cat_item';
 import { FaTags } from 'react-icons/fa'; // fallback icon

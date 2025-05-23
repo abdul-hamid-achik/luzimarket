@@ -7,10 +7,10 @@ import { useProducts } from '@/api/hooks';
 import ImagenBanner1 from "@/pages/inicio/images/new_images_luzi/new_banner_luzi.png";
 import ImagenBanner2 from "@/pages/inicio/images/new_images_luzi/new_banner_luzi2.png";
 import ModalIndex from "@/pages/inicio/components/modal_index";
+import BestSellersSection from "@/components/cards/best_sellers_section";
 
 import "@/pages/inicio/css/card_index.css";
 import "@/pages/inicio/css/general.css";
-// import { Button } from "@nextui-org/react"
 
 import Card from "react-bootstrap/Card";
 import { Link } from "react-router-dom";
@@ -129,6 +129,9 @@ const BodyLuzi = () => {
           con un catálogo de marcas y tiendas seleccionadas en todo México.
         </p>
       </div>
+
+      {/* Best Sellers Section */}
+      <BestSellersSection />
 
       {/* Productos (Handpicked) */}
       <div className="titulosHandpicked">

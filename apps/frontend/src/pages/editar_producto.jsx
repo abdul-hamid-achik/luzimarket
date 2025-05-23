@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Button } from "@nextui-org/react";
+import { Button } from "react-bootstrap";
 import "@/css/form_productos.css";
 import Flecha from "@/assets/images/flecha_correcta.png";
 import ImagenProducto1 from "@/assets/images/pastel_chocolate.jpg";
@@ -50,46 +50,27 @@ export default function App() {
       </div>
       <div className="botones__opciones">
         <Button
-          css={{
-            background: "white",
-            color: "Black",
-            border: "1px solid",
-            width: "5%",
-          }}
-          className="boton__op"
+          variant="outline-dark"
+          className="boton__op me-2"
+          as={Link}
+          to="/inicio/peticiones/productos"
         >
-          <Link to="/inicio/peticiones/productos" className="boton_linkP1">
-            Regresar
-          </Link>
+          Regresar
         </Button>
 
-        <Link to="#" className="link__boton">
-          <Button
-            css={{
-              background: "black",
-              color: "white",
-              border: "1px solid",
-              width: "5%",
-            }}
-            className="boton__op"
-          >
-            Enviar Feedback
-          </Button>
-        </Link>
+        <Button
+          variant="dark"
+          className="boton__op me-2"
+        >
+          Enviar Feedback
+        </Button>
 
-        <Link to="#" className="link__boton">
-          <Button
-            css={{
-              background: "primary",
-              color: "white",
-              border: "1px solid",
-              width: "5%",
-            }}
-            className="boton__op"
-          >
-            Aceptar
-          </Button>
-        </Link>
+        <Button
+          variant="primary"
+          className="boton__op"
+        >
+          Aceptar
+        </Button>
       </div>
     </>
   );

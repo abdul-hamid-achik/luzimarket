@@ -16,12 +16,19 @@ import * as brandsApi from "@/api/brands";
 import * as favoritesApi from "@/api/favorites";
 import * as deliveryZonesApi from "@/api/deliveryZones";
 import * as paymentMethodsApi from "@/api/paymentMethods";
+import * as bestSellersApi from "@/api/bestSellers";
 
 export const useProducts = (filters = {}) =>
   useQuery(['products', filters], () => productsApi.getProducts(filters));
 
 export const useProduct = (productId) =>
   useQuery(['product', productId], () => productsApi.getProduct(productId));
+
+export const useBestSellers = () =>
+  useQuery(['bestSellers'], bestSellersApi.getBestSellers, {
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 15 * 60 * 1000, // 15 minutes
+  });
 
 export const useCart = () =>
   useQuery(['cart'], cartApi.getCart);

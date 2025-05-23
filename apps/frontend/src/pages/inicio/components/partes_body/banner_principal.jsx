@@ -2,7 +2,7 @@ import ImagenBanner1 from "@/pages/inicio/images/new_images_luzi/new_banner_luzi
 import ImagenBanner2 from "@/pages/inicio/images/new_images_luzi/new_banner_luzi.png";
 
 import "@/pages/inicio/css/general.css"
-import { Button } from "@nextui-org/react"
+import { Button } from "react-bootstrap"
 
 const BannerPrincipal = () => {
    return (
@@ -14,7 +14,11 @@ const BannerPrincipal = () => {
             <div className="BannerSecundario">
                <img src={ImagenBanner2} className="ImagenTextoBanner" />
                <p>Experiencias y productos seleccionados a mano para momentos especiales</p>
-               <Button css={{ background: "Black", color: "White", border: "0px solid", width: "5%", marginTop: "1rem", borderRadius: "0px" }} >
+               <Button
+                  variant="dark"
+                  className="mt-3"
+                  style={{ borderRadius: "0px" }}
+               >
                   Ver Handpicked
                </Button>
             </div>
