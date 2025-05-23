@@ -14,15 +14,13 @@
     "test": "vitest run",
     "lint": "next lint",
     "db:setup": "npm run migrate:push && npm run seed",
-    "pglite:setup": "DB_MODE=pglite tsx src/db/setup-pglite.ts",
-    "pglite:seed": "DB_MODE=pglite tsx src/db/seed.ts",
-    "test:offline": "DB_MODE=pglite npm run test"
+    "test:offline": "DB_MODE=offline npm run test"
   },
   "dependencies": {
-    "@electric-sql/pglite": "^0.3.2",
     "@neondatabase/serverless": "^1.0.0",
     "@vercel/blob": "^1.0.1",
     "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.7.0",
     "dotenv": "^16.0.3",
     "drizzle-orm": "^0.43.1",
     "http-status-codes": "^2.2.0",
