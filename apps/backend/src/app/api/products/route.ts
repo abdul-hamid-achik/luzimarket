@@ -268,6 +268,9 @@ export async function POST(request: NextRequest) {
         // Generate slug if not provided
         const productSlug = slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
+        // Convert empty string vendorId to null for proper foreign key handling
+        const cleanVendorId = vendorId && vendorId.trim() !== '' ? vendorId : null;
+
         let created;
         try {
             [created] = await dbService.insertReturning(products, {
@@ -276,7 +279,7 @@ export async function POST(request: NextRequest) {
                 price,
                 slug: productSlug,
                 categoryId,
-                vendorId,
+                vendorId: cleanVendorId,
                 status,
                 featured,
                 updatedAt: new Date()
@@ -298,7 +301,7 @@ export async function POST(request: NextRequest) {
                     price,
                     slug: productSlug,
                     categoryId,
-                    vendorId,
+                    vendorId: cleanVendorId,
                     status,
                     featured,
                     updatedAt: new Date()

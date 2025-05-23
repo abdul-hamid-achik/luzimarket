@@ -130,6 +130,12 @@ test.describe('Product Edge Cases and Error Handling', () => {
                 await link.click();
                 await page.waitForLoadState('networkidle');
 
+                // Wait for loading state to complete
+                await page.waitForFunction(() => {
+                    const loadingContainer = document.querySelector('.modern-loading-container');
+                    return !loadingContainer;
+                }, { timeout: 10000 });
+
                 // Check if product page loaded properly (correct selectors for our enhanced design)
                 const hasProductElements = await page.locator('.product-title, .add-to-cart-btn, .price-value, .product-description').count() > 0;
                 expect(hasProductElements).toBe(true);

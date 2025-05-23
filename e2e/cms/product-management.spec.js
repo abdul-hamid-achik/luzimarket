@@ -95,17 +95,29 @@ test.describe('CMS Product Management', () => {
         test('should create new product successfully', async ({ page }) => {
             await page.click('button:has-text("Add New Product")');
 
+            // Make test data unique to avoid conflicts on retries
+            const timestamp = Date.now();
+            const productName = `Test Product Amazing Widget ${timestamp}`;
+            const productSlug = `test-product-amazing-widget-${timestamp}`;
+
             // Fill out the form
-            await page.fill('input[name="name"]', 'Test Product Amazing Widget');
+            await page.fill('input[name="name"]', productName);
             await page.fill('textarea[name="description"]', 'This is a comprehensive test product with all the amazing features you could want.');
             await page.fill('input[name="price"]', '2999'); // $29.99 in cents
-            await page.fill('input[name="slug"]', 'test-product-amazing-widget');
+            await page.fill('input[name="slug"]', productSlug);
 
             // Select category (assuming at least one exists)
             const categoryOptions = page.locator('select[name="categoryId"] option');
             const categoryCount = await categoryOptions.count();
             if (categoryCount > 1) { // More than just the default "Select Category" option
                 await page.selectOption('select[name="categoryId"]', { index: 1 });
+            }
+
+            // Select vendor (assuming at least one exists)
+            const vendorOptions = page.locator('select[name="vendorId"] option');
+            const vendorCount = await vendorOptions.count();
+            if (vendorCount > 1) { // More than just the default "Select Vendor" option
+                await page.selectOption('select[name="vendorId"]', { index: 1 });
             }
 
             // Set status and other fields
@@ -122,7 +134,7 @@ test.describe('CMS Product Management', () => {
             await expect(page.locator('.modal-title')).not.toBeVisible();
 
             // Verify product appears in table
-            await expect(page.locator('td:has-text("Test Product Amazing Widget")')).toBeVisible();
+            await expect(page.locator(`td:has-text("${productName}")`)).toBeVisible();
             await expect(page.locator('td:has-text("$29.99")')).toBeVisible();
         });
 
@@ -207,6 +219,13 @@ test.describe('CMS Product Management', () => {
                     await page.selectOption('select[name="categoryId"]', { index: 1 });
                 }
 
+                // Select first available vendor
+                const vendorOptions = page.locator('select[name="vendorId"] option');
+                const vendorCount = await vendorOptions.count();
+                if (vendorCount > 1) {
+                    await page.selectOption('select[name="vendorId"]', { index: 1 });
+                }
+
                 await page.click('button[type="submit"]');
                 await expect(page.locator('.alert-success-cms')).toBeVisible({ timeout: 10000 });
             }
@@ -266,6 +285,12 @@ test.describe('CMS Product Management', () => {
                     await page.selectOption('select[name="categoryId"]', { index: 1 });
                 }
 
+                const vendorOptions = page.locator('select[name="vendorId"] option');
+                const vendorCount = await vendorOptions.count();
+                if (vendorCount > 1) {
+                    await page.selectOption('select[name="vendorId"]', { index: 1 });
+                }
+
                 await page.click('button[type="submit"]');
                 await expect(page.locator('.alert-success-cms')).toBeVisible({ timeout: 10000 });
             }
@@ -290,6 +315,12 @@ test.describe('CMS Product Management', () => {
             const categoryCount = await categoryOptions.count();
             if (categoryCount > 1) {
                 await page.selectOption('select[name="categoryId"]', { index: 1 });
+            }
+
+            const vendorOptions = page.locator('select[name="vendorId"] option');
+            const vendorCount = await vendorOptions.count();
+            if (vendorCount > 1) {
+                await page.selectOption('select[name="vendorId"]', { index: 1 });
             }
 
             await page.click('button[type="submit"]');
@@ -426,6 +457,13 @@ test.describe('CMS Product Management', () => {
             const categoryCount = await categoryOptions.count();
             if (categoryCount > 1) {
                 await page.selectOption('select[name="categoryId"]', { index: 1 });
+            }
+
+            // Select vendor if available
+            const vendorOptions = page.locator('select[name="vendorId"] option');
+            const vendorCount = await vendorOptions.count();
+            if (vendorCount > 1) {
+                await page.selectOption('select[name="vendorId"]', { index: 1 });
             }
 
             // Submit and immediately check for loading state
