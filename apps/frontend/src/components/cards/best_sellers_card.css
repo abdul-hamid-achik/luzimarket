@@ -25,7 +25,7 @@
 }
 
 .rank-number {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #343a40 0%, #495057 100%);
     color: white;
     font-weight: 700;
     font-size: 18px;
@@ -37,7 +37,7 @@
 }
 
 .bestseller-badge {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background: linear-gradient(135deg, #adb5bd 0%, #6c757d 100%);
     color: white;
     font-weight: 600;
     font-size: 12px;
@@ -111,7 +111,7 @@
 }
 
 .product-category {
-    color: #667eea;
+    color: #6c757d;
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
@@ -173,7 +173,7 @@
 
 .add-to-cart-btn {
     width: 100%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #343a40 0%, #495057 100%);
     color: white;
     border: none;
     padding: 16px 24px;
@@ -187,7 +187,7 @@
 }
 
 .add-to-cart-btn:hover {
-    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
 }
