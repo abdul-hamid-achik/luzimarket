@@ -1,0 +1,25 @@
+.cajaDescripcionPagina {
+    margin-top: 45rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10rem;
+}
+
+.cajaDescripcionPagina p {
+    font-family: var(--fontLandingPage);
+    line-height: 15px;
+    font-size: 25px;
+}
+
+.cajaDescripcionPagina p span {
+    font-family: var(--fontLandingPage);
+    font-weight: bolder;
+}
+
+.cajaDescripcionPagina .Simbolo {
+    font-size: 20px;
+    position: relative;
+    top: .5rem;
+}

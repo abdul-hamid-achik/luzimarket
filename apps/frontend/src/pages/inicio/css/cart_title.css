@@ -1,0 +1,11 @@
+.cart-title {
+  padding: 6%;
+}
+
+.cart-title h1 {
+  font-family: "Arial", sans-serif;
+  font-size: 200%;
+  font-weight: 100;
+  color: #333;
+  margin: 0;
+}

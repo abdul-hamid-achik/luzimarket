@@ -1,0 +1,11 @@
+{
+    "relatedProjects": [
+        "prj_Ups3iwOyxoGezjWuHAw0uY7zsjBQ"
+    ],
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
+    ]
+}

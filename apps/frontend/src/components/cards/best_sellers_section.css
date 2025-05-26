@@ -1,0 +1,323 @@
+.best-sellers-section {
+    padding: 3rem 1rem;
+    max-width: 95%;
+    margin: 2rem auto;
+    background: #ffffff;
+    border: 2px solid #000000;
+    border-radius: 24px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.best-sellers-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.header-content {
+    flex: 1;
+    text-align: left;
+}
+
+.section-title {
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #343a40 0%, #495057 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.title-icon {
+    font-size: 40px;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+.section-subtitle {
+    font-size: 16px;
+    color: #64748b;
+    margin: 0;
+    font-weight: 500;
+    line-height: 1.6;
+}
+
+.header-stats {
+    display: flex;
+    align-items: center;
+}
+
+.stats-badge {
+    background: linear-gradient(135deg, #adb5bd 0%, #6c757d 100%);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.best-sellers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2.5rem;
+    margin-top: 2rem;
+    justify-items: center;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Loading States */
+.best-sellers-loading {
+    margin-top: 40px;
+}
+
+.loading-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2.5rem;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.loading-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    animation: pulse 1.5s ease-in-out infinite;
+    min-height: 680px;
+}
+
+.loading-image {
+    width: 100%;
+    height: 320px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+.loading-content {
+    padding: 24px;
+}
+
+.loading-line {
+    height: 16px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.loading-line.short {
+    width: 60%;
+}
+
+.loading-line.medium {
+    width: 80%;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* Error States */
+.best-sellers-error {
+    margin-top: 40px;
+}
+
+.error-content {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.error-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+
+.error-content h3 {
+    font-size: 24px;
+    color: #2d3748;
+    margin-bottom: 12px;
+    font-weight: 700;
+}
+
+.error-content p {
+    color: #718096;
+    font-size: 16px;
+    margin-bottom: 30px;
+}
+
+.retry-button {
+    background: linear-gradient(135deg, #343a40 0%, #495057 100%);
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.retry-button:hover {
+    background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* No Products State */
+.no-products {
+    margin-top: 40px;
+}
+
+.no-products-content {
+    text-align: center;
+    padding: 80px 20px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.no-products-icon {
+    font-size: 80px;
+    margin-bottom: 24px;
+    opacity: 0.7;
+}
+
+.no-products-content h3 {
+    font-size: 28px;
+    color: #2d3748;
+    margin-bottom: 16px;
+    font-weight: 700;
+}
+
+.no-products-content p {
+    color: #718096;
+    font-size: 18px;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .best-sellers-section {
+        padding: 3rem 1.5rem;
+        margin: 2rem auto;
+    }
+
+    .best-sellers-grid,
+    .loading-grid {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+    }
+
+    .best-sellers-header {
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .best-sellers-section {
+        padding: 2rem 1rem;
+        margin: 1.5rem auto;
+        border-radius: 16px;
+    }
+
+    .best-sellers-header {
+        flex-direction: column;
+        text-align: center;
+        margin-bottom: 2rem;
+        gap: 1rem;
+    }
+
+    .header-content {
+        text-align: center;
+    }
+
+    .section-title {
+        font-size: 32px;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .title-icon {
+        font-size: 40px;
+    }
+
+    .section-subtitle {
+        font-size: 16px;
+    }
+
+    .best-sellers-grid,
+    .loading-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .stats-badge {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .best-sellers-section {
+        padding: 1.5rem 0.75rem;
+        margin: 1rem auto;
+    }
+
+    .section-title {
+        font-size: 28px;
+    }
+
+    .section-subtitle {
+        font-size: 14px;
+    }
+
+    .best-sellers-grid,
+    .loading-grid {
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .best-sellers-header {
+        margin-bottom: 1.5rem;
+    }
+}

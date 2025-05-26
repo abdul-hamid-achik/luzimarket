@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "apps/backend/src/*"
+      ]
+    }
+  },
+  "files": [],
+  "references": [
+    {
+      "path": "apps/backend"
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+.categoriasFiltros {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+
+}
+
+.LogoFiltroHandpicked {
+    width: 2rem;
+    height: fit-content;
+    margin-top: .5rem;
+}
+
+.TextoTituloFiltroHandpicked {
+    font-size: x-large;
+    margin-bottom: .5rem;
+    margin-top: .5rem;
+}
+
+/*.card{
+    width: 18rem;
+    width: 80%;
+}*/
+
+/*@media (max-width: 1280px) {
+    .card {
+        width: 15rem
+    }
+}
+
+@media (max-width: 1024px) {
+    .card {
+        width: 13rem
+    }
+}*/
+#divfiltro {
+    width: 25%;
+}
+
+@media (max-width: 990px) {
+    #FHP {
+        display: none;
+    }
+
+    #divfiltro {
+        display: none;
+    }
+
+    #divproducto {
+        width: 100%;
+    }
+}
+
+.filters-sidebar {
+    padding: 20px;
+    background-color: #f8f9fa;
+    height: 100%;
+    border-right: 1px solid #dee2e6;
+}
+
+.filter-title {
+    font-weight: 600;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #000;
+    padding-bottom: 10px;
+}
+
+.accordion-button {
+    font-weight: 500;
+    padding: 10px 15px;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: transparent;
+    color: #000;
+    box-shadow: none;
+}
+
+.accordion-button:focus {
+    box-shadow: none;
+    border-color: rgba(0, 0, 0, 0.125);
+}
+
+.accordion-body {
+    padding: 15px;
+}
+
+.form-check-input:checked {
+    background-color: #000;
+    border-color: #000;
+}
+
+.form-check-label {
+    cursor: pointer;
+}
+
+.color-option {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}

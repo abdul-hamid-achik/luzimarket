@@ -1,0 +1,68 @@
+#tablaPeticiones {
+    font-family: 'UniLTStd-L';
+    width: 90%;
+    position: relative;
+    bottom: 2rem;
+    left: 2rem;
+  }
+    
+  #tablaPeticiones td, #tablaPeticiones th {
+    padding: 10px;
+    border-radius: 10px;
+    margin-right: 5rem;
+  }
+    
+  #tablaPeticiones th {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-align: left;
+    opacity: 50%;
+    font-family: 'UniLTStd-L';
+  }
+  
+  #tablaPeticiones td {
+      border-radius: 10px;
+      /* background: #d7e0eb; */
+  }
+  
+  #tablaPeticiones button {
+      padding-left: 40px;
+      padding-right: 40px;
+      border-radius: 7px;
+  }
+
+
+/*Modal: configuración*/
+.titulo_modal-Producto {
+  font-family: 'UniLTStd-L';
+  font-size: 25px;
+  font-weight: normal;
+  position: relative;
+  right: 14rem;
+}
+
+.parrafo__precio,
+.parrafo__producto,
+.parrafo__descripcion,
+.parrafo__detalle {
+  font-family: 'UniLTStd-L';
+  font-weight: normal;
+}
+
+
+.label__detalle {
+  font-family: 'UniLTStd-L';
+  margin-top: 3rem;
+  position: relative;
+}
+
+.label__descripcion {
+  font-family: 'UniLTStd-L';
+  margin-top: 3rem;
+}
+  
+  
+  
+  
+  
+  

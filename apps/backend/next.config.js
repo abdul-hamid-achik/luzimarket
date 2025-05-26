@@ -1,0 +1,75 @@
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+    // Basic configuration for API-only mode
+    trailingSlash: false,
+    generateEtags: false,
+    poweredByHeader: false,
+
+    // Disable build optimization for tests to avoid AwaiterOnce errors
+    experimental: {
+        forceSwcTransforms: process.env.NODE_ENV !== 'test',
+    },
+
+    // Reduce cache issues in test mode
+    webpack: (config, { isServer, dev }) => {
+        if (process.env.NODE_ENV === 'test') {
+            // Disable webpack cache in test mode to prevent cache errors
+            config.cache = false;
+            // Reduce webpack noise in tests
+            config.stats = 'errors-warnings';
+        }
+        return config;
+    },
+
+    // Compiler optimizations
+    compiler: {
+        removeConsole: process.env.NODE_ENV === 'production',
+    },
+
+    // Enable CORS headers for API routes
+    async headers() {
+        return [
+            {
+                source: '/api/:path*',
+                headers: [
+                    { key: 'Access-Control-Allow-Credentials', value: 'true' },
+                    { key: 'Access-Control-Allow-Origin', value: '*' },
+                    { key: 'Access-Control-Allow-Methods', value: 'GET,DELETE,PATCH,POST,PUT,OPTIONS' },
+                    { key: 'Access-Control-Allow-Headers', value: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization' },
+                ],
+            },
+        ];
+    },
+
+    // Configure images for Vercel Blob and fallbacks
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: '*.public.blob.vercel-storage.com',
+                port: '',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'picsum.photos',
+                port: '',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'images.unsplash.com',
+                port: '',
+                pathname: '/**',
+            },
+        ],
+        deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+        imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+        formats: ['image/webp'],
+        minimumCacheTTL: 60,
+        dangerouslyAllowSVG: false,
+        contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    },
+};
+
+module.exports = nextConfig; 

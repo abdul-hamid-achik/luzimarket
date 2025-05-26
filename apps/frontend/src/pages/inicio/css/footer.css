@@ -1,0 +1,343 @@
+/* ========================================
+   FOOTER COMPONENT STYLES
+   ======================================== */
+
+.footerContainer {
+   width: 100%;
+   background: #ffffff;
+   border-top: 2px solid #000000;
+   margin-top: auto;
+   position: relative;
+   z-index: 100;
+}
+
+.footerContent {
+   max-width: 1400px;
+   margin: 0 auto;
+   padding: 3rem 2rem 1.5rem;
+}
+
+/* ========================================
+   FIRST LEVEL - MAIN FOOTER CONTENT
+   ======================================== */
+
+.footerPrimerPiso {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   margin-bottom: 2rem;
+   flex-wrap: wrap;
+   gap: 2rem;
+   padding-bottom: 2rem;
+   border-bottom: 1px solid #e9ecef;
+}
+
+.bannerLogoFooter {
+   width: 10rem;
+   height: auto;
+   object-fit: contain;
+   flex-shrink: 0;
+}
+
+/* ========================================
+   FOOTER NAVIGATION LINKS
+   ======================================== */
+
+.FooterTextoPiso2 {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   flex-wrap: wrap;
+   gap: 0.5rem 2rem;
+   flex: 1;
+   min-width: 300px;
+}
+
+.FooterTextoPiso2 p {
+   margin: 0;
+   font-size: 14px;
+   font-weight: 500;
+   color: #495057;
+   cursor: pointer;
+   transition: color 0.3s ease;
+   position: relative;
+   padding: 0.5rem 0;
+}
+
+.FooterTextoPiso2 p:hover {
+   color: #000000;
+}
+
+.FooterTextoPiso2 p::after {
+   content: '';
+   position: absolute;
+   bottom: 0;
+   left: 0;
+   width: 0;
+   height: 2px;
+   background: #000000;
+   transition: width 0.3s ease;
+}
+
+.FooterTextoPiso2 p:hover::after {
+   width: 100%;
+}
+
+/* ========================================
+   SOCIAL MEDIA LINKS
+   ======================================== */
+
+.FooterImagenesBannerPiso3 {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   gap: 1rem;
+   flex-shrink: 0;
+}
+
+.bannerRedesSociales,
+.bannerRedesSociales2 {
+   width: 1.5rem;
+   height: 1.5rem;
+   object-fit: contain;
+   cursor: pointer;
+   transition: all 0.3s ease;
+   border-radius: 4px;
+   padding: 2px;
+}
+
+.bannerRedesSociales:hover,
+.bannerRedesSociales2:hover {
+   transform: translateY(-2px) scale(1.1);
+   background: #f8f9fa;
+   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ========================================
+   SECOND LEVEL - COPYRIGHT & LEGAL
+   ======================================== */
+
+.FooterSegundoPiso {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   flex-wrap: wrap;
+   gap: 0.5rem 2rem;
+   padding-top: 1.5rem;
+}
+
+.FooterSegundoPiso p {
+   margin: 0;
+   font-size: 12px;
+   color: #6c757d;
+   cursor: pointer;
+   transition: color 0.3s ease;
+   padding: 0.25rem 0;
+}
+
+.FooterSegundoPiso p:hover {
+   color: #495057;
+}
+
+.FooterSegundoPiso p span {
+   font-weight: 700;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 1200px) {
+   .footerContent {
+      padding: 2.5rem 1.5rem 1.5rem;
+   }
+
+   .bannerLogoFooter {
+      width: 8rem;
+   }
+
+   .FooterTextoPiso2 {
+      min-width: 250px;
+   }
+}
+
+@media (max-width: 768px) {
+   .footerContent {
+      padding: 2rem 1rem 1rem;
+   }
+
+   .footerPrimerPiso {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 2rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+   }
+
+   .bannerLogoFooter {
+      width: 7rem;
+   }
+
+   .FooterTextoPiso2 {
+      min-width: auto;
+      width: 100%;
+      justify-content: center;
+   }
+
+   .FooterTextoPiso2 p {
+      font-size: 13px;
+   }
+
+   .FooterImagenesBannerPiso3 {
+      width: 100%;
+      justify-content: center;
+   }
+
+   .FooterSegundoPiso {
+      flex-direction: column;
+      gap: 0.75rem;
+      padding-top: 1rem;
+   }
+
+   .FooterSegundoPiso p {
+      font-size: 11px;
+      text-align: center;
+   }
+}
+
+@media (max-width: 480px) {
+   .footerContent {
+      padding: 1.5rem 0.75rem 1rem;
+   }
+
+   .footerPrimerPiso {
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+   }
+
+   .bannerLogoFooter {
+      width: 6rem;
+   }
+
+   .FooterTextoPiso2 {
+      flex-direction: column;
+      gap: 0.75rem;
+      align-items: center;
+   }
+
+   .FooterTextoPiso2 p {
+      font-size: 12px;
+   }
+
+   .FooterImagenesBannerPiso3 {
+      gap: 0.75rem;
+   }
+
+   .bannerRedesSociales,
+   .bannerRedesSociales2 {
+      width: 1.25rem;
+      height: 1.25rem;
+   }
+
+   .FooterSegundoPiso p {
+      font-size: 10px;
+      line-height: 1.4;
+   }
+}
+
+/* ========================================
+   MOBILE LANDSCAPE & SMALL SCREENS
+   ======================================== */
+
+@media (max-width: 360px) {
+   .FooterTextoPiso2 {
+      display: none;
+   }
+
+   .footerPrimerPiso {
+      justify-content: space-between;
+      align-items: center;
+      flex-direction: row;
+      gap: 1rem;
+   }
+
+   .bannerLogoFooter {
+      width: 5rem;
+   }
+
+   .FooterSegundoPiso p {
+      font-size: 9px;
+   }
+}
+
+/* ========================================
+   UTILITY CLASSES FOR LAYOUT INTEGRATION
+   ======================================== */
+
+/* For pages with min-height layouts */
+.page-with-footer {
+   display: flex;
+   flex-direction: column;
+   min-height: 100vh;
+}
+
+.page-with-footer .footerContainer {
+   margin-top: auto;
+}
+
+/* For sticky footer behavior */
+.footer-wrapper {
+   position: relative;
+   min-height: 100vh;
+   display: flex;
+   flex-direction: column;
+}
+
+.footer-wrapper main,
+.footer-wrapper .main-content {
+   flex: 1;
+}
+
+/* ========================================
+   ACCESSIBILITY & INTERACTION STATES
+   ======================================== */
+
+.FooterTextoPiso2 p:focus,
+.FooterSegundoPiso p:focus,
+.bannerRedesSociales:focus,
+.bannerRedesSociales2:focus {
+   outline: 2px solid #000000;
+   outline-offset: 2px;
+}
+
+/* Remove default button styles for social media icons */
+.FooterImagenesBannerPiso3 img {
+   border: none;
+   background: none;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+   .footerContainer {
+      border-top: 3px solid #000000;
+   }
+
+   .FooterTextoPiso2 p,
+   .FooterSegundoPiso p {
+      color: #000000;
+   }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+
+   .FooterTextoPiso2 p,
+   .FooterSegundoPiso p,
+   .bannerRedesSociales,
+   .bannerRedesSociales2,
+   .FooterTextoPiso2 p::after {
+      transition: none;
+   }
+}

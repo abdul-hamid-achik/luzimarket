@@ -1,0 +1,35 @@
+#tabla {
+    font-family: 'UniLTStd-L';
+    width: 90%;
+    position: relative;
+    top: 2rem;
+    left: 6rem;
+  }
+    
+  #tabla td, #tabla th {
+    padding: 10px;
+    border-radius: 10px;
+    margin-right: 5rem;
+  }
+    
+  #tabla th {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-align: left;
+    opacity: 50%;
+    font-family: 'UniLTStd-L';
+  }
+  
+  #tabla td {
+      border-radius: 10px;
+      /* background: #d7e0eb; */
+  }
+  
+  #tabla button {
+      padding-left: 40px;
+      padding-right: 40px;
+      border-radius: 7px;
+  }
+  
+  
+  

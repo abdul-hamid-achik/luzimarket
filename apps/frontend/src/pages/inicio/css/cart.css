@@ -1,0 +1,146 @@
+.cart {
+  width: 100%;
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 2px solid #000000;
+}
+
+h1.cart {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #343a40;
+  margin-bottom: 2rem;
+  text-align: center;
+  border-bottom: 2px solid #000000;
+  padding-bottom: 1rem;
+}
+
+h2.cart {
+  display: flex;
+  justify-content: flex-end;
+  text-align: right;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #343a40;
+  margin: 1.5rem 0;
+}
+
+/* Cart item styles */
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.cart-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.cart-item-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+}
+
+.cart-item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cart-item-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #343a40;
+}
+
+.cart-item-price {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #000000;
+}
+
+.cart-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 2rem;
+  border-top: 2px solid #e9ecef;
+}
+
+.cart-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  border: 2px solid #000000;
+  background: #000000;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cart-button:hover {
+  background: #333333;
+  transform: translateY(-2px);
+  text-decoration: none;
+  color: #ffffff;
+}
+
+.cart-button.secondary {
+  background: #ffffff;
+  color: #000000;
+}
+
+.cart-button.secondary:hover {
+  background: #f8f9fa;
+  color: #000000;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .cart {
+    margin: 1rem;
+    padding: 1rem;
+    width: calc(100% - 2rem);
+  }
+
+  h1.cart {
+    font-size: 2rem;
+  }
+
+  .cart-item {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .cart-item-image {
+    width: 120px;
+    height: 120px;
+  }
+
+  .cart-actions {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .cart-button {
+    width: 100%;
+    text-align: center;
+  }
+}
