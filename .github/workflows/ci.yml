@@ -15,12 +15,10 @@ permissions:
 
 env:
   # Global environment variables shared across all jobs
-  DB_MODE: offline
   NODE_ENV: test
   CI: true
   SKIP_STRIPE_CLI: true
-  # Use per-file database approach - no fixed DATABASE_URL
-  # Each test will create its own database file using the session ID
+  # DATABASE_URL must be set for PostgreSQL testing
   CORS_ORIGIN: http://localhost:5173
   VITE_API_URL: http://localhost:8000
   STRIPE_WEBHOOK_SECRET: whsec_test_ci_webhook_secret_for_testing_only
@@ -55,8 +53,7 @@ jobs:
       - name: Install dependencies
         run: npm ci --silent --ignore-scripts
         
-      - name: Rebuild native dependencies for Linux
-        run: npm rebuild better-sqlite3 --silent
+      # No need to rebuild native dependencies for PostgreSQL
         
       - name: Cache node_modules
         uses: actions/cache/save@v4
@@ -98,9 +95,9 @@ jobs:
           mkdir -p tmp/test-results
           echo "Created tmp/test-results directory"
         
-      - name: Prepare environment for per-file databases
+      - name: Prepare environment for PostgreSQL testing
         run: |
-          echo "DB_MODE=${DB_MODE}" > .env
+          echo "DATABASE_URL=${DATABASE_URL}" > .env
           echo "NEXTAUTH_SECRET=${NEXTAUTH_SECRET}" >> .env
           echo "CORS_ORIGIN=${CORS_ORIGIN}" >> .env
           echo "STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}" >> .env
@@ -110,8 +107,8 @@ jobs:
           echo "NODE_ENV=${NODE_ENV}" >> .env
           echo "SKIP_STRIPE_CLI=${SKIP_STRIPE_CLI}" >> .env
           echo "JWT_SECRET=${JWT_SECRET}" >> .env
-          # Per-file database approach - each test creates its own database
-          echo "Using per-file database approach for backend tests"
+          # PostgreSQL database approach
+          echo "Using PostgreSQL database for backend tests"
         
       - name: Run backend unit tests
         run: npm run test:backend
@@ -243,9 +240,9 @@ jobs:
           mkdir -p playwright-report
           echo "Created test directories"
         
-      - name: Prepare environment for per-file databases
+      - name: Prepare environment for PostgreSQL testing
         run: |
-          echo "DB_MODE=${DB_MODE}" > .env
+          echo "DATABASE_URL=${DATABASE_URL}" > .env
           echo "NEXTAUTH_SECRET=${NEXTAUTH_SECRET}" >> .env
           echo "CORS_ORIGIN=${CORS_ORIGIN}" >> .env
           echo "STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}" >> .env
@@ -255,8 +252,8 @@ jobs:
           echo "NODE_ENV=${NODE_ENV}" >> .env
           echo "SKIP_STRIPE_CLI=${SKIP_STRIPE_CLI}" >> .env
           echo "JWT_SECRET=${JWT_SECRET}" >> .env
-          # Per-file database approach - E2E tests will create session-specific databases
-          echo "Using per-file database approach for E2E tests - shard ${{ matrix.shard }}"
+          # PostgreSQL database approach for E2E tests
+          echo "Using PostgreSQL database for E2E tests - shard ${{ matrix.shard }}"
           
       - name: Install Playwright browsers
         run: npx playwright install --with-deps ${{ matrix.project }}

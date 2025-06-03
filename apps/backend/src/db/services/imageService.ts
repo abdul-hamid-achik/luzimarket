@@ -440,20 +440,14 @@ export class ImageService {
                     args: [productId]
                 });
             } else {
-                // SQLite fallback - use direct query
-                try {
-                    const { sql, eq } = await import('drizzle-orm');
-                    result = await db.select({ count: sql`COUNT(*)` })
-                        .from(schema.photos)
-                        .where(eq(schema.photos.productId, productId));
-                } catch (sqliteError) {
-                    // If Drizzle query fails, return false to be safe
-                    console.error('SQLite query error:', sqliteError);
-                    return false;
-                }
+                // Use standard Drizzle query
+                const { sql, eq } = await import('drizzle-orm');
+                result = await db.select({ count: sql`COUNT(*)` })
+                    .from(schema.photos)
+                    .where(eq(schema.photos.productId, productId));
             }
 
-            // Handle both PostgreSQL and SQLite response formats
+            // Handle response format
             const count = Array.isArray(result) ?
                 result[0]?.count :
                 (result.rows?.[0]?.count || result[0]?.count || 0);

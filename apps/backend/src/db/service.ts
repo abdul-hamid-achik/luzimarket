@@ -8,6 +8,8 @@ import {
     sql
 } from 'drizzle-orm';
 import { db } from './index';
+import * as schema from './schema.postgres';
+import type { PgTable } from 'drizzle-orm/pg-core';
 
 // Helper function to get the correct database instance
 function getDbInstance() {
@@ -20,11 +22,11 @@ function getDbInstance() {
     return db;
 }
 
-// Simple, practical types that work with dynamic schemas
-type DatabaseTable = any;
+// Type-safe database types using PostgreSQL schema
+type DatabaseTable = PgTable;
 type WhereCondition = SQL<unknown> | undefined;
 
-// Type-safe database service that actually works
+// Type-safe database service for PostgreSQL
 class DatabaseService {
     /**
      * Select records from a table
@@ -219,7 +221,7 @@ class DatabaseService {
                 return await (database as any).execute(sql);
             }
 
-            // For SQLite - try all() first for SELECT queries
+            // Fallback for other database types
             return await (database as any).all(sql);
         } catch (error) {
             // Fallback to run() for non-SELECT queries
@@ -323,11 +325,10 @@ class DatabaseService {
     }
 
     /**
-     * Get the current schema tables (dynamic based on environment)
+     * Get the PostgreSQL schema (now type-safe)
      */
-    async getSchema() {
-        const { getSchema } = await import('./schema');
-        return await getSchema();
+    getSchema() {
+        return schema;
     }
 
     /**
@@ -350,4 +351,7 @@ export const dbService = new DatabaseService();
 
 // Export commonly used Drizzle operators and helpful types
 export { eq, and, or, isNull, gt, SQL, sql };
-export type { WhereCondition, DatabaseTable }; 
+export type { WhereCondition, DatabaseTable };
+
+// Export the schema for type-safe access
+export { schema }; 

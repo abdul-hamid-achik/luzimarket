@@ -83,15 +83,34 @@ export async function GET(request: NextRequest) {
             .from(orders)
             .where(and(...dateConditions));
 
-        const summary = summaryResult[0];
+        // Convert string values to numbers (PostgreSQL returns numeric values as strings)
+        const summary = summaryResult[0] ? {
+            totalRevenue: Number(summaryResult[0].totalRevenue) || 0,
+            totalOrders: Number(summaryResult[0].totalOrders) || 0,
+            averageOrderValue: Number(summaryResult[0].averageOrderValue) || 0,
+            completedOrders: Number(summaryResult[0].completedOrders) || 0,
+        } : {
+            totalRevenue: 0,
+            totalOrders: 0,
+            averageOrderValue: 0,
+            completedOrders: 0,
+        };
 
-        // Format revenue data based on period
-        let formattedData: any[] = revenueData;
+        // Convert numeric values in revenue data and format based on period
+        let formattedData: any[] = revenueData.map((item: any) => ({
+            date: item.date,
+            totalRevenue: Number(item.totalRevenue) || 0,
+            orderCount: Number(item.orderCount) || 0,
+            averageOrderValue: Number(item.averageOrderValue) || 0,
+        }));
         if (period === 'weekly') {
-            // Group by week
+            // Group by week (start on Monday)
             const weeklyData = revenueData.reduce((acc: Record<string, WeeklyData>, item: RevenueItem) => {
                 const date = new Date(item.date);
-                const weekStart = new Date(date.setDate(date.getDate() - date.getDay()));
+                // Calculate Monday of the week (getDay() returns 0 for Sunday, 1 for Monday, etc.)
+                const dayOfWeek = date.getDay();
+                const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // If Sunday (0), go back 6 days to Monday
+                const weekStart = new Date(date.setDate(date.getDate() - daysToSubtract));
                 const weekKey = weekStart.toISOString().split('T')[0];
 
                 if (!acc[weekKey]) {
@@ -104,8 +123,8 @@ export async function GET(request: NextRequest) {
                     };
                 }
 
-                acc[weekKey].totalRevenue += item.totalRevenue;
-                acc[weekKey].orderCount += item.orderCount;
+                acc[weekKey].totalRevenue += Number(item.totalRevenue) || 0;
+                acc[weekKey].orderCount += Number(item.orderCount) || 0;
 
                 return acc;
             }, {} as Record<string, WeeklyData>);
@@ -127,8 +146,8 @@ export async function GET(request: NextRequest) {
                     };
                 }
 
-                acc[monthKey].totalRevenue += item.totalRevenue;
-                acc[monthKey].orderCount += item.orderCount;
+                acc[monthKey].totalRevenue += Number(item.totalRevenue) || 0;
+                acc[monthKey].orderCount += Number(item.orderCount) || 0;
 
                 return acc;
             }, {} as Record<string, MonthlyData>);

@@ -67,7 +67,7 @@ import { NextRequest, NextResponse } from 'next/server';
  *                           items:
  *                             type: string
  */
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
     try {
         return NextResponse.json({
             success: true,

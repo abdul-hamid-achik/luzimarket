@@ -75,7 +75,7 @@ export default defineConfig({
         // Environment variables for testing
         env: {
             NODE_ENV: 'test',
-            DB_MODE: 'offline', // Force offline mode for tests
+            // DB_MODE removed - using PostgreSQL for tests
             NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || 'test-secret-for-vitest-backend-tests',
             VITEST_SESSION_ID: sessionId,
             CI: process.env.CI || 'false',

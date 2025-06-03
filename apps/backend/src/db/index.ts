@@ -1,83 +1,36 @@
-// @ts-ignore: Allow importing dotenv without type declarations
 import * as dotenv from 'dotenv';
-import { drizzle as neonDrizzle } from 'drizzle-orm/neon-serverless';
-import { drizzle as sqliteDrizzle } from 'drizzle-orm/better-sqlite3';
-import Database from 'better-sqlite3';
-import path from 'path';
-import * as fs from 'fs';
-import * as sqliteSchema from './schema.sqlite';
-
-// Global test database instances (only available during tests)
-// eslint-disable-next-line no-var
-declare global {
-    // eslint-disable-next-line no-var
-    var __TEST_DB_INSTANCE__: Database.Database | undefined;
-    // eslint-disable-next-line no-var
-    var __TEST_DRIZZLE_INSTANCE__: any | undefined;
-}
+import { drizzle } from 'drizzle-orm/neon-serverless';
 
 dotenv.config();
 
-const DB_MODE = process.env.DB_MODE || 'online';
-// If no DATABASE_URL and not explicitly offline, fallback to offline mode (e.g. during tests)
-let effectiveMode = DB_MODE;
-if (DB_MODE !== 'offline' && !process.env.DATABASE_URL) {
-    console.warn('DATABASE_URL not set, defaulting to offline SQLite mode.');
-    effectiveMode = 'offline';
-}
-const DATABASE_URL = process.env.DATABASE_URL || '';
+const DATABASE_URL = process.env.DATABASE_URL;
 
-// Initialize database connection
-function initializeDatabase(): any {
-    console.log('[DB DEBUG] initializeDatabase() called');
-    console.log('[DB DEBUG] NODE_ENV:', process.env.NODE_ENV);
-    console.log('[DB DEBUG] DATABASE_URL:', process.env.DATABASE_URL);
-    console.log('[DB DEBUG] DB_MODE:', process.env.DB_MODE);
-    console.log('[DB DEBUG] Effective mode:', effectiveMode);
-
-    if (effectiveMode === 'offline') {
-        console.log('Using SQLite database for offline mode.');
-
-        // Normal SQLite connection logic
-        let sqliteDbPath: string;
-        if (DATABASE_URL === ':memory:') {
-            sqliteDbPath = ':memory:';
-        } else if (DATABASE_URL && (DATABASE_URL.startsWith('file:') || DATABASE_URL.endsWith('.db') || DATABASE_URL.includes('sqlite'))) {
-            // Use the provided DATABASE_URL for SQLite (file: URLs or .db files)
-            sqliteDbPath = DATABASE_URL.startsWith('file:') ? DATABASE_URL.slice(5) : DATABASE_URL;
-            // Ensure the directory exists
-            const dir = path.dirname(sqliteDbPath);
-            if (!fs.existsSync(dir)) {
-                fs.mkdirSync(dir, { recursive: true });
-            }
-        } else {
-            // Default to project-relative path if DATABASE_URL is not SQLite-compatible
-            sqliteDbPath = path.resolve(process.cwd(), '../../tmp/db.sqlite');
-        }
-
-        console.log(`[DB DEBUG] Resolved sqliteDbPath: "${sqliteDbPath}"`);
-        console.log(`[DB DEBUG] sqliteDbPath exists: ${fs.existsSync(sqliteDbPath)}`);
-
-        const sqlite = new Database(sqliteDbPath);
-        const drizzleDb = sqliteDrizzle(sqlite, { schema: sqliteSchema });
-
-        if (sqliteDbPath === ':memory:') {
-            console.log('Connected to in-memory SQLite database.');
-        } else {
-            console.log(`Connected to SQLite database at ${sqliteDbPath}.`);
-        }
-        return drizzleDb;
-    } else { // This includes 'neon' or any other non-offline mode intended for PostgreSQL/Neon
-        if (!DATABASE_URL) {
-            throw new Error('DATABASE_URL is not set for non-offline (Neon/PostgreSQL) mode.');
-        }
-        const drizzleDb = neonDrizzle(DATABASE_URL);
-        console.log('Connected to Neon database');
-        return drizzleDb;
+if (!DATABASE_URL) {
+    // During build time, DATABASE_URL might not be available
+    if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
+        console.warn('DATABASE_URL is not set, database operations will fail');
+    } else if (process.env.NODE_ENV !== 'production') {
+        throw new Error('DATABASE_URL is required for PostgreSQL database connection.');
     }
 }
 
-// Lazy-initialize the database to allow for test setup
+// Initialize database connection
+function initializeDatabase() {
+    console.log('[DB DEBUG] initializeDatabase() called');
+    console.log('[DB DEBUG] NODE_ENV:', process.env.NODE_ENV);
+    console.log('[DB DEBUG] DATABASE_URL:', process.env.DATABASE_URL ? 'Set' : 'Not set');
+
+    if (!DATABASE_URL) {
+        console.warn('DATABASE_URL not available, returning null database instance');
+        return null;
+    }
+
+    const drizzleDb = drizzle(DATABASE_URL);
+    console.log('Connected to PostgreSQL database');
+    return drizzleDb;
+}
+
+// Lazy-initialize the database
 let _db: any = null;
 
 function getDatabase(): any {
@@ -93,6 +46,11 @@ function getDatabase(): any {
         _db = initializeDatabase();
         console.log('[DB DEBUG] Database initialized:', typeof _db);
     }
+
+    if (!_db) {
+        throw new Error('Database not available - DATABASE_URL might not be set');
+    }
+
     return _db;
 }
 

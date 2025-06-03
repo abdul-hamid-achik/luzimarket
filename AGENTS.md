@@ -10,7 +10,7 @@
    ```bash
    docker compose up -d
    ```
-   - If Docker is unavailable, tests fall back to local processes using **pglite** for the backend and SQLite. This is handled directly in `playwright.config.js`.
+   - If Docker is unavailable, tests fall back to local processes using **Neon PostgreSQL** for the backend. This is handled directly in `playwright.config.js`.
 3. Run database migrations:
    ```bash
    npm run migrate
@@ -22,7 +22,7 @@
 
 ## Testing
 
-- **Backend unit tests** run against pglite when `docker compose` is not running:
+- **Backend unit tests** run against Neon PostgreSQL when `docker compose` is not running:
   ```bash
   npm run test:backend
   ```
@@ -30,7 +30,7 @@
   ```bash
   npm run test:frontend
   ```
-- **End-to-end tests** will try to use Docker containers if available. When Docker cannot be started, the tests automatically run against local instances started with pglite and SQLite. Run:
+- **End-to-end tests** will try to use Docker containers if available. When Docker cannot be started, the tests automatically run against local instances using Neon PostgreSQL. Run:
   ```bash
   npm run test:e2e
   ```

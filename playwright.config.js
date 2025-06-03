@@ -20,19 +20,14 @@ const generateSessionDirectories = () => {
     logsDir: path.join(sessionDir, 'logs'),
     screenshotsDir: path.join(sessionDir, 'screenshots'),
     resultsDir: path.join(sessionDir, 'results'),
-    reportDir: path.join(sessionDir, 'report'),
-    dbPath: path.join(sessionDir, 'luzimarket.db')
+    reportDir: path.join(sessionDir, 'report')
   };
 };
 
-const { sessionDir, sessionId, logsDir, screenshotsDir, resultsDir, reportDir, dbPath } = generateSessionDirectories();
+const { sessionDir, sessionId, logsDir, screenshotsDir, resultsDir, reportDir } = generateSessionDirectories();
 
-// Check if we're using PGLite (offline mode) or Neon (online mode)
-const DB_MODE = process.env.DB_MODE || 'neon';
-const isOfflineMode = DB_MODE === 'offline';
-
-console.log(`Running tests in ${isOfflineMode ? 'OFFLINE (SQLite)' : 'ONLINE (PostgreSQL)'} mode using ${DB_MODE} database`);
-console.log(`🗂️  Test session: ${sessionId}`);
+console.log('Running tests in (PostgreSQL) using Neon database');
+console.log(`🗂️ Test session: ${sessionId}`);
 console.log(`📁 Session directory: ${sessionDir}`);
 
 // Create all session directories
@@ -65,13 +60,6 @@ const appendLog = (filename, content) => {
 
 // Backend port - matches the port in vite.config.ts
 const BACKEND_PORT = process.env.PORT || 8000;
-
-// Use session-specific database path
-const UNIQUE_DB_PATH = isOfflineMode ? dbPath : process.env.DATABASE_URL;
-
-if (isOfflineMode) {
-  console.log(`🗄️  Database: ${UNIQUE_DB_PATH}`);
-}
 
 // Check if we're in CI environment
 const isCI = process.env.CI === 'true';
@@ -142,8 +130,6 @@ module.exports = defineConfig({
         PORT: BACKEND_PORT,
         NODE_ENV: 'test',
         LOG_LEVEL: 'info',
-        DB_MODE: DB_MODE,
-        DATABASE_URL: UNIQUE_DB_PATH,
         // Ensure consistent JWT secret for e2e tests
         JWT_SECRET: 'test-jwt-secret-for-e2e-tests',
         // Enable verbose API logging for debugging
@@ -198,13 +184,14 @@ module.exports = defineConfig({
     // Start Stripe CLI webhook listener (if available)
     ...(hasStripeCLI ? [{
       command: `stripe listen --forward-to localhost:${BACKEND_PORT}/api/webhooks/stripe --events payment_intent.succeeded,payment_intent.payment_failed,payment_intent.created,charge.succeeded,charge.failed,invoice.payment_succeeded,invoice.payment_failed,customer.subscription.created,customer.subscription.updated,customer.subscription.deleted`,
-      url: null, // No health check URL for Stripe CLI
+      url: `http://localhost:${BACKEND_PORT}/api/webhooks/stripe`,
       reuseExistingServer: false,
-      timeout: 60000, // Increased timeout for Stripe CLI to start
+      timeout: 30000,
       stdout: 'pipe',
       stderr: 'pipe',
       env: {
         ...process.env,
+        STRIPE_WEBHOOK_SECRET: 'whsec_test_secret_for_e2e_tests'
       },
       onStdOut: (chunk) => {
         const output = chunk.toString().trim();
@@ -213,90 +200,47 @@ module.exports = defineConfig({
           appendLog('stripe-webhook.log', `STDOUT: ${output}`);
 
           // Extract webhook secret from Stripe CLI output
-          const secretMatch = output.match(/Your webhook signing secret is ([^ \n\r]+)/);
+          const secretMatch = output.match(/whsec_[a-zA-Z0-9]+/);
           if (secretMatch) {
-            const webhookSecret = secretMatch[1];
-            console.log('🔑 Stripe webhook secret captured:', webhookSecret.substring(0, 10) + '...');
-
-            // Store the webhook secret for tests to use
-            process.env.STRIPE_WEBHOOK_SECRET_TEST = webhookSecret;
-
-            // Write to session directory
-            try {
-              fs.writeFileSync(
-                path.join(sessionDir, 'stripe-webhook-secret.txt'),
-                webhookSecret
-              );
-              console.log('📝 Webhook secret saved to session directory');
-              appendLog('stripe-webhook.log', `Webhook secret saved: ${webhookSecret.substring(0, 10)}...`);
-            } catch (e) {
-              console.error('Failed to write webhook secret:', e);
-              appendLog('stripe-webhook.log', `ERROR: Failed to save webhook secret: ${e.message}`);
-            }
-          }
-
-          // Log webhook events for debugging
-          if (output.includes('payment_intent.') || output.includes('charge.') || output.includes('invoice.')) {
-            console.log('🎯 Stripe webhook event received:', output.trim());
-            appendLog('stripe-webhook.log', `WEBHOOK_EVENT: ${output.trim()}`);
+            const webhookSecret = secretMatch[0];
+            const secretFile = path.join(sessionDir, 'stripe-webhook-secret.txt');
+            fs.writeFileSync(secretFile, webhookSecret);
+            console.log(`🔑 Stripe webhook secret saved: ${webhookSecret.substring(0, 20)}...`);
           }
         }
       },
       onStdErr: (chunk) => {
-        const error = chunk.toString().trim();
-        if (error) {
-          console.error('Stripe CLI Error:', error);
-          appendLog('stripe-webhook.log', `STDERR: ${error}`);
+        const output = chunk.toString().trim();
+        if (output && !output.includes('Ready!')) {
+          console.error('Stripe CLI Error:', output);
+          appendLog('stripe-webhook.log', `STDERR: ${output}`);
         }
       }
     }] : [])
   ],
+  globalSetup: require.resolve('./e2e/global-setup.js'),
+  globalTeardown: require.resolve('./e2e/global-teardown.js'),
   projects: [
-    // For local dev, only run Chromium for speed
-    // For CI, run all browsers for comprehensive testing
-    // NOTE: Browser-specific launch options are required because:
-    // - WebKit doesn't support --disable-web-security flag
-    // - Firefox needs different security preferences 
-    // - Each browser has different capabilities and requirements
     {
       name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        // Chromium-specific launch options
-        launchOptions: {
-          args: ['--disable-web-security'] // Required to allow cross-origin access
-        }
-      }
+      use: { ...devices['Desktop Chrome'] },
     },
-    ...(isCI ? [
-      {
-        name: 'firefox',
-        use: {
-          ...devices['Desktop Firefox'],
-          // Firefox-specific launch options
-          launchOptions: {
-            firefoxUserPrefs: {
-              'security.fileuri.strict_origin_policy': false
-            }
-          }
-        }
-      },
-      {
-        name: 'webkit',
-        use: {
-          ...devices['Desktop Safari'],
-          // WebKit-specific configuration for better stability
-          launchOptions: {},
-          // Increase timeouts for WebKit as it can be slower
-          actionTimeout: 45000,
-          navigationTimeout: 90000,
-          // WebKit specific viewport
-          viewport: { width: 1280, height: 720 }
-        }
-      },
-    ] : [])
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] },
+    },
+    // Mobile testing
+    {
+      name: 'Mobile Chrome',
+      use: { ...devices['Pixel 5'] },
+    },
+    {
+      name: 'Mobile Safari',
+      use: { ...devices['iPhone 12'] },
+    },
   ],
-  // Global setup to capture request/response logging
-  globalSetup: './e2e/global-setup.js',
-  globalTeardown: './e2e/global-teardown.js',
 });

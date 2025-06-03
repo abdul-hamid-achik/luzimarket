@@ -88,12 +88,12 @@ class TestServerSingleton {
                     env: {
                         NODE_ENV: 'test',
                         DATABASE_URL: databaseUrl,
-                        DB_MODE: 'offline', // Force offline mode for tests
+                        // DB_MODE removed - using PostgreSQL for tests
                         NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
                     },
                     experimental: {
                         // Pass environment variables to the server
-                        serverComponentsExternalPackages: ['better-sqlite3']
+                        serverComponentsExternalPackages: []
                     }
                 }
             });

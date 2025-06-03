@@ -81,7 +81,7 @@ describe('Products API Tests', () => {
             const productData = {
                 name: `Test Product ${timestamp}`,
                 description: 'A test product for unit testing',
-                price: 29.99,
+                price: 2999, // Price in cents (29.99 * 100)
                 categoryId: testCategoryId
             };
 
@@ -119,7 +119,7 @@ describe('Products API Tests', () => {
             const productData = {
                 name: 'Duplicate Slug Product',
                 description: 'A product to test slug conflict handling',
-                price: 39.99,
+                price: 3999, // Price in cents (39.99 * 100)
                 slug: `test-duplicate-slug-${timestamp}`,
                 categoryId: testCategoryId
             };
@@ -155,7 +155,7 @@ describe('Products API Tests', () => {
             const productData = {
                 name: 'Invalid Product',
                 description: 'A product to test database error handling',
-                price: 29.99,
+                price: 2999, // Price in cents (29.99 * 100)
                 categoryId: '00000000-0000-0000-0000-000000000000' // Invalid ID
             };
 

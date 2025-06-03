@@ -53,7 +53,7 @@ describe('Favorites API Tests', () => {
                     .send({
                         name: 'Test Product for Favorites',
                         description: 'A test product for testing favorites functionality',
-                        price: 45.99,
+                        price: 4599, // Price in cents (45.99 * 100)
                         categoryId: testCategoryId,
                         status: 'active',
                         variants: [

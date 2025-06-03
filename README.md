@@ -221,7 +221,7 @@ Create a `.env` file at the project root:
 # Database Configuration
 DATABASE_URL="your-neon-postgres-url"
 DRIZZLE_DATABASE_URL="your-neon-postgres-url"
-DB_MODE="neon" # or "offline" for SQLite
+# DB_MODE removed - PostgreSQL only
 
 # Authentication
 JWT_SECRET="your-super-secure-jwt-secret-256bit"
@@ -326,15 +326,12 @@ npm run migrate:down && npm run migrate:up && npm run seed
 npm run studio
 ```
 
-### **Dual Database Support**
+### **PostgreSQL Database**
 ```bash
-# Switch to offline SQLite mode
-export DB_MODE=offline
-npm run seed
-
-# Switch back to PostgreSQL
-export DB_MODE=neon
+# Ensure DATABASE_URL is set for PostgreSQL
+export DATABASE_URL="your-neon-postgres-url"
 npm run migrate:up
+npm run seed
 ```
 
 ## 🧪 Testing Infrastructure

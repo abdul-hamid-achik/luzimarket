@@ -289,8 +289,8 @@ export async function POST(request: NextRequest) {
             });
         } catch (error: any) {
             console.error('Error creating product:', error);
-            // Handle unique constraint violations for both PostgreSQL and SQLite
-            if (error.code === '23505' || error.code === 'SQLITE_CONSTRAINT_UNIQUE' ||
+            // Handle unique constraint violations for PostgreSQL
+            if (error.code === '23505' ||
                 error.message?.includes('UNIQUE constraint failed') ||
                 error.message?.includes('slug already exists')) {
                 return NextResponse.json(
