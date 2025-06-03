@@ -13,6 +13,20 @@ html {
   overflow-y: auto;
 }
 
+/* Global layout fixes */
+* {
+  box-sizing: border-box;
+}
+
+.container-fluid {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.row {
+  max-width: 100%;
+}
+
 /*Container: Para separar el sidebar y el container */
 
 /*.Container {

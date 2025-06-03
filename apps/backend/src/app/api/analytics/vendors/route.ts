@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
         const db = dbService.raw;
 
         // Get vendor performance data
-        const vendorPerformance = await db
+        const vendorPerformanceResult = await db
             .select({
                 vendorId: vendors.id,
                 vendorName: vendors.businessName,
@@ -66,8 +66,18 @@ export async function GET(request: NextRequest) {
             .orderBy(sql`COALESCE(SUM(${orderItems.price} * ${orderItems.quantity}), 0) DESC`)
             .limit(limit);
 
+        // Convert numeric values from strings to numbers
+        const vendorPerformance = vendorPerformanceResult.map((item: any) => ({
+            vendorId: item.vendorId,
+            vendorName: item.vendorName,
+            totalRevenue: Number(item.totalRevenue) || 0,
+            totalOrders: Number(item.totalOrders) || 0,
+            totalProducts: Number(item.totalProducts) || 0,
+            averageOrderValue: Number(item.averageOrderValue) || 0,
+        }));
+
         // Get vendor status distribution
-        const vendorStatusDistribution = await db
+        const vendorStatusDistributionResult = await db
             .select({
                 status: vendors.status,
                 count: sql<number>`COUNT(*)`.as('count'),
@@ -77,8 +87,15 @@ export async function GET(request: NextRequest) {
             .groupBy(vendors.status)
             .orderBy(vendors.status);
 
+        // Convert numeric values from strings to numbers
+        const vendorStatusDistribution = vendorStatusDistributionResult.map((item: any) => ({
+            status: item.status,
+            count: Number(item.count) || 0,
+            percentage: Number(item.percentage) || 0,
+        }));
+
         // Get top vendors by commission earned
-        const topVendorsByCommission = await db
+        const topVendorsByCommissionResult = await db
             .select({
                 vendorId: vendors.id,
                 vendorName: vendors.businessName,
@@ -97,6 +114,15 @@ export async function GET(request: NextRequest) {
             .groupBy(vendors.id, vendors.businessName, vendors.commissionRate)
             .orderBy(sql`COALESCE(SUM(${orderItems.price} * ${orderItems.quantity}) * ${vendors.commissionRate} / 100, 0) DESC`)
             .limit(limit);
+
+        // Convert numeric values from strings to numbers
+        const topVendorsByCommission = topVendorsByCommissionResult.map((item: any) => ({
+            vendorId: item.vendorId,
+            vendorName: item.vendorName,
+            commissionRate: Number(item.commissionRate) || 0,
+            totalRevenue: Number(item.totalRevenue) || 0,
+            estimatedCommission: Number(item.estimatedCommission) || 0,
+        }));
 
         // Calculate summary statistics
         const totalVendors = vendorPerformance.length;

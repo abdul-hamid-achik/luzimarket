@@ -1,0 +1,150 @@
+/* Employee Dashboard Styles - Fix Layout Issues */
+.Dashboard {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.Dashboard.container {
+    max-width: 100% !important;
+    padding: 2rem;
+    margin: 0;
+    width: 100%;
+}
+
+.Dashboard .container {
+    max-width: 100% !important;
+    padding: 2rem;
+    margin: 0;
+    width: 100%;
+}
+
+.Dashboard .row {
+    margin: 0 !important;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    --bs-gutter-x: 0;
+}
+
+.Dashboard .col-md-4 {
+    flex: 1;
+    min-width: 300px;
+    max-width: none;
+    padding: 0;
+    margin-bottom: 0;
+}
+
+/* Fix card styling */
+.Dashboard .card {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: white;
+    height: 100%;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.Dashboard .card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.Dashboard .card-body {
+    padding: 1.5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.Dashboard .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #2d3748;
+}
+
+.Dashboard .display-5 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0.5rem 0;
+}
+
+.Dashboard .card-subtitle {
+    font-size: 0.9rem;
+    color: #718096;
+    margin-bottom: 1rem;
+}
+
+/* Chart container styling */
+.Dashboard .card .chart-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+}
+
+/* Responsive design */
+@media (max-width: 992px) {
+    .Dashboard .row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .Dashboard .col-md-4 {
+        min-width: 100%;
+        max-width: 100%;
+    }
+
+    .Dashboard .container,
+    .Dashboard.container {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .Dashboard .container,
+    .Dashboard.container {
+        padding: 0.5rem;
+    }
+
+    .Dashboard .card-body {
+        padding: 1rem;
+    }
+
+    .Dashboard .display-5 {
+        font-size: 2rem;
+    }
+}
+
+/* Fix any overflow issues with the main layout */
+.employee-layout {
+    overflow-x: hidden;
+}
+
+.employee-layout .container-fluid {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.employee-layout .row {
+    margin: 0;
+    max-width: 100%;
+}
+
+.employee-layout .sidebar {
+    flex-shrink: 0;
+}
+
+.employee-layout .outlet {
+    flex: 1;
+    min-width: 0;
+    overflow-x: hidden;
+}

@@ -288,20 +288,18 @@ export async function POST(request: NextRequest) {
                 updatedAt: new Date()
             });
         } catch (error: any) {
-            console.error('Error creating product:', error);
+            console.error('Database insertReturning error:', error);
             // Handle unique constraint violations for PostgreSQL
             if (error.code === '23505' ||
                 error.message?.includes('UNIQUE constraint failed') ||
+                error.message?.includes('duplicate key value violates unique constraint') ||
                 error.message?.includes('slug already exists')) {
                 return NextResponse.json(
                     { error: 'Product slug already exists' },
                     { status: StatusCodes.CONFLICT }
                 );
             }
-            return NextResponse.json(
-                { error: 'Failed to create product' },
-                { status: StatusCodes.INTERNAL_SERVER_ERROR }
-            );
+            throw error; // Re-throw to be caught by outer catch block
         }
 
         // Create variants if provided

@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
         const db = dbService.raw;
 
         // Get order status distribution
-        const statusDistribution = await db
+        const statusDistributionResult = await db
             .select({
                 status: orders.status,
                 count: sql<number>`COUNT(*)`.as('count'),
@@ -63,8 +63,15 @@ export async function GET(request: NextRequest) {
             .groupBy(orders.status)
             .orderBy(orders.status);
 
+        // Convert numeric values from strings to numbers
+        const statusDistribution = statusDistributionResult.map((item: any) => ({
+            status: item.status,
+            count: Number(item.count) || 0,
+            percentage: Number(item.percentage) || 0,
+        }));
+
         // Get payment status distribution
-        const paymentStatusDistribution = await db
+        const paymentStatusDistributionResult = await db
             .select({
                 paymentStatus: orders.payment_status,
                 count: sql<number>`COUNT(*)`.as('count'),
@@ -75,12 +82,19 @@ export async function GET(request: NextRequest) {
             .groupBy(orders.payment_status)
             .orderBy(orders.payment_status);
 
-        // Get weekly progress data for charts
+        // Convert numeric values from strings to numbers
+        const paymentStatusDistribution = paymentStatusDistributionResult.map((item: any) => ({
+            paymentStatus: item.paymentStatus,
+            count: Number(item.count) || 0,
+            percentage: Number(item.percentage) || 0,
+        }));
+
+        // Get weekly progress data for charts  
         let progressData = [];
         if (period === 'weekly') {
             progressData = await db
                 .select({
-                    week: sql<string>`strftime('%Y-W%W', ${orders.createdAt})`.as('week'),
+                    week: sql<string>`TO_CHAR(${orders.createdAt}, 'IYYY-IW')`.as('week'),
                     pending: sql<number>`COUNT(CASE WHEN ${orders.status} = 'pending' THEN 1 END)`.as('pending'),
                     processing: sql<number>`COUNT(CASE WHEN ${orders.status} = 'processing' THEN 1 END)`.as('processing'),
                     shipped: sql<number>`COUNT(CASE WHEN ${orders.status} = 'shipped' THEN 1 END)`.as('shipped'),
@@ -89,12 +103,12 @@ export async function GET(request: NextRequest) {
                 })
                 .from(orders)
                 .where(dateConditions.length > 0 ? and(...dateConditions) : undefined)
-                .groupBy(sql`strftime('%Y-W%W', ${orders.createdAt})`)
-                .orderBy(sql`strftime('%Y-W%W', ${orders.createdAt})`);
+                .groupBy(sql`TO_CHAR(${orders.createdAt}, 'IYYY-IW')`)
+                .orderBy(sql`TO_CHAR(${orders.createdAt}, 'IYYY-IW')`);
         } else if (period === 'monthly') {
             progressData = await db
                 .select({
-                    month: sql<string>`strftime('%Y-%m', ${orders.createdAt})`.as('month'),
+                    month: sql<string>`TO_CHAR(${orders.createdAt}, 'YYYY-MM')`.as('month'),
                     pending: sql<number>`COUNT(CASE WHEN ${orders.status} = 'pending' THEN 1 END)`.as('pending'),
                     processing: sql<number>`COUNT(CASE WHEN ${orders.status} = 'processing' THEN 1 END)`.as('processing'),
                     shipped: sql<number>`COUNT(CASE WHEN ${orders.status} = 'shipped' THEN 1 END)`.as('shipped'),
@@ -103,8 +117,8 @@ export async function GET(request: NextRequest) {
                 })
                 .from(orders)
                 .where(dateConditions.length > 0 ? and(...dateConditions) : undefined)
-                .groupBy(sql`strftime('%Y-%m', ${orders.createdAt})`)
-                .orderBy(sql`strftime('%Y-%m', ${orders.createdAt})`);
+                .groupBy(sql`TO_CHAR(${orders.createdAt}, 'YYYY-MM')`)
+                .orderBy(sql`TO_CHAR(${orders.createdAt}, 'YYYY-MM')`);
         } else {
             // Daily data
             progressData = await db
@@ -129,9 +143,14 @@ export async function GET(request: NextRequest) {
             .reduce((sum: number, item: StatusDistributionItem) => sum + item.count, 0);
         const completionRate = totalOrders > 0 ? (completedOrders / totalOrders) * 100 : 0;
 
-        // Format progress data with names for chart display
+        // Convert numeric values and format progress data with names for chart display
         const formattedProgressData = progressData.map((item: any) => ({
             ...item,
+            pending: Number(item.pending) || 0,
+            processing: Number(item.processing) || 0,
+            shipped: Number(item.shipped) || 0,
+            delivered: Number(item.delivered) || 0,
+            total: Number(item.total) || 0,
             name: period === 'weekly' ? `Week ${item.week}`
                 : period === 'monthly' ? new Date(item.month + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
                     : item.date
