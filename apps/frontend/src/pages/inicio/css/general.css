@@ -84,16 +84,25 @@ body {
 .cajaBody {
     position: relative;
     margin-top: 0rem;
-    max-width: 1400px;
+    max-width: 100%;
     margin: 0 auto;
     padding: 0;
     flex: 1;
+    overflow-x: hidden;
 }
 
-/* Add proper container spacing */
+/* Add proper container spacing and prevent overflow */
 .cajaBody>* {
     margin-left: auto;
     margin-right: auto;
+    max-width: 100%;
+}
+
+/* Fix container width issues */
+.cajaBody .container,
+.cajaBody .container-fluid {
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 .Banners {
@@ -103,6 +112,8 @@ body {
     gap: 2rem;
     flex-wrap: wrap;
     justify-content: center;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 .ImagenTextoBanner {

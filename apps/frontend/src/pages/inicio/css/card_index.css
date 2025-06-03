@@ -232,25 +232,128 @@
 .cajaProductosMuestra {
     display: flex;
     justify-content: center;
-    align-items: center;
-    margin: .5rem;
-    flex-wrap: wrap;
-    gap: 1rem;
-    max-width: 1400px;
+    align-items: flex-start;
     margin: 2rem auto;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    max-width: 1400px;
     padding: 0 1rem;
+    overflow-x: hidden;
 }
 
 .cajaProductosMuestra .card {
-    margin-right: 1rem;
     border: 1px solid #000;
     border-radius: 12px;
     transition: all 0.3s ease;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    flex: 0 0 auto;
+    width: 280px;
+    max-width: 100%;
+    background: white;
 }
 
 .cajaProductosMuestra .card:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.cajaProductosMuestra .card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 1px solid #eee;
+}
+
+.cajaProductosMuestra .card-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.cajaProductosMuestra .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0;
+    line-height: 1.3;
+    /* Remove text clipping */
+    overflow: visible;
+    text-overflow: visible;
+    white-space: normal;
+    -webkit-line-clamp: unset;
+    -webkit-box-orient: unset;
+    display: block;
+}
+
+.cajaProductosMuestra .card-text {
+    color: #718096;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 0;
+    /* Allow more text to show */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cajaProductosMuestra .card-text:last-child {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 1.1rem;
+    margin-top: auto;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+    .cajaProductosMuestra {
+        gap: 1.25rem;
+        padding: 0 0.75rem;
+    }
+
+    .cajaProductosMuestra .card {
+        width: 260px;
+    }
+}
+
+@media (max-width: 768px) {
+    .cajaProductosMuestra {
+        margin: 1.5rem auto;
+        gap: 1rem;
+        padding: 0 0.5rem;
+    }
+
+    .cajaProductosMuestra .card {
+        width: 240px;
+    }
+
+    .cajaProductosMuestra .card-body {
+        padding: 1.25rem;
+    }
+
+    .cajaProductosMuestra .card img {
+        height: 180px;
+    }
+}
+
+@media (max-width: 480px) {
+    .cajaProductosMuestra {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        margin: 1rem auto;
+        padding: 0 0.25rem;
+    }
+
+    .cajaProductosMuestra .card {
+        width: 100%;
+        max-width: 320px;
+    }
+
+    .cajaProductosMuestra .card-body {
+        padding: 1rem;
+    }
 }
