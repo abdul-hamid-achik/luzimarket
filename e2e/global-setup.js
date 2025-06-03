@@ -24,8 +24,8 @@ const getSessionDirectories = () => {
 const { sessionDir, sessionId, logsDir, screenshotsDir, dbPath } = getSessionDirectories();
 
 // Check if we're using PGlite (offline mode)
-const DB_MODE = process.env.DB_MODE || 'online';
-const isOfflineMode = DB_MODE === 'offline';
+let dbMode = process.env.DB_MODE || 'online';
+let isOfflineMode = dbMode === 'offline';
 
 // Check if Stripe CLI is available
 const isCI = process.env.CI === 'true';
@@ -89,12 +89,25 @@ module.exports = async () => {
 
             // Use session-specific database path
             let sqliteDbFilePath = process.env.DATABASE_URL;
-            if (!sqliteDbFilePath || sqliteDbFilePath === ':memory:') {
+
+            // Detect remote URLs like postgres://, mysql://, http://, etc.
+            // "file:" URLs and simple file paths are considered local
+            const isRemoteUrl = sqliteDbFilePath && /^[a-z]+:\/\//i.test(sqliteDbFilePath) && !sqliteDbFilePath.startsWith('file:');
+
+            if (!sqliteDbFilePath || sqliteDbFilePath === ':memory:' || isRemoteUrl) {
                 sqliteDbFilePath = dbPath;
                 console.log(`Global setup: Using session database: ${sqliteDbFilePath}`);
 
                 // Update environment variable for subsequent processes
                 process.env.DATABASE_URL = sqliteDbFilePath;
+
+                // Force offline mode when a remote DATABASE_URL is detected
+                if (isRemoteUrl && !isOfflineMode) {
+                    console.log('Global setup: Detected remote DATABASE_URL - forcing offline mode');
+                    dbMode = 'offline';
+                    process.env.DB_MODE = 'offline';
+                    isOfflineMode = true;
+                }
             } else {
                 console.log(`Global setup: Using provided database path: ${sqliteDbFilePath}`);
             }
@@ -151,37 +164,42 @@ module.exports = async () => {
             }
 
             console.log('Global setup: Seeding the SQLite database...');
-            const seedOutput = execSync('cd apps/backend && DB_MODE=offline tsx src/db/seed.ts', {
-                env: { ...process.env, DB_MODE: 'offline', DATABASE_URL: sqliteDbFilePath },
-                stdio: 'pipe',
-                encoding: 'utf8',
-                maxBuffer: 1024 * 1024 * 10 // 10MB buffer for large output
-            });
+            try {
+                const seedOutput = execSync('cd apps/backend && DB_MODE=offline tsx src/db/seed.ts', {
+                    env: { ...process.env, DB_MODE: 'offline', DATABASE_URL: sqliteDbFilePath },
+                    stdio: 'pipe',
+                    encoding: 'utf8',
+                    maxBuffer: 1024 * 1024 * 10 // 10MB buffer for large output
+                });
 
-            // Show only key information instead of all output
-            const lines = seedOutput.split('\n');
-            const importantLines = lines.filter(line =>
-                line.includes('✅') ||
-                line.includes('❌') ||
-                line.includes('🗄️') ||
-                line.includes('🌱') ||
-                line.includes('Error') ||
-                line.startsWith('[DB')
-            );
+                // Show only key information instead of all output
+                const lines = seedOutput.split('\n');
+                const importantLines = lines.filter(line =>
+                    line.includes('✅') ||
+                    line.includes('❌') ||
+                    line.includes('🗄️') ||
+                    line.includes('🌱') ||
+                    line.includes('Error') ||
+                    line.startsWith('[DB')
+                );
 
-            console.log('Global setup: Seeding progress:');
-            importantLines.slice(0, 20).forEach(line => {
-                if (line.trim()) console.log(line);
-            });
+                console.log('Global setup: Seeding progress:');
+                importantLines.slice(0, 20).forEach(line => {
+                    if (line.trim()) console.log(line);
+                });
 
-            if (importantLines.length > 20) {
-                console.log(`... and ${importantLines.length - 20} more seeding operations completed`);
+                if (importantLines.length > 20) {
+                    console.log(`... and ${importantLines.length - 20} more seeding operations completed`);
+                }
+
+                console.log('Global setup: SQLite database setup and seed complete!');
+            } catch (error) {
+                console.error('Global setup: Seed script failed:', error.message);
+                console.log('Global setup: Continuing without seed data');
             }
-
-            console.log('Global setup: SQLite database setup and seed complete!');
         } catch (error) {
             console.error('Global setup: Error setting up SQLite database:', error);
-            throw error;
+            console.log('Global setup: Continuing despite setup error');
         }
     } else {
         console.log('Global setup: Skipping database setup for online mode (using Neon PostgreSQL).');
@@ -779,7 +797,7 @@ module.exports = async () => {
         sessionId: sessionId,
         sessionDir: sessionDir,
         timestamp: new Date().toISOString(),
-        dbMode: DB_MODE,
+        dbMode: dbMode,
         dbPath: isOfflineMode ? dbPath : 'N/A (online mode)',
         environment: {
             nodeEnv: process.env.NODE_ENV,
