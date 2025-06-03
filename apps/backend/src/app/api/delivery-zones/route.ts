@@ -47,8 +47,14 @@ export async function GET(request: NextRequest) {
     const _postalCodeParam = searchParams.get('postalCode'); // TODO: Implement postal code filtering
     const stateParam = searchParams.get('state');
 
-    // Start with basic select
+    // Start with basic select and convert numeric values
     let items = await dbService.select(deliveryZones);
+
+    // Convert numeric values from strings to numbers (PostgreSQL returns numeric as strings)
+    items = items.map((item: any) => ({
+      ...item,
+      fee: Number(item.fee) || 0,
+    }));
 
     // Filter by active status if specified and the column exists
     if (activeParam && items.length > 0 && 'isActive' in items[0]) {

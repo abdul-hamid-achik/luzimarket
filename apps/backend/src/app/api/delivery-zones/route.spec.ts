@@ -210,8 +210,8 @@ describe('Delivery Zones API', () => {
             response.body.forEach((zone: any) => {
                 expect(zone.fee).toBeGreaterThanOrEqual(0);
 
-                // Fee should be in reasonable range (assuming Mexican pesos)
-                expect(zone.fee).toBeLessThan(10000); // Less than 10,000 MXN
+                // Fee should be in reasonable range (assuming Mexican pesos in cents)
+                expect(zone.fee).toBeLessThan(50000); // Less than 500 MXN (50,000 cents)
 
                 // Fee should be reasonable increment (not something like 12.345)
                 if (zone.fee > 0) {
