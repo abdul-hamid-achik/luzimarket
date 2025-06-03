@@ -211,6 +211,20 @@ export async function POST(request: NextRequest) {
 
         let dbVariantId = variantId;
 
+        // Validate the variant if provided directly
+        if (dbVariantId) {
+            const variantExists = await dbService.findFirst(
+                productVariants,
+                eq(productVariants.id, dbVariantId)
+            );
+            if (!variantExists) {
+                return NextResponse.json(
+                    { error: 'Variant not found' },
+                    { status: StatusCodes.BAD_REQUEST }
+                );
+            }
+        }
+
         // If productId provided, find first variant for that product
         if (!dbVariantId && productId) {
             const variants = await dbService.select(productVariants, eq(productVariants.productId, productId));
