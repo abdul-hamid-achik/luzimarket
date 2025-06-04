@@ -6,17 +6,19 @@ import './inicio.css';
 const Inicio = () => {
   return (
     <div className="employee-layout">
-      <div>
-        <NavBarInicio />
-      </div>
-      <div className="container-fluid">
-        <div className="row">
-          <div className="sidebar border border-right col-md-3 col-lg-2 p-0 bg-body-tertiary d-none d-md-block">
-            <SlideBar />
-          </div>
-          <main className="outlet col-md-9 col-lg-10">
-            <Outlet />
-          </main>
+      {/* Navbar */}
+      <NavBarInicio />
+
+      {/* Main Layout */}
+      <div className="employee-main">
+        {/* Sidebar */}
+        <div className="employee-sidebar">
+          <SlideBar />
+        </div>
+
+        {/* Content */}
+        <div className="employee-content">
+          <Outlet />
         </div>
       </div>
     </div>

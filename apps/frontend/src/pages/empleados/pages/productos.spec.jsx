@@ -1,21 +1,41 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, BrowserRouter } from 'react-router-dom';
 import { vi, afterEach, beforeEach, describe, it, expect } from 'vitest';
 import Productos from './productos';
+
+// Mock the API modules
+vi.mock('@/api/products', () => ({
+    getProducts: vi.fn(() => Promise.resolve({ products: [] })),
+    createProduct: vi.fn(() => Promise.resolve({ id: '1' })),
+    updateProduct: vi.fn(() => Promise.resolve({ id: '1' })),
+    deleteProduct: vi.fn(() => Promise.resolve({}))
+}));
+
+vi.mock('@/api/categories', () => ({
+    getCategories: vi.fn(() => Promise.resolve([
+        { id: '1', name: 'Electronics' },
+        { id: '2', name: 'Clothing' }
+    ]))
+}));
+
+vi.mock('@/api/photos', () => ({
+    uploadPhoto: vi.fn(() => Promise.resolve({ id: '1', url: 'test-url', alt: 'test' }))
+}));
 
 // Mock the breadcrumb component
 vi.mock('@/components/breadcrumb', () => ({
     default: ({ items, activeItem }) => (
-        <div data-testid="breadcrumb">
-            <span data-testid="breadcrumb-active">{activeItem}</span>
-        </div>
+        <nav data-testid="breadcrumb">
+            {items.map(item => <span key={item.name}>{item.name}</span>)}
+            <span>{activeItem}</span>
+        </nav>
     )
 }));
 
 // Mock react-icons
 vi.mock('react-icons/bs', () => ({
-    BsBoxSeam: () => <div data-testid="box-icon">📦</div>,
+    BsBoxSeam: () => <div data-testid="box-icon">��</div>,
     BsImage: () => <div data-testid="image-icon">🖼️</div>,
     BsArrowLeft: () => <div data-testid="arrow-left-icon">←</div>,
     BsChatDots: () => <div data-testid="chat-icon">💬</div>,
@@ -75,6 +95,87 @@ const renderProductos = () => {
         </MemoryRouter>
     );
 };
+
+const renderWithRouter = (component) => {
+    return render(
+        <BrowserRouter>
+            {component}
+        </BrowserRouter>
+    );
+};
+
+describe('Productos Component', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('renders the product management page', async () => {
+        renderWithRouter(<Productos />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Gestión de Productos')).toBeInTheDocument();
+        });
+    });
+
+    it('shows loading state initially', () => {
+        renderWithRouter(<Productos />);
+
+        expect(screen.getByText('Cargando...')).toBeInTheDocument();
+    });
+
+    it('displays new product button', async () => {
+        renderWithRouter(<Productos />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Nuevo Producto')).toBeInTheDocument();
+        });
+    });
+
+    it('switches to form view when new product button is clicked', async () => {
+        renderWithRouter(<Productos />);
+
+        await waitFor(() => {
+            const newProductBtn = screen.getByText('Nuevo Producto');
+            fireEvent.click(newProductBtn);
+        });
+
+        await waitFor(() => {
+            expect(screen.getByText('Nuevo Producto')).toBeInTheDocument();
+            expect(screen.getByText('Información Básica')).toBeInTheDocument();
+        });
+    });
+
+    it('displays search and filter controls', async () => {
+        renderWithRouter(<Productos />);
+
+        await waitFor(() => {
+            expect(screen.getByPlaceholderText('Buscar productos...')).toBeInTheDocument();
+            expect(screen.getByDisplayValue('Todos los estados')).toBeInTheDocument();
+            expect(screen.getByDisplayValue('Todas las categorías')).toBeInTheDocument();
+        });
+    });
+
+    it('shows empty state when no products exist', async () => {
+        renderWithRouter(<Productos />);
+
+        await waitFor(() => {
+            expect(screen.getByText('No se encontraron productos')).toBeInTheDocument();
+            expect(screen.getByText('Comienza agregando tu primer producto')).toBeInTheDocument();
+        });
+    });
+
+    it('toggles between grid and table view', async () => {
+        renderWithRouter(<Productos />);
+
+        await waitFor(() => {
+            const tableViewBtn = screen.getByRole('button', { name: /table view/i });
+            fireEvent.click(tableViewBtn);
+        });
+
+        // The view should change (this would be more apparent with actual products)
+        expect(screen.getByRole('button', { name: /table view/i })).toHaveClass('btn-primary');
+    });
+});
 
 describe('Productos Page', () => {
     describe('Rendering', () => {

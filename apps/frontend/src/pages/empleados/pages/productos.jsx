@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useForm } from 'react-hook-form';
 import BreadCrumb from "@/components/breadcrumb";
 import {
   BsBoxSeam,
@@ -13,379 +14,754 @@ import {
   BsInfoCircle,
   BsTag,
   BsCurrencyDollar,
-  BsBuilding
+  BsBuilding,
+  BsPlus,
+  BsPencil,
+  BsSearch,
+  BsFilter,
+  BsGrid,
+  BsList,
+  BsThreeDotsVertical,
+  BsCheckCircle,
+  BsXCircle,
+  BsClock,
+  BsArchive
 } from "react-icons/bs";
+import { getProducts, createProduct, updateProduct, deleteProduct } from '@/api/products';
+import { getCategories } from '@/api/categories';
+import { uploadPhoto } from '@/api/photos';
 import './productos.css';
 
 const Productos = () => {
-  const [formData, setFormData] = useState({
-    nombre: "Tetera Sowden",
-    precio: "1000",
-    marca: "HAY DESIGN",
-    descripcion: `Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum. Nullam id dolor id nibh ultricies vehicula ut id elit. Donec sed odio dui.`,
-    detalles: `Hour, minute, and second hand in red · Artist signature at back face · German-made UTS quartz movement · AA battery required · Approx. H18 x W18 cm Each item is handcrafted and unique. Supplier color: Red hands Glass. Made in Denmark. 231741M793001.`,
-    status: 'draft'
+  // State management
+  const [view, setView] = useState('list'); // 'list' or 'form'
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'table'
+
+  // React Hook Form
+  const {
+    register,
+    handleSubmit: onSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors, isSubmitting }
+  } = useForm({
+    defaultValues: {
+      name: '',
+      description: '',
+      price: '',
+      categoryId: '',
+      status: 'draft',
+      featured: false,
+      slug: ''
+    }
   });
 
-  const [images, setImages] = useState([
-    { id: 1, url: '/src/assets/images/imagen_test1.png', name: 'Imagen 1' },
-    { id: 2, url: '/src/assets/images/imagen_test2.png', name: 'Imagen 2' },
-    { id: 3, url: '/src/assets/images/imagen_test3.png', name: 'Imagen 3' }
-  ]);
+  // Watch form values for auto-slug generation
+  const watchedName = watch('name');
+  const watchedPrice = watch('price');
+  const watchedDescription = watch('description');
+  const watchedStatus = watch('status');
+  const watchedFeatured = watch('featured');
 
-  const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const [images, setImages] = useState([]);
   const fileInputRef = useRef(null);
 
   const items = [
+    { name: "Dashboard", link: "/dashboard" },
     { name: "Productos", link: "/dashboard/productos" },
   ];
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  // Load initial data
+  useEffect(() => {
+    loadData();
+  }, []);
 
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
+  // Auto-generate slug from name
+  useEffect(() => {
+    if (watchedName && !editingProduct) {
+      const slug = watchedName.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim();
+      setValue('slug', slug);
+    }
+  }, [watchedName, setValue, editingProduct]);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const [productsData, categoriesData] = await Promise.all([
+        getProducts(),
+        getCategories()
+      ]);
+      setProducts(productsData.products || productsData || []);
+      setCategories(categoriesData || []);
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const validateForm = () => {
-    const newErrors = {};
+  // Form submission handler
+  const handleFormSubmit = async (data) => {
+    setSaving(true);
+    try {
+      const productData = {
+        ...data,
+        price: parseFloat(data.price)
+      };
 
-    if (!formData.nombre.trim()) {
-      newErrors.nombre = 'El nombre del producto es requerido';
+      let result;
+      if (editingProduct) {
+        result = await updateProduct({ productId: editingProduct.id, ...productData });
+      } else {
+        result = await createProduct(productData);
+      }
+
+      // Reload products list
+      await loadData();
+
+      // Reset form and go back to list
+      reset();
+      setImages([]);
+      setEditingProduct(null);
+      setView('list');
+
+      alert(`Producto ${editingProduct ? 'actualizado' : 'creado'} exitosamente`);
+    } catch (error) {
+      console.error('Error saving product:', error);
+      alert('Error al guardar el producto. Intente nuevamente.');
+    } finally {
+      setSaving(false);
     }
-
-    if (!formData.precio.trim()) {
-      newErrors.precio = 'El precio es requerido';
-    } else if (isNaN(formData.precio) || parseFloat(formData.precio) <= 0) {
-      newErrors.precio = 'El precio debe ser un número válido mayor a 0';
-    }
-
-    if (!formData.marca.trim()) {
-      newErrors.marca = 'La marca es requerida';
-    }
-
-    if (!formData.descripcion.trim()) {
-      newErrors.descripcion = 'La descripción es requerida';
-    }
-
-    if (images.length === 0) {
-      newErrors.images = 'Se requiere al menos una imagen del producto';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
+
+    for (const file of files) {
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('alt', file.name);
+
+        const uploadedPhoto = await uploadPhoto(formData);
+
         const newImage = {
-          id: Date.now() + Math.random(),
-          url: event.target.result,
-          name: file.name,
+          id: uploadedPhoto.id || Date.now() + Math.random(),
+          url: uploadedPhoto.url,
+          alt: uploadedPhoto.alt || file.name,
           file: file
         };
+
         setImages(prev => [...prev, newImage]);
-      };
-      reader.readAsDataURL(file);
-    });
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        alert(`Error al subir la imagen ${file.name}`);
+      }
+    }
   };
 
   const removeImage = (imageId) => {
     setImages(prev => prev.filter(img => img.id !== imageId));
   };
 
-  const handleSubmit = async (action) => {
-    if (!validateForm()) {
+  const handleEdit = (product) => {
+    setEditingProduct(product);
+    reset({
+      name: product.name || '',
+      description: product.description || '',
+      price: product.price?.toString() || '',
+      categoryId: product.categoryId || '',
+      status: product.status || 'draft',
+      featured: product.featured || false,
+      slug: product.slug || ''
+    });
+    setImages([]); // Reset images for now
+    setView('form');
+  };
+
+  const handleDelete = async (productId) => {
+    if (!confirm('¿Está seguro de que desea eliminar este producto?')) {
       return;
     }
 
-    setIsSaving(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      console.log(`Product ${action} with data:`, formData);
-      console.log('Images:', images);
-
-      // Show success message or redirect
-      alert(`Producto ${action === 'save' ? 'guardado' : action === 'approve' ? 'aprobado' : 'enviado'} exitosamente`);
-
+      await deleteProduct(productId);
+      await loadData();
+      alert('Producto eliminado exitosamente');
     } catch (error) {
-      console.error('Error submitting product:', error);
-      alert('Error al procesar el producto. Intente nuevamente.');
-    } finally {
-      setIsSaving(false);
+      console.error('Error deleting product:', error);
+      alert('Error al eliminar el producto');
     }
   };
 
-  const getStatusBadge = () => {
+  const resetForm = () => {
+    reset({
+      name: '',
+      description: '',
+      price: '',
+      categoryId: '',
+      status: 'draft',
+      featured: false,
+      slug: ''
+    });
+    setImages([]);
+    setEditingProduct(null);
+  };
+
+  const handleNewProduct = () => {
+    resetForm();
+    setView('form');
+  };
+
+  // Filter products
+  const filteredProducts = products.filter(product => {
+    const matchesSearch = product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || product.status === statusFilter;
+    const matchesCategory = categoryFilter === 'all' || product.categoryId === categoryFilter;
+
+    return matchesSearch && matchesStatus && matchesCategory;
+  });
+
+  const getStatusBadge = (status) => {
     const statusConfig = {
-      draft: { class: 'status-draft', text: 'Borrador' },
-      published: { class: 'status-published', text: 'Publicado' },
-      pending: { class: 'status-pending', text: 'Pendiente' }
+      draft: { class: 'badge bg-secondary', text: 'Borrador', icon: BsClock },
+      active: { class: 'badge bg-success', text: 'Activo', icon: BsCheckCircle },
+      inactive: { class: 'badge bg-warning', text: 'Inactivo', icon: BsXCircle },
+      out_of_stock: { class: 'badge bg-danger', text: 'Agotado', icon: BsArchive }
     };
 
-    const config = statusConfig[formData.status] || statusConfig.draft;
+    const config = statusConfig[status] || statusConfig.draft;
+    const IconComponent = config.icon;
+
     return (
-      <span className={`status-badge ${config.class}`}>
+      <span className={config.class}>
+        <IconComponent className="me-1" size={12} />
         {config.text}
       </span>
     );
   };
 
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '400px' }}>
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Cargando...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="productos-dashboard">
       <div className="container-fluid p-4">
-        <BreadCrumb items={items} activeItem={"Productos"} />
+        <BreadCrumb items={items} activeItem={view === 'form' ? (editingProduct ? 'Editar Producto' : 'Nuevo Producto') : 'Productos'} />
 
-        {/* Product Status Header */}
-        <div className="product-form-card mt-4">
-          <div className="card-body">
-            <div className="d-flex justify-content-between align-items-center">
+        {view === 'list' ? (
+          // Products List View
+          <>
+            {/* Header */}
+            <div className="d-flex justify-content-between align-items-center mb-4">
               <div>
-                <h2 className="card-section-title mb-2">
-                  <BsBoxSeam className="section-icon" />
-                  Detalles del Producto
+                <h2 className="mb-1">
+                  <BsBoxSeam className="me-2" />
+                  Gestión de Productos
                 </h2>
-                <p className="text-muted mb-0">Complete la información del producto para su revisión</p>
+                <p className="text-muted mb-0">Administra el catálogo de productos de la tienda</p>
               </div>
-              <div>
-                {getStatusBadge()}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Basic Information */}
-        <div className="product-form-card">
-          <div className="card-body">
-            <h3 className="card-section-title">
-              <BsTag className="section-icon" />
-              Información Básica
-            </h3>
-
-            <div className="row">
-              <div className="col-md-6 mb-3">
-                <label className="modern-form-label">Nombre del Producto</label>
-                <input
-                  type="text"
-                  name="nombre"
-                  value={formData.nombre}
-                  onChange={handleInputChange}
-                  className={`form-control modern-form-control ${errors.nombre ? 'form-control-error' : ''}`}
-                  placeholder="Ingrese el nombre del producto"
-                />
-                {errors.nombre && <div className="error-message">{errors.nombre}</div>}
-              </div>
-
-              <div className="col-md-3 mb-3">
-                <label className="modern-form-label">Precio (MXN)</label>
-                <div className="input-group">
-                  <span className="input-group-text bg-light">
-                    <BsCurrencyDollar />
-                  </span>
-                  <input
-                    type="number"
-                    name="precio"
-                    value={formData.precio}
-                    onChange={handleInputChange}
-                    className={`form-control modern-form-control ${errors.precio ? 'form-control-error' : ''}`}
-                    placeholder="0.00"
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
-                {errors.precio && <div className="error-message">{errors.precio}</div>}
-              </div>
-
-              <div className="col-md-3 mb-3">
-                <label className="modern-form-label">Marca</label>
-                <div className="input-group">
-                  <span className="input-group-text bg-light">
-                    <BsBuilding />
-                  </span>
-                  <input
-                    type="text"
-                    name="marca"
-                    value={formData.marca}
-                    onChange={handleInputChange}
-                    className={`form-control modern-form-control ${errors.marca ? 'form-control-error' : ''}`}
-                    placeholder="Marca del producto"
-                  />
-                </div>
-                {errors.marca && <div className="error-message">{errors.marca}</div>}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Description and Details */}
-        <div className="product-form-card">
-          <div className="card-body">
-            <h3 className="card-section-title">
-              <BsChatDots className="section-icon" />
-              Descripción y Detalles
-            </h3>
-
-            <div className="row">
-              <div className="col-md-6 mb-3">
-                <label className="modern-form-label">Descripción</label>
-                <textarea
-                  name="descripcion"
-                  value={formData.descripcion}
-                  onChange={handleInputChange}
-                  className={`form-control modern-form-control ${errors.descripcion ? 'form-control-error' : ''}`}
-                  rows="8"
-                  placeholder="Describa las características principales del producto..."
-                />
-                {errors.descripcion && <div className="error-message">{errors.descripcion}</div>}
-                <small className="text-muted">
-                  {formData.descripcion.length}/500 caracteres
-                </small>
-              </div>
-
-              <div className="col-md-6 mb-3">
-                <label className="modern-form-label">Detalles Técnicos</label>
-                <textarea
-                  name="detalles"
-                  value={formData.detalles}
-                  onChange={handleInputChange}
-                  className="form-control modern-form-control"
-                  rows="8"
-                  placeholder="Especificaciones técnicas, dimensiones, materiales, etc..."
-                />
-                <small className="text-muted">
-                  Información adicional para el cliente
-                </small>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Photo Gallery */}
-        <div className="photo-gallery-card">
-          <div className="card-body p-0">
-            <div className="p-4 border-bottom">
-              <h3 className="card-section-title mb-2">
-                <BsImage className="section-icon" />
-                Galería de Fotos
-              </h3>
-              <p className="text-muted mb-0">Suba imágenes de alta calidad del producto</p>
-              {errors.images && <div className="error-message mt-2">{errors.images}</div>}
+              <button
+                className="btn btn-primary"
+                onClick={handleNewProduct}
+              >
+                <BsPlus className="me-2" />
+                Nuevo Producto
+              </button>
             </div>
 
-            <div className="photo-gallery-grid">
-              {images.map((image) => (
-                <div key={image.id} className="photo-container">
-                  <img
-                    src={image.url}
-                    alt={image.name}
-                    className="photo-image"
-                  />
-                  <div className="photo-overlay">
-                    <div className="photo-actions">
+            {/* Filters and Search */}
+            <div className="card mb-4">
+              <div className="card-body">
+                <div className="row g-3">
+                  <div className="col-md-4">
+                    <div className="input-group">
+                      <span className="input-group-text">
+                        <BsSearch />
+                      </span>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Buscar productos..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="col-md-2">
+                    <select
+                      className="form-select"
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                    >
+                      <option value="all">Todos los estados</option>
+                      <option value="draft">Borrador</option>
+                      <option value="active">Activo</option>
+                      <option value="inactive">Inactivo</option>
+                      <option value="out_of_stock">Agotado</option>
+                    </select>
+                  </div>
+                  <div className="col-md-3">
+                    <select
+                      className="form-select"
+                      value={categoryFilter}
+                      onChange={(e) => setCategoryFilter(e.target.value)}
+                    >
+                      <option value="all">Todas las categorías</option>
+                      {categories.map(category => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="col-md-3">
+                    <div className="btn-group" role="group">
                       <button
-                        className="photo-action-btn"
-                        title="Ver imagen"
+                        type="button"
+                        className={`btn ${viewMode === 'grid' ? 'btn-primary' : 'btn-outline-primary'}`}
+                        onClick={() => setViewMode('grid')}
                       >
-                        <BsEye />
+                        <BsGrid />
                       </button>
                       <button
-                        className="photo-action-btn"
-                        onClick={() => removeImage(image.id)}
-                        title="Eliminar imagen"
+                        type="button"
+                        className={`btn ${viewMode === 'table' ? 'btn-primary' : 'btn-outline-primary'}`}
+                        onClick={() => setViewMode('table')}
                       >
-                        <BsTrash />
+                        <BsList />
                       </button>
                     </div>
                   </div>
                 </div>
-              ))}
-
-              {/* Upload new image */}
-              <div
-                className="photo-container interactive-card"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <div className="d-flex flex-column align-items-center justify-content-center h-100 text-muted">
-                  <BsUpload size={32} className="mb-2" />
-                  <span className="text-center">
-                    Agregar<br />Imagen
-                  </span>
-                </div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleImageUpload}
-                  className="d-none"
-                />
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Action Buttons */}
-        <div className="action-buttons-container">
-          <button
-            className="modern-btn btn-secondary-modern"
-            onClick={() => window.history.back()}
-            disabled={isSaving}
-          >
-            <BsArrowLeft />
-            Regresar
-          </button>
-
-          <button
-            className="modern-btn btn-dark-modern"
-            onClick={() => handleSubmit('feedback')}
-            disabled={isSaving}
-          >
-            {isSaving ? <div className="loading-spinner" /> : <BsChatDots />}
-            Enviar Feedback
-          </button>
-
-          <button
-            className="modern-btn btn-primary-modern"
-            onClick={() => handleSubmit('approve')}
-            disabled={isSaving}
-          >
-            {isSaving ? <div className="loading-spinner" /> : <BsCheck2Circle />}
-            Aceptar
-          </button>
-        </div>
-
-        {/* Help Section */}
-        <div className="product-form-card">
-          <div className="card-body">
-            <div className="d-flex align-items-start">
-              <BsInfoCircle className="text-info me-3 mt-1" size={20} />
-              <div>
-                <h6 className="mb-2">Información sobre el proceso de aprobación</h6>
-                <p className="text-muted mb-0 small">
-                  Una vez que acepte el producto, será enviado para revisión final.
-                  Puede usar "Enviar Feedback" para solicitar cambios al proveedor
-                  antes de la aprobación final.
+            {/* Products Display */}
+            {filteredProducts.length === 0 ? (
+              <div className="text-center py-5">
+                <BsBoxSeam size={64} className="text-muted mb-3" />
+                <h4 className="text-muted">No se encontraron productos</h4>
+                <p className="text-muted">
+                  {searchTerm || statusFilter !== 'all' || categoryFilter !== 'all'
+                    ? 'Intenta ajustar los filtros de búsqueda'
+                    : 'Comienza agregando tu primer producto'
+                  }
                 </p>
+                {!searchTerm && statusFilter === 'all' && categoryFilter === 'all' && (
+                  <button className="btn btn-primary" onClick={handleNewProduct}>
+                    <BsPlus className="me-2" />
+                    Agregar Primer Producto
+                  </button>
+                )}
               </div>
+            ) : viewMode === 'grid' ? (
+              // Grid View
+              <div className="row">
+                {filteredProducts.map(product => (
+                  <div key={product.id} className="col-lg-4 col-md-6 mb-4">
+                    <div className="card h-100 product-card">
+                      <div className="card-img-top-container">
+                        {product.imageUrl ? (
+                          <img
+                            src={product.imageUrl}
+                            className="card-img-top"
+                            alt={product.name}
+                            style={{ height: '200px', objectFit: 'cover' }}
+                          />
+                        ) : (
+                          <div className="card-img-placeholder d-flex align-items-center justify-content-center">
+                            <BsImage size={48} className="text-muted" />
+                          </div>
+                        )}
+                        <div className="card-img-overlay-actions">
+                          <div className="dropdown">
+                            <button
+                              className="btn btn-sm btn-light"
+                              data-bs-toggle="dropdown"
+                            >
+                              <BsThreeDotsVertical />
+                            </button>
+                            <ul className="dropdown-menu">
+                              <li>
+                                <button
+                                  className="dropdown-item"
+                                  onClick={() => handleEdit(product)}
+                                >
+                                  <BsPencil className="me-2" />
+                                  Editar
+                                </button>
+                              </li>
+                              <li>
+                                <button
+                                  className="dropdown-item text-danger"
+                                  onClick={() => handleDelete(product.id)}
+                                >
+                                  <BsTrash className="me-2" />
+                                  Eliminar
+                                </button>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="card-body">
+                        <div className="d-flex justify-content-between align-items-start mb-2">
+                          <h5 className="card-title mb-0">{product.name}</h5>
+                          {getStatusBadge(product.status)}
+                        </div>
+                        <p className="card-text text-muted small">
+                          {product.description?.substring(0, 100)}
+                          {product.description?.length > 100 && '...'}
+                        </p>
+                        <div className="d-flex justify-content-between align-items-center">
+                          <span className="h5 mb-0 text-primary">
+                            ${parseFloat(product.price || 0).toLocaleString('es-MX')}
+                          </span>
+                          <small className="text-muted">
+                            {categories.find(c => c.id === product.categoryId)?.name || 'Sin categoría'}
+                          </small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              // Table View
+              <div className="card">
+                <div className="table-responsive">
+                  <table className="table table-hover mb-0">
+                    <thead className="table-light">
+                      <tr>
+                        <th>Producto</th>
+                        <th>Precio</th>
+                        <th>Categoría</th>
+                        <th>Estado</th>
+                        <th>Destacado</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredProducts.map(product => (
+                        <tr key={product.id}>
+                          <td>
+                            <div className="d-flex align-items-center">
+                              {product.imageUrl ? (
+                                <img
+                                  src={product.imageUrl}
+                                  alt={product.name}
+                                  className="rounded me-3"
+                                  style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                                />
+                              ) : (
+                                <div
+                                  className="bg-light rounded me-3 d-flex align-items-center justify-content-center"
+                                  style={{ width: '50px', height: '50px' }}
+                                >
+                                  <BsImage className="text-muted" />
+                                </div>
+                              )}
+                              <div>
+                                <div className="fw-medium">{product.name}</div>
+                                <small className="text-muted">
+                                  {product.description?.substring(0, 50)}
+                                  {product.description?.length > 50 && '...'}
+                                </small>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="fw-medium">
+                            ${parseFloat(product.price || 0).toLocaleString('es-MX')}
+                          </td>
+                          <td>
+                            {categories.find(c => c.id === product.categoryId)?.name || 'Sin categoría'}
+                          </td>
+                          <td>
+                            {getStatusBadge(product.status)}
+                          </td>
+                          <td>
+                            {product.featured ? (
+                              <BsCheckCircle className="text-success" />
+                            ) : (
+                              <BsXCircle className="text-muted" />
+                            )}
+                          </td>
+                          <td>
+                            <div className="btn-group btn-group-sm">
+                              <button
+                                className="btn btn-outline-primary"
+                                onClick={() => handleEdit(product)}
+                              >
+                                <BsPencil />
+                              </button>
+                              <button
+                                className="btn btn-outline-danger"
+                                onClick={() => handleDelete(product.id)}
+                              >
+                                <BsTrash />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          // Product Form View
+          <div className="row justify-content-center">
+            <div className="col-lg-8">
+              {/* Form Header */}
+              <div className="d-flex align-items-center mb-4">
+                <button
+                  className="btn btn-outline-secondary me-3"
+                  onClick={() => setView('list')}
+                >
+                  <BsArrowLeft />
+                </button>
+                <div>
+                  <h2 className="mb-1">
+                    {editingProduct ? 'Editar Producto' : 'Nuevo Producto'}
+                  </h2>
+                  <p className="text-muted mb-0">
+                    {editingProduct ? 'Modifica la información del producto' : 'Completa la información del nuevo producto'}
+                  </p>
+                </div>
+              </div>
+
+              <form onSubmit={onSubmit(handleFormSubmit)}>
+                {/* Basic Information */}
+                <div className="card mb-4">
+                  <div className="card-header">
+                    <h5 className="mb-0">
+                      <BsTag className="me-2" />
+                      Información Básica
+                    </h5>
+                  </div>
+                  <div className="card-body">
+                    <div className="row">
+                      <div className="col-md-8 mb-3">
+                        <label className="form-label">Nombre del Producto *</label>
+                        <input
+                          type="text"
+                          {...register('name', {
+                            required: 'El nombre del producto es requerido',
+                            minLength: { value: 2, message: 'El nombre debe tener al menos 2 caracteres' }
+                          })}
+                          className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+                          placeholder="Ingrese el nombre del producto"
+                        />
+                        {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
+                      </div>
+
+                      <div className="col-md-4 mb-3">
+                        <label className="form-label">Precio (MXN) *</label>
+                        <div className="input-group">
+                          <span className="input-group-text">
+                            <BsCurrencyDollar />
+                          </span>
+                          <input
+                            type="number"
+                            {...register('price', {
+                              required: 'El precio es requerido',
+                              min: { value: 0.01, message: 'El precio debe ser mayor a 0' }
+                            })}
+                            className={`form-control ${errors.price ? 'is-invalid' : ''}`}
+                            placeholder="0.00"
+                            step="0.01"
+                            min="0"
+                          />
+                          {errors.price && <div className="invalid-feedback">{errors.price.message}</div>}
+                        </div>
+                      </div>
+
+                      <div className="col-md-6 mb-3">
+                        <label className="form-label">Categoría *</label>
+                        <select
+                          {...register('categoryId', {
+                            required: 'La categoría es requerida'
+                          })}
+                          className={`form-select ${errors.categoryId ? 'is-invalid' : ''}`}
+                        >
+                          <option value="">Seleccionar categoría</option>
+                          {categories.map(category => (
+                            <option key={category.id} value={category.id}>
+                              {category.name}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.categoryId && <div className="invalid-feedback">{errors.categoryId.message}</div>}
+                      </div>
+
+                      <div className="col-md-6 mb-3">
+                        <label className="form-label">Estado</label>
+                        <select
+                          {...register('status')}
+                          className="form-select"
+                        >
+                          <option value="draft">Borrador</option>
+                          <option value="active">Activo</option>
+                          <option value="inactive">Inactivo</option>
+                          <option value="out_of_stock">Agotado</option>
+                        </select>
+                      </div>
+
+                      <div className="col-12 mb-3">
+                        <label className="form-label">Slug (URL)</label>
+                        <input
+                          type="text"
+                          {...register('slug')}
+                          className="form-control"
+                          placeholder="url-amigable-del-producto"
+                        />
+                        <div className="form-text">Se genera automáticamente desde el nombre</div>
+                      </div>
+
+                      <div className="col-12 mb-3">
+                        <div className="form-check">
+                          <input
+                            type="checkbox"
+                            {...register('featured')}
+                            className="form-check-input"
+                            id="featured"
+                          />
+                          <label className="form-check-label" htmlFor="featured">
+                            Producto destacado
+                          </label>
+                        </div>
+                      </div>
+
+                      <div className="col-12">
+                        <label className="form-label">Descripción *</label>
+                        <textarea
+                          {...register('description', {
+                            required: 'La descripción es requerida',
+                            minLength: { value: 10, message: 'La descripción debe tener al menos 10 caracteres' }
+                          })}
+                          className={`form-control ${errors.description ? 'is-invalid' : ''}`}
+                          rows="4"
+                          placeholder="Describe el producto detalladamente..."
+                        />
+                        {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Images */}
+                <div className="card mb-4">
+                  <div className="card-header">
+                    <h5 className="mb-0">
+                      <BsImage className="me-2" />
+                      Imágenes del Producto
+                    </h5>
+                  </div>
+                  <div className="card-body">
+                    <div className="mb-3">
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleImageUpload}
+                        accept="image/*"
+                        multiple
+                        className="d-none"
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-outline-primary"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <BsUpload className="me-2" />
+                        Subir Imágenes
+                      </button>
+                    </div>
+
+                    {images.length > 0 && (
+                      <div className="row">
+                        {images.map(image => (
+                          <div key={image.id} className="col-md-3 mb-3">
+                            <div className="position-relative">
+                              <img
+                                src={image.url}
+                                alt={image.alt}
+                                className="img-fluid rounded"
+                                style={{ height: '150px', width: '100%', objectFit: 'cover' }}
+                              />
+                              <button
+                                type="button"
+                                className="btn btn-sm btn-danger position-absolute top-0 end-0 m-1"
+                                onClick={() => removeImage(image.id)}
+                              >
+                                <BsX />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Form Actions */}
+                <div className="card">
+                  <div className="card-body">
+                    <div className="d-flex justify-content-between">
+                      <button
+                        type="button"
+                        className="btn btn-outline-secondary"
+                        onClick={() => setView('list')}
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="submit"
+                        className="btn btn-primary"
+                        disabled={isSubmitting || saving}
+                      >
+                        {(isSubmitting || saving) ? (
+                          <>
+                            <span className="spinner-border spinner-border-sm me-2" />
+                            Guardando...
+                          </>
+                        ) : (
+                          <>
+                            <BsCheck2Circle className="me-2" />
+                            {editingProduct ? 'Actualizar Producto' : 'Crear Producto'}
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

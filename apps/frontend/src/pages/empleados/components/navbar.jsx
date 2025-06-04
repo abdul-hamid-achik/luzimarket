@@ -5,52 +5,65 @@ import notificacion from "@/assets/images/notificacion.png";
 
 const Navbar = () => {
   return (
-    <nav className="navbar navbar-expand-lg p-0  border-bottom border-black ">
-      <div className="container-fluid">
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <div className="container-fluid">
-            <div className="row">
-              <div className="col-md-3 mb-2 mt-2 ">
-                <a
-                  href="#"
-                  className="d-block link-body-emphasis text-decoration-none ms-3"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <img
-                    src={Usuario}
-                    alt="mdo"
-                    width="60"
-                    height="55"
-                    className="rounded-circle border border-2 p-1 me-3"
-                  />
-
-                  <span>Mariana García → Montacometa</span>
-                </a>
-              </div>
-              <div className="col-md-6 text-center mb-2 mt-2 ">
-                <img src={Logo} alt="" width="300" />
-              </div>
-              <div className="col-md-3 d-flex align-items-center justify-content-end">
-                <a href="#" className="me-3 ">
-                  <img src={bandera} alt="" width="20" />
-                </a>
-                <a href="#">
-                  <img src={notificacion} alt="" width="25" />
-                </a>
-              </div>
+    <nav
+      className="navbar navbar-expand-lg border-bottom border-black"
+      style={{
+        zIndex: 1050,
+        position: 'relative',
+        backgroundColor: '#fff',
+        minHeight: '70px',
+        padding: '0.75rem 0'
+      }}
+    >
+      <div className="container-fluid px-4">
+        <div className="d-flex w-100 align-items-center justify-content-between">
+          {/* User Section - Left */}
+          <div className="d-flex align-items-center" style={{ minWidth: '250px' }}>
+            <div className="d-flex align-items-center text-decoration-none">
+              <img
+                src={Usuario}
+                alt="User"
+                width="50"
+                height="50"
+                className="rounded-circle border border-2 p-1 me-3"
+                style={{ flexShrink: 0 }}
+              />
+              <span
+                style={{
+                  color: '#222',
+                  fontWeight: '500',
+                  fontSize: '0.95rem',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
+              >
+                Mariana García → Montacometa
+              </span>
             </div>
+          </div>
+
+          {/* Logo Section - Center */}
+          <div className="d-flex justify-content-center flex-grow-1">
+            <img
+              src={Logo}
+              alt="Luzimarket Logo"
+              style={{
+                height: '40px',
+                width: 'auto',
+                maxWidth: '280px'
+              }}
+            />
+          </div>
+
+          {/* Actions Section - Right */}
+          <div className="d-flex align-items-center gap-3" style={{ minWidth: '100px', justifyContent: 'flex-end' }}>
+            <a href="#" className="d-flex align-items-center text-decoration-none">
+              <img src={bandera} alt="Mexico Flag" width="24" height="auto" />
+            </a>
+            <a href="#" className="d-flex align-items-center text-decoration-none">
+              <img src={notificacion} alt="Notifications" width="24" height="auto" />
+            </a>
           </div>
         </div>
       </div>

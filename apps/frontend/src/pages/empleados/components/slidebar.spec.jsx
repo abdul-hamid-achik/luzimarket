@@ -23,6 +23,7 @@ describe('Employee Sidebar', () => {
         expect(screen.getByText('Dashboard')).toBeInTheDocument();
         expect(screen.getByText('Alertas')).toBeInTheDocument();
         expect(screen.getByText('Productos')).toBeInTheDocument();
+        expect(screen.getByText('Categorías')).toBeInTheDocument();
         expect(screen.getByText('Envíos')).toBeInTheDocument();
         expect(screen.getByText('Dinero')).toBeInTheDocument();
         expect(screen.getByText('Horarios')).toBeInTheDocument();
@@ -41,6 +42,8 @@ describe('Employee Sidebar', () => {
         const dashboardLink = dashboardLinks.find(link => link.closest('a')?.getAttribute('href') === '/dashboard')?.closest('a');
         const alertasLink = alertasLinks.find(link => link.closest('a')?.getAttribute('href') === '/dashboard/alertas')?.closest('a');
         const productosLink = productosLinks.find(link => link.closest('a')?.getAttribute('href') === '/dashboard/productos')?.closest('a');
+        const categoriasLinks = screen.getAllByText('Categorías');
+        const categoriasLink = categoriasLinks.find(link => link.closest('a')?.getAttribute('href') === '/dashboard/categorias')?.closest('a');
         const enviosLink = enviosLinks.find(link => link.closest('a')?.getAttribute('href') === '/dashboard/envios')?.closest('a');
         const dineroLink = dineroLinks.find(link => link.closest('a')?.getAttribute('href') === '/dashboard/dinero')?.closest('a');
         const horariosLink = horariosLinks.find(link => link.closest('a')?.getAttribute('href') === '/dashboard/horarios')?.closest('a');
@@ -48,6 +51,7 @@ describe('Employee Sidebar', () => {
         expect(dashboardLink).toHaveAttribute('href', '/dashboard');
         expect(alertasLink).toHaveAttribute('href', '/dashboard/alertas');
         expect(productosLink).toHaveAttribute('href', '/dashboard/productos');
+        expect(categoriasLink).toHaveAttribute('href', '/dashboard/categorias');
         expect(enviosLink).toHaveAttribute('href', '/dashboard/envios');
         expect(dineroLink).toHaveAttribute('href', '/dashboard/dinero');
         expect(horariosLink).toHaveAttribute('href', '/dashboard/horarios');
@@ -57,14 +61,14 @@ describe('Employee Sidebar', () => {
         renderSidebar();
 
         const sidebar = document.querySelector('.sidebar');
-        expect(sidebar).toHaveClass('overflow-hidden');
+        expect(sidebar).toBeInTheDocument();
 
         const navList = document.querySelector('.nav.nav-pills.flex-column.mb-auto');
         expect(navList).toBeInTheDocument();
 
         const sidebarContainer = document.querySelector('.sidebar');
         const navItems = sidebarContainer?.querySelectorAll('.nav-item.mb-3') || [];
-        expect(navItems).toHaveLength(6);
+        expect(navItems).toHaveLength(7);
     });
 
     it('all links have correct CSS classes', () => {
@@ -89,6 +93,7 @@ describe('Employee Sidebar', () => {
             'Dashboard',
             'Alertas',
             'Productos',
+            'Categorías',
             'Envíos',
             'Dinero',
             'Horarios'
@@ -111,7 +116,7 @@ describe('Employee Sidebar', () => {
     it('has proper Bootstrap structure', () => {
         renderSidebar();
 
-        expect(document.querySelector('.d-flex.flex-nowrap')).toBeInTheDocument();
+        expect(document.querySelector('.sidebar')).toBeInTheDocument();
         expect(document.querySelector('.d-flex.flex-column.flex-shrink-0.p-3.bg-body-tertiary')).toBeInTheDocument();
     });
 }); 

@@ -13,6 +13,13 @@ body {
     scroll-behavior: smooth;
 }
 
+/* Ensure dropdowns are not clipped */
+.navbar,
+.nav,
+.dropdown {
+    overflow: visible !important;
+}
+
 body {
     background: #ffffff;
     color: var(--text-primary, #000);

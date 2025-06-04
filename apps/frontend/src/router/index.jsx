@@ -41,6 +41,7 @@ import Alertas2 from '@/pages/empleados/pages/alertas';
 import Envios from '@/pages/empleados/pages/envios';
 import Horarios from '@/pages/empleados/pages/horarios';
 import Productos from '@/pages/empleados/pages/productos';
+import CategoriasEmpleados from '@/pages/empleados/pages/categorias';
 import Dinero from '@/pages/empleados/pages/dinero';
 import { StripeProvider } from '@/context/StripeContext';
 
@@ -187,6 +188,10 @@ export const router = createBrowserRouter([
       {
         path: "productos",
         element: <Productos />,
+      },
+      {
+        path: "categorias",
+        element: <CategoriasEmpleados />,
       },
       {
         path: "envios",
