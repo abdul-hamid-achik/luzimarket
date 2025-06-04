@@ -50,6 +50,11 @@ import AdminLayout from '@/components/cms/admin_layout';
 import ProductManagement from '@/components/cms/product_management';
 import VendorManagement from '@/components/cms/vendor_management';
 import HomepageSlidesManagement from '@/components/cms/homepage_slides_management';
+import CMSDashboard from '@/components/cms/cms_dashboard';
+import CategoryManagement from '@/components/cms/category_management';
+import OrderManagement from '@/components/cms/order_management';
+import MediaLibrary from '@/components/cms/media_library';
+import UserManagement from '@/components/cms/user_management';
 
 export const router = createBrowserRouter([
   /*PAGINA PRINCIPAL*/
@@ -95,15 +100,15 @@ export const router = createBrowserRouter([
     element: <RequireRole allowedRoles={['admin']}><AdminLayout /></RequireRole>,
     errorElement: <NotFound />,
     children: [
+      { index: true, element: <CMSDashboard /> },
+      { path: "dashboard", element: <CMSDashboard /> },
       { path: "products", element: <ProductManagement /> },
       { path: "vendors", element: <VendorManagement /> },
       { path: "homepage", element: <HomepageSlidesManagement /> },
-      // Add more CMS routes as components are created
-      // { path: "dashboard", element: <CMSDashboard /> },
-      // { path: "categories", element: <CategoryManagement /> },
-      // { path: "orders", element: <OrderManagement /> },
-      // { path: "users", element: <UserManagement /> },
-      // { path: "photos", element: <MediaLibrary /> },
+      { path: "categories", element: <CategoryManagement /> },
+      { path: "orders", element: <OrderManagement /> },
+      { path: "users", element: <UserManagement /> },
+      { path: "photos", element: <MediaLibrary /> },
       // { path: "settings", element: <CMSSettings /> },
       // Catch-all route for CMS admin invalid URLs
       { path: "*", element: <NotFound /> },

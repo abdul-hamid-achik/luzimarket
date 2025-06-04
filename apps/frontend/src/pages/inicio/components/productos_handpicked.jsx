@@ -150,7 +150,7 @@ const ProductosHandpicked = ({ filters }) => {
 
         <div className="cajaTodosLosProductos row g-4">
           {products.map((product) => (
-            <div key={product.id} className="col-12 col-sm-6 col-md-6 col-lg-4">
+            <div key={product.id} className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
               <Card className="product-card h-100 border-0 shadow-sm">
                 <Link
                   to={`/handpicked/productos/${product.id}`}

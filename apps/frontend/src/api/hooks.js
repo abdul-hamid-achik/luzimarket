@@ -11,6 +11,7 @@ import * as petitionsApi from "@/api/petitions";
 import * as statesApi from "@/api/states";
 import * as adminOrdersApi from "@/api/adminOrders";
 import * as categoriesApi from "@/api/categories";
+import * as usersApi from "@/api/users";
 import { getProductDetails } from "@/api/productDetails";
 import * as articlesApi from "@/api/articles";
 import * as brandsApi from "@/api/brands";
@@ -501,3 +502,84 @@ export const useMarkNotificationAsRead = () =>
 
 export const useDeleteNotification = () =>
   useMutation(notificationsApi.deleteNotification);
+
+// =============== CATEGORY MANAGEMENT HOOKS ===============
+
+export const useCreateCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation(categoriesApi.createCategory, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['categories']);
+    },
+  });
+};
+
+export const useUpdateCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation(categoriesApi.updateCategory, {
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries(['categories']);
+      queryClient.invalidateQueries(['category', variables.categoryId]);
+    },
+  });
+};
+
+export const useDeleteCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation(categoriesApi.deleteCategory, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['categories']);
+    },
+  });
+};
+
+// =============== USER MANAGEMENT HOOKS ===============
+
+export const useUsers = (filters = {}) =>
+  useQuery(['users', filters], () => usersApi.getUsers(filters));
+
+export const useUser = (userId) =>
+  useQuery(['user', userId], () => usersApi.getUser(userId), {
+    enabled: !!userId
+  });
+
+export const useCreateUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation(usersApi.createUser, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['users']);
+    },
+  });
+};
+
+export const useUpdateUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation(usersApi.updateUser, {
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries(['users']);
+      queryClient.invalidateQueries(['user', variables.userId]);
+    },
+  });
+};
+
+export const useDeleteUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation(usersApi.deleteUser, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['users']);
+    },
+  });
+};
+
+// =============== ORDER MANAGEMENT HOOKS ===============
+
+export const useUpdateOrder = () => {
+  const queryClient = useQueryClient();
+  return useMutation(ordersApi.updateOrder, {
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries(['adminOrders']);
+      queryClient.invalidateQueries(['orders']);
+      queryClient.invalidateQueries(['order', variables.orderId]);
+    },
+  });
+};
