@@ -375,3 +375,56 @@ export const productDeliveryZones = pgTable('product_delivery_zones', {
 
 export type ProductDeliveryZoneInsert = typeof productDeliveryZones.$inferInsert;
 export type ProductDeliveryZoneSelect = typeof productDeliveryZones.$inferSelect;
+
+// Notifications/Alerts system for admin dashboard
+export const notifications = pgTable('notifications', {
+    id: text('id').primaryKey().$defaultFn(() => generatePrefixedId(ID_PATTERNS.NOTIFICATION)),
+    type: text('type').notNull(), // vendor_request, low_stock, payment_failed, delivery_issue, system_maintenance, high_sales, etc.
+    severity: text('severity', { enum: ['info', 'warning', 'error', 'success'] }).default('info').notNull(),
+    title: text('title').notNull(),
+    message: text('message').notNull(),
+    category: text('category').notNull(), // vendors, orders, inventory, payments, petitions, system, sales
+    actionRequired: boolean('action_required').default(false).notNull(),
+    isRead: boolean('is_read').default(false).notNull(),
+    userId: text('user_id').references(() => users.id), // Optional: specific user, null for system-wide
+    relatedEntityId: text('related_entity_id'), // ID of related order, product, user, etc.
+    relatedEntityType: text('related_entity_type'), // order, product, user, vendor, etc.
+    data: json('data'), // Additional data for the notification
+    expiresAt: timestamp('expires_at'), // Optional: auto-expire notifications
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export type NotificationInsert = typeof notifications.$inferInsert;
+export type NotificationSelect = typeof notifications.$inferSelect;
+
+// Delivery zone schedules for horarios management
+export const deliveryZoneSchedules = pgTable('delivery_zone_schedules', {
+    id: text('id').primaryKey().$defaultFn(() => generatePrefixedId(ID_PATTERNS.DELIVERY)),
+    deliveryZoneId: text('delivery_zone_id').references(() => deliveryZones.id).notNull(),
+    dayOfWeek: integer('day_of_week').notNull(), // 0=Sunday, 1=Monday, ..., 6=Saturday
+    openTime: text('open_time').notNull(), // HH:MM format
+    closeTime: text('close_time').notNull(), // HH:MM format
+    isEnabled: boolean('is_enabled').default(true).notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export type DeliveryZoneScheduleInsert = typeof deliveryZoneSchedules.$inferInsert;
+export type DeliveryZoneScheduleSelect = typeof deliveryZoneSchedules.$inferSelect;
+
+// Special delivery hours (holidays, special events, etc.)
+export const deliveryZoneSpecialHours = pgTable('delivery_zone_special_hours', {
+    id: text('id').primaryKey().$defaultFn(() => generatePrefixedId(ID_PATTERNS.DELIVERY)),
+    deliveryZoneId: text('delivery_zone_id').references(() => deliveryZones.id).notNull(),
+    date: text('date').notNull(), // YYYY-MM-DD format
+    openTime: text('open_time'), // HH:MM format, null if closed
+    closeTime: text('close_time'), // HH:MM format, null if closed
+    isClosed: boolean('is_closed').default(false).notNull(),
+    description: text('description'), // "Holiday", "Special Event", etc.
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export type DeliveryZoneSpecialHoursInsert = typeof deliveryZoneSpecialHours.$inferInsert;
+export type DeliveryZoneSpecialHoursSelect = typeof deliveryZoneSpecialHours.$inferSelect;

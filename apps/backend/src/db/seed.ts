@@ -476,7 +476,11 @@ async function seed(currentDb: NeonDatabase, currentSchema: PostgresSchemaModule
 
             if (productsWithVariants.length > 0 && allUsers.length > 0) {
                 const numberOfOrders = 75; // Create 75 orders for realistic data
-                console.log(`📦 Creando ${numberOfOrders} órdenes realistas...`);
+                console.log(`📦 Creando ${numberOfOrders} órdenes realistas con información de envío mexicana...`);
+
+                // Mexican shipping carriers
+                const mexicanCarriers = ['estafeta', 'correos_mexico', 'fedex', 'ups', 'dhl', 'paquete_express', '99minutos'];
+                const shippingServices = ['standard', 'express', 'economy', 'same_day', 'overnight'];
 
                 for (let i = 0; i < numberOfOrders; i++) {
                     // Randomly select a user for the order
@@ -499,7 +503,7 @@ async function seed(currentDb: NeonDatabase, currentSchema: PostgresSchemaModule
                     }
 
                     // More realistic status distribution
-                    let status, paymentStatus;
+                    let status, paymentStatus, shippingCarrier, shippingService, trackingNumber;
                     const statusRandom = Math.random();
                     if (statusRandom < 0.6) {
                         status = 'delivered';
@@ -516,6 +520,15 @@ async function seed(currentDb: NeonDatabase, currentSchema: PostgresSchemaModule
                     } else {
                         status = 'cancelled';
                         paymentStatus = 'failed';
+                    }
+
+                    // Add shipping details for shipped/delivered orders
+                    if (status === 'shipped' || status === 'delivered') {
+                        shippingCarrier = faker.helpers.arrayElement(mexicanCarriers);
+                        shippingService = faker.helpers.arrayElement(shippingServices);
+                        // Generate Mexican tracking number
+                        const trackingSuffix = faker.string.alphanumeric(8).toUpperCase();
+                        trackingNumber = `LZ${new Date().getFullYear().toString().slice(-2)}${faker.string.numeric(6)}${trackingSuffix}`;
                     }
 
                     // Add 1-5 items per order with realistic pricing
@@ -549,6 +562,9 @@ async function seed(currentDb: NeonDatabase, currentSchema: PostgresSchemaModule
                         total: orderTotal,
                         status,
                         payment_status: paymentStatus,
+                        shipping_carrier: shippingCarrier,
+                        shipping_service: shippingService,
+                        tracking_number: trackingNumber,
                         createdAt: orderDateSql
                     };
 
@@ -571,14 +587,210 @@ async function seed(currentDb: NeonDatabase, currentSchema: PostgresSchemaModule
 
                     // Show progress every 15 orders
                     if ((i + 1) % 15 === 0) {
-                        console.log(`✅ Procesadas ${i + 1}/${numberOfOrders} órdenes realistas`);
+                        console.log(`✅ Procesadas ${i + 1}/${numberOfOrders} órdenes realistas con envío mexicano`);
                     }
                 }
-                console.log('✅ Órdenes realistas sembradas exitosamente (PostgreSQL)');
+                console.log('✅ Órdenes realistas con envío mexicano sembradas exitosamente (PostgreSQL)');
             } else {
                 console.log('⚠️  No se encontraron productos o usuarios para crear órdenes');
             }
         } catch (err) { console.log('❌ Error sembrando órdenes realistas (PostgreSQL):', err); }
+
+        // Seed realistic notifications for admin dashboard
+        try {
+            console.log('🔔 Creando notificaciones realistas para dashboard de admin...');
+
+            // Get some real data for notifications
+            const recentOrders = await dbInstance.select().from(schemaInstance.orders).limit(10);
+            const vendors = await dbInstance.select().from(schemaInstance.vendors).limit(5);
+            const products = await dbInstance.select().from(schemaInstance.products).limit(20);
+
+            const notificationTemplates = [
+                // Vendor requests
+                {
+                    type: 'vendor_request',
+                    severity: 'warning',
+                    title: 'Nueva solicitud de vendedor',
+                    message: 'Artesanías Mexicanas ha solicitado unirse como vendedor en la plataforma',
+                    category: 'vendors',
+                    actionRequired: true,
+                    data: { vendorName: 'Artesanías Mexicanas', email: 'contacto@artesanias.mx' }
+                },
+                {
+                    type: 'vendor_request',
+                    severity: 'warning',
+                    title: 'Solicitud de vendedor pendiente',
+                    message: 'Productos Tradicionales de Coahuila solicita aprobación para vender',
+                    category: 'vendors',
+                    actionRequired: true,
+                    data: { vendorName: 'Productos Tradicionales de Coahuila', email: 'ventas@tradicionales.mx' }
+                },
+                // Stock issues
+                {
+                    type: 'low_stock',
+                    severity: 'warning',
+                    title: 'Inventario bajo',
+                    message: 'Tetera de barro artesanal tiene menos de 5 unidades disponibles',
+                    category: 'inventory',
+                    actionRequired: true,
+                    data: { productName: 'Tetera de barro artesanal', currentStock: 3 }
+                },
+                {
+                    type: 'low_stock',
+                    severity: 'error',
+                    title: 'Producto agotado',
+                    message: 'Servilletas bordadas a mano están agotadas',
+                    category: 'inventory',
+                    actionRequired: true,
+                    data: { productName: 'Servilletas bordadas a mano', currentStock: 0 }
+                },
+                // Payment issues
+                {
+                    type: 'payment_failed',
+                    severity: 'error',
+                    title: 'Pago fallido',
+                    message: 'Orden por $1,250 pesos rechazada por el banco - tarjeta expirada',
+                    category: 'payments',
+                    actionRequired: true,
+                    data: { amount: 125000, reason: 'expired_card' }
+                },
+                {
+                    type: 'payment_failed',
+                    severity: 'error',
+                    title: 'Problema con procesador de pagos',
+                    message: 'Stripe reporta problemas con pagos en pesos mexicanos',
+                    category: 'payments',
+                    actionRequired: true,
+                    data: { processor: 'stripe', currency: 'MXN' }
+                },
+                // Delivery issues
+                {
+                    type: 'delivery_issue',
+                    severity: 'warning',
+                    title: 'Problema de entrega en Torreón',
+                    message: 'Estafeta reporta retraso en entregas por condiciones climáticas',
+                    category: 'orders',
+                    actionRequired: true,
+                    data: { carrier: 'estafeta', zone: 'Torreón', reason: 'weather' }
+                },
+                {
+                    type: 'delivery_issue',
+                    severity: 'error',
+                    title: 'Dirección incorrecta',
+                    message: 'Cliente reporta dirección de entrega incorrecta en orden',
+                    category: 'orders',
+                    actionRequired: true,
+                    data: { customer: 'María García', issue: 'wrong_address' }
+                },
+                // Customer petitions
+                {
+                    type: 'customer_petition',
+                    severity: 'info',
+                    title: 'Nueva petición de cliente',
+                    message: 'Solicitud de productos orgánicos en la categoría de alimentos artesanales',
+                    category: 'petitions',
+                    actionRequired: false,
+                    data: { petitionType: 'product_request', category: 'alimentos' }
+                },
+                {
+                    type: 'customer_petition',
+                    severity: 'info',
+                    title: 'Sugerencia de mejora',
+                    message: 'Cliente sugiere agregar opción de entrega en horario nocturno',
+                    category: 'petitions',
+                    actionRequired: false,
+                    data: { petitionType: 'improvement', feature: 'night_delivery' }
+                },
+                // Sales achievements
+                {
+                    type: 'high_sales',
+                    severity: 'success',
+                    title: 'Meta de ventas superada',
+                    message: 'Las ventas de hoy superaron la meta diaria en un 125%',
+                    category: 'sales',
+                    actionRequired: false,
+                    data: { salesAmount: 87500, target: 70000, percentage: 125 }
+                },
+                {
+                    type: 'high_sales',
+                    severity: 'success',
+                    title: 'Producto más vendido',
+                    message: 'Rebozos de Saltillo fueron el producto más vendido esta semana',
+                    category: 'sales',
+                    actionRequired: false,
+                    data: { productName: 'Rebozos de Saltillo', unitsSold: 45 }
+                },
+                // System notifications
+                {
+                    type: 'system_maintenance',
+                    severity: 'info',
+                    title: 'Mantenimiento programado',
+                    message: 'Mantenimiento del sistema programado para el domingo de 2:00 AM a 4:00 AM',
+                    category: 'system',
+                    actionRequired: false,
+                    data: { date: '2025-02-02', startTime: '02:00', endTime: '04:00', timezone: 'America/Mexico_City' }
+                },
+                {
+                    type: 'system_update',
+                    severity: 'info',
+                    title: 'Actualización completada',
+                    message: 'Sistema de notificaciones actualizado con mejoras de rendimiento',
+                    category: 'system',
+                    actionRequired: false,
+                    data: { version: '2.1.0', features: ['real-time updates', 'performance improvements'] }
+                }
+            ];
+
+            // Create notifications with realistic timestamps
+            for (let i = 0; i < notificationTemplates.length; i++) {
+                const template = notificationTemplates[i];
+
+                // Create timestamps ranging from 1 hour to 7 days ago
+                const hoursAgo = faker.number.int({ min: 1, max: 168 }); // 1 hour to 7 days
+                const notificationDateSql = sql`NOW() - INTERVAL '${sql.raw(hoursAgo.toString())} hours'`;
+
+                // Set expiration for some notifications (7 days from creation)
+                let expiresAt = null;
+                if (['system_maintenance', 'system_update', 'high_sales'].includes(template.type)) {
+                    expiresAt = sql`NOW() + INTERVAL '7 days'`;
+                }
+
+                // Mark some as read (60% unread for urgency)
+                const isRead = Math.random() < 0.4;
+
+                const notificationData = {
+                    ...template,
+                    severity: template.severity as 'info' | 'warning' | 'error' | 'success',
+                    isRead,
+                    expiresAt,
+                    createdAt: notificationDateSql,
+                    updatedAt: notificationDateSql
+                };
+
+                await dbInstance.insert(schemaInstance.notifications).values(notificationData).onConflictDoNothing();
+            }
+
+            // Create some order-specific notifications using real order data
+            for (const order of recentOrders.slice(0, 5)) {
+                const orderNotification = {
+                    type: 'order_update',
+                    severity: (order.status === 'delivered' ? 'success' : 'info') as 'info' | 'warning' | 'error' | 'success',
+                    title: `Orden ${order.id.slice(-8)} actualizada`,
+                    message: `Estado cambiado a: ${order.status}`,
+                    category: 'orders',
+                    actionRequired: false,
+                    relatedEntityId: order.id,
+                    relatedEntityType: 'order',
+                    data: { orderId: order.id, newStatus: order.status },
+                    isRead: Math.random() < 0.3,
+                    createdAt: sql`NOW() - INTERVAL '${sql.raw(faker.number.int({ min: 1, max: 48 }).toString())} hours'`
+                };
+
+                await dbInstance.insert(schemaInstance.notifications).values(orderNotification).onConflictDoNothing();
+            }
+
+            console.log('✅ Notificaciones realistas sembradas exitosamente (PostgreSQL)');
+        } catch (err) { console.log('❌ Error sembrando notificaciones (PostgreSQL):', err); }
 
         // Seed example petitions
         try {

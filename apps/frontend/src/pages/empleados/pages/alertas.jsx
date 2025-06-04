@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import BreadCrumb from "@/components/breadcrumb";
 import {
+  useNotifications,
+  useMarkNotificationAsRead,
+  useDeleteNotification
+} from "@/api/hooks";
+import {
   BsExclamationTriangle,
   BsCheckCircle,
   BsInfoCircle,
@@ -22,8 +27,6 @@ import {
 import './alertas.css';
 
 const Alertas = () => {
-  const [alerts, setAlerts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -32,108 +35,19 @@ const Alertas = () => {
     { name: "Alertas", link: "/dashboard/alertas" },
   ];
 
-  useEffect(() => {
-    loadAlerts();
-  }, []);
+  // Fetch notifications from API
+  const {
+    data: notifications = [],
+    isLoading,
+    error,
+    refetch
+  } = useNotifications({
+    limit: 50
+  });
 
-  const loadAlerts = async () => {
-    setLoading(true);
-    try {
-      // Simulate loading alerts from various sources
-      const mockAlerts = [
-        {
-          id: 1,
-          type: 'vendor_request',
-          severity: 'warning',
-          title: 'Nueva solicitud de vendedor',
-          message: 'Artesanías Mexicanas ha solicitado unirse como vendedor',
-          timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-          read: false,
-          category: 'vendors',
-          actionRequired: true,
-          data: { vendorName: 'Artesanías Mexicanas', email: 'contacto@artesanias.mx' }
-        },
-        {
-          id: 2,
-          type: 'delivery_issue',
-          severity: 'error',
-          title: 'Problema de entrega',
-          message: 'Orden #ORD-2024-001 reporta dirección incorrecta',
-          timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000),
-          read: false,
-          category: 'orders',
-          actionRequired: true,
-          data: { orderId: 'ORD-2024-001', customer: 'María García' }
-        },
-        {
-          id: 3,
-          type: 'low_stock',
-          severity: 'warning',
-          title: 'Stock bajo',
-          message: 'Tetera Sowden tiene menos de 5 unidades disponibles',
-          timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000),
-          read: true,
-          category: 'inventory',
-          actionRequired: true,
-          data: { productName: 'Tetera Sowden', currentStock: 3 }
-        },
-        {
-          id: 4,
-          type: 'payment_failed',
-          severity: 'error',
-          title: 'Pago fallido',
-          message: 'Orden #ORD-2024-002 - Pago rechazado por el banco',
-          timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000),
-          read: false,
-          category: 'payments',
-          actionRequired: true,
-          data: { orderId: 'ORD-2024-002', amount: 1250.00 }
-        },
-        {
-          id: 5,
-          type: 'customer_petition',
-          severity: 'info',
-          title: 'Nueva petición de cliente',
-          message: 'Solicitud de productos orgánicos en la categoría de alimentos',
-          timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000),
-          read: true,
-          category: 'petitions',
-          actionRequired: false,
-          data: { petitionType: 'product_request', category: 'alimentos' }
-        },
-        {
-          id: 6,
-          type: 'system_maintenance',
-          severity: 'info',
-          title: 'Mantenimiento programado',
-          message: 'El sistema estará en mantenimiento el domingo de 2:00 AM a 4:00 AM',
-          timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
-          read: true,
-          category: 'system',
-          actionRequired: false,
-          data: { maintenanceDate: '2024-01-28', duration: '2 horas' }
-        },
-        {
-          id: 7,
-          type: 'high_sales',
-          severity: 'success',
-          title: 'Ventas excepcionales',
-          message: 'Las ventas de hoy superaron el objetivo diario en un 150%',
-          timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-          read: true,
-          category: 'sales',
-          actionRequired: false,
-          data: { salesAmount: 45250, target: 30000 }
-        }
-      ];
-
-      setAlerts(mockAlerts);
-    } catch (error) {
-      console.error('Error loading alerts:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Mutations for marking as read and deleting
+  const markAsReadMutation = useMarkNotificationAsRead();
+  const deleteNotificationMutation = useDeleteNotification();
 
   const getAlertIcon = (type, severity) => {
     const iconProps = { size: 20 };
@@ -182,7 +96,8 @@ const Alertas = () => {
 
   const formatTimeAgo = (timestamp) => {
     const now = new Date();
-    const diff = now - timestamp;
+    const notificationDate = new Date(timestamp);
+    const diff = now - notificationDate;
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(hours / 24);
 
@@ -195,37 +110,67 @@ const Alertas = () => {
     }
   };
 
-  const markAsRead = (alertId) => {
-    setAlerts(prev => prev.map(alert =>
-      alert.id === alertId ? { ...alert, read: true } : alert
-    ));
+  const markAsRead = async (notificationId) => {
+    try {
+      await markAsReadMutation.mutateAsync({ id: notificationId, isRead: true });
+      refetch(); // Refresh the notifications list
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
   };
 
-  const deleteAlert = (alertId) => {
-    setAlerts(prev => prev.filter(alert => alert.id !== alertId));
+  const deleteAlert = async (notificationId) => {
+    try {
+      await deleteNotificationMutation.mutateAsync(notificationId);
+      refetch(); // Refresh the notifications list
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+    }
   };
 
-  const filteredAlerts = alerts.filter(alert => {
+  const filteredAlerts = notifications.filter(notification => {
     const matchesFilter = filter === 'all' ||
-      (filter === 'unread' && !alert.read) ||
-      (filter === 'action_required' && alert.actionRequired) ||
-      alert.severity === filter ||
-      alert.category === filter;
+      (filter === 'unread' && !notification.read) ||
+      (filter === 'action_required' && notification.actionRequired) ||
+      notification.severity === filter ||
+      notification.category === filter;
 
-    const matchesSearch = alert.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      alert.message.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = notification.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      notification.message.toLowerCase().includes(searchTerm.toLowerCase());
 
     return matchesFilter && matchesSearch;
   });
 
-  const unreadCount = alerts.filter(alert => !alert.read).length;
-  const actionRequiredCount = alerts.filter(alert => alert.actionRequired && !alert.read).length;
+  const unreadCount = notifications.filter(notification => !notification.read).length;
+  const actionRequiredCount = notifications.filter(notification => notification.actionRequired && !notification.read).length;
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ height: '400px' }}>
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Cargando alertas...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="alertas-dashboard">
+        <div className="container-fluid p-4">
+          <BreadCrumb items={items} activeItem="Alertas" />
+          <div className="alert alert-warning mt-4">
+            <BsExclamationTriangle className="me-2" />
+            <div>
+              <strong>Error al cargar alertas:</strong> {error.message || "Error desconocido"}
+              <br />
+              <small className="text-muted">
+                <button className="btn btn-link p-0 ms-1" onClick={() => refetch()}>
+                  Intentar de nuevo
+                </button>
+              </small>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -315,73 +260,75 @@ const Alertas = () => {
               </p>
             </div>
           ) : (
-            filteredAlerts.map(alert => (
+            filteredAlerts.map(notification => (
               <div
-                key={alert.id}
-                className={`alert-card ${getSeverityClass(alert.severity)} ${!alert.read ? 'unread' : ''}`}
+                key={notification.id}
+                className={`alert-card ${getSeverityClass(notification.severity)} ${!notification.read ? 'unread' : ''}`}
               >
                 <div className="alert-header">
                   <div className="alert-icon">
-                    {getAlertIcon(alert.type, alert.severity)}
+                    {getAlertIcon(notification.type, notification.severity)}
                   </div>
                   <div className="alert-content">
                     <div className="alert-title-row">
-                      <h5 className="alert-title">{alert.title}</h5>
+                      <h5 className="alert-title">{notification.title}</h5>
                       <div className="alert-actions">
                         <span className="alert-time">
                           <BsClock size={14} className="me-1" />
-                          {formatTimeAgo(alert.timestamp)}
+                          {formatTimeAgo(notification.timestamp)}
                         </span>
-                        {!alert.read && (
+                        {!notification.read && (
                           <button
                             className="btn btn-sm btn-outline-primary"
-                            onClick={() => markAsRead(alert.id)}
+                            onClick={() => markAsRead(notification.id)}
                             title="Marcar como leído"
+                            disabled={markAsReadMutation.isLoading}
                           >
                             <BsEye size={14} />
                           </button>
                         )}
                         <button
                           className="btn btn-sm btn-outline-danger"
-                          onClick={() => deleteAlert(alert.id)}
+                          onClick={() => deleteAlert(notification.id)}
                           title="Eliminar alerta"
+                          disabled={deleteNotificationMutation.isLoading}
                         >
                           <BsTrash size={14} />
                         </button>
                       </div>
                     </div>
-                    <p className="alert-message">{alert.message}</p>
+                    <p className="alert-message">{notification.message}</p>
 
-                    {alert.actionRequired && !alert.read && (
+                    {notification.actionRequired && !notification.read && (
                       <div className="alert-action-required">
                         <BsExclamationTriangle size={16} className="me-2" />
                         <span>Requiere acción</span>
                       </div>
                     )}
 
-                    {/* Alert-specific data */}
-                    {alert.data && (
+                    {/* Alert-specific data and actions */}
+                    {notification.data && (
                       <div className="alert-data">
-                        {alert.type === 'vendor_request' && (
+                        {notification.type === 'vendor_request' && (
                           <div className="d-flex gap-2">
                             <button className="btn btn-sm btn-success">Aprobar</button>
                             <button className="btn btn-sm btn-danger">Rechazar</button>
                             <button className="btn btn-sm btn-outline-primary">Ver detalles</button>
                           </div>
                         )}
-                        {alert.type === 'delivery_issue' && (
+                        {notification.type === 'delivery_issue' && (
                           <div className="d-flex gap-2">
                             <button className="btn btn-sm btn-primary">Ver orden</button>
                             <button className="btn btn-sm btn-warning">Contactar cliente</button>
                           </div>
                         )}
-                        {alert.type === 'low_stock' && (
+                        {notification.type === 'low_stock' && (
                           <div className="d-flex gap-2">
                             <button className="btn btn-sm btn-primary">Ver producto</button>
                             <button className="btn btn-sm btn-success">Reabastecer</button>
                           </div>
                         )}
-                        {alert.type === 'payment_failed' && (
+                        {notification.type === 'payment_failed' && (
                           <div className="d-flex gap-2">
                             <button className="btn btn-sm btn-primary">Ver orden</button>
                             <button className="btn btn-sm btn-warning">Reintentar pago</button>

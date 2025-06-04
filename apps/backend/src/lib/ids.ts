@@ -31,6 +31,7 @@ export const ID_PATTERNS = {
     STATE: 'state',     // states
     SLIDE: 'slide',     // homepage slides
     TOKEN: 'token',     // refresh tokens
+    NOTIFICATION: 'notif', // notifications/alerts
 } as const;
 
 export type IDPattern = typeof ID_PATTERNS[keyof typeof ID_PATTERNS];

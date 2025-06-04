@@ -23,6 +23,7 @@ import * as photosApi from "@/api/photos";
 import * as homepageSlidesApi from "@/api/homepageSlides";
 import * as analyticsApi from "@/api/analytics";
 import * as authApi from "@/api/auth";
+import * as notificationsApi from "./notifications";
 
 export const useProducts = (filters = {}) =>
   useQuery(['products', filters], () => productsApi.getProducts(filters));
@@ -479,3 +480,24 @@ export const useUpdateProductDeliveryZones = () => {
     },
   });
 };
+
+// Notifications hooks
+export const useNotifications = (params = {}) =>
+  useQuery(
+    ['notifications', params],
+    () => notificationsApi.getNotifications(params),
+    {
+      enabled: true,
+      refetchInterval: 30 * 1000, // Refetch every 30 seconds for real-time updates
+      staleTime: 10 * 1000, // 10 seconds
+    }
+  );
+
+export const useCreateNotification = () =>
+  useMutation(notificationsApi.createNotification);
+
+export const useMarkNotificationAsRead = () =>
+  useMutation(({ id, isRead }) => notificationsApi.markNotificationAsRead(id, isRead));
+
+export const useDeleteNotification = () =>
+  useMutation(notificationsApi.deleteNotification);

@@ -51,44 +51,48 @@ function Ordenes() {
   // Create fallback orders for when the API fails
   const fallbackOrders = [
     {
-      OrderID: "ord_a7e5a1cfd10040b2a0367c79db6ddd98",
-      Total: "521.16",
-      Cliente: "Mariana García",
+      OrderID: "lm_ord_a7e5a1cfd10040b2",
+      Total: "1,250.50",
+      Cliente: "María García Hernández",
       EstadoPago: "pagado",
       EstadoOrden: "enviado",
       TipoEnvio: "Express",
-      Fecha: "2023-05-15",
-      TrackingNumber: "LZ2023051501"
+      Carrier: "Estafeta",
+      TrackingNumber: "LZ25011501",
+      Fecha: "2025-01-15"
     },
     {
-      OrderID: "ord_ddd14b9a9bae4e9c91eec6c083229201",
-      Total: "602.78",
-      Cliente: "Carlos Ruiz",
+      OrderID: "lm_ord_ddd14b9a9bae4e9c",
+      Total: "875.25",
+      Cliente: "Carlos Rodríguez Méndez",
       EstadoPago: "pendiente",
       EstadoOrden: "procesando",
       TipoEnvio: "Estándar",
-      Fecha: "2023-05-17",
-      TrackingNumber: "LZ2023051702"
+      Carrier: "Correos de México",
+      TrackingNumber: null,
+      Fecha: "2025-01-17"
     },
     {
-      OrderID: "ord_17f9077fa655458884969485e06d42c1",
-      Total: "1218.61",
-      Cliente: "Ana López",
+      OrderID: "lm_ord_17f9077fa655458",
+      Total: "2,180.75",
+      Cliente: "Ana López Fernández",
       EstadoPago: "completado",
       EstadoOrden: "entregado",
       TipoEnvio: "Express",
-      Fecha: "2023-05-14",
-      TrackingNumber: "LZ2023051403"
+      Carrier: "FedEx México",
+      TrackingNumber: "LZ25011403",
+      Fecha: "2025-01-14"
     },
     {
-      OrderID: "ord_576d89d185c543cba731d7dcedc7703d",
-      Total: "547.07",
-      Cliente: "Luis Martínez",
-      EstadoPago: "failed",
+      OrderID: "lm_ord_576d89d185c543c",
+      Total: "950.00",
+      Cliente: "Luis Martínez Santos",
+      EstadoPago: "fallido",
       EstadoOrden: "cancelado",
       TipoEnvio: "Estándar",
-      Fecha: "2023-05-13",
-      TrackingNumber: "LZ2023051304"
+      Carrier: "Por asignar",
+      TrackingNumber: null,
+      Fecha: "2025-01-13"
     }
   ];
 
@@ -103,7 +107,8 @@ function Ordenes() {
       orden.EstadoOrden.toLowerCase().includes(BuscaTermino.toLowerCase()) ||
       orden.TipoEnvio.toLowerCase().includes(BuscaTermino.toLowerCase()) ||
       orden.Fecha.toLowerCase().includes(BuscaTermino.toLowerCase()) ||
-      (orden.TrackingNumber && orden.TrackingNumber.toLowerCase().includes(BuscaTermino.toLowerCase()))
+      (orden.TrackingNumber && orden.TrackingNumber.toLowerCase().includes(BuscaTermino.toLowerCase())) ||
+      (orden.Carrier && orden.Carrier.toLowerCase().includes(BuscaTermino.toLowerCase()))
     );
 
     const matchesPaymentFilter = selectedFilter === "all" ||
@@ -398,6 +403,7 @@ function Ordenes() {
                     <th>Estado del Pago</th>
                     <th>Estado de Envío</th>
                     <th>Tipo de Entrega</th>
+                    <th>Paquetería</th>
                     <th>Tracking</th>
                     <th>Fecha</th>
                     <th>Acciones</th>
@@ -453,6 +459,11 @@ function Ordenes() {
                           </span>
                         </td>
                         <td>
+                          <span className="carrier-name">
+                            {Orden.Carrier || "Por asignar"}
+                          </span>
+                        </td>
+                        <td>
                           {Orden.TrackingNumber ? (
                             <code className="tracking-number">
                               {Orden.TrackingNumber}
@@ -493,7 +504,7 @@ function Ordenes() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="10" className="text-center py-5">
+                      <td colSpan="11" className="text-center py-5">
                         <div className="text-muted">
                           <BsTruck size={48} className="mb-3 opacity-50" />
                           <h5>No se encontraron órdenes</h5>
