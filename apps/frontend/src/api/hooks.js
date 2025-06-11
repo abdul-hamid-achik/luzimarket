@@ -465,6 +465,14 @@ export const useProductAnalytics = (params = {}) =>
     enabled: true
   });
 
+// Products Analytics (for dashboard)
+export const useProductsAnalytics = (params = {}) =>
+  useQuery(['productsAnalytics', params], () => analyticsApi.getProductsAnalytics(params), {
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 15 * 60 * 1000, // 15 minutes
+    enabled: true
+  });
+
 // Product Delivery Zones
 export const useProductDeliveryZones = (productId) =>
   useQuery(['productDeliveryZones', productId], () => productsApi.getProductDeliveryZones(productId), {

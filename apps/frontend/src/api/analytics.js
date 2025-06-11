@@ -83,4 +83,10 @@ export const getProductAnalytics = (params = {}) => {
     });
 
     return api.get(`/analytics/products?${searchParams.toString()}`).then((res) => res.data);
-}; 
+};
+
+/**
+ * Fetch products analytics data (inventory and stats)
+ * Alias for getProductAnalytics for clarity
+ */
+export const getProductsAnalytics = getProductAnalytics; 

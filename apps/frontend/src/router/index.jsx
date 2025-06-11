@@ -19,7 +19,7 @@ import PaginaInicialInicio from '@/pages/inicio/layout/inicio';
 import BodyLuzi from '@/pages/inicio/pages/body_luzi';
 import Handpicked from '@/pages/inicio/pages/hand_picked';
 import HandpickedProductos from '@/pages/inicio/pages/productos';
-import BestSellersPage from '@/pages/inicio/pages/best_sellers';
+import ModernBestSellersPage from '@/pages/inicio/pages/modern_best_sellers';
 import Carrito from '@/pages/inicio/pages/cart';
 import CustomerLogin from '@/pages/inicio/pages/login_customer';
 import CustomerRegister from '@/pages/inicio/pages/register_customer';
@@ -65,7 +65,7 @@ export const router = createBrowserRouter([
     errorElement: <NotFound />,
     children: [
       { index: true, element: <BodyLuzi /> },
-      { path: "best-sellers", element: <BestSellersPage /> },
+      { path: "best-sellers", element: <ModernBestSellersPage /> },
       { path: "handpicked/productos", element: <HandpickedProductos /> },
       { path: "handpicked/productos/:id", element: <Handpicked /> },
       { path: "carrito", element: <Carrito /> },
