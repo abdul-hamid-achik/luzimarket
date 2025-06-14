@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { StatusCodes } from 'http-status-codes';
 import { dbService, eq } from '@/db/service';
-import { orders, users, orderItems, productVariants, products } from '@/db/schema';
+import { orders, users } from '@/db/schema';
 import { desc } from 'drizzle-orm';
 
 /**

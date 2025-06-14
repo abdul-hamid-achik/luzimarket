@@ -1,92 +1,145 @@
 import React from 'react';
-import BestSellersSection from '@/components/cards/best_sellers_section';
+import { useBestSellers } from '@/api/hooks';
 import { Link } from 'react-router-dom';
-import '@/pages/inicio/css/general.css';
+import '@/pages/inicio/css/best_sellers.css';
 
 const BestSellersPage = () => {
+    const { data: bestSellers = [], isLoading, error } = useBestSellers();
+
+    const formatPrice = (price) => {
+        return (price && typeof price === 'number') ? (price / 100).toFixed(2) : '0.00';
+    };
+
     return (
-        <div className="cajaBody">
-            {/* Header Navigation */}
-            <div className="container-fluid bg-light py-3 mb-4">
+        <div className="best-sellers-page">
+            {/* Page Header */}
+            <div className="best-sellers-header">
                 <div className="container">
-                    <nav aria-label="breadcrumb">
-                        <ol className="breadcrumb mb-0">
-                            <li className="breadcrumb-item">
-                                <Link to="/" className="text-decoration-none">Inicio</Link>
-                            </li>
-                            <li className="breadcrumb-item active" aria-current="page">
-                                Los Más Vendidos
-                            </li>
-                        </ol>
-                    </nav>
+                    <h1 className="best-sellers-title">
+                        Los Más Vendidos
+                    </h1>
+                    <p className="best-sellers-subtitle">
+                        Descubre nuestros productos más populares elegidos por miles de clientes
+                    </p>
                 </div>
             </div>
 
-            {/* Page Header */}
-            <div className="container mb-5">
-                <div className="text-center">
-                    <h1 className="display-4 fw-bold mb-3">
-                        <span className="me-3">🏆</span>
-                        Los Más Vendidos
-                    </h1>
-                    <p className="lead text-muted mb-4">
-                        Descubre los productos favoritos de nuestros clientes. Estos son los regalos que más enamoran y sorprenden.
-                    </p>
-                    <div className="d-flex justify-content-center gap-3 flex-wrap">
-                        <div className="badge bg-primary fs-6 px-3 py-2">
-                            ⭐ Productos más populares
-                        </div>
-                        <div className="badge bg-success fs-6 px-3 py-2">
-                            🔥 Actualizado diariamente
-                        </div>
-                        <div className="badge bg-warning text-dark fs-6 px-3 py-2">
-                            💝 Perfectos para regalar
+            {/* Loading State */}
+            {isLoading && (
+                <div className="best-sellers-container">
+                    <div className="container">
+                        <div className="best-sellers-loading">
+                            <div className="loading-spinner"></div>
+                            <p className="loading-text">Cargando productos...</p>
                         </div>
                     </div>
                 </div>
-            </div>
+            )}
 
-            {/* Best Sellers Section */}
-            <BestSellersSection />
+            {/* Error State */}
+            {error && (
+                <div className="best-sellers-container">
+                    <div className="container">
+                        <div className="best-sellers-error">
+                            <div className="error-icon">⚠️</div>
+                            <h2 className="error-title">Error al cargar productos</h2>
+                            <p className="error-message">Por favor intenta de nuevo más tarde</p>
+                            <button
+                                className="btn-cta btn-cta-primary"
+                                onClick={() => window.location.reload()}
+                            >
+                                Reintentar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
-            {/* Additional Information */}
-            <div className="container my-5">
-                <div className="row">
-                    <div className="col-lg-8 mx-auto">
-                        <div className="card border-0 shadow-sm">
-                            <div className="card-body p-4">
-                                <h3 className="card-title text-center mb-4">
-                                    ¿Por qué estos productos son los más vendidos?
-                                </h3>
-                                <div className="row g-4">
-                                    <div className="col-md-4 text-center">
-                                        <div className="mb-3">
-                                            <span className="display-6">⭐</span>
+            {/* Products Grid */}
+            {!isLoading && !error && bestSellers.length > 0 && (
+                <div className="best-sellers-container">
+                    <div className="container">
+                        <div className="best-sellers-grid">
+                            {bestSellers.map((product, index) => (
+                                <div key={product.id} className="best-seller-card">
+                                    <div className="best-seller-rank">#{index + 1}</div>
+                                    <Link to={`/handpicked/productos/${product.id}`}>
+                                        <div className="best-seller-image">
+                                            <img
+                                                src={product.imageUrl || 'https://via.placeholder.com/400x400?text=Sin+Imagen'}
+                                                alt={product.imageAlt || product.name}
+                                            />
                                         </div>
-                                        <h5>Calidad Premium</h5>
-                                        <p className="text-muted small">
-                                            Productos seleccionados cuidadosamente por su calidad excepcional
-                                        </p>
-                                    </div>
-                                    <div className="col-md-4 text-center">
-                                        <div className="mb-3">
-                                            <span className="display-6">💝</span>
+                                    </Link>
+                                    <div className="best-seller-content">
+                                        <h3 className="best-seller-name">
+                                            <Link to={`/handpicked/productos/${product.id}`}>
+                                                {product.name}
+                                            </Link>
+                                        </h3>
+                                        <p className="best-seller-category">{product.categoryName}</p>
+                                        <div className="best-seller-price">${formatPrice(product.price)}</div>
+                                        <div className="best-seller-sold">
+                                            {product.totalSold} vendidos
                                         </div>
-                                        <h5>Perfectos para Regalar</h5>
-                                        <p className="text-muted small">
-                                            Ideales para sorprender en ocasiones especiales y momentos únicos
-                                        </p>
-                                    </div>
-                                    <div className="col-md-4 text-center">
-                                        <div className="mb-3">
-                                            <span className="display-6">❤️</span>
-                                        </div>
-                                        <h5>Amor Garantizado</h5>
-                                        <p className="text-muted small">
-                                            Con miles de clientes satisfechos que recomiendan estos productos
-                                        </p>
+                                        <Link
+                                            to={`/handpicked/productos/${product.id}`}
+                                            className="best-seller-button"
+                                        >
+                                            Ver Producto
+                                        </Link>
                                     </div>
                                 </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Empty State */}
+            {!isLoading && !error && bestSellers.length === 0 && (
+                <div className="best-sellers-container">
+                    <div className="container">
+                        <div className="best-sellers-empty">
+                            <div className="empty-icon">📦</div>
+                            <h2 className="empty-title">No hay productos más vendidos disponibles por el momento.</h2>
+                            <p className="empty-message">Vuelve pronto para ver nuestros productos favoritos</p>
+                            <Link to="/handpicked/productos" className="btn-cta btn-cta-primary">
+                                Ver Todos los Productos
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Information Section */}
+            <div className="best-sellers-info">
+                <div className="container">
+                    <div className="info-card">
+                        <h3 className="info-title">
+                            Por Qué los Clientes Aman Estos Productos
+                        </h3>
+                        <div className="info-grid">
+                            <div className="info-item">
+                                <span className="info-icon">✓</span>
+                                <h5 className="info-heading">Calidad Asegurada</h5>
+                                <p className="info-text">
+                                    Cada producto es cuidadosamente seleccionado por su calidad excepcional
+                                </p>
+                            </div>
+                            <div className="info-item">
+                                <span className="info-icon">⭐</span>
+                                <h5 className="info-heading">Altamente Calificados</h5>
+                                <p className="info-text">
+                                    Calificados consistentemente con 5 estrellas por nuestros clientes satisfechos
+                                </p>
+                            </div>
+                            <div className="info-item">
+                                <span className="info-icon">❤️</span>
+                                <h5 className="info-heading">Regalos Perfectos</h5>
+                                <p className="info-text">
+                                    Ideales para ocasiones especiales y momentos memorables
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -94,19 +147,21 @@ const BestSellersPage = () => {
             </div>
 
             {/* Call to Action */}
-            <div className="container my-5">
-                <div className="text-center bg-light rounded p-5">
-                    <h3 className="mb-3">¿Buscas algo diferente?</h3>
-                    <p className="text-muted mb-4">
-                        Explora todas nuestras categorías para encontrar el regalo perfecto
-                    </p>
-                    <div className="d-flex justify-content-center gap-3 flex-wrap">
-                        <Link to="/handpicked/productos" className="btn btn-primary btn-lg">
-                            Ver Todos los Productos
-                        </Link>
-                        <Link to="/categorias" className="btn btn-outline-primary btn-lg">
-                            Explorar Categorías
-                        </Link>
+            <div className="best-sellers-cta">
+                <div className="container">
+                    <div className="cta-box">
+                        <h3 className="cta-title">¿Buscas Algo Específico?</h3>
+                        <p className="cta-text">
+                            Explora nuestro catálogo completo para encontrar el producto perfecto
+                        </p>
+                        <div className="cta-buttons">
+                            <Link to="/handpicked/productos" className="btn-cta btn-cta-primary">
+                                Ver Todos los Productos
+                            </Link>
+                            <Link to="/categorias" className="btn-cta btn-cta-outline">
+                                Explorar Categorías
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -114,4 +169,4 @@ const BestSellersPage = () => {
     );
 };
 
-export default BestSellersPage; 
+export default BestSellersPage;

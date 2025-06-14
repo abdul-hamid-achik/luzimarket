@@ -275,6 +275,13 @@ export async function PUT(
     if (data.description !== undefined) updateFields.description = data.description;
     if (data.price !== undefined) updateFields.price = data.price;
     if (data.categoryId !== undefined) updateFields.categoryId = data.categoryId;
+    if (data.status !== undefined) updateFields.status = data.status;
+    if (data.featured !== undefined) updateFields.featured = data.featured;
+    if (data.slug !== undefined) updateFields.slug = data.slug;
+    if (data.vendorId !== undefined) updateFields.vendorId = data.vendorId;
+    
+    // Add updatedAt timestamp
+    updateFields.updatedAt = new Date();
 
     await dbService.update(products, updateFields, eq(products.id, productId));
 

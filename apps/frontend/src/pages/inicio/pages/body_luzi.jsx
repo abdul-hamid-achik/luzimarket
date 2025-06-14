@@ -2,7 +2,7 @@ import React from 'react';
 import { useProducts } from '@/api/hooks';
 import ModalIndex from "@/pages/inicio/components/modal_index";
 import LuxuryHeroCarousel from "@/components/carousel/luxury_hero_carousel";
-import LuxuryBestSellersCarousel from "@/components/carousel/luxury_best_sellers_carousel";
+import ModernBestSellersSection from "@/components/cards/modern_best_sellers_section";
 
 import "@/css/typography.css";
 import "@/pages/inicio/css/card_index.css";
@@ -26,8 +26,8 @@ const BodyLuzi = () => {
       {/* Dynamic Hero Carousel */}
       <LuxuryHeroCarousel />
 
-      {/* Best Sellers Carousel */}
-      <LuxuryBestSellersCarousel />
+      {/* Best Sellers Section */}
+      <ModernBestSellersSection limit={8} />
 
       {/* Imagenes banner opciones - Categories */}
       <div className="category-grid">

@@ -1,5 +1,5 @@
 import "@/css/fonts.css"
-import "@/pages/inicio/css/filtros_handpicked.css"
+import "@/pages/inicio/css/productos_listing.css"
 import { useState } from "react"
 import { useCategories } from "@/api/hooks"
 
@@ -8,6 +8,11 @@ const Filtros = ({ onApply, onClear }) => {
    const [selectedCategories, setSelectedCategories] = useState([])
    const [priceRange, setPriceRange] = useState([0, 1000])
    const [selectedColors, setSelectedColors] = useState([])
+   const [openSections, setOpenSections] = useState({
+      categories: true,
+      price: true,
+      color: false
+   })
 
    const handleCategoryChange = (e) => {
       const value = e.target.value
@@ -32,36 +37,27 @@ const Filtros = ({ onApply, onClear }) => {
    }
 
    return (
-      <div id="FHP" className="filters-sidebar">
-         <h4 className="mb-4 filter-title">Filtros</h4>
+      <div className="filters-sidebar">
+         <h4 className="filter-title">Filtros</h4>
 
-         <div className="accordion" id="filterAccordion">
+         <div className="filter-sections">
             {/* Categorías */}
-            <div className="accordion-item border-0">
-               <h2 className="accordion-header" id="headingCategories">
-                  <button
-                     className="accordion-button"
-                     type="button"
-                     data-bs-toggle="collapse"
-                     data-bs-target="#collapseCategories"
-                     aria-expanded="true"
-                     aria-controls="collapseCategories"
-                  >
-                     Categorías
-                  </button>
-               </h2>
-               <div
-                  id="collapseCategories"
-                  className="accordion-collapse collapse show"
-                  aria-labelledby="headingCategories"
-                  data-bs-parent="#filterAccordion"
+            <div className="accordion-item">
+               <button
+                  className="accordion-button"
+                  type="button"
+                  onClick={() => setOpenSections(prev => ({ ...prev, categories: !prev.categories }))}
+                  aria-expanded={openSections.categories}
                >
+                  Categorías
+               </button>
+               {openSections.categories && (
                   <div className="accordion-body">
                      {catLoading ? (
                         <p>Cargando categorías...</p>
                      ) : (
                         categories.map((cat) => (
-                           <div className="form-check mb-2" key={cat.id}>
+                           <div className="form-check" key={cat.id}>
                               <input
                                  className="form-check-input"
                                  type="checkbox"
@@ -77,78 +73,56 @@ const Filtros = ({ onApply, onClear }) => {
                         ))
                      )}
                   </div>
-               </div>
+               )}
             </div>
 
             {/* Precio */}
-            <div className="accordion-item border-0">
-               <h2 className="accordion-header" id="headingPrice">
-                  <button
-                     className="accordion-button"
-                     type="button"
-                     data-bs-toggle="collapse"
-                     data-bs-target="#collapsePrice"
-                     aria-expanded="true"
-                     aria-controls="collapsePrice"
-                  >
-                     Precio
-                  </button>
-               </h2>
-               <div
-                  id="collapsePrice"
-                  className="accordion-collapse collapse show"
-                  aria-labelledby="headingPrice"
-                  data-bs-parent="#filterAccordion"
+            <div className="accordion-item">
+               <button
+                  className="accordion-button"
+                  type="button"
+                  onClick={() => setOpenSections(prev => ({ ...prev, price: !prev.price }))}
+                  aria-expanded={openSections.price}
                >
+                  Precio
+               </button>
+               {openSections.price && (
                   <div className="accordion-body">
-                     <div className="price-range-container">
-                        <div className="price-inputs d-flex justify-content-between mb-3">
-                           <div>
-                              <label htmlFor="minPrice">Min</label>
-                              <input
-                                 type="number"
-                                 id="minPrice"
-                                 className="form-control"
-                                 value={priceRange[0]}
-                                 onChange={handlePriceChange}
-                              />
-                           </div>
-                           <div>
-                              <label htmlFor="maxPrice">Max</label>
-                              <input
-                                 type="number"
-                                 id="maxPrice"
-                                 className="form-control"
-                                 value={priceRange[1]}
-                                 onChange={handlePriceChange}
-                              />
-                           </div>
+                     <div className="price-inputs">
+                        <div>
+                           <label htmlFor="minPrice">Min ($)</label>
+                           <input
+                              type="number"
+                              id="minPrice"
+                              value={priceRange[0]}
+                              onChange={handlePriceChange}
+                           />
+                        </div>
+                        <div>
+                           <label htmlFor="maxPrice">Max ($)</label>
+                           <input
+                              type="number"
+                              id="maxPrice"
+                              value={priceRange[1]}
+                              onChange={handlePriceChange}
+                           />
                         </div>
                      </div>
                   </div>
-               </div>
+               )}
             </div>
 
             {/* Color */}
-            <div className="accordion-item border-0">
-               <h2 className="accordion-header" id="headingColor">
-                  <button
-                     className="accordion-button collapsed"
-                     type="button"
-                     data-bs-toggle="collapse"
-                     data-bs-target="#collapseColor"
-                     aria-expanded="false"
-                     aria-controls="collapseColor"
-                  >
-                     Color
-                  </button>
-               </h2>
-               <div
-                  id="collapseColor"
-                  className="accordion-collapse collapse"
-                  aria-labelledby="headingColor"
-                  data-bs-parent="#filterAccordion"
+            <div className="accordion-item">
+               <button
+                  className="accordion-button"
+                  type="button"
+                  onClick={() => setOpenSections(prev => ({ ...prev, color: !prev.color }))}
+                  aria-expanded={openSections.color}
                >
+                  Color
+               </button>
+               {openSections.color && (
                   <div className="accordion-body">
                      <div className="d-flex flex-wrap gap-2">
                         {['#000', '#fff', '#ff0000', '#0000ff', '#00ff00', '#ffff00'].map((color) => (
@@ -162,18 +136,18 @@ const Filtros = ({ onApply, onClear }) => {
                         ))}
                      </div>
                   </div>
-               </div>
+               )}
             </div>
          </div>
 
-         <div className="mt-4">
+         <div className="filter-buttons">
             <button
-               className="btn btn-dark w-100"
+               className="btn-apply-filters"
                onClick={() =>
                   onApply({
-                     categoryIds: selectedCategories,
-                     minPrice: priceRange[0],
-                     maxPrice: priceRange[1],
+                     categoryId: selectedCategories.length > 0 ? selectedCategories[0] : null,
+                     minPrice: priceRange[0] * 100, // Convert to cents
+                     maxPrice: priceRange[1] * 100, // Convert to cents
                      colors: selectedColors,
                   })
                }
@@ -181,7 +155,7 @@ const Filtros = ({ onApply, onClear }) => {
                Aplicar Filtros
             </button>
             <button
-               className="btn btn-outline-secondary w-100 mt-2"
+               className="btn-clear-filters"
                onClick={() => {
                   setSelectedCategories([])
                   setPriceRange([0, 1000])

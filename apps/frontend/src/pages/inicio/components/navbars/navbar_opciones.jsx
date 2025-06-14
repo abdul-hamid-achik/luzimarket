@@ -9,7 +9,7 @@ const NavbarOpciones = () => {
                <div className="collapse navbar-collapse" id="navbarNav">
                   <ul className="navbar-nav mx-auto">
                      <li className="nav-item">
-                        <Link className="nav-link" to="/best-sellers">Best Sellers</Link>
+                        <Link className="nav-link" to="/best-sellers">Más Vendidos</Link>
                      </li>
                      <li className="nav-item">
                         <Link className="nav-link" to="/handpicked/productos">Handpicked</Link>

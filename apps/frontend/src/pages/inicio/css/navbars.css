@@ -152,11 +152,11 @@ Code for create styles to the navbar's for Luzimarket's page
 #NavbarOpciones {
     background-color: var(--colorNavbarPO);
     font-family: var(--fontLandingPage);
-    border-bottom: 1px solid #000;
+    border-bottom: 1px solid #e0e0e0;
     min-height: 50px;
-    padding: 0.25rem 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    border-radius: 0 0 12px 12px;
+    padding: 0.5rem 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border-radius: 0;
     position: relative;
 }
 
@@ -165,15 +165,34 @@ Code for create styles to the navbar's for Luzimarket's page
 }
 
 #NavbarOpciones .nav-link {
-    color: #222;
-    font-weight: 500;
-    transition: color 0.2s ease;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.9rem;
+    color: #4a4a4a;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
 }
 
 #NavbarOpciones .nav-link:hover {
     color: #000;
+}
+
+#NavbarOpciones .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: #000;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+#NavbarOpciones .nav-link:hover::after {
+    width: 80%;
 }
 
 /*============== General Navbar Styles ==============*/

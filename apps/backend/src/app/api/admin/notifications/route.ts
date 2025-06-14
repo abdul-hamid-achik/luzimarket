@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { StatusCodes } from 'http-status-codes';
-import { dbService, eq, and, or, SQL, isNull } from '@/db/service';
-import { notifications, orders, users, products, vendors } from '@/db/schema';
+import { dbService, eq, and, or, isNull } from '@/db/service';
+import { notifications } from '@/db/schema';
 import { desc, gt } from 'drizzle-orm';
 
 /**

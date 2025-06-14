@@ -66,6 +66,7 @@ export const categories = pgTable('categories', {
     name: text('name').notNull().unique(),
     slug: text('slug').notNull().unique(),
     description: text('description').notNull(),
+    imageUrl: text('image_url'),
 });
 
 // Products and variants

@@ -1,16 +1,15 @@
-import React, { useState, useEffect, useContext } from 'react';
-// Remove duplicate navbar and footer imports
-import ModalUsr from "@/pages/inicio/components/modal_index";
-import { AuthContext } from '@/context/auth_context';
-import { secureStorage } from '@/utils/storage';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/context/auth_context';
+import { useProfile, useUpdateProfile } from '@/api/hooks';
 import { Alert, Spinner } from 'react-bootstrap';
+import api from '@/api/client';
 
 const Perfil = () => {
-    const { user } = useContext(AuthContext);
-    const [profile, setProfile] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const { user } = useAuth();
+    const { data: profileData, isLoading: profileLoading, error: profileError } = useProfile();
+    const updateProfile = useUpdateProfile();
     const [saveSuccess, setSaveSuccess] = useState(false);
+    const [loadingPortal, setLoadingPortal] = useState(false);
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -24,73 +23,22 @@ const Perfil = () => {
     });
 
     useEffect(() => {
-        if (!user) {
-            setLoading(false);
-            setError('User not authenticated');
-            return;
+        if (profileData?.user) {
+            // Initialize form with profile data from API
+            const userData = profileData.user;
+            setFormData({
+                firstName: userData.firstName || '',
+                lastName: userData.lastName || '',
+                phone: userData.phone || '',
+                address: userData.address || '',
+                postalCode: userData.postalCode || '',
+                state: userData.state || '',
+                area: userData.area || '',
+                country: userData.country || 'México',
+                stateRegion: userData.stateRegion || ''
+            });
         }
-
-        // Fetch user profile from API
-        const fetchProfile = async () => {
-            try {
-                const userId = user.userId || user.id;
-                if (!userId) {
-                    throw new Error('User ID not found in token');
-                }
-
-                const response = await fetch(`/api/profiles/user/${userId}`);
-
-                if (!response.ok) {
-                    // If the profile doesn't exist yet, create a default one
-                    if (response.status === 404) {
-                        // Initialize with empty profile
-                        initializeProfile({
-                            id: null,
-                            firstName: '',
-                            lastName: '',
-                            email: user.email,
-                            phone: '',
-                            address: '',
-                            postalCode: '',
-                            state: '',
-                            area: '',
-                            country: '',
-                            stateRegion: ''
-                        });
-                        return;
-                    }
-                    throw new Error(`Error fetching profile: ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                initializeProfile(data);
-            } catch (err) {
-                console.error('Error fetching profile:', err);
-                setError(err.message || 'Failed to load profile');
-                setLoading(false);
-            }
-        };
-
-        fetchProfile();
-    }, [user]);
-
-    const initializeProfile = (data) => {
-        setProfile(data);
-        // Initialize form with profile data
-        setFormData({
-            firstName: data.firstName || '',
-            lastName: data.lastName || '',
-            phone: data.phone || '',
-            address: data.address || '',
-            postalCode: data.postalCode || '',
-            state: data.state || '',
-            area: data.area || '',
-            country: data.country || '',
-            stateRegion: data.stateRegion || ''
-        });
-        setLoading(false);
-        setError(null);
-    };
+    }, [profileData]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -102,184 +50,208 @@ const Perfil = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!user) {
-            setError('User not authenticated');
-            return;
-        }
-
-        setLoading(true);
-
-        // Prepare the API endpoint and method
-        const method = profile?.id ? 'PUT' : 'POST';
-        const url = profile?.id
-            ? `/api/profiles/${profile.id}`
-            : '/api/profiles';
-
-        try {
-            // Send the update request
-            const response = await fetch(url, {
-                method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${secureStorage.getAccessToken()}`
-                },
-                body: JSON.stringify({
-                    ...formData,
-                    userId: user.userId || user.id,
-                    email: user.email
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Error updating profile');
+        
+        updateProfile.mutate(formData, {
+            onSuccess: () => {
+                setSaveSuccess(true);
+                setTimeout(() => setSaveSuccess(false), 3000);
+            },
+            onError: (error) => {
+                console.error('Error updating profile:', error);
             }
+        });
+    };
 
-            const data = await response.json();
-            setProfile(data);
-            setSaveSuccess(true);
-            setTimeout(() => setSaveSuccess(false), 3000);
-        } catch (err) {
-            console.error('Error updating profile:', err);
-            setError('Failed to update profile');
+    const handleStripePortal = async () => {
+        setLoadingPortal(true);
+        try {
+            const response = await api.post('/create-customer-portal-session', {
+                returnUrl: window.location.href
+            });
+            
+            if (response.data.url) {
+                // Redirect to Stripe Customer Portal
+                window.location.href = response.data.url;
+            }
+        } catch (error) {
+            console.error('Error opening Stripe portal:', error);
+            alert(error.response?.data?.error || 'Error al abrir el portal de pagos. Por favor intenta de nuevo.');
         } finally {
-            setLoading(false);
+            setLoadingPortal(false);
         }
     };
 
-    return (
-        <div className="container rounded bg-white mt-5 mb-5 profile-page" data-testid="profile-page">
-            {loading ? (
+    if (!user) {
+        return (
+            <div className="container rounded bg-white mt-5 mb-5">
+                <Alert variant="warning">
+                    Por favor inicia sesión para ver tu perfil.
+                </Alert>
+            </div>
+        );
+    }
+
+    if (profileLoading) {
+        return (
+            <div className="container rounded bg-white mt-5 mb-5">
                 <div className="text-center p-5">
                     <Spinner animation="border" role="status">
-                        <span className="visually-hidden">Loading profile...</span>
+                        <span className="visually-hidden">Cargando perfil...</span>
                     </Spinner>
                 </div>
-            ) : (
-                <div className="row">
-                    {saveSuccess && (
-                        <Alert variant="success" className="mt-3">
-                            Perfil actualizado correctamente
-                        </Alert>
-                    )}
+            </div>
+        );
+    }
 
-                    {error && (
-                        <Alert variant="danger" className="mt-3">
-                            {error}
-                        </Alert>
-                    )}
+    return (
+        <div className="container rounded bg-white mt-5 mb-5 profile-page" data-testid="profile-page">
+            <div className="row">
+                {saveSuccess && (
+                    <Alert variant="success" className="mt-3">
+                        Perfil actualizado correctamente
+                    </Alert>
+                )}
 
-                    <div className="col-md-3 border-right">
-                        <div className="d-flex flex-column align-items-center text-center p-3 py-5">
-                            <img className="rounded-circle mt-5" width="150px" height="150px"
-                                src="https://www.stockvault.net/data/2011/08/12/126170/preview16.jpg"
-                                alt="Profile" />
-                            <span className="font-weight-bold mt-2">{user?.email || 'Usuario'}</span>
-                            <span className="text-black-50">{formData.firstName} {formData.lastName}</span>
-                        </div>
+                {profileError && (
+                    <Alert variant="danger" className="mt-3">
+                        Error al cargar el perfil. Por favor intenta de nuevo.
+                    </Alert>
+                )}
+
+                <div className="col-md-3 border-right">
+                    <div className="d-flex flex-column align-items-center text-center p-3 py-5">
+                        <img className="rounded-circle mt-5" width="150px" height="150px"
+                            src="https://www.stockvault.net/data/2011/08/12/126170/preview16.jpg"
+                            alt="Profile" />
+                        <span className="font-weight-bold mt-2">{user?.email || 'Usuario'}</span>
+                        <span className="text-black-50">{formData.firstName} {formData.lastName}</span>
                     </div>
-                    <div className="col-md-5 border-right">
-                        <form onSubmit={handleSubmit}>
-                            <div className="p-3 py-5">
-                                <div className="d-flex justify-content-between align-items-center mb-3">
-                                    <h3>Detalles del Perfil</h3>
+                </div>
+                <div className="col-md-5 border-right">
+                    <form onSubmit={handleSubmit}>
+                        <div className="p-3 py-5">
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                                <h3>Detalles del Perfil</h3>
+                            </div>
+                            <div className="row mt-2">
+                                <div className="col-md-6">
+                                    <label className="labels">Nombre</label>
+                                    <input type="text" className="form-control"
+                                        name="firstName"
+                                        value={formData.firstName}
+                                        onChange={handleChange} />
                                 </div>
-                                <div className="row mt-2">
-                                    <div className="col-md-6">
-                                        <label className="labels">Nombre</label>
-                                        <input type="text" className="form-control"
-                                            name="firstName"
-                                            value={formData.firstName}
-                                            onChange={handleChange} />
-                                    </div>
-                                    <div className="col-md-6">
-                                        <label className="labels">Apellido</label>
-                                        <input type="text" className="form-control"
-                                            name="lastName"
-                                            value={formData.lastName}
-                                            onChange={handleChange} />
-                                    </div>
-                                </div>
-                                <div className="row mt-3">
-                                    <div className="col-md-12">
-                                        <label className="labels">Teléfono</label>
-                                        <input type="text" className="form-control"
-                                            name="phone"
-                                            value={formData.phone}
-                                            onChange={handleChange} />
-                                    </div>
-                                    <div className="col-md-12">
-                                        <label className="labels">Dirección</label>
-                                        <input type="text" className="form-control"
-                                            name="address"
-                                            value={formData.address}
-                                            onChange={handleChange} />
-                                    </div>
-                                    <div className="col-md-12">
-                                        <label className="labels">Código Postal</label>
-                                        <input type="text" className="form-control"
-                                            name="postalCode"
-                                            value={formData.postalCode}
-                                            onChange={handleChange} />
-                                    </div>
-                                    <div className="col-md-12">
-                                        <label className="labels">Estado</label>
-                                        <input type="text" className="form-control"
-                                            name="state"
-                                            value={formData.state}
-                                            onChange={handleChange} />
-                                    </div>
-                                    <div className="col-md-12">
-                                        <label className="labels">Area</label>
-                                        <input type="text" className="form-control"
-                                            name="area"
-                                            value={formData.area}
-                                            onChange={handleChange} />
-                                    </div>
-                                </div>
-                                <div className="row mt-3">
-                                    <div className="col-md-6">
-                                        <label className="labels">Pais</label>
-                                        <input type="text" className="form-control"
-                                            name="country"
-                                            value={formData.country}
-                                            onChange={handleChange} />
-                                    </div>
-                                    <div className="col-md-6">
-                                        <label className="labels">Estado/Region</label>
-                                        <input type="text" className="form-control"
-                                            name="stateRegion"
-                                            value={formData.stateRegion}
-                                            onChange={handleChange} />
-                                    </div>
-                                </div>
-                                <div className="mt-5">
-                                    <button className="btn btn-primary profile-button" type="submit">
-                                        Guardar Cambios
-                                    </button>
+                                <div className="col-md-6">
+                                    <label className="labels">Apellido</label>
+                                    <input type="text" className="form-control"
+                                        name="lastName"
+                                        value={formData.lastName}
+                                        onChange={handleChange} />
                                 </div>
                             </div>
-                        </form>
-                    </div>
-                    <div className="col-md-4">
-                        <div className="p-3 py-5">
-                            <div className="d-flex justify-content-between align-items-center experience">
-                                <h3>Metodo de pago</h3>
-                            </div><br />
-                            <div className="col-md-12">
-                                <label className="labels">Tarjeta termina en *98</label>
-                                <button
-                                    className="btn btn-primary profile-button ms-2"
-                                    type="button"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#ModalCard">
-                                    Cambiar
+                            <div className="row mt-3">
+                                <div className="col-md-12">
+                                    <label className="labels">Teléfono</label>
+                                    <input type="text" className="form-control"
+                                        name="phone"
+                                        value={formData.phone}
+                                        onChange={handleChange} />
+                                </div>
+                                <div className="col-md-12">
+                                    <label className="labels">Dirección</label>
+                                    <input type="text" className="form-control"
+                                        name="address"
+                                        value={formData.address}
+                                        onChange={handleChange} />
+                                </div>
+                                <div className="col-md-12">
+                                    <label className="labels">Código Postal</label>
+                                    <input type="text" className="form-control"
+                                        name="postalCode"
+                                        value={formData.postalCode}
+                                        onChange={handleChange} />
+                                </div>
+                                <div className="col-md-12">
+                                    <label className="labels">Estado</label>
+                                    <input type="text" className="form-control"
+                                        name="state"
+                                        value={formData.state}
+                                        onChange={handleChange} />
+                                </div>
+                                <div className="col-md-12">
+                                    <label className="labels">Area</label>
+                                    <input type="text" className="form-control"
+                                        name="area"
+                                        value={formData.area}
+                                        onChange={handleChange} />
+                                </div>
+                            </div>
+                            <div className="row mt-3">
+                                <div className="col-md-6">
+                                    <label className="labels">País</label>
+                                    <input type="text" className="form-control"
+                                        name="country"
+                                        value={formData.country}
+                                        onChange={handleChange} />
+                                </div>
+                                <div className="col-md-6">
+                                    <label className="labels">Estado/Región</label>
+                                    <input type="text" className="form-control"
+                                        name="stateRegion"
+                                        value={formData.stateRegion}
+                                        onChange={handleChange} />
+                                </div>
+                            </div>
+                            <div className="mt-5">
+                                <button 
+                                    className="btn btn-primary profile-button" 
+                                    type="submit"
+                                    disabled={updateProfile.isLoading}
+                                >
+                                    {updateProfile.isLoading ? 'Guardando...' : 'Guardar Cambios'}
                                 </button>
-                            </div> <br />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div className="col-md-4">
+                    <div className="p-3 py-5">
+                        <div className="d-flex justify-content-between align-items-center experience">
+                            <h3>Facturación y Pagos</h3>
+                        </div><br />
+                        <div className="col-md-12">
+                            <p className="text-muted mb-3">
+                                Administra tus métodos de pago, ve tu historial de compras y descarga facturas.
+                            </p>
+                            <button
+                                className="btn btn-primary profile-button w-100"
+                                type="button"
+                                onClick={handleStripePortal}
+                                disabled={loadingPortal}
+                            >
+                                {loadingPortal ? (
+                                    <>
+                                        <Spinner
+                                            as="span"
+                                            animation="border"
+                                            size="sm"
+                                            role="status"
+                                            aria-hidden="true"
+                                            className="me-2"
+                                        />
+                                        Abriendo portal...
+                                    </>
+                                ) : (
+                                    'Gestionar Pagos y Facturas'
+                                )}
+                            </button>
+                            <small className="text-muted d-block mt-2">
+                                Serás redirigido al portal seguro de Stripe
+                            </small>
                         </div>
                     </div>
                 </div>
-            )}
-            <ModalUsr />
+            </div>
         </div>
     );
 };

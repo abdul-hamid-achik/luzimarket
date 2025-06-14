@@ -2,50 +2,57 @@ import React from 'react';
 import { useCategories } from "@/api/hooks";
 import { Link } from "react-router-dom";
 import { FaTags, FaShoppingBag, FaGift, FaHeart, FaHome, FaBirthdayCake } from "react-icons/fa";
+import "@/pages/inicio/css/categorias.css";
 
-// Demo categories with icons for fallback
+// Demo categories with proper image URLs
 const demoCategories = [
     {
         id: 1,
-        name: 'Flowershop',
-        description: 'Hermosas flores y arreglos florales para toda ocasión',
-        icon: <FaHeart className="text-danger" />,
-        image: 'https://dummyimage.com/300x200/ff6b6b/fff&text=Flowershop'
+        name: 'Arreglos Florales',
+        slug: 'arreglos-florales',
+        description: 'Hermosos arreglos florales frescos para toda ocasión, desde rosas clásicas hasta composiciones únicas que expresan tus sentimientos más profundos.',
+        icon: <FaHeart />,
+        imageUrl: 'https://images.unsplash.com/photo-1563241527-3004b7be0ffd?w=600&h=400&fit=crop&auto=format&q=80'
     },
     {
         id: 2,
-        name: 'Sweet',
-        description: 'Dulces, pasteles y postres deliciosos',
-        icon: <FaBirthdayCake className="text-warning" />,
-        image: 'https://dummyimage.com/300x200/feca57/fff&text=Sweet'
+        name: 'Canastas de Regalo',
+        slug: 'canastas-de-regalo',
+        description: 'Canastas cuidadosamente seleccionadas con los mejores productos gourmet, frutas frescas y detalles especiales para sorprender a tus seres queridos.',
+        icon: <FaGift />,
+        imageUrl: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=600&h=400&fit=crop&auto=format&q=80'
     },
     {
         id: 3,
-        name: 'Events + Dinners',
-        description: 'Todo lo necesario para eventos y cenas especiales',
-        icon: <FaGift className="text-success" />,
-        image: 'https://dummyimage.com/300x200/48dbfb/fff&text=Events'
+        name: 'Delicias Gourmet',
+        slug: 'delicias-gourmet',
+        description: 'Exquisitos chocolates artesanales, dulces tradicionales y manjares gourmet que deleitan el paladar más exigente.',
+        icon: <FaBirthdayCake />,
+        imageUrl: 'https://images.unsplash.com/photo-1481391319762-47dff72954d9?w=600&h=400&fit=crop&auto=format&q=80'
     },
     {
         id: 4,
-        name: 'Giftshop',
-        description: 'Regalos únicos y especiales para sorprender',
-        icon: <FaShoppingBag className="text-primary" />,
-        image: 'https://dummyimage.com/300x200/0abde3/fff&text=Giftshop'
+        name: 'Decoración para el Hogar',
+        slug: 'decoracion-para-el-hogar',
+        description: 'Piezas únicas de decoración que transforman cualquier espacio en un hogar acogedor y lleno de estilo.',
+        icon: <FaHome />,
+        imageUrl: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&h=400&fit=crop&auto=format&q=80'
     },
     {
         id: 5,
-        name: 'Home & Living',
-        description: 'Decoración y artículos para el hogar',
-        icon: <FaHome className="text-info" />,
-        image: 'https://dummyimage.com/300x200/778ca3/fff&text=Home'
+        name: 'Regalos Personalizados',
+        slug: 'regalos-personalizados',
+        description: 'Crea momentos inolvidables con regalos únicos personalizados especialmente para esa persona especial.',
+        icon: <FaShoppingBag />,
+        imageUrl: 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=600&h=400&fit=crop&auto=format&q=80'
     },
     {
         id: 6,
-        name: 'Fashion',
-        description: 'Ropa y accesorios de moda',
-        icon: <FaTags className="text-secondary" />,
-        image: 'https://dummyimage.com/300x200/c44569/fff&text=Fashion'
+        name: 'Aromaterapia y Bienestar',
+        slug: 'aromaterapia-y-bienestar',
+        description: 'Productos de aromaterapia y bienestar para crear ambientes relajantes y promover el equilibrio interior.',
+        icon: <FaTags />,
+        imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=400&fit=crop&auto=format&q=80'
     },
 ];
 
@@ -54,75 +61,68 @@ const Categorias = () => {
     const categories = (data && data.length) ? data : demoCategories;
 
     return (
-        <div style={{ padding: '2rem 0', backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+        <div className="categories-page">
             <div className="container">
                 {/* Header */}
-                <div className="text-center mb-5">
-                    <h1 className="display-4 fw-bold mb-3">Nuestras Categorías</h1>
-                    <p className="lead text-muted">
+                <div className="categories-header">
+                    <h1 className="categories-title">Nuestras Categorías</h1>
+                    <p className="categories-subtitle">
                         Explora nuestra amplia selección de productos organizados por categorías
                     </p>
                 </div>
 
-                {/* Loading and Error States */}
+                {/* Loading State */}
                 {isLoading && (
-                    <div className="text-center my-5">
-                        <div className="spinner-border text-primary" role="status">
-                            <span className="visually-hidden">Cargando categorías...</span>
-                        </div>
-                        <p className="mt-3">Cargando categorías...</p>
+                    <div className="categories-loading">
+                        <div className="categories-spinner"></div>
+                        <p className="categories-loading-text">Cargando categorías...</p>
                     </div>
                 )}
 
+                {/* Error State */}
                 {error && (
-                    <div className="alert alert-danger text-center">
-                        <h5>Error al cargar las categorías</h5>
-                        <p>Por favor intenta nuevamente más tarde.</p>
-                        <small className="text-muted">Error: {error.message}</small>
+                    <div className="categories-error">
+                        <h5 className="categories-error-title">Error al cargar las categorías</h5>
+                        <p className="categories-error-message">Por favor intenta nuevamente más tarde.</p>
+                        <small className="categories-error-detail">Error: {error.message}</small>
                     </div>
                 )}
 
                 {/* Categories Grid */}
                 {!isLoading && !error && (
-                    <div className="row g-4">
+                    <div className="categories-grid">
                         {categories.map(category => (
-                            <div key={category.id} className="col-lg-4 col-md-6">
-                                <div className="card h-100 shadow-sm border-0 category-card">
-                                    {/* Category Image */}
-                                    <div className="position-relative overflow-hidden" style={{ height: '200px' }}>
-                                        <img
-                                            src={category.image || `https://dummyimage.com/300x200/6c757d/fff&text=${encodeURIComponent(category.name)}`}
-                                            alt={category.name}
-                                            className="card-img-top w-100 h-100"
-                                            style={{ objectFit: 'cover', transition: 'transform 0.3s ease' }}
-                                        />
-                                        <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-25">
-                                            <div className="text-white text-center">
-                                                <div style={{ fontSize: '3rem' }}>
-                                                    {category.icon || <FaTags />}
-                                                </div>
+                            <div key={category.id} className="category-card">
+                                {/* Category Image */}
+                                <div className="category-image-container">
+                                    <img
+                                        src={category.imageUrl || category.image || `https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=600&h=400&fit=crop&auto=format&q=80`}
+                                        alt={category.name}
+                                        className="category-image"
+                                    />
+                                    <div className="category-overlay">
+                                        <div>
+                                            <div className="category-icon">
+                                                {category.icon || <FaTags />}
                                             </div>
                                         </div>
                                     </div>
+                                </div>
 
-                                    {/* Category Content */}
-                                    <div className="card-body d-flex flex-column">
-                                        <h5 className="card-title fw-bold mb-3">{category.name}</h5>
-                                        <p className="card-text text-muted flex-grow-1">
-                                            {category.description || `Descubre productos increíbles en la categoría ${category.name}`}
-                                        </p>
+                                {/* Category Content */}
+                                <div className="category-content">
+                                    <h3 className="category-name">{category.name}</h3>
+                                    <p className="category-description">
+                                        {category.description || `Descubre productos increíbles en la categoría ${category.name}`}
+                                    </p>
 
-                                        {/* Action Button */}
-                                        <div className="mt-auto">
-                                            <Link
-                                                to={`/categorias/${category.slug || category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`}
-                                                className="btn btn-primary w-100"
-                                                style={{ borderRadius: '25px' }}
-                                            >
-                                                Ver Productos
-                                            </Link>
-                                        </div>
-                                    </div>
+                                    {/* Action Button */}
+                                    <Link
+                                        to={`/categorias/${category.slug || category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`}
+                                        className="btn-category"
+                                    >
+                                        Ver Productos
+                                    </Link>
                                 </div>
                             </div>
                         ))}
@@ -131,52 +131,35 @@ const Categorias = () => {
 
                 {/* Empty State */}
                 {!isLoading && !error && categories.length === 0 && (
-                    <div className="text-center my-5">
-                        <FaTags size={64} className="text-muted mb-3" />
-                        <h3>No hay categorías disponibles</h3>
-                        <p className="text-muted">Vuelve pronto para ver nuestras categorías.</p>
+                    <div className="categories-empty">
+                        <div className="categories-empty-icon">
+                            <FaTags />
+                        </div>
+                        <h3 className="categories-empty-title">No hay categorías disponibles</h3>
+                        <p className="categories-empty-message">Vuelve pronto para ver nuestras categorías.</p>
                     </div>
                 )}
 
                 {/* Call to Action */}
                 {!isLoading && !error && categories.length > 0 && (
-                    <div className="text-center mt-5 pt-4 border-top">
-                        <h4 className="mb-3">¿No encuentras lo que buscas?</h4>
-                        <p className="text-muted mb-4">
+                    <div className="categories-cta">
+                        <h4 className="categories-cta-title">¿No encuentras lo que buscas?</h4>
+                        <p className="categories-cta-text">
                             Explora todos nuestros productos o contáctanos para ayudarte
                         </p>
-                        <div className="d-flex gap-3 justify-content-center flex-wrap">
-                            <Link to="/handpicked/productos" className="btn btn-outline-primary">
+                        <div className="categories-cta-buttons">
+                            <Link to="/handpicked/productos" className="btn-cta-primary">
                                 Ver Todos los Productos
                             </Link>
-                            <Link to="/editorial" className="btn btn-outline-secondary">
+                            <Link to="/editorial" className="btn-cta-secondary">
                                 Leer Nuestro Blog
                             </Link>
                         </div>
                     </div>
                 )}
             </div>
-
-            <style>{`
-        .category-card:hover {
-          transform: translateY(-5px);
-          transition: transform 0.3s ease;
-        }
-        
-        .category-card:hover img {
-          transform: scale(1.05);
-        }
-        
-        .category-card {
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .category-card:hover {
-          box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
-        }
-      `}</style>
         </div>
     );
 };
 
-export default Categorias; 
+export default Categorias;

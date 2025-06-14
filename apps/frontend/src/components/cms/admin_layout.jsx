@@ -11,7 +11,6 @@ const AdminLayout = () => {
         { path: '/admin/cms/products', label: 'Products', icon: '📦' },
         { path: '/admin/cms/vendors', label: 'Vendors', icon: '🏪' },
         { path: '/admin/cms/categories', label: 'Categories', icon: '🏷️' },
-        { path: '/admin/cms/orders', label: 'Orders', icon: '🛒' },
         { path: '/admin/cms/users', label: 'Users', icon: '👥' },
         { path: '/admin/cms/photos', label: 'Media Library', icon: '🖼️' },
         { path: '/admin/cms/settings', label: 'Settings', icon: '⚙️' }
