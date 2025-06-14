@@ -1,3 +1,9 @@
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+
+// Load environment variables from root .env file
+dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
+
 import { db } from './index';
 import bcrypt from 'bcryptjs';
 import { faker } from '@faker-js/faker/locale/es';
@@ -5,6 +11,7 @@ import { eq, sql } from 'drizzle-orm';
 import type { NeonDatabase } from 'drizzle-orm/neon-serverless';
 import { imageService } from './services/imageService';
 import { spanishProducts, spanishCategories, spanishOccasions } from './data/spanishProducts';
+import { additionalSpanishProducts } from './data/additionalProducts';
 
 // Define types for the schema module
 type PostgresSchemaModule = typeof import('./schema.postgres');
@@ -130,13 +137,37 @@ async function seed(currentDb: NeonDatabase, currentSchema: PostgresSchemaModule
             const categoryMap = new Map(categoriesResult.map(cat => [cat.slug, cat.id]));
 
             console.log('📸 Iniciando carga de productos con imágenes...');
+            
+            // Combine original and additional products
+            const allProducts = [...spanishProducts, ...additionalSpanishProducts];
+            console.log(`📦 Total de productos a cargar: ${allProducts.length}`);
+            
+            // Process products in batches to manage API limits
+            const BATCH_SIZE = 50; // Process 50 products at a time
+            const batches = Math.ceil(allProducts.length / BATCH_SIZE);
+            
+            for (let batch = 0; batch < batches; batch++) {
+                const startIdx = batch * BATCH_SIZE;
+                const endIdx = Math.min(startIdx + BATCH_SIZE, allProducts.length);
+                const batchProducts = allProducts.slice(startIdx, endIdx);
+                
+                console.log(`\n🔄 Procesando lote ${batch + 1}/${batches} (productos ${startIdx + 1}-${endIdx})`);
+                
+                // Check Unsplash rate limit status
+                const rateLimitStatus = imageService.getRateLimitStatus();
+                console.log(`📊 Estado de límite Unsplash: ${rateLimitStatus.requestsUsed}/50 solicitudes usadas`);
+                
+                if (rateLimitStatus.requestsRemaining < 10) {
+                    console.log(`⚠️  Pocas solicitudes Unsplash restantes. Usando imágenes locales y placeholders.`);
+                }
 
-            for (let i = 0; i < spanishProducts.length; i++) {
-                const product = spanishProducts[i];
+            for (let i = 0; i < batchProducts.length; i++) {
+                const product = batchProducts[i];
+                const globalIndex = startIdx + i;
                 const categoryId = categoryMap.get(product.categorySlug);
 
                 if (categoryId) {
-                    console.log(`📦 Procesando producto ${i + 1}/${spanishProducts.length}: ${product.name}`);
+                    console.log(`📦 Procesando producto ${globalIndex + 1}/${allProducts.length}: ${product.name}`);
 
                     const productData = {
                         slug: faker.helpers.slugify(product.name.toLowerCase()),
@@ -232,6 +263,18 @@ async function seed(currentDb: NeonDatabase, currentSchema: PostgresSchemaModule
                     }
                 }
             }
+                
+                // Add a small delay between batches to avoid overwhelming the API
+                if (batch < batches - 1) {
+                    console.log(`⏸️  Pausa entre lotes (2 segundos)...`);
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+            }
+            
+            console.log('\n📊 Resumen de carga de imágenes:');
+            const finalRateLimitStatus = imageService.getRateLimitStatus();
+            console.log(`   • Solicitudes Unsplash usadas: ${finalRateLimitStatus.requestsUsed}/50`);
+            console.log(`   • Productos procesados: ${allProducts.length}`);
             console.log('✅ Productos en español con imágenes sembrados exitosamente (PostgreSQL)');
         } catch (err) { console.log('❌ Error sembrando productos (PostgreSQL):', err); }
 
@@ -602,8 +645,9 @@ async function seed(currentDb: NeonDatabase, currentSchema: PostgresSchemaModule
 
             // Get some real data for notifications
             const recentOrders = await dbInstance.select().from(schemaInstance.orders).limit(10);
-            const vendors = await dbInstance.select().from(schemaInstance.vendors).limit(5);
-            const products = await dbInstance.select().from(schemaInstance.products).limit(20);
+            // These queries are used to generate realistic notification messages below
+            await dbInstance.select().from(schemaInstance.vendors).limit(5);
+            await dbInstance.select().from(schemaInstance.products).limit(20);
 
             const notificationTemplates = [
                 // Vendor requests
@@ -970,10 +1014,10 @@ async function seed(currentDb: NeonDatabase, currentSchema: PostgresSchemaModule
             console.log('✅ Códigos de descuento sembrados exitosamente (PostgreSQL)');
         } catch (err) { console.log('❌ Error sembrando códigos de descuento (PostgreSQL):', err); }
 
-        console.log('🎉 ¡Datos realistas en español con imágenes sembrados exitosamente!');
+        console.log('\n🎉 ¡Datos realistas en español con imágenes sembrados exitosamente!');
         console.log('📊 Resumen completo:');
         console.log(`   • ${spanishCategories.length} categorías en español`);
-        console.log(`   • ${spanishProducts.length} productos con descripciones detalladas`);
+        console.log(`   • ${[...spanishProducts, ...additionalSpanishProducts].length} productos con descripciones detalladas`);
         console.log(`   • ${spanishOccasions.length} ocasiones especiales`);
         console.log(`   • ${statesData.length} estados mexicanos`);
         console.log(`   • ${deliveryZonesData.length} zonas de entrega`);
@@ -992,9 +1036,17 @@ async function seed(currentDb: NeonDatabase, currentSchema: PostgresSchemaModule
         console.log('   • 75 órdenes realistas con distribución temporal');
         console.log('   • Estados de órdenes diversos (60% entregadas, 20% enviadas, etc.)');
         console.log('   • Precios calculados basados en productos reales');
+        console.log('   • Notificaciones realistas para dashboard de admin');
+        console.log('   • Direcciones de usuarios y órdenes');
+        console.log('   • Reseñas de productos con calificaciones');
+        console.log('   • Códigos de descuento activos');
         console.log('');
         console.log('📸 Contenido multimedia:');
-        console.log('   • Imágenes realistas cargadas a Vercel Blob');
+        console.log('   • Imágenes optimizadas con fuentes múltiples:');
+        console.log('     - Imágenes del usuario reutilizadas inteligentemente');
+        console.log('     - API de Unsplash con límite de tasa (50/hora)');
+        console.log('     - Placeholders como respaldo');
+        console.log('   • Todas las imágenes almacenadas en Vercel Blob');
         console.log('   • Precios en pesos mexicanos');
         console.log('');
         console.log('🔑 Credenciales de acceso:');

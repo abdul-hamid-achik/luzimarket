@@ -6,14 +6,13 @@ import ModernBestSellersCard from '@/components/cards/modern_best_sellers_card';
 import './modern_best_sellers.css';
 
 const ModernBestSellersPage = () => {
-  const { data, isLoading, error } = useBestSellers({ limit: 20 });
-  const products = data?.products || [];
+  const { data: products = [], isLoading, error } = useBestSellers({ limit: 5 });
 
   if (isLoading) {
     return (
       <div className="page-loading">
         <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading best sellers...</span>
+          <span className="visually-hidden">Cargando más vendidos...</span>
         </Spinner>
       </div>
     );
@@ -23,7 +22,7 @@ const ModernBestSellersPage = () => {
     return (
       <Container className="my-5">
         <Alert variant="danger">
-          Failed to load best sellers. Please try again later.
+          Error al cargar los más vendidos. Por favor intenta de nuevo más tarde.
         </Alert>
       </Container>
     );
@@ -31,48 +30,47 @@ const ModernBestSellersPage = () => {
 
   return (
     <div className="modern-bestsellers-page">
-      {/* Breadcrumb */}
-      <div className="breadcrumb-section">
-        <Container>
-          <nav aria-label="breadcrumb">
-            <ol className="breadcrumb mb-0">
-              <li className="breadcrumb-item">
-                <Link to="/">Home</Link>
-              </li>
-              <li className="breadcrumb-item active">
-                Best Sellers
-              </li>
-            </ol>
-          </nav>
-        </Container>
-      </div>
 
       {/* Page Header */}
       <Container className="page-header">
-        <h1>Best Sellers</h1>
+        <h1>Los Más Vendidos</h1>
         <p className="lead">
-          Discover our most popular products chosen by thousands of customers
+          Descubre nuestros productos más populares elegidos por miles de clientes
         </p>
       </Container>
 
       {/* Products Grid */}
       <Container className="products-section">
-        <Row className="g-4">
+        <div className="best-sellers-showcase">
           {products.map((product, index) => (
-            <Col key={product.id} xs={12} sm={6} md={4} lg={3}>
-              <ModernBestSellersCard 
-                product={product} 
-                rank={index + 1}
-              />
-            </Col>
+            <div key={product.id} className="showcase-item">
+              <div className="showcase-rank">{index + 1}</div>
+              <Link to={`/handpicked/productos/${product.id}`} className="showcase-link">
+                <div className="showcase-image">
+                  <img 
+                    src={product.imageUrl || 'https://via.placeholder.com/400x400?text=Sin+Imagen'} 
+                    alt={product.imageAlt || product.name}
+                  />
+                </div>
+                <div className="showcase-content">
+                  <h3 className="showcase-title">{product.name}</h3>
+                  <p className="showcase-category">{product.categoryName}</p>
+                  <div className="showcase-price">${(product.price / 100).toFixed(2)}</div>
+                  <div className="showcase-sold">{product.totalSold} vendidos</div>
+                  <button className="showcase-button">
+                    Ver Producto
+                  </button>
+                </div>
+              </Link>
+            </div>
           ))}
-        </Row>
+        </div>
 
         {products.length === 0 && (
           <div className="no-products">
-            <p>No best sellers available at the moment.</p>
-            <Link to="/handpicked/productos" className="btn btn-primary">
-              Browse All Products
+            <p>No hay productos más vendidos disponibles por el momento.</p>
+            <Link to="/handpicked/productos" className="btn btn-primary btn-black">
+              Ver Todos los Productos
             </Link>
           </div>
         )}
@@ -81,27 +79,27 @@ const ModernBestSellersPage = () => {
       {/* Why Best Sellers Section */}
       <div className="why-bestsellers-section">
         <Container>
-          <h2 className="text-center mb-5">Why Customers Love These Products</h2>
+          <h2 className="text-center mb-5">Por Qué los Clientes Aman Estos Productos</h2>
           <Row className="g-4">
             <Col md={4} className="text-center">
               <div className="feature-icon">✓</div>
-              <h4>Quality Assured</h4>
+              <h4>Calidad Asegurada</h4>
               <p className="text-muted">
-                Each product is carefully selected for exceptional quality
+                Cada producto es cuidadosamente seleccionado por su calidad excepcional
               </p>
             </Col>
             <Col md={4} className="text-center">
               <div className="feature-icon">★</div>
-              <h4>Highly Rated</h4>
+              <h4>Altamente Calificados</h4>
               <p className="text-muted">
-                Consistently rated 5 stars by our satisfied customers
+                Calificados consistentemente con 5 estrellas por nuestros clientes satisfechos
               </p>
             </Col>
             <Col md={4} className="text-center">
               <div className="feature-icon">♥</div>
-              <h4>Perfect Gifts</h4>
+              <h4>Regalos Perfectos</h4>
               <p className="text-muted">
-                Ideal for special occasions and memorable moments
+                Ideales para ocasiones especiales y momentos memorables
               </p>
             </Col>
           </Row>
@@ -111,16 +109,16 @@ const ModernBestSellersPage = () => {
       {/* Call to Action */}
       <div className="cta-section">
         <Container className="text-center">
-          <h3>Looking for Something Specific?</h3>
+          <h3>¿Buscas Algo Específico?</h3>
           <p className="mb-4">
-            Explore our full catalog to find the perfect product
+            Explora nuestro catálogo completo para encontrar el producto perfecto
           </p>
           <div className="cta-buttons">
-            <Link to="/handpicked/productos" className="btn btn-primary btn-lg">
-              View All Products
+            <Link to="/handpicked/productos" className="btn btn-primary btn-lg btn-black">
+              Ver Todos los Productos
             </Link>
-            <Link to="/categorias" className="btn btn-outline-primary btn-lg">
-              Browse Categories
+            <Link to="/categorias" className="btn btn-outline-primary btn-lg btn-outline-black">
+              Explorar Categorías
             </Link>
           </div>
         </Container>

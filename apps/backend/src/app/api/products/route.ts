@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { dbService, eq, and } from '@/db/service';
 import { products, productVariants, categories, vendors, photos } from '@/db/schema';
-import { inArray, count } from 'drizzle-orm';
+import { inArray, count, gte, lte, desc, asc } from 'drizzle-orm';
 import { StatusCodes } from 'http-status-codes';
 
 /**
@@ -48,6 +48,23 @@ import { StatusCodes } from 'http-status-codes';
  *         schema:
  *           type: boolean
  *         description: Filter by featured products only
+ *       - in: query
+ *         name: minPrice
+ *         schema:
+ *           type: number
+ *         description: Minimum price filter (in cents)
+ *       - in: query
+ *         name: maxPrice
+ *         schema:
+ *           type: number
+ *         description: Maximum price filter (in cents)
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum: [price-low, price-high, newest, relevance]
+ *           default: relevance
+ *         description: Sort products by price or date
  *     responses:
  *       200:
  *         description: List of products with vendor and category info
@@ -98,6 +115,9 @@ export async function GET(request: NextRequest) {
         const vendorId = searchParams.get('vendorId');
         const categoryId = searchParams.get('categoryId');
         const featured = searchParams.get('featured') === 'true';
+        const minPrice = searchParams.get('minPrice');
+        const maxPrice = searchParams.get('maxPrice');
+        const sortBy = searchParams.get('sortBy') || 'relevance';
 
         // Build where conditions
         const whereConditions = [];
@@ -112,6 +132,12 @@ export async function GET(request: NextRequest) {
         }
         if (featured) {
             whereConditions.push(eq(products.featured, true));
+        }
+        if (minPrice && !isNaN(Number(minPrice))) {
+            whereConditions.push(gte(products.price, Number(minPrice)));
+        }
+        if (maxPrice && !isNaN(Number(maxPrice))) {
+            whereConditions.push(lte(products.price, Number(maxPrice)));
         }
 
         const whereClause = whereConditions.length > 0 ? and(...whereConditions) : undefined;
@@ -143,13 +169,30 @@ export async function GET(request: NextRequest) {
             .from(products)
             .leftJoin(vendors, eq(products.vendorId, vendors.id))
             .leftJoin(categories, eq(products.categoryId, categories.id))
-            .where(whereClause)
-            .limit(limit)
-            .offset(offset);
+            .where(whereClause);
+
+        // Add sorting
+        switch (sortBy) {
+            case 'price-low':
+                query.orderBy(asc(products.price));
+                break;
+            case 'price-high':
+                query.orderBy(desc(products.price));
+                break;
+            case 'newest':
+                query.orderBy(desc(products.createdAt));
+                break;
+            case 'relevance':
+            default:
+                query.orderBy(desc(products.featured), desc(products.createdAt));
+                break;
+        }
+
+        query.limit(limit).offset(offset);
 
         const productResults = await query;
 
-        // Get photo counts for all products in one query
+        // Get photo counts and first photo for all products in one query
         const productIds = productResults.map((p: any) => p.id);
         const photoCounts = productIds.length > 0 ? await dbService.raw
             .select({
@@ -165,11 +208,36 @@ export async function GET(request: NextRequest) {
             return acc;
         }, {} as Record<string, number>);
 
+        // Get first photo for each product
+        const productPhotos = productIds.length > 0 ? await dbService.raw
+            .select({
+                productId: photos.productId,
+                url: photos.url,
+                alt: photos.alt,
+                sortOrder: photos.sortOrder
+            })
+            .from(photos)
+            .where(inArray(photos.productId, productIds))
+            .orderBy(photos.sortOrder) : [];
+
+        // Create a map of product ID to first photo
+        const photoMap = new Map();
+        productPhotos.forEach((photo: any) => {
+            if (!photoMap.has(photo.productId)) {
+                photoMap.set(photo.productId, photo);
+            }
+        });
+
         // Combine results
-        const enrichedProducts = productResults.map((product: any) => ({
-            ...product,
-            photoCount: photoCountMap[product.id] || 0
-        }));
+        const enrichedProducts = productResults.map((product: any) => {
+            const photo = photoMap.get(product.id);
+            return {
+                ...product,
+                photoCount: photoCountMap[product.id] || 0,
+                imageUrl: photo?.url || null,
+                imageAlt: photo?.alt || product.name
+            };
+        });
 
         const hasMore = offset + limit < total;
 

@@ -1,0 +1,38 @@
+/* Dashboard cards - consistent with CMS style */
+.card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border: none;
+  background: #fff;
+  margin-bottom: 1.5rem;
+}
+.card-header {
+  background: transparent;
+  border-bottom: 1px solid #f0f0f0;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+.card-body {
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+}
+.card .btn {
+  border-radius: 6px;
+}
+.card .badge {
+  font-size: 0.95rem;
+  padding: 0.4em 0.8em;
+  border-radius: 6px;
+}
+.row {
+  margin-left: 0;
+  margin-right: 0;
+}
+.col-md-4, .col-12 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+@media (max-width: 900px) {
+  .card-body {
+    padding: 1rem 0.7rem 0.7rem 0.7rem;
+  }
+}

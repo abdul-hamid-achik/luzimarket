@@ -3,6 +3,12 @@ import { dbService } from '@/db/service';
 import { products, productVariants, orderItems, orders, categories } from '@/db/schema';
 import { sql, eq, and } from 'drizzle-orm';
 
+// Constants for analytics thresholds
+const ANALYTICS_CONFIG = {
+    LOW_STOCK_THRESHOLD: 10,
+    TOP_PRODUCTS_LIMIT: 10,
+};
+
 /**
  * @swagger
  * /api/analytics/products:
@@ -77,7 +83,7 @@ export async function GET(_request: NextRequest) {
         const inventoryStatus = await db
             .select({
                 totalVariants: sql<number>`COUNT(*)`,
-                lowStockVariants: sql<number>`COUNT(CASE WHEN ${productVariants.stock} > 0 AND ${productVariants.stock} <= 10 THEN 1 END)`,
+                lowStockVariants: sql<number>`COUNT(CASE WHEN ${productVariants.stock} > 0 AND ${productVariants.stock} <= ${ANALYTICS_CONFIG.LOW_STOCK_THRESHOLD} THEN 1 END)`,
                 outOfStockVariants: sql<number>`COUNT(CASE WHEN ${productVariants.stock} = 0 THEN 1 END)`,
                 totalStock: sql<number>`COALESCE(SUM(${productVariants.stock}), 0)`,
             })
@@ -101,7 +107,7 @@ export async function GET(_request: NextRequest) {
             ))
             .groupBy(products.id, products.name, products.price)
             .orderBy(sql`COUNT(${orderItems.id}) DESC`)
-            .limit(10);
+            .limit(ANALYTICS_CONFIG.TOP_PRODUCTS_LIMIT);
 
         // Get category distribution
         const categoryDistribution = await db
@@ -129,14 +135,14 @@ export async function GET(_request: NextRequest) {
                 outOfStockVariants: Number(inventoryStatus[0]?.outOfStockVariants) || 0,
                 totalStock: Number(inventoryStatus[0]?.totalStock) || 0,
             },
-            topSellingProducts: topSellingProducts.map(product => ({
+            topSellingProducts: topSellingProducts.map((product: any) => ({
                 id: product.id,
                 name: product.name,
                 price: Number(product.price),
                 soldCount: Number(product.soldCount) || 0,
                 revenue: Number(product.revenue) || 0,
             })),
-            categoryDistribution: categoryDistribution.map(cat => ({
+            categoryDistribution: categoryDistribution.map((cat: any) => ({
                 categoryId: cat.categoryId,
                 categoryName: cat.categoryName,
                 productCount: Number(cat.productCount) || 0,
@@ -150,7 +156,10 @@ export async function GET(_request: NextRequest) {
             { 
                 success: false, 
                 error: 'Failed to fetch product analytics',
-                details: error instanceof Error ? error.message : 'Unknown error'
+                // Only include error details in development mode
+                ...(process.env.NODE_ENV === 'development' && {
+                    details: error instanceof Error ? error.message : 'Unknown error'
+                })
             },
             { status: 500 }
         );

@@ -1,5 +1,5 @@
 import { put, head } from '@vercel/blob';
-import { readFile } from 'fs/promises';
+import { readFile, access } from 'fs/promises';
 import path from 'path';
 
 // Environment variables
@@ -163,7 +163,8 @@ export class ImageService {
         }
 
         // Get the absolute path to the image file
-        const baseDir = path.resolve(process.cwd(), 'apps/frontend/src/pages/inicio/images');
+        // Since we're running from apps/backend, we need to go up to the project root
+        const baseDir = path.resolve(process.cwd(), '..', 'frontend', 'src', 'pages', 'inicio', 'images');
         return path.join(baseDir, relativePath);
     }
 
@@ -326,19 +327,25 @@ export class ImageService {
         // 2. Try user provided images first
         const userImagePath = this.selectUserImageForCategory(categorySlug, productId);
         if (userImagePath) {
-            console.log(`🖼️  Using user provided image for ${productName}`);
-            const uploadedUrl = await this.uploadLocalImageToBlob(userImagePath, pathname);
+            // Check if file exists before trying to upload
+            try {
+                await access(userImagePath);
+                console.log(`🖼️  Using user provided image for ${productName}`);
+                const uploadedUrl = await this.uploadLocalImageToBlob(userImagePath, pathname);
 
-            if (uploadedUrl) {
-                return {
-                    url: uploadedUrl,
-                    alt: `${productName} - Imagen seleccionada`,
-                    success: true,
-                    isExisting: false,
-                    source: 'user-provided'
-                };
-            } else {
-                console.warn(`Failed to upload user image for ${productName}, trying Unsplash`);
+                if (uploadedUrl) {
+                    return {
+                        url: uploadedUrl,
+                        alt: `${productName} - Imagen seleccionada`,
+                        success: true,
+                        isExisting: false,
+                        source: 'user-provided'
+                    };
+                } else {
+                    console.warn(`Failed to upload user image for ${productName}, trying Unsplash`);
+                }
+            } catch (error) {
+                console.warn(`User image not found at ${userImagePath}, trying Unsplash`);
             }
         }
 

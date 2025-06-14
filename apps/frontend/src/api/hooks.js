@@ -25,6 +25,7 @@ import * as homepageSlidesApi from "@/api/homepageSlides";
 import * as analyticsApi from "@/api/analytics";
 import * as authApi from "@/api/auth";
 import * as notificationsApi from "./notifications";
+import * as profileApi from "@/api/profile";
 
 export const useProducts = (filters = {}) =>
   useQuery(['products', filters], () => productsApi.getProducts(filters));
@@ -588,6 +589,25 @@ export const useUpdateOrder = () => {
       queryClient.invalidateQueries(['adminOrders']);
       queryClient.invalidateQueries(['orders']);
       queryClient.invalidateQueries(['order', variables.orderId]);
+    },
+  });
+};
+
+// =============== PROFILE HOOKS ===============
+
+export const useProfile = () => {
+  const { user } = useAuth();
+  return useQuery(['profile'], profileApi.getProfile, {
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+  return useMutation(profileApi.updateProfile, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['profile']);
     },
   });
 };

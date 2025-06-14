@@ -1,7 +1,9 @@
 import * as dotenv from 'dotenv';
+import * as path from 'path';
 import { drizzle } from 'drizzle-orm/neon-serverless';
 
-dotenv.config();
+// Load .env from root directory
+dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
 
 const DATABASE_URL = process.env.DATABASE_URL;
 

@@ -17,16 +17,32 @@ const CheckoutPage = () => {
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState('');
     const [orderTotal, setOrderTotal] = useState(0);
+    const [deliveryZone, setDeliveryZone] = useState(null);
 
-    // Calculate total from cart
+    // Load delivery zone from sessionStorage
+    useEffect(() => {
+        const storedDeliveryZone = sessionStorage.getItem('selectedDeliveryZone');
+        if (storedDeliveryZone) {
+            try {
+                setDeliveryZone(JSON.parse(storedDeliveryZone));
+            } catch (e) {
+                console.error('Error parsing delivery zone:', e);
+            }
+        }
+    }, []);
+
+    // Calculate total from cart including delivery
     useEffect(() => {
         if (cart?.items) {
-            const total = cart.items.reduce((sum, item) => {
+            const subtotal = cart.items.reduce((sum, item) => {
                 return sum + (item.price * item.quantity);
             }, 0);
+            const iva = subtotal * 0.16;
+            const shipping = deliveryZone?.fee || 0;
+            const total = subtotal + iva + shipping;
             setOrderTotal(total);
         }
-    }, [cart]);
+    }, [cart, deliveryZone]);
 
     // Create order and payment intent when component mounts
     useEffect(() => {
@@ -197,10 +213,25 @@ const CheckoutPage = () => {
                         <div className="card-body">
                             {cart.items.map((item) => (
                                 <div key={item.id} className="d-flex justify-content-between mb-2">
-                                    <span>{item.productName || `Product ${item.productId}`} x {item.quantity}</span>
+                                    <span>{item.name || item.productName || `Product ${item.productId}`} x {item.quantity}</span>
                                     <span>${(item.price * item.quantity).toFixed(2)}</span>
                                 </div>
                             ))}
+                            <hr />
+                            <div className="d-flex justify-content-between">
+                                <span>Subtotal:</span>
+                                <span>${cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}</span>
+                            </div>
+                            <div className="d-flex justify-content-between">
+                                <span>IVA (16%):</span>
+                                <span>${(cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 0.16).toFixed(2)}</span>
+                            </div>
+                            {deliveryZone && (
+                                <div className="d-flex justify-content-between">
+                                    <span>Envío ({deliveryZone.name}):</span>
+                                    <span>${deliveryZone.fee.toFixed(2)}</span>
+                                </div>
+                            )}
                             <hr />
                             <div className="d-flex justify-content-between fw-bold">
                                 <span>Total:</span>

@@ -1,0 +1,437 @@
+/* =================================
+   BEST SELLERS PAGE - LUXURY BLACK & WHITE THEME
+   ================================= */
+
+/* Page Container */
+.best-sellers-page {
+    background-color: #ffffff;
+    min-height: 100vh;
+}
+
+/* Page Header */
+.best-sellers-header {
+    text-align: center;
+    padding: 3rem 0 2rem;
+    background: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.best-sellers-title {
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: #000000;
+    margin-bottom: 0.75rem;
+    letter-spacing: -1px;
+    font-family: 'Playfair Display', 'Georgia', serif;
+}
+
+.best-sellers-subtitle {
+    font-size: 1.125rem;
+    color: #6c757d;
+    font-weight: 300;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+}
+
+/* Badges */
+.best-sellers-badges {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.best-seller-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: #f8f8f8;
+    border: 1px solid #e0e0e0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #000000;
+    transition: all 0.3s ease;
+}
+
+.best-seller-badge:hover {
+    background: #000000;
+    color: #ffffff;
+    border-color: #000000;
+    transform: translateY(-2px);
+}
+
+/* Products Section */
+.best-sellers-container {
+    padding: 4rem 0;
+}
+
+/* Info Section */
+.best-sellers-info {
+    padding: 4rem 0;
+    background: #f8f8f8;
+}
+
+.info-card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    padding: 3rem;
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.info-card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+}
+
+.info-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #000000;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.info-item {
+    text-align: center;
+    padding: 1rem;
+}
+
+.info-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.info-heading {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #000000;
+    margin-bottom: 0.5rem;
+}
+
+.info-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+    line-height: 1.6;
+}
+
+/* CTA Section */
+.best-sellers-cta {
+    padding: 4rem 0;
+    text-align: center;
+}
+
+.cta-box {
+    background: #f8f8f8;
+    border: 2px solid #000000;
+    padding: 3rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.cta-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #000000;
+    margin-bottom: 1rem;
+}
+
+.cta-text {
+    font-size: 1.125rem;
+    color: #6c757d;
+    margin-bottom: 2rem;
+}
+
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-cta {
+    padding: 1rem 2.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 0.875rem;
+}
+
+.btn-cta-primary {
+    background: #000000;
+    color: #ffffff;
+    border: 2px solid #000000;
+}
+
+.btn-cta-primary:hover {
+    background: #ffffff;
+    color: #000000;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.btn-cta-outline {
+    background: #ffffff;
+    color: #000000;
+    border: 2px solid #000000;
+}
+
+.btn-cta-outline:hover {
+    background: #000000;
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+/* Product Grid Styling */
+.best-sellers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+/* Product Card Override */
+.best-seller-card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.best-seller-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    border-color: #000000;
+}
+
+.best-seller-rank {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    width: 50px;
+    height: 50px;
+    background: #000000;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    z-index: 10;
+}
+
+.best-seller-image {
+    position: relative;
+    padding-top: 100%;
+    background: #f8f8f8;
+    overflow: hidden;
+}
+
+.best-seller-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.best-seller-card:hover .best-seller-image img {
+    transform: scale(1.05);
+}
+
+.best-seller-content {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.best-seller-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #000000;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.best-seller-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #000000;
+    margin-bottom: 1rem;
+}
+
+.best-seller-button {
+    margin-top: auto;
+    width: 100%;
+    padding: 0.875rem;
+    background: #000000;
+    color: #ffffff;
+    border: 2px solid #000000;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.813rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.best-seller-button:hover {
+    background: #ffffff;
+    color: #000000;
+}
+
+/* Loading State */
+.best-sellers-loading {
+    text-align: center;
+    padding: 5rem 0;
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 3px solid #f0f0f0;
+    border-top-color: #000000;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1.5rem;
+}
+
+/* Error State */
+.best-sellers-error {
+    text-align: center;
+    padding: 5rem 2rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.error-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.error-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #dc3545;
+    margin-bottom: 1rem;
+}
+
+.error-message {
+    font-size: 1.125rem;
+    color: #6c757d;
+}
+
+/* Empty State */
+.best-sellers-empty {
+    text-align: center;
+    padding: 5rem 2rem;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    color: #e0e0e0;
+    margin-bottom: 1.5rem;
+}
+
+.empty-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #000000;
+    margin-bottom: 1rem;
+}
+
+.empty-message {
+    font-size: 1.125rem;
+    color: #6c757d;
+    margin-bottom: 2rem;
+}
+
+/* Animations */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .best-sellers-title {
+        font-size: 2.5rem;
+    }
+    
+    .best-sellers-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+    
+    .info-grid {
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .best-sellers-header {
+        padding: 3rem 1rem 2rem;
+    }
+    
+    .best-sellers-title {
+        font-size: 2rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .best-sellers-icon {
+        font-size: 2rem;
+    }
+    
+    .best-sellers-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .cta-box {
+        padding: 2rem 1.5rem;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn-cta {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .best-sellers-title {
+        font-size: 1.75rem;
+    }
+    
+    .best-sellers-subtitle {
+        font-size: 1rem;
+    }
+    
+    .best-sellers-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .best-seller-badge {
+        font-size: 0.75rem;
+        padding: 0.5rem 1rem;
+    }
+}

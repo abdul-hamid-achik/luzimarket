@@ -1,5 +1,6 @@
 import { Container, Row, Col, Button, Spinner, Alert } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 import { useBestSellers } from "@/api/hooks";
 import ModernBestSellersCard from "./modern_best_sellers_card";
 import "./modern_best_sellers_section.css";
@@ -61,6 +62,10 @@ const ModernBestSellersSection = ({ limit = 10 }) => {
       </Container>
     </section>
   );
+};
+
+ModernBestSellersSection.propTypes = {
+  limit: PropTypes.number,
 };
 
 export default ModernBestSellersSection;

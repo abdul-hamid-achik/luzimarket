@@ -53,11 +53,6 @@ const CollapseDetails = ({ product }) => {
 
    return (
       <div className="product-details-accordion">
-         <div className="accordion-header-section">
-            <h3 className="details-title">Detalles del Producto</h3>
-            <p className="details-subtitle">Información completa sobre este producto</p>
-         </div>
-
          <div className="modern-accordion">
             {sections.length > 0 ? (
                sections.map((sec, idx) => (

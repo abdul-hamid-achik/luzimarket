@@ -4,6 +4,7 @@ import ConnectedOverview from "@/components/dashboard/connected_overview";
 import { useNotifications } from "@/api/hooks";
 import { Alert, Badge } from "react-bootstrap";
 import './dashboard.css';
+import '@/components/dashboard/cards_dashboard.css';
 
 const Dashboard = () => {
   const { data: notifications } = useNotifications({ category: 'all' });

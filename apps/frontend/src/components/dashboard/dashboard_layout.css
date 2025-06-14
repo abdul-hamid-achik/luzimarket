@@ -1,0 +1,341 @@
+.dashboard-layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa;
+}
+
+.dashboard-header {
+    background: #ffffff;
+    color: #000000;
+    padding: 1.5rem 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 2px solid #000000;
+}
+
+.dashboard-header .container-fluid {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.dashboard-title {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.logo {
+    font-size: 2rem;
+}
+
+.dashboard-user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-welcome {
+    font-weight: 500;
+    margin-right: 0.5rem;
+}
+
+.dashboard-body {
+    display: flex;
+    flex: 1;
+    min-height: calc(100vh - 100px);
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.dashboard-sidebar {
+    width: 280px;
+    background: white;
+    border-right: 1px solid #e9ecef;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 100px;
+    height: calc(100vh - 100px);
+    overflow-y: auto;
+}
+
+.dashboard-nav {
+    padding: 2rem 0;
+}
+
+.nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item {
+    margin: 0;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 2rem;
+    color: #495057;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.nav-link:hover {
+    background-color: #f8f9fa;
+    color: #000000;
+    text-decoration: none;
+    transform: translateX(2px);
+}
+
+.nav-link.active {
+    background-color: #e9ecef;
+    color: #000000;
+    border-left-color: #000000;
+    font-weight: 500;
+}
+
+.nav-icon {
+    font-size: 1.3rem;
+    width: 28px;
+    text-align: center;
+}
+
+.nav-label {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.dashboard-main {
+    flex: 1;
+    padding: 3rem;
+    overflow-y: auto;
+    background: #ffffff;
+    margin: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-content {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+    .dashboard-header .container-fluid {
+        padding: 0 1.5rem;
+    }
+
+    .dashboard-sidebar {
+        width: 240px;
+    }
+
+    .dashboard-main {
+        padding: 2rem;
+        margin: 1.5rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .dashboard-body {
+        flex-direction: column;
+    }
+
+    .dashboard-sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        border-right: none;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .dashboard-nav {
+        padding: 1rem 0;
+    }
+
+    .nav-link {
+        padding: 0.75rem 1.5rem;
+    }
+
+    .dashboard-main {
+        margin: 1rem;
+        padding: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-header {
+        padding: 1rem 0;
+    }
+
+    .dashboard-header .container-fluid {
+        padding: 0 1rem;
+    }
+
+    .dashboard-header .row {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .dashboard-title {
+        font-size: 1.5rem;
+        justify-content: center;
+    }
+
+    .dashboard-user-info {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .nav-link {
+        padding: 0.6rem 1rem;
+    }
+
+    .nav-label {
+        font-size: 0.9rem;
+    }
+
+    .dashboard-main {
+        padding: 1.5rem;
+        margin: 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .dashboard-header .container-fluid {
+        padding: 0 0.5rem;
+    }
+
+    .dashboard-title {
+        font-size: 1.3rem;
+        gap: 0.5rem;
+    }
+
+    .logo {
+        font-size: 1.5rem;
+    }
+
+    .btn-dashboard-white,
+    .btn-dashboard-black {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+        margin-left: 0.25rem;
+    }
+
+    .user-welcome {
+        font-size: 0.9rem;
+        margin-right: 0.25rem;
+    }
+
+    .dashboard-main {
+        padding: 1rem;
+        margin: 0.25rem;
+        border-radius: 8px;
+    }
+
+    .nav-link {
+        padding: 0.5rem 0.75rem;
+    }
+
+    .nav-icon {
+        font-size: 1.1rem;
+        width: 24px;
+    }
+
+    .nav-label {
+        font-size: 0.85rem;
+    }
+}
+
+/* Loading states */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #000000;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Success/Error states */
+.alert-success-cms {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+}
+
+.alert-error-cms {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+}
+
+/* Dashboard Header Buttons */
+.btn-dashboard-white,
+.btn-dashboard-black {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 0.5rem;
+    transition: all 0.3s ease;
+    border: 2px solid;
+    font-size: 0.875rem;
+}
+
+.btn-dashboard-white {
+    background: #ffffff;
+    color: #000000;
+    border-color: #000000;
+}
+
+.btn-dashboard-white:hover {
+    background: #f8f9fa;
+    color: #000000;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.btn-dashboard-black {
+    background: #000000;
+    color: #ffffff;
+    border-color: #000000;
+}
+
+.btn-dashboard-black:hover {
+    background: #333333;
+    color: #ffffff;
+    text-decoration: none;
+    transform: translateY(-1px);
+}

@@ -1,12 +1,20 @@
-import { Card, Container, Spinner, Alert, Button } from "react-bootstrap";
+import { Container, Spinner, Alert, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useProducts, useAddToCart } from "@/api/hooks";
 import FavoriteButton from "@/components/ui/favorite_button";
-import "@/pages/inicio/css/handpicked.css";
+import "@/pages/inicio/css/productos_listing.css";
 import { useState } from "react";
 
 const ProductosHandpicked = ({ filters }) => {
-  const { data, isLoading, error } = useProducts(filters);
+  const [sortBy, setSortBy] = useState('relevance');
+  
+  // Include sortBy in the filters passed to the API
+  const apiFilters = {
+    ...filters,
+    sortBy: sortBy
+  };
+  
+  const { data, isLoading, error } = useProducts(apiFilters);
   const addToCart = useAddToCart();
   const [addedProducts, setAddedProducts] = useState({});
   const [imageErrors, setImageErrors] = useState({});
@@ -68,8 +76,14 @@ const ProductosHandpicked = ({ filters }) => {
 
   // Get optimized image URL for a product
   const getImageUrl = (product) => {
+    // Use the imageUrl from API if available - this should be a Vercel Blob URL
     if (product.imageUrl && !imageErrors[product.id]) {
-      return product.imageUrl;
+      // If it's a Vercel Blob URL, it should already be complete
+      if (product.imageUrl.startsWith('http')) {
+        return product.imageUrl;
+      }
+      // Otherwise, prepend the base URL if needed
+      return `${window.location.origin}${product.imageUrl}`;
     }
 
     // Default to first fallback
@@ -136,125 +150,129 @@ const ProductosHandpicked = ({ filters }) => {
   }
 
   return (
-    <div className="featured-products-container">
-      <Container>
-        <div className="text-center mb-5">
-          <h1 className="display-4 fw-bold mb-3">
-            <span className="me-3">✨</span>
-            Hand Picked Products
-          </h1>
-          <p className="lead text-muted">
+    <div className="products-listing-page">
+      <div className="products-header">
+        <div className="products-header-content">
+          <h1 className="products-title">Hand Picked Products</h1>
+          <p className="products-subtitle">
             Productos cuidadosamente seleccionados para momentos especiales
           </p>
         </div>
+      </div>
 
-        <div className="cajaTodosLosProductos row g-4">
+      <Container>
+        <div className="results-bar">
+          <div className="results-count">
+            Mostrando {products.length} productos
+          </div>
+          <div className="sort-dropdown">
+            <label htmlFor="sort">Ordenar por:</label>
+            <select id="sort" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+              <option value="relevance">Más relevantes</option>
+              <option value="price-low">Precio: menor a mayor</option>
+              <option value="price-high">Precio: mayor a menor</option>
+              <option value="newest">Más recientes</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="products-grid-container">
           {products.map((product) => (
-            <div key={product.id} className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
-              <Card className="product-card h-100 border-0 shadow-sm">
-                <Link
-                  to={`/handpicked/productos/${product.id}`}
-                  className="product-link"
-                  data-testid={`product-${product.id}`}
-                >
-                  <div className="position-relative overflow-hidden">
-                    <Card.Img
-                      variant="top"
-                      src={getImageUrl(product)}
-                      alt={product.name}
-                      className="product-image"
-                      style={{
-                        height: '250px',
-                        objectFit: 'cover',
-                        transition: 'transform 0.3s ease'
-                      }}
-                      onError={(e) => handleImageError(e, product)}
-                      loading="lazy"
-                    />
-                    <div className="position-absolute top-0 end-0 p-2">
-                      {product.featured && (
-                        <span className="badge bg-warning text-dark">
-                          ⭐ Destacado
-                        </span>
-                      )}
-                    </div>
-                    <div className="position-absolute top-0 start-0 p-2">
-                      <FavoriteButton
-                        productId={product.id}
-                        variantId={product.variantId}
-                        size="medium"
-                      />
-                    </div>
-                    <div
-                      className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
-                      style={{
-                        background: 'rgba(0,0,0,0.7)',
-                        opacity: 0,
-                        transition: 'opacity 0.3s ease'
-                      }}
-                      onMouseEnter={(e) => e.target.style.opacity = 1}
-                      onMouseLeave={(e) => e.target.style.opacity = 0}
-                    >
-                      <span className="text-white fw-bold">Ver Detalles</span>
-                    </div>
+            <div key={product.id} className="luxury-product-card">
+              <Link
+                to={`/handpicked/productos/${product.id}`}
+                className="product-link"
+                data-testid={`product-${product.id}`}
+              >
+                <div className="product-image-container">
+                  <img
+                    src={getImageUrl(product)}
+                    alt={product.imageAlt || product.name}
+                    className="product-image"
+                    onError={(e) => handleImageError(e, product)}
+                    loading="lazy"
+                  />
+                  <div className="quick-view-overlay">
+                    <span className="quick-view-text">Vista Rápida</span>
                   </div>
-                </Link>
-                <Card.Body className="d-flex flex-column">
-                  <div className="mb-2">
-                    {product.categoryName && (
-                      <small className="text-muted text-uppercase fw-bold">
-                        {product.categoryName}
-                      </small>
-                    )}
+                </div>
+              </Link>
+              
+              <div className="product-badges">
+                {product.featured && (
+                  <span className="badge badge-featured">Destacado</span>
+                )}
+              </div>
+              
+              <div className="favorite-button-container">
+                <FavoriteButton
+                  productId={product.id}
+                  variantId={product.variantId}
+                  size="medium"
+                  className="favorite-button"
+                />
+              </div>
+
+              <div className="product-info">
+                {product.categoryName && (
+                  <div className="product-category">
+                    {product.categoryName}
                   </div>
-                  <Card.Title className="product-title h5 mb-3">
+                )}
+                
+                <h3 className="product-name">
+                  <Link to={`/handpicked/productos/${product.id}`}>
+                    {product.name}
+                  </Link>
+                </h3>
+                
+                <div className="product-rating">
+                  <span className="stars">★★★★★</span>
+                  <span className="rating-count">(0)</span>
+                </div>
+                
+                <p className="product-description">
+                  {product.description || 'Producto único seleccionado especialmente para ti.'}
+                </p>
+                
+                <div className="price-section">
+                  <div className="price-container">
+                    <span className="current-price">
+                      ${(product.price && typeof product.price === 'number') ? (product.price / 100).toFixed(2) : '0.00'}
+                    </span>
+                  </div>
+                  
+                  <div className="product-actions">
                     <Link
                       to={`/handpicked/productos/${product.id}`}
-                      className="text-decoration-none text-dark"
+                      className="btn-view-details"
                     >
-                      {product.name}
+                      Ver Detalles
                     </Link>
-                  </Card.Title>
-                  <Card.Text className="product-description text-muted flex-grow-1">
-                    {product.description || 'Producto único seleccionado especialmente para ti.'}
-                  </Card.Text>
-                  <div className="mt-auto">
-                    <Card.Text className="product-price h4 mb-3 text-primary fw-bold">
-                      ${(product.price && typeof product.price === 'number') ? (product.price / 100).toFixed(2) : '0.00'}
-                    </Card.Text>
-                    <div className="d-flex gap-2">
-                      <Link
-                        to={`/handpicked/productos/${product.id}`}
-                        className="btn btn-outline-dark flex-grow-1 view-details-btn"
-                      >
-                        Ver Detalles
-                      </Link>
-                      <Button
-                        variant="primary"
-                        className="add-to-cart"
-                        onClick={() => handleAddToCart(product)}
-                        disabled={addToCart.isLoading || addedProducts[product.id]}
-                      >
+                    <button
+                      className={`btn-add-to-cart ${addedProducts[product.id] ? 'added' : ''}`}
+                      onClick={() => handleAddToCart(product)}
+                      disabled={addToCart.isLoading || addedProducts[product.id]}
+                    >
+                      <span className="cart-icon">
                         {addedProducts[product.id] ? '✓' : '🛒'}
-                      </Button>
-                    </div>
-                    {addedProducts[product.id] && (
-                      <div className="text-success mt-2 text-center small">
-                        ¡Agregado al carrito!
-                      </div>
-                    )}
+                      </span>
+                    </button>
                   </div>
-                </Card.Body>
-              </Card>
+                </div>
+              </div>
+              
+              {addedProducts[product.id] && (
+                <div className="add-to-cart-success">
+                  ¡Agregado al carrito!
+                </div>
+              )}
             </div>
           ))}
         </div>
 
         {products.length > 0 && (
           <div className="text-center mt-5">
-            <p className="text-muted mb-3">
-              Mostrando {products.length} productos
-            </p>
             <Link to="/categorias" className="btn btn-outline-primary">
               Explorar más categorías
             </Link>

@@ -3,9 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useCreateOrder, useDeliveryZones } from "@/api/hooks";
 import "@/pages/inicio/css/cart_checkout.css";
 import { useState, useEffect } from 'react';
+import { secureStorage } from '@/utils/storage';
+import { useAuth } from '@/context/auth_context';
 
 const Checkout = ({ cartItems }) => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const createOrder = useCreateOrder();
   // Delivery zones state
   const { data: zones = [], isLoading: zonesLoading } = useDeliveryZones();
@@ -40,20 +43,22 @@ const Checkout = ({ cartItems }) => {
     // Clear any previous errors
     setErrorMessage("");
 
-    // Verify token exists before proceeding
-    const token = sessionStorage.getItem('token');
-    if (!token) {
-      console.error("No authentication token found!");
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      console.error("User not authenticated!");
       setErrorMessage("You must be logged in to checkout. Please login first.");
-      // Try to restore from localStorage as fallback
-      const backupToken = localStorage.getItem('token');
-      if (backupToken) {
-        sessionStorage.setItem('token', backupToken);
-      } else {
-        // Redirect to login if no token can be found
-        navigate('/login', { state: { returnTo: '/carrito' } });
-        return;
-      }
+      // Redirect to login
+      navigate('/login', { state: { returnTo: '/carrito' } });
+      return;
+    }
+
+    // Verify token exists in secure storage
+    const token = secureStorage.getAccessToken();
+    if (!token) {
+      console.error("No authentication token found in secure storage!");
+      setErrorMessage("Authentication error. Please login again.");
+      navigate('/login', { state: { returnTo: '/carrito' } });
+      return;
     }
 
     // Ensure a delivery zone is selected
@@ -66,21 +71,10 @@ const Checkout = ({ cartItems }) => {
       }
     }
 
-    // Proceed with order creation
-    createOrder.mutate({ deliveryZoneId: selectedZone?.id }, {
-      onSuccess: (data) => {
-        navigate(`/order-confirmation/${data.id}`);
-      },
-      onError: (error) => {
-        console.error("Checkout error:", error);
-        if (error.response?.status === 401) {
-          setErrorMessage("Authentication error. Please login again.");
-          navigate('/login', { state: { returnTo: '/carrito' } });
-        } else {
-          setErrorMessage(error.response?.data?.error || "Error processing your order. Please try again.");
-        }
-      }
-    });
+    // Navigate to the Stripe checkout page
+    // Store selected delivery zone in sessionStorage for the checkout page
+    sessionStorage.setItem('selectedDeliveryZone', JSON.stringify(selectedZone));
+    navigate('/checkout');
   };
 
   return (
