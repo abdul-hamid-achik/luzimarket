@@ -1,4 +1,0 @@
-# Ignore large font files that break vercel dev
-dist/assets/*.otf
-# Also ignore any other overly large static files
-apps/frontend/dist/assets/*.otf 

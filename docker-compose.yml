@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: luzimarket-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: luzimarket
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: luzimarket-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mailcatcher:
+    image: dockage/mailcatcher:latest
+    container_name: luzimarket-mail
+    ports:
+      - "1080:1080"  # Web interface
+      - "1025:1025"  # SMTP server
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: luzimarket-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/luzimarket
+      REDIS_URL: redis://redis:6379
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      # Stripe
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-sk_test_your_key}
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:-pk_test_your_key}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-whsec_your_secret}
+      # Email (for development, use mailcatcher)
+      SMTP_HOST: mailcatcher
+      SMTP_PORT: 1025
+      EMAIL_FROM: noreply@luzimarket.com
+      # Auth
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-your-nextauth-secret}
+      NEXTAUTH_URL: http://localhost:3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
+
+  # Stripe CLI for webhook testing (optional, for development)
+  stripe-cli:
+    image: stripe/stripe-cli:latest
+    container_name: luzimarket-stripe
+    command: listen --forward-to http://app:3000/api/webhooks/stripe --skip-verify
+    environment:
+      STRIPE_API_KEY: ${STRIPE_SECRET_KEY:-sk_test_your_key}
+    depends_on:
+      - app
+    profiles:
+      - stripe
+
+volumes:
+  postgres_data:
+  redis_data:

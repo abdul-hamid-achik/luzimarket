@@ -1,9 +1,0 @@
-.next/
-dist/
-build/
-node_modules/
-coverage/
-**/*.min.js
-**/vendor/
-*.config.js
-drizzle/ 

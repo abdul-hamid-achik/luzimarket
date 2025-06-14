@@ -1,7 +1,0 @@
--P ubuntu-latest=catthehacker/ubuntu:act-latest 
---container-architecture linux/amd64 
---env-file .env
-# DB_MODE removed - using PostgreSQL
---env CI=true
---env NODE_ENV=test
---env SKIP_STRIPE_CLI=true
