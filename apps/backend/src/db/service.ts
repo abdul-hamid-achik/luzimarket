@@ -13,12 +13,6 @@ import type { PgTable } from 'drizzle-orm/pg-core';
 
 // Helper function to get the correct database instance
 function getDbInstance() {
-    console.log('[DB SERVICE DEBUG] getDbInstance() called');
-    console.log('[DB SERVICE DEBUG] NODE_ENV:', process.env.NODE_ENV);
-    console.log('[DB SERVICE DEBUG] DATABASE_URL:', process.env.DATABASE_URL);
-
-    // Just use the db instance from index.ts - it handles test mode internally
-    console.log('[DB SERVICE DEBUG] Using database instance from index.ts');
     return db;
 }
 
@@ -36,13 +30,7 @@ class DatabaseService {
         where?: WhereCondition
     ): Promise<T[]> {
         try {
-            console.log('[DB SERVICE] select() called');
-            console.log('[DB SERVICE] NODE_ENV:', process.env.NODE_ENV);
-            console.log('[DB SERVICE] DATABASE_URL:', process.env.DATABASE_URL);
-
             const database = getDbInstance();
-            console.log('[DB SERVICE] Database instance obtained:', typeof database);
-
             const query = (database as any).select().from(table);
 
             if (where) {

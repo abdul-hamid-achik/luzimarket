@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/auth_context';
-import { useProfile, useUpdateProfile } from '@/api/hooks';
+import { useProfile, useUpdateProfile, useCreateCustomerPortalSession } from '@/api/hooks';
 import { Alert, Spinner } from 'react-bootstrap';
-import api from '@/api/client';
 
 const Perfil = () => {
     const { user } = useAuth();
     const { data: profileData, isLoading: profileLoading, error: profileError } = useProfile();
     const updateProfile = useUpdateProfile();
+    const createPortalSession = useCreateCustomerPortalSession();
     const [saveSuccess, setSaveSuccess] = useState(false);
-    const [loadingPortal, setLoadingPortal] = useState(false);
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -63,22 +62,21 @@ const Perfil = () => {
     };
 
     const handleStripePortal = async () => {
-        setLoadingPortal(true);
-        try {
-            const response = await api.post('/create-customer-portal-session', {
-                returnUrl: window.location.href
-            });
-            
-            if (response.data.url) {
-                // Redirect to Stripe Customer Portal
-                window.location.href = response.data.url;
+        createPortalSession.mutate(
+            { returnUrl: window.location.href },
+            {
+                onSuccess: (data) => {
+                    if (data.url) {
+                        // Redirect to Stripe Customer Portal
+                        window.location.href = data.url;
+                    }
+                },
+                onError: (error) => {
+                    console.error('Error opening Stripe portal:', error);
+                    alert(error.response?.data?.error || 'Error al abrir el portal de pagos. Por favor intenta de nuevo.');
+                }
             }
-        } catch (error) {
-            console.error('Error opening Stripe portal:', error);
-            alert(error.response?.data?.error || 'Error al abrir el portal de pagos. Por favor intenta de nuevo.');
-        } finally {
-            setLoadingPortal(false);
-        }
+        );
     };
 
     if (!user) {
@@ -227,9 +225,9 @@ const Perfil = () => {
                                 className="btn btn-primary profile-button w-100"
                                 type="button"
                                 onClick={handleStripePortal}
-                                disabled={loadingPortal}
+                                disabled={createPortalSession.isLoading}
                             >
-                                {loadingPortal ? (
+                                {createPortalSession.isLoading ? (
                                     <>
                                         <Spinner
                                             as="span"

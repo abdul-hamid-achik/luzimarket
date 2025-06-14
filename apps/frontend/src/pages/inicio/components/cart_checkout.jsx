@@ -78,36 +78,38 @@ const Checkout = ({ cartItems }) => {
   };
 
   return (
-    <div className="container" style={{ width: "50%", height: "100%" }}>
-      <h2>Total del Carrito</h2>
-      <hr />
+    <div className="card shadow-sm">
+      <div className="card-body">
+        <h5 className="card-title mb-3">Resumen del Pedido</h5>
 
       {errorMessage && (
         <div className="alert alert-danger">{errorMessage}</div>
       )}
 
-      <div className="d-flex justify-content-between">
-        <div>SubTotal</div>
-        <div>${CalcularSubTotal(cartItems).toFixed(2)}</div>
+      <div className="d-flex justify-content-between mb-2">
+        <span className="text-muted">Subtotal</span>
+        <span>${CalcularSubTotal(cartItems).toFixed(2)}</span>
       </div>
 
-      <div className="d-flex justify-content-between">
-        <div>IVA(16%)</div>
-        <div>${CalcularIVA(cartItems).toFixed(2)}</div>
+      <div className="d-flex justify-content-between mb-2">
+        <span className="text-muted">IVA (16%)</span>
+        <span>${CalcularIVA(cartItems).toFixed(2)}</span>
       </div>
 
-      <div className="d-flex justify-content-between">
-        <div>Envio</div>
+      <div className="d-flex justify-content-between mb-3">
+        <span className="text-muted">Envío</span>
         <div>
           {zonesLoading
             ? 'Cargando zonas...'
             : (
               <select
+                className="form-select form-select-sm"
                 value={selectedZone?.id || ''}
                 onChange={(e) => {
                   const zone = zones.find(z => z.id === parseInt(e.target.value, 10));
                   setSelectedZone(zone);
                 }}
+                style={{width: 'auto'}}
               >
                 <option value="" disabled>Selecciona zona</option>
                 {zones.map(zone => (
@@ -121,22 +123,23 @@ const Checkout = ({ cartItems }) => {
       </div>
 
       <hr />
-      <div className="d-flex justify-content-between">
-        <div>Total</div>
-        <div>${CalcularTotal(cartItems).toFixed(2)}</div>
+      <div className="d-flex justify-content-between mb-3">
+        <span className="fw-bold">Total</span>
+        <span className="fw-bold fs-5">${CalcularTotal(cartItems).toFixed(2)} MXN</span>
       </div>
 
       <button
-        className="btn btn-dark w-100 mt-3"
+        className="btn btn-dark w-100 mb-3"
         onClick={handleCheckout}
         disabled={createOrder.isLoading}
       >
-        {createOrder.isLoading ? 'Procesando...' : 'Pagar'}
+        {createOrder.isLoading ? 'Procesando...' : 'Proceder al pago'}
       </button>
-      <div className="text-center mt-4">
-        <Link to="/handpicked/productos" className="text-dark">
-          Seguir Comprando
+      <div className="text-center">
+        <Link to="/handpicked/productos" className="text-decoration-none text-muted small">
+          <i className="bi bi-arrow-left"></i> Seguir comprando
         </Link>
+      </div>
       </div>
     </div>
   );

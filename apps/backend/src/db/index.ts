@@ -18,17 +18,12 @@ if (!DATABASE_URL) {
 
 // Initialize database connection
 function initializeDatabase() {
-    console.log('[DB DEBUG] initializeDatabase() called');
-    console.log('[DB DEBUG] NODE_ENV:', process.env.NODE_ENV);
-    console.log('[DB DEBUG] DATABASE_URL:', process.env.DATABASE_URL ? 'Set' : 'Not set');
-
     if (!DATABASE_URL) {
         console.warn('DATABASE_URL not available, returning null database instance');
         return null;
     }
 
     const drizzleDb = drizzle(DATABASE_URL);
-    console.log('Connected to PostgreSQL database');
     return drizzleDb;
 }
 
@@ -38,15 +33,12 @@ let _db: any = null;
 function getDatabase(): any {
     // Always initialize fresh for tests to pick up new DATABASE_URL
     if (process.env.NODE_ENV === 'test') {
-        console.log('[DB DEBUG] Test mode - creating fresh database connection');
         return initializeDatabase();
     }
 
     // In non-test mode, use caching as before
     if (!_db) {
-        console.log('[DB DEBUG] Initializing database...');
         _db = initializeDatabase();
-        console.log('[DB DEBUG] Database initialized:', typeof _db);
     }
 
     if (!_db) {
@@ -59,7 +51,6 @@ function getDatabase(): any {
 // Helper function to reset database connection (useful for tests)
 export function resetDatabaseConnection(): void {
     _db = null;
-    console.log('[DB DEBUG] Database connection reset');
 }
 
 // Export the database instance as a getter

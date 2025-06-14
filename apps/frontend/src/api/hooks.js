@@ -26,6 +26,7 @@ import * as analyticsApi from "@/api/analytics";
 import * as authApi from "@/api/auth";
 import * as notificationsApi from "./notifications";
 import * as profileApi from "@/api/profile";
+import * as trackingApi from "@/api/tracking";
 
 export const useProducts = (filters = {}) =>
   useQuery(['products', filters], () => productsApi.getProducts(filters));
@@ -610,4 +611,51 @@ export const useUpdateProfile = () => {
       queryClient.invalidateQueries(['profile']);
     },
   });
+};
+
+// =============== AUTH HOOKS ===============
+
+export const useGuestToken = () => {
+  return useMutation(authApi.getGuestToken);
+};
+
+export const useCreateCustomerPortalSession = () => {
+  return useMutation(authApi.createCustomerPortalSession);
+};
+
+// =============== TRACKING HOOKS ===============
+
+export const useTrackOrder = () => {
+  return useMutation(trackingApi.trackOrder);
+};
+
+// =============== FINANCIAL DATA HOOKS ===============
+
+// Combined financial data hook for the dinero page
+export const useFinancialData = (period = 'month') => {
+  return useQuery(
+    ['financialData', period],
+    async () => {
+      // Fetch all data in parallel
+      const [ordersData, salesData, analyticsData] = await Promise.all([
+        adminOrdersApi.getAdminOrders(),
+        salesApi.getSales(),
+        analyticsApi.getSalesAnalytics({ period })
+      ]);
+
+      return {
+        orders: ordersData,
+        sales: salesData,
+        analytics: analyticsData
+      };
+    },
+    {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 15 * 60 * 1000, // 15 minutes
+      retry: 2,
+      onError: (error) => {
+        console.error('Error loading financial data:', error);
+      }
+    }
+  );
 };

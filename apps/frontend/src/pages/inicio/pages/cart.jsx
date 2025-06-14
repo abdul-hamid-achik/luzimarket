@@ -155,25 +155,45 @@ const Cart = () => {
       <div className="container py-4 cart-page cart-container" style={{ marginBottom: '7%' }}>
         <CartTitle />
         <div className="text-center py-5">
-          <Alert variant="info">
-            Tu carrito está vacío
-          </Alert>
-          <Link to="/handpicked/productos" className="btn btn-primary mt-3">
-            Ir a productos
-          </Link>
-
           {/* Empty cart elements for test selectors */}
           <div className="cart-item-container mt-4 d-flex justify-content-center">
             <div className="cart-quantity quantity-display">
               <table className="tabla-carrito">
                 <tbody>
                   <tr>
-                    <td>No hay productos en el carrito</td>
+                    <td style={{ fontSize: '1.1rem', color: '#333' }}>No hay productos en el carrito</td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </div>
+          <Link 
+            to="/handpicked/productos" 
+            className="mt-4"
+            style={{
+              display: 'inline-block',
+              padding: '12px 30px',
+              backgroundColor: '#000',
+              color: '#fff',
+              textDecoration: 'none',
+              fontSize: '14px',
+              fontFamily: 'inherit',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              transition: 'all 0.3s ease',
+              border: '1px solid #000'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#fff';
+              e.target.style.color = '#000';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = '#000';
+              e.target.style.color = '#fff';
+            }}
+          >
+            Ir a productos
+          </Link>
         </div>
       </div>
     );
@@ -200,30 +220,6 @@ const Cart = () => {
 
         <div className="col-md-4">
           <Checkout cartItems={cartItems} />
-
-          <div className="checkout-actions mt-4">
-            <Button
-              variant="success"
-              className="checkout-btn w-100"
-              onClick={handleCheckout}
-              disabled={!hasItems}
-            >
-              {isAuthenticated ? 'Proceder al pago' : 'Inicia sesión para continuar'}
-            </Button>
-            {!isAuthenticated && (
-              <div className="text-center mt-2">
-                <small className="text-muted">Debes iniciar sesión para completar la compra</small>
-              </div>
-            )}
-
-            {/* Show total for quick reference */}
-            <div className="mt-3 p-3 bg-light rounded">
-              <div className="d-flex justify-content-between fw-bold">
-                <span>Total del carrito:</span>
-                <span>${subtotal.toFixed(2)} MXN</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

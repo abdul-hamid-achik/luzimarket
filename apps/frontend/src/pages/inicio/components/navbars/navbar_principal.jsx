@@ -86,6 +86,7 @@ const NavbarPrincipal = () => {
                   className="border-0 p-0"
                 >
                   <NavDropdown.Item as={Link} to="/perfil">Mi Perfil</NavDropdown.Item>
+                  <NavDropdown.Item as={Link} to="/mis-pedidos">Mis Pedidos</NavDropdown.Item>
                   {(user?.role === 'employee' || user?.role === 'admin') && (
                     <>
                       <NavDropdown.Divider />

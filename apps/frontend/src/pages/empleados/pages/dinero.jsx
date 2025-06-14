@@ -1,82 +1,50 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import BreadCrumb from "@/components/breadcrumb";
 import { BsCurrencyDollar, BsGraphUp, BsWallet, BsCreditCard, BsArrowUp, BsArrowDown } from "react-icons/bs";
+import { useFinancialData } from '@/api/hooks';
 import './dinero.css';
 
 const Dinero = () => {
     const [selectedPeriod, setSelectedPeriod] = useState('month');
-    const [financialData, setFinancialData] = useState(null);
-    const [recentTransactions, setRecentTransactions] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
+    
     const items = [
         { name: "Dashboard", link: "/dashboard" },
         { name: "Dinero", link: "/dashboard/dinero" },
     ];
 
-    useEffect(() => {
-        loadFinancialData();
-    }, [selectedPeriod]);
+    // Use React Query hook for fetching financial data
+    const { data, isLoading, error } = useFinancialData(selectedPeriod);
 
-    const loadFinancialData = async () => {
-        setLoading(true);
-        setError(null);
-
-        try {
-            // Load data from multiple API endpoints
-            const [ordersResponse, salesResponse, analyticsResponse] = await Promise.allSettled([
-                fetch('/api/admin/orders'),
-                fetch('/api/admin/sales'),
-                fetch('/api/analytics/sales')
-            ]);
-
-            let orders = [];
-            let salesData = [];
-
-            // Process orders data
-            if (ordersResponse.status === 'fulfilled' && ordersResponse.value.ok) {
-                orders = await ordersResponse.value.json();
-            }
-
-            // Process sales data
-            if (salesResponse.status === 'fulfilled' && salesResponse.value.ok) {
-                salesData = await salesResponse.value.json();
-            }
-
-            // Calculate financial metrics from real data
-            const calculatedData = calculateFinancialMetrics(orders, salesData);
-            setFinancialData(calculatedData);
-
-            // Generate recent transactions from orders
-            const transactions = generateTransactionsFromOrders(orders);
-            setRecentTransactions(transactions);
-
-        } catch (error) {
-            console.error('Error loading financial data:', error);
-            setError('Error al cargar datos financieros');
-
-            // Fallback to mock data
-            setFinancialData({
+    // Calculate financial metrics using useMemo for performance
+    const financialData = useMemo(() => {
+        if (!data) {
+            // Fallback data while loading or on error
+            return {
                 totalSales: 45250.00,
                 commission: 2262.50,
                 pendingPayments: 1850.00,
                 completedTransactions: 127,
                 monthlyGrowth: 12.5,
                 previousPeriodSales: 40350.00
-            });
+            };
+        }
+        return calculateFinancialMetrics(data.orders, data.sales);
+    }, [data]);
 
-            setRecentTransactions([
+    // Generate transactions using useMemo
+    const recentTransactions = useMemo(() => {
+        if (!data?.orders) {
+            // Fallback transactions
+            return [
                 { id: 1, date: '2025-01-15', amount: 250.00, type: 'Venta', status: 'Completado', orderId: 'ORD-001' },
                 { id: 2, date: '2025-01-14', amount: 180.50, type: 'Comisión', status: 'Pendiente', orderId: 'ORD-002' },
                 { id: 3, date: '2025-01-13', amount: 320.00, type: 'Venta', status: 'Completado', orderId: 'ORD-003' },
                 { id: 4, date: '2025-01-12', amount: 95.75, type: 'Comisión', status: 'Completado', orderId: 'ORD-004' },
                 { id: 5, date: '2025-01-11', amount: 410.00, type: 'Venta', status: 'Completado', orderId: 'ORD-005' },
-            ]);
-        } finally {
-            setLoading(false);
+            ];
         }
-    };
+        return generateTransactionsFromOrders(data.orders);
+    }, [data]);
 
     const calculateFinancialMetrics = (orders, salesData) => {
         if (!orders || orders.length === 0) {
@@ -212,7 +180,7 @@ const Dinero = () => {
         return `${sign}${value.toFixed(1)}%`;
     };
 
-    if (loading) {
+    if (isLoading) {
         return (
             <div className="d-flex justify-content-center align-items-center" style={{ height: '400px' }}>
                 <div className="spinner-border text-primary" role="status">
@@ -228,11 +196,8 @@ const Dinero = () => {
                 <div className="container-fluid p-4">
                     <BreadCrumb items={items} activeItem="Dinero" />
                     <div className="alert alert-warning mt-4">
-                        <h5>⚠️ {error}</h5>
+                        <h5>⚠️ Error al cargar datos financieros</h5>
                         <p>Mostrando datos de ejemplo. Verifique la conexión con el backend.</p>
-                        <button className="btn btn-primary" onClick={loadFinancialData}>
-                            Reintentar
-                        </button>
                     </div>
                 </div>
             </div>

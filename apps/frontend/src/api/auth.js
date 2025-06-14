@@ -32,3 +32,15 @@ export const updateSessionDeliveryZone = ({ deliveryZoneId }) =>
  */
 export const restoreUserPreferences = () =>
   api.post('/auth/restore-preferences').then((res) => res.data);
+
+/**
+ * Get guest token for anonymous users
+ */
+export const getGuestToken = () =>
+  api.post('/auth/guest').then((res) => res.data);
+
+/**
+ * Create Stripe customer portal session
+ */
+export const createCustomerPortalSession = (payload = {}) =>
+  api.post('/create-customer-portal-session', payload).then((res) => res.data);

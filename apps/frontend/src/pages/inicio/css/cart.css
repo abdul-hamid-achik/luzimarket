@@ -29,21 +29,46 @@ h2.cart {
   margin: 1.5rem 0;
 }
 
+/* Cart Page Container */
+.cart-page {
+  background: #fafafa;
+  min-height: calc(100vh - 200px);
+}
+
+.cart-container {
+  padding-top: 2rem;
+  padding-bottom: 4rem;
+}
+
+/* Cart Title */
+.cart-title {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.cart-title h1 {
+  font-size: 3rem;
+  font-weight: 300;
+  color: #000;
+  font-family: 'Playfair Display', serif;
+  letter-spacing: -1px;
+}
+
 /* Cart item styles */
 .cart-item {
   display: flex;
   align-items: center;
   gap: 1rem;
   padding: 1.5rem;
+  background: white;
   border: 1px solid #e9ecef;
-  border-radius: 8px;
+  border-radius: 12px;
   margin-bottom: 1rem;
   transition: all 0.3s ease;
 }
 
 .cart-item:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .cart-item-image {

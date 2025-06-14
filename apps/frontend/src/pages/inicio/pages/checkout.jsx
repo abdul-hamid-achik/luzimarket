@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useCart, useCreateOrder } from '@/api/hooks';
@@ -18,6 +18,9 @@ const CheckoutPage = () => {
     const [error, setError] = useState('');
     const [orderTotal, setOrderTotal] = useState(0);
     const [deliveryZone, setDeliveryZone] = useState(null);
+    const [isInitializing, setIsInitializing] = useState(false);
+    const hasInitialized = useRef(false);
+    const [orderSummary, setOrderSummary] = useState(null); // Store order summary before cart is cleared
 
     // Load delivery zone from sessionStorage
     useEffect(() => {
@@ -46,11 +49,30 @@ const CheckoutPage = () => {
 
     // Create order and payment intent when component mounts
     useEffect(() => {
+        // Only initialize when we have cart data and a valid total
+        if (cartLoading || orderTotal <= 0 || hasInitialized.current || isInitializing || createOrderMutation.isLoading) {
+            return;
+        }
+
         const initializePayment = async () => {
             if (!cart?.items || cart.items.length === 0) {
                 navigate('/carrito');
                 return;
             }
+
+            hasInitialized.current = true;
+            setIsInitializing(true);
+
+            // Store order summary before creating order (which clears the cart)
+            const summary = {
+                items: [...cart.items],
+                subtotal: cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+                iva: cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 0.16,
+                shipping: deliveryZone?.fee || 0,
+                total: orderTotal,
+                deliveryZone: deliveryZone
+            };
+            setOrderSummary(summary);
 
             try {
                 // First create the order
@@ -66,16 +88,18 @@ const CheckoutPage = () => {
                 });
 
                 setClientSecret(paymentResponse.data.clientSecret);
+                console.log('Payment intent created with client secret:', paymentResponse.data.clientSecret);
+                setIsInitializing(false);
             } catch (err) {
                 console.error('Error initializing payment:', err);
                 setError('Failed to initialize payment. Please try again.');
+                setIsInitializing(false);
+                hasInitialized.current = false; // Allow retry on error
             }
         };
 
-        if (orderTotal > 0) {
-            initializePayment();
-        }
-    }, [orderTotal, cart, createOrderMutation, navigate]);
+        initializePayment();
+    }, [cartLoading, orderTotal]); // Simplified dependencies to prevent loops
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -128,21 +152,49 @@ const CheckoutPage = () => {
         );
     }
 
+    // If we don't have cart items or order summary, show empty cart message
     if (!cart?.items || cart.items.length === 0) {
-        return (
-            <div className="container mt-5">
-                <div className="alert alert-warning">
-                    <h4>Your cart is empty</h4>
-                    <p>Add some items to your cart before checking out.</p>
-                    <button
-                        className="btn btn-primary"
-                        onClick={() => navigate('/handpicked/productos')}
-                    >
-                        Continue Shopping
-                    </button>
+        // If we have a client secret, it means order was already created
+        if (clientSecret && orderSummary) {
+            // Continue with checkout using stored order summary
+        } else {
+            return (
+                <div className="container mt-5">
+                    <div className="text-center py-5">
+                        <h3 style={{ fontFamily: 'Playfair Display, serif', marginBottom: '30px' }}>Tu carrito está vacío</h3>
+                        <p style={{ fontSize: '1.1rem', color: '#666', marginBottom: '30px' }}>
+                            Agrega algunos productos a tu carrito antes de proceder al pago.
+                        </p>
+                        <button
+                            onClick={() => navigate('/handpicked/productos')}
+                            style={{
+                                display: 'inline-block',
+                                padding: '12px 30px',
+                                backgroundColor: '#000',
+                                color: '#fff',
+                                fontSize: '14px',
+                                fontFamily: 'inherit',
+                                textTransform: 'uppercase',
+                                letterSpacing: '1px',
+                                transition: 'all 0.3s ease',
+                                border: '1px solid #000',
+                                cursor: 'pointer'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.target.style.backgroundColor = '#fff';
+                                e.target.style.color = '#000';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.backgroundColor = '#000';
+                                e.target.style.color = '#fff';
+                            }}
+                        >
+                            Continuar Comprando
+                        </button>
+                    </div>
                 </div>
-            </div>
-        );
+            );
+        }
     }
 
     return (
@@ -157,6 +209,18 @@ const CheckoutPage = () => {
                             {error && (
                                 <div className="alert alert-danger" role="alert">
                                     {error}
+                                    {!clientSecret && (
+                                        <button 
+                                            className="btn btn-sm btn-outline-danger ms-3"
+                                            onClick={() => {
+                                                setError('');
+                                                setIsInitializing(false);
+                                                hasInitialized.current = false;
+                                            }}
+                                        >
+                                            Retry
+                                        </button>
+                                    )}
                                 </div>
                             )}
 
@@ -164,7 +228,11 @@ const CheckoutPage = () => {
                                 <form onSubmit={handleSubmit}>
                                     <div className="mb-4">
                                         <h5>Payment Information</h5>
-                                        <PaymentElement />
+                                        {stripe && elements ? (
+                                            <PaymentElement />
+                                        ) : (
+                                            <div className="text-muted">Loading payment form...</div>
+                                        )}
                                     </div>
 
                                     <div className="d-flex justify-content-between">
@@ -211,7 +279,7 @@ const CheckoutPage = () => {
                             <h5>Order Summary</h5>
                         </div>
                         <div className="card-body">
-                            {cart.items.map((item) => (
+                            {(orderSummary?.items || cart.items).map((item) => (
                                 <div key={item.id} className="d-flex justify-content-between mb-2">
                                     <span>{item.name || item.productName || `Product ${item.productId}`} x {item.quantity}</span>
                                     <span>${(item.price * item.quantity).toFixed(2)}</span>
@@ -220,22 +288,22 @@ const CheckoutPage = () => {
                             <hr />
                             <div className="d-flex justify-content-between">
                                 <span>Subtotal:</span>
-                                <span>${cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}</span>
+                                <span>${(orderSummary?.subtotal || cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0)).toFixed(2)}</span>
                             </div>
                             <div className="d-flex justify-content-between">
                                 <span>IVA (16%):</span>
-                                <span>${(cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 0.16).toFixed(2)}</span>
+                                <span>${(orderSummary?.iva || (cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 0.16)).toFixed(2)}</span>
                             </div>
-                            {deliveryZone && (
+                            {(orderSummary?.deliveryZone || deliveryZone) && (
                                 <div className="d-flex justify-content-between">
-                                    <span>Envío ({deliveryZone.name}):</span>
-                                    <span>${deliveryZone.fee.toFixed(2)}</span>
+                                    <span>Envío ({(orderSummary?.deliveryZone || deliveryZone).name}):</span>
+                                    <span>${(orderSummary?.deliveryZone || deliveryZone).fee.toFixed(2)}</span>
                                 </div>
                             )}
                             <hr />
                             <div className="d-flex justify-content-between fw-bold">
                                 <span>Total:</span>
-                                <span>${orderTotal.toFixed(2)} MXN</span>
+                                <span>${(orderSummary?.total || orderTotal).toFixed(2)} MXN</span>
                             </div>
                         </div>
                     </div>

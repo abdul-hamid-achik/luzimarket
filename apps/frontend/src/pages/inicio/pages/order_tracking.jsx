@@ -1,42 +1,26 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTrackOrder } from '@/api/hooks';
 import '@/pages/inicio/css/general.css';
 import './order_tracking.css';
 
 const OrderTracking = () => {
     const [searchParams] = useSearchParams();
     const [trackingNumber, setTrackingNumber] = useState(searchParams.get('tracking') || '');
-    const [trackingData, setTrackingData] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+    const trackOrderMutation = useTrackOrder();
 
     const handleTrackOrder = async (e) => {
         e.preventDefault();
         if (!trackingNumber.trim()) {
-            setError('Por favor ingresa un número de seguimiento');
             return;
         }
 
-        setLoading(true);
-        setError('');
-        setTrackingData(null);
-
-        try {
-            const response = await fetch(`/api/track/${trackingNumber.trim()}`);
-            const data = await response.json();
-
-            if (response.ok) {
-                setTrackingData(data);
-            } else {
-                setError(data.error || 'Número de seguimiento no encontrado');
-            }
-        } catch (err) {
-            console.error('Error tracking order:', err);
-            setError('Error al buscar el pedido. Por favor intenta de nuevo.');
-        } finally {
-            setLoading(false);
-        }
+        trackOrderMutation.mutate(trackingNumber.trim());
     };
+
+    // Get data and states from mutation
+    const { data: trackingData, isLoading: loading, error, isError } = trackOrderMutation;
+    const errorMessage = isError ? (error?.response?.data?.error || 'Error al buscar el pedido. Por favor intenta de nuevo.') : '';
 
     const getStatusBadgeClass = (status) => {
         const statusClasses = {
@@ -146,10 +130,10 @@ const OrderTracking = () => {
                                 </div>
                             </form>
 
-                            {error && (
+                            {errorMessage && (
                                 <div className="alert alert-danger mt-3">
                                     <i className="fas fa-exclamation-triangle me-2"></i>
-                                    {error}
+                                    {errorMessage}
                                 </div>
                             )}
                         </div>

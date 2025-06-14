@@ -83,10 +83,10 @@ const CartItem = ({ item, onRemove, onQuantityChange }) => {
               <button
                 className="remove-button delete-item remove"
                 onClick={() => onRemove(item.id)}
-                style={{ position: 'relative', zIndex: 10, pointerEvents: 'auto' }}
-                aria-label="Remove item"
+                aria-label="Eliminar producto"
+                title="Eliminar producto"
               >
-                x
+                ×
               </button>
             </td>
             <td className="img">
@@ -95,7 +95,6 @@ const CartItem = ({ item, onRemove, onQuantityChange }) => {
             <td className="descripcion">
               <div className="item-details">
                 <h2 className="item-name">{name}</h2>
-                <p className="item-description">{description}</p>
               </div>
             </td>
             <td className="price">
@@ -109,17 +108,15 @@ const CartItem = ({ item, onRemove, onQuantityChange }) => {
                   className="quantity-button decrement minus"
                   onClick={() => onQuantityChange(item.id, quantity - 1)}
                   disabled={quantity <= 1}
-                  style={{ position: 'relative', zIndex: 10, pointerEvents: 'auto' }}
-                  aria-label="Decrease quantity"
+                  aria-label="Disminuir cantidad"
                 >
-                  -
+                  −
                 </button>
                 <span className="quantity-display item-quantity">{quantity}</span>
                 <button
                   className="quantity-button increment plus"
                   onClick={() => onQuantityChange(item.id, quantity + 1)}
-                  style={{ position: 'relative', zIndex: 10, pointerEvents: 'auto' }}
-                  aria-label="Increase quantity"
+                  aria-label="Aumentar cantidad"
                 >
                   +
                 </button>

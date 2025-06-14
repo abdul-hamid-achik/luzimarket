@@ -30,6 +30,7 @@ import Ocasiones from '@/pages/inicio/pages/ocasiones';
 import Editorial from '@/pages/inicio/pages/editorial';
 import Favoritos from '@/pages/inicio/pages/favoritos';
 import CategoryPage from '@/pages/inicio/pages/category';
+import MisPedidos from '@/pages/inicio/pages/mis_pedidos';
 import RequireAuth from '@/components/require_auth';
 import RequireRole from '@/components/require_role';
 import CheckoutPage from '@/pages/inicio/pages/checkout';
@@ -73,6 +74,7 @@ export const router = createBrowserRouter([
       { path: "login", element: <CustomerLogin /> },
       { path: "register", element: <CustomerRegister /> },
       { path: "perfil", element: <RequireAuth><PerfilUsuario /></RequireAuth> },
+      { path: "mis-pedidos", element: <RequireAuth><MisPedidos /></RequireAuth> },
       { path: "order-confirmation/:id", element: <RequireAuth><OrderConfirmation /></RequireAuth> },
       { path: "tiendas-marcas", element: <TiendasMarcas /> },
       { path: "categorias", element: <CategoriasCustomer /> },
