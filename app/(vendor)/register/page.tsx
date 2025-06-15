@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { vendorRegistrationSchema, type VendorRegistration } from "@/lib/schemas/vendor";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { InputWithValidation } from "@/components/ui/input-with-validation";
 import { Label } from "@/components/ui/label";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -23,6 +23,7 @@ export default function VendorRegisterPage() {
       hasDelivery: false,
       country: "México",
     },
+    mode: "onChange", // Enable real-time validation
   });
 
   async function onSubmit(data: VendorRegistration) {
@@ -102,11 +103,13 @@ export default function VendorRegisterPage() {
           </p>
           
           <div className="mt-8">
-            <svg className="w-16 h-16 mx-auto" viewBox="0 0 100 100">
-              <path d="M20 50 Q 30 30, 50 30 T 80 50" fill="none" stroke="black" strokeWidth="2"/>
-              <circle cx="50" cy="50" r="5" fill="black"/>
-              <path d="M45 60 Q 50 70, 55 60" fill="none" stroke="black" strokeWidth="2"/>
-            </svg>
+            <Image
+              src="/images/logos/hand-gesture-icon.png"
+              alt="Hand gesture"
+              width={60}
+              height={60}
+              className="mx-auto"
+            />
           </div>
         </div>
 
@@ -125,7 +128,13 @@ export default function VendorRegisterPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="Nombre de la marca / tienda / negocio" {...field} />
+                        <InputWithValidation 
+                          placeholder="Nombre de la marca / tienda / negocio" 
+                          {...field}
+                          showValidation={form.formState.dirtyFields.businessName}
+                          isValid={form.formState.dirtyFields.businessName && !form.formState.errors.businessName}
+                          isInvalid={!!form.formState.errors.businessName}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -138,7 +147,7 @@ export default function VendorRegisterPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="Nombre del responsable / contacto" {...field} />
+                        <InputWithValidation placeholder="Nombre del responsable / contacto" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -151,7 +160,7 @@ export default function VendorRegisterPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input type="email" placeholder="Email" {...field} />
+                        <InputWithValidation type="email" placeholder="Email" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -164,7 +173,7 @@ export default function VendorRegisterPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="Celular / Whatsapp" {...field} />
+                        <InputWithValidation placeholder="Celular / Whatsapp" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -177,7 +186,7 @@ export default function VendorRegisterPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="Teléfono de la tienda / negocio" {...field} />
+                        <InputWithValidation placeholder="Teléfono de la tienda / negocio" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -190,7 +199,7 @@ export default function VendorRegisterPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="Horarios de la tienda / negocio" {...field} />
+                        <InputWithValidation placeholder="Horarios de la tienda / negocio" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -203,7 +212,7 @@ export default function VendorRegisterPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="Calle" {...field} />
+                        <InputWithValidation placeholder="Calle" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -217,7 +226,7 @@ export default function VendorRegisterPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
-                          <Input placeholder="Ciudad" {...field} />
+                          <InputWithValidation placeholder="Ciudad" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -230,7 +239,7 @@ export default function VendorRegisterPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
-                          <Input placeholder="Estado" {...field} />
+                          <InputWithValidation placeholder="Estado" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -243,7 +252,7 @@ export default function VendorRegisterPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
-                          <Input placeholder="País" {...field} />
+                          <InputWithValidation placeholder="País" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -258,7 +267,7 @@ export default function VendorRegisterPage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input placeholder="URL / Página web" {...field} />
+                      <InputWithValidation placeholder="URL / Página web" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -353,7 +362,7 @@ export default function VendorRegisterPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="¿Qué servicio usas?" {...field} />
+                        <InputWithValidation placeholder="¿Qué servicio usas?" {...field} />
                       </FormControl>
                     </FormItem>
                   )}
@@ -374,7 +383,7 @@ export default function VendorRegisterPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="Instagram" {...field} />
+                        <InputWithValidation placeholder="Instagram" {...field} />
                       </FormControl>
                     </FormItem>
                   )}
@@ -386,7 +395,7 @@ export default function VendorRegisterPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="Facebook" {...field} />
+                        <InputWithValidation placeholder="Facebook" {...field} />
                       </FormControl>
                     </FormItem>
                   )}
@@ -398,7 +407,7 @@ export default function VendorRegisterPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="TikTok" {...field} />
+                        <InputWithValidation placeholder="TikTok" {...field} />
                       </FormControl>
                     </FormItem>
                   )}
@@ -410,7 +419,7 @@ export default function VendorRegisterPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="Twitter" {...field} />
+                        <InputWithValidation placeholder="Twitter" {...field} />
                       </FormControl>
                     </FormItem>
                   )}

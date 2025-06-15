@@ -23,24 +23,31 @@ export default function ComingSoonPage() {
 
           {/* Main content */}
           <div className="mb-12">
-            <h2 className="text-6xl font-times-now mb-8">
-            <span className="inline-block border-2 border-black rounded-full px-8 py-4">
-              Handpicked
-            </span>
-          </h2>
+            <h2 className="text-6xl font-times-now mb-8 relative">
+              <span className="relative">
+                Handpicked
+                <Image
+                  src="/images/logos/gradient-circle.png"
+                  alt=""
+                  width={300}
+                  height={100}
+                  className="absolute inset-0 w-full h-full object-contain -z-10"
+                />
+              </span>
+            </h2>
           <h2 className="text-6xl font-times-now mb-12">
             extraordinary gifts
           </h2>
           
           {/* Decorative element */}
           <div className="mb-12">
-            <svg className="w-24 h-24 mx-auto" viewBox="0 0 100 100">
-              <path d="M50 20 L50 80 M30 50 L70 50" stroke="black" strokeWidth="2" />
-              <circle cx="50" cy="20" r="3" fill="black" />
-              <circle cx="50" cy="80" r="3" fill="black" />
-              <circle cx="30" cy="50" r="3" fill="black" />
-              <circle cx="70" cy="50" r="3" fill="black" />
-            </svg>
+            <Image
+              src="/images/logos/hand-gesture-icon.png"
+              alt="Hand gesture"
+              width={80}
+              height={80}
+              className="mx-auto"
+            />
           </div>
 
           <p className="text-lg font-univers max-w-2xl mx-auto mb-12">

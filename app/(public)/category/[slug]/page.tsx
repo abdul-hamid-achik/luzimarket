@@ -1,98 +1,128 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { HeroBanner } from "@/components/categories/hero-banner";
+import { getFilteredProducts } from "@/lib/actions/products";
+import { db } from "@/db";
+import { categories } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { notFound } from "next/navigation";
 
-const products = [
-  {
-    id: 1,
-    name: "Sunkissed Box",
-    vendor: "BOTANICA",
-    price: "$1,000",
-    image: "/images/links/pia-riverola.webp",
+// Map of category slugs to their display information
+const categoryInfo: Record<string, { title: string; description: string; gradientFrom: string; gradientTo: string; image?: string }> = {
+  "flores-amores": {
+    title: "Flores & Amores",
+    description: "Expresa tus sentimientos con los arreglos florales más hermosos. Desde rosas clásicas hasta diseños modernos para cada ocasión especial.",
+    gradientFrom: "from-pink-400",
+    gradientTo: "to-yellow-300",
+    image: "/images/logos/flower-icon-1.png"
   },
-  {
-    id: 2,
-    name: "Mango Lamp",
-    vendor: "NAP",
-    price: "$2,000",
-    image: "/images/links/game-wwe-19-1507733870-150-911.jpg",
+  "dulces": {
+    title: "Dulces & Postres",
+    description: "Descubre una selección de los mejores dulces artesanales y postres gourmet. Perfectos para endulzar cualquier momento.",
+    gradientFrom: "from-purple-400",
+    gradientTo: "to-pink-300",
   },
-  {
-    id: 3,
-    name: "Coffee Cake",
-    vendor: "LA VITRINA",
-    price: "$100",
-    image: "/images/links/pia-riverola.webp",
+  "eventos-cenas": {
+    title: "Eventos & Cenas",
+    description: "Todo lo que necesitas para hacer tus eventos inolvidables. Desde decoración hasta experiencias gastronómicas únicas.",
+    gradientFrom: "from-blue-400",
+    gradientTo: "to-green-300",
   },
-  {
-    id: 4,
-    name: "BFF Protonic Cleanser",
-    vendor: "BFF",
-    price: "$440",
-    image: "/images/links/game-wwe-19-1507733870-150-911.jpg",
+  "regalos": {
+    title: "Tienda de Regalos",
+    description: "Encuentra el regalo perfecto para cada persona especial. Curación de productos únicos y experiencias memorables.",
+    gradientFrom: "from-orange-400",
+    gradientTo: "to-red-300",
   },
-];
+};
 
-export default function CategoryPage({ params }: { params: { slug: string } }) {
+export default async function CategoryPage({ params }: { params: { slug: string } }) {
+  // Get category from database
+  const category = await db.query.categories.findFirst({
+    where: eq(categories.slug, params.slug),
+  });
+
+  if (!category) {
+    notFound();
+  }
+
+  // Get category display info
+  const info = categoryInfo[params.slug] || {
+    title: category.name,
+    description: category.description || "Descubre nuestra selección curada de productos.",
+    gradientFrom: "from-gray-400",
+    gradientTo: "to-gray-300",
+  };
+
+  // Fetch products for this category
+  const { products } = await getFilteredProducts({
+    categoryIds: [category.id],
+    limit: 12,
+  });
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-96 flex items-center">
-        <div className="absolute inset-0 bg-gradient-to-r from-pink-200 via-yellow-200 to-pink-100" />
-        <Image
-          src="/images/links/pia-riverola.webp"
-          alt="Flores & Amores"
-          fill
-          className="object-cover object-right mix-blend-multiply"
-        />
-        <div className="relative container mx-auto px-4 max-w-2xl">
-          <h1 className="text-6xl font-times-now mb-4">Flores & Amores</h1>
-          <p className="text-lg font-univers text-gray-700 max-w-lg">
-            Praesent commodo cursus magna, vel scelerisque nisl consectetur et. 
-            Nulla vitae elit libero, a pharetra augue. Sed posuere consectetur est at lobortis.
-          </p>
-          <Button className="mt-6 rounded-none bg-white text-black hover:bg-gray-100">
-            Flowershop
-          </Button>
-        </div>
-      </section>
+      <HeroBanner
+        title={info.title}
+        description={info.description}
+        categoryName={category.name}
+        categorySlug={category.slug}
+        imageUrl={info.image}
+        gradientFrom={info.gradientFrom}
+        gradientTo={info.gradientTo}
+      />
 
       {/* Filters & Sort */}
       <section className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-univers">Handpicked</h2>
-          <button className="text-sm font-univers hover:underline">
+          <Link href="/products" className="text-sm font-univers hover:underline">
             Ver todos
-          </button>
+          </Link>
         </div>
 
         {/* Product Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {products.map((product) => (
-            <div key={product.id} className="group">
-              <div className="relative aspect-square mb-4 overflow-hidden bg-gray-100">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="absolute top-2 right-2 bg-white/80 hover:bg-white"
-                >
-                  <Heart className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="space-y-1">
-                <h3 className="font-univers text-sm">{product.name}</h3>
-                <p className="text-xs text-gray-600 font-univers uppercase">+ {product.vendor}</p>
-                <p className="font-univers">{product.price}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+        {products.length > 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {products.map((product) => (
+              <Link key={product.id} href={`/products/${product.id}`} className="group">
+                <div className="relative aspect-square mb-4 overflow-hidden bg-gray-100">
+                  <Image
+                    src={product.images[0] || "/images/links/pia-riverola.webp"}
+                    alt={product.name}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="absolute top-2 right-2 bg-white/80 hover:bg-white"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      // TODO: Add to wishlist
+                    }}
+                  >
+                    <Heart className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="space-y-1">
+                  <h3 className="font-univers text-sm">{product.name}</h3>
+                  {product.vendor && (
+                    <p className="text-xs text-gray-600 font-univers uppercase">+ {product.vendor.businessName}</p>
+                  )}
+                  <p className="font-univers">${product.price}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-600 font-univers">No hay productos disponibles en esta categoría.</p>
+          </div>
+        )}
       </section>
     </div>
   );

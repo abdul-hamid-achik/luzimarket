@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Newsletter } from "./newsletter";
 
 export function Footer() {
   const socialLinks = [
@@ -12,8 +13,10 @@ export function Footer() {
   ];
 
   return (
-    <footer className="bg-gradient-to-r from-green-400 via-yellow-300 to-cyan-400 text-black">
-      <div className="container mx-auto py-12">
+    <>
+      <Newsletter />
+      <footer className="bg-gradient-to-r from-green-400 via-yellow-300 to-cyan-400 text-black">
+        <div className="container mx-auto py-12">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Logo and Description */}
@@ -90,5 +93,6 @@ export function Footer() {
         </div>
       </div>
     </footer>
+    </>
   );
 }

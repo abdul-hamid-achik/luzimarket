@@ -5,7 +5,9 @@ import { setRequestLocale } from 'next-intl/server';
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { CartProvider } from "@/contexts/cart-context";
+import { WishlistProvider } from "@/contexts/wishlist-context";
 import CartSheet from "@/components/cart/cart-sheet";
+import { Toaster } from "@/components/ui/sonner";
 
 export default async function LocaleLayout({
   children,
@@ -28,10 +30,13 @@ export default async function LocaleLayout({
       <body>
         <NextIntlClientProvider>
           <CartProvider>
-            <Header />
-            {children}
-            <Footer />
-            <CartSheet />
+            <WishlistProvider>
+              <Header />
+              {children}
+              <Footer />
+              <CartSheet />
+              <Toaster />
+            </WishlistProvider>
           </CartProvider>
         </NextIntlClientProvider>
       </body>
