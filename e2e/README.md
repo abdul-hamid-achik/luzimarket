@@ -1,0 +1,173 @@
+# E2E Tests for Luzimarket
+
+This directory contains end-to-end tests for the Luzimarket e-commerce platform using Playwright.
+
+## Setup
+
+1. Install dependencies (already done if you ran `npm install`):
+   ```bash
+   npm install -D @playwright/test
+   ```
+
+2. Install Playwright browsers:
+   ```bash
+   npx playwright install
+   ```
+
+## Running Tests
+
+### Run all tests
+```bash
+npm run test:e2e
+```
+
+### Run tests with UI mode (recommended for development)
+```bash
+npm run test:e2e:ui
+```
+
+### Run tests in headed mode (see browser)
+```bash
+npm run test:e2e:headed
+```
+
+### Debug tests
+```bash
+npm run test:e2e:debug
+```
+
+### View test report
+```bash
+npm run test:e2e:report
+```
+
+## Test Structure
+
+```
+e2e/
+├── fixtures/
+│   └── test.ts          # Custom test fixtures
+├── tests/
+│   ├── homepage.spec.ts      # Homepage tests
+│   ├── products.spec.ts      # Product catalog tests
+│   ├── checkout.spec.ts      # Checkout flow tests
+│   ├── vendor.spec.ts        # Vendor registration tests
+│   ├── auth.spec.ts          # Authentication tests
+│   └── mockup-compliance.spec.ts  # Design mockup compliance
+└── global.setup.ts      # Global setup (auth, test data)
+```
+
+## Test Categories
+
+### Homepage Tests
+- Hero section and navigation
+- Category links
+- Language switching
+- Footer links
+
+### Product Tests
+- Product grid display
+- Filtering by category/price
+- Sorting products
+- Quick view modal
+- Add to cart functionality
+
+### Checkout Tests
+- Cart management
+- Checkout form validation
+- Guest checkout
+- Payment integration
+
+### Vendor Tests
+- Registration form
+- Field validation
+- Delivery options
+- Terms acceptance
+
+### Authentication Tests
+- Login for customers/vendors/admins
+- Registration flow
+- Password validation
+- Logout functionality
+
+### Mockup Compliance Tests
+- Design system adherence
+- Typography verification
+- Responsive design
+- Brand colors
+
+## Writing New Tests
+
+1. Create a new file in `e2e/tests/` with `.spec.ts` extension
+2. Import test utilities:
+   ```typescript
+   import { test, expect } from '@playwright/test';
+   ```
+3. Group related tests:
+   ```typescript
+   test.describe('Feature Name', () => {
+     test('should do something', async ({ page }) => {
+       await page.goto('/');
+       await expect(page.locator('h1')).toBeVisible();
+     });
+   });
+   ```
+
+## Best Practices
+
+1. **Use data-testid attributes** for reliable element selection
+2. **Wait for elements** before interacting:
+   ```typescript
+   await page.waitForSelector('[data-testid="product-card"]');
+   ```
+3. **Use descriptive test names** that explain what is being tested
+4. **Keep tests independent** - each test should run in isolation
+5. **Use Page Object Model** for complex pages (create in `e2e/pages/`)
+
+## Debugging Failed Tests
+
+1. Run with `--debug` flag to step through tests
+2. Use `page.pause()` to pause execution
+3. Check screenshots in `test-results/` folder
+4. View traces for failed tests in the HTML report
+
+## CI/CD Integration
+
+Add to your GitHub Actions workflow:
+
+```yaml
+- name: Install Playwright Browsers
+  run: npx playwright install --with-deps
+  
+- name: Run Playwright tests
+  run: npm run test:e2e
+  
+- uses: actions/upload-artifact@v4
+  if: ${{ !cancelled() }}
+  with:
+    name: playwright-report
+    path: playwright-report/
+    retention-days: 30
+```
+
+## Environment Variables
+
+Tests use the same `.env.local` file as the application. For CI/CD, set:
+- `CI=true` - Enables retries and disables test.only
+- `NEXT_PUBLIC_APP_URL` - Base URL for tests
+
+## Troubleshooting
+
+### Tests timing out
+- Increase timeout in `playwright.config.ts`
+- Check if dev server is running
+- Verify database is seeded
+
+### Element not found
+- Use Playwright Inspector: `npx playwright test --debug`
+- Check if element has different text in Spanish/English
+- Add data-testid attributes to components
+
+### Authentication issues
+- Ensure test users exist in database (run `npm run db:seed`)
+- Check session handling in global.setup.ts
