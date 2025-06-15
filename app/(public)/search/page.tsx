@@ -10,7 +10,7 @@ import { products } from "@/db/schema";
 import { or, like, eq } from "drizzle-orm";
 
 interface SearchPageProps {
-  searchParams: {
+  searchParams: Promise<{
     q?: string;
     categories?: string;
     vendors?: string;
@@ -18,11 +18,12 @@ interface SearchPageProps {
     maxPrice?: string;
     sortBy?: string;
     page?: string;
-  };
+  }>;
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
-  const query = searchParams.q || "";
+  const params = await searchParams;
+  const query = params.q || "";
   
   if (!query) {
     return (
@@ -54,12 +55,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   // Parse other filters
   const filters = {
-    categoryIds: searchParams.categories?.split(",").filter(Boolean),
-    vendorIds: searchParams.vendors?.split(",").filter(Boolean),
-    minPrice: searchParams.minPrice ? parseFloat(searchParams.minPrice) : undefined,
-    maxPrice: searchParams.maxPrice ? parseFloat(searchParams.maxPrice) : undefined,
-    sortBy: searchParams.sortBy as any,
-    page: searchParams.page ? parseInt(searchParams.page) : 1,
+    categoryIds: params.categories?.split(",").filter(Boolean),
+    vendorIds: params.vendors?.split(",").filter(Boolean),
+    minPrice: params.minPrice ? parseFloat(params.minPrice) : undefined,
+    maxPrice: params.maxPrice ? parseFloat(params.maxPrice) : undefined,
+    sortBy: params.sortBy as any,
+    page: params.page ? parseInt(params.page) : 1,
   };
 
   // Fetch products and filter options
@@ -162,7 +163,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                     {pagination.hasPreviousPage && (
                       <Link
                         href={`/search?${new URLSearchParams({
-                          ...searchParams,
+                          ...params,
                           page: String(pagination.page - 1),
                         }).toString()}`}
                       >
@@ -179,7 +180,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                     {pagination.hasNextPage && (
                       <Link
                         href={`/search?${new URLSearchParams({
-                          ...searchParams,
+                          ...params,
                           page: String(pagination.page + 1),
                         }).toString()}`}
                       >

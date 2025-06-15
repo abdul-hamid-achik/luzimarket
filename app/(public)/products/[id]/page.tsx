@@ -54,9 +54,10 @@ async function getRelatedProducts(categorySlug: string, currentProductId: string
 export default async function ProductDetailPage({
   params
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
-  const product = await getProduct(params.id);
+  const { id } = await params;
+  const product = await getProduct(id);
 
   if (!product) {
     notFound();
@@ -233,7 +234,7 @@ export default async function ProductDetailPage({
 
               {/* Stock info */}
               <p className="text-sm font-univers text-gray-600">
-                {product.stock > 0 
+                {product.stock && product.stock > 0 
                   ? `${product.stock} disponibles`
                   : "Sin stock disponible"
                 }
@@ -268,7 +269,15 @@ export default async function ProductDetailPage({
         {/* Reviews Section */}
         <ProductReviews
           productId={product.id}
-          reviews={productReviews}
+          reviews={productReviews.map(review => ({
+            ...review,
+            createdAt: review.createdAt || new Date(),
+            isVerifiedPurchase: review.isVerifiedPurchase || false,
+            helpfulCount: review.helpfulCount || 0,
+            user: {
+              name: review.user.name || "Usuario"
+            }
+          }))}
           averageRating={averageRating}
           totalReviews={totalReviews}
           ratingDistribution={ratingDistribution}

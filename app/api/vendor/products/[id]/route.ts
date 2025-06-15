@@ -18,9 +18,10 @@ const updateProductSchema = z.object({
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     
     if (!session || session.user.role !== "vendor") {
@@ -32,7 +33,7 @@ export async function GET(
 
     const product = await db.query.products.findFirst({
       where: and(
-        eq(products.id, params.id),
+        eq(products.id, id),
         eq(products.vendorId, session.user.id)
       ),
       with: {
@@ -59,9 +60,10 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     
     if (!session || session.user.role !== "vendor") {
@@ -77,7 +79,7 @@ export async function PUT(
     // Verify the product belongs to the vendor
     const existingProduct = await db.query.products.findFirst({
       where: and(
-        eq(products.id, params.id),
+        eq(products.id, id),
         eq(products.vendorId, session.user.id)
       ),
     });
@@ -105,7 +107,7 @@ export async function PUT(
       })
       .where(
         and(
-          eq(products.id, params.id),
+          eq(products.id, id),
           eq(products.vendorId, session.user.id)
         )
       )
@@ -131,9 +133,10 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     
     if (!session || session.user.role !== "vendor") {
@@ -146,7 +149,7 @@ export async function DELETE(
     // Verify the product belongs to the vendor
     const existingProduct = await db.query.products.findFirst({
       where: and(
-        eq(products.id, params.id),
+        eq(products.id, id),
         eq(products.vendorId, session.user.id)
       ),
     });
@@ -163,7 +166,7 @@ export async function DELETE(
       .delete(products)
       .where(
         and(
-          eq(products.id, params.id),
+          eq(products.id, id),
           eq(products.vendorId, session.user.id)
         )
       );

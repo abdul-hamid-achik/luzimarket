@@ -11,15 +11,17 @@ import { stripe } from "@/lib/stripe";
 export default async function SuccessPage({
   searchParams,
 }: {
-  searchParams: { session_id?: string };
+  searchParams: Promise<{ session_id?: string }>;
 }) {
-  if (!searchParams.session_id) {
+  const params = await searchParams;
+  
+  if (!params.session_id) {
     redirect("/");
   }
 
   try {
     // Retrieve the session from Stripe
-    const session = await stripe.checkout.sessions.retrieve(searchParams.session_id, {
+    const session = await stripe.checkout.sessions.retrieve(params.session_id, {
       expand: ["line_items", "customer"],
     });
 
@@ -127,13 +129,13 @@ export default async function SuccessPage({
                     <span>Subtotal</span>
                     <span>${parseFloat(order.subtotal).toLocaleString('es-MX')}</span>
                   </div>
-                  {order.shippingCost > 0 && (
+                  {parseFloat(order.shipping) > 0 && (
                     <div className="flex justify-between text-sm font-univers">
                       <span>Envío</span>
-                      <span>${parseFloat(order.shippingCost).toLocaleString('es-MX')}</span>
+                      <span>${parseFloat(order.shipping).toLocaleString('es-MX')}</span>
                     </div>
                   )}
-                  {order.tax > 0 && (
+                  {parseFloat(order.tax) > 0 && (
                     <div className="flex justify-between text-sm font-univers">
                       <span>Impuestos</span>
                       <span>${parseFloat(order.tax).toLocaleString('es-MX')}</span>
@@ -154,10 +156,10 @@ export default async function SuccessPage({
               <div className="bg-white rounded-lg shadow-sm p-8 mb-6">
                 <h2 className="text-lg font-univers mb-4">Información de envío</h2>
                 <address className="font-univers text-sm not-italic text-gray-600">
-                  {JSON.parse(order.shippingAddress as string).name}<br />
-                  {JSON.parse(order.shippingAddress as string).street}<br />
-                  {JSON.parse(order.shippingAddress as string).city}, {JSON.parse(order.shippingAddress as string).state} {JSON.parse(order.shippingAddress as string).postalCode}<br />
-                  {JSON.parse(order.shippingAddress as string).country}
+                  {(order.shippingAddress as any).name || "N/A"}<br />
+                  {(order.shippingAddress as any).street}<br />
+                  {(order.shippingAddress as any).city}, {(order.shippingAddress as any).state} {(order.shippingAddress as any).postalCode}<br />
+                  {(order.shippingAddress as any).country}
                 </address>
               </div>
             )}

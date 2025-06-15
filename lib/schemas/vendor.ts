@@ -14,7 +14,7 @@ export const vendorRegistrationSchema = z.object({
   street: z.string().min(5, "La dirección debe tener al menos 5 caracteres"),
   city: z.string().min(2, "Ciudad requerida"),
   state: z.string().min(2, "Estado requerido"),
-  country: z.string().default("México"),
+  country: z.string().min(1, "País requerido"),
   postalCode: z.string().optional(),
   
   // Online presence
@@ -22,7 +22,7 @@ export const vendorRegistrationSchema = z.object({
   description: z.string().min(10, "La descripción debe tener al menos 10 caracteres"),
   
   // Delivery
-  hasDelivery: z.boolean().default(false),
+  hasDelivery: z.boolean(),
   deliveryService: z.enum(["own", "external", "none"]).optional(),
   
   // Social media

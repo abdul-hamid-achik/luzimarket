@@ -1,7 +1,8 @@
 "use client";
 
 import { useLocale } from 'next-intl';
-import { useRouter, usePathname } from '@/i18n/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import {
   Select,
   SelectContent,
@@ -15,9 +16,22 @@ export default function LanguageSwitcher() {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
+  const params = useParams();
 
   const handleLocaleChange = (newLocale: string) => {
-    router.replace(pathname, { locale: newLocale });
+    // Replace the locale in the pathname
+    const currentLocale = pathname.startsWith('/en') ? 'en' : 'es';
+    let newPath = pathname;
+    
+    if (currentLocale === 'en' && newLocale === 'es') {
+      // Remove /en prefix
+      newPath = pathname.replace(/^\/en/, '') || '/';
+    } else if (currentLocale === 'es' && newLocale === 'en') {
+      // Add /en prefix
+      newPath = `/en${pathname}`;
+    }
+    
+    router.push(newPath);
   };
 
   return (

@@ -16,7 +16,7 @@ const loginSchema = z.object({
 export const authOptions = {
   adapter: DrizzleAdapter(db),
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as const,
   },
   providers: [
     CredentialsProvider({
@@ -83,7 +83,7 @@ export const authOptions = {
           return {
             id: user.id,
             email: user.email,
-            name: user.name || user.businessName || user.email,
+            name: user.name || user.email,
             role: userType,
           };
         } catch (error) {
@@ -94,14 +94,14 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: any) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: any) {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;

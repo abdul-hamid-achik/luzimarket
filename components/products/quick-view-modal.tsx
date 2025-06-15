@@ -160,18 +160,23 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
             {/* Actions */}
             <div className="space-y-3 pt-4">
               <div className="flex gap-3">
-                <AddToCartButton
-                  product={{
-                    id: product.id,
-                    name: product.name,
-                    price: Number(product.price),
-                    image: productImages[0] || "/images/placeholder.jpg",
-                    vendorId: product.vendorId,
-                    vendorName: product.vendorName,
-                  }}
-                  className="flex-1"
-                  disabled={product.stock === 0}
-                />
+                {product.stock > 0 ? (
+                  <AddToCartButton
+                    product={{
+                      id: product.id,
+                      name: product.name,
+                      price: Number(product.price),
+                      image: productImages[0] || "/images/placeholder.jpg",
+                      vendorId: product.vendorId,
+                      vendorName: product.vendorName,
+                    }}
+                    className="flex-1"
+                  />
+                ) : (
+                  <Button disabled className="flex-1">
+                    Sin stock
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   size="icon"

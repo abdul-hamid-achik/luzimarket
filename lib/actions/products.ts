@@ -27,7 +27,7 @@ export interface ProductWithRelations {
   stock: number;
   isActive: boolean;
   category: {
-    id: string;
+    id: number;
     name: string;
     slug: string;
   } | null;
@@ -126,6 +126,9 @@ export async function getFilteredProducts(filters: ProductFilters = {}) {
     const formattedProducts: ProductWithRelations[] = result.map(({ product, category, vendor }) => ({
       ...product,
       images: product.images || [],
+      tags: product.tags || [],
+      stock: product.stock || 0,
+      isActive: product.isActive ?? true,
       category: category ? {
         id: category.id,
         name: category.name,
@@ -185,7 +188,7 @@ export async function getProductFilterOptions() {
         eq(products.vendorId, vendors.id),
         eq(products.isActive, true)
       ))
-      .where(eq(vendors.isApproved, true))
+      .where(eq(vendors.isActive, true))
       .groupBy(vendors.id)
       .orderBy(vendors.businessName);
 

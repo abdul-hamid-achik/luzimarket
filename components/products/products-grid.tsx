@@ -16,7 +16,7 @@ interface Product {
     businessName: string;
   } | null;
   category: {
-    id: number;
+    id: number | string;
     name: string;
     slug: string;
   } | null;

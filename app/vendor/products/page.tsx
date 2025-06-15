@@ -124,9 +124,9 @@ export default async function VendorProductsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`text-sm font-univers ${
-                          product.stock > 0 ? 'text-gray-900' : 'text-red-600'
+                          product.stock && product.stock > 0 ? 'text-gray-900' : 'text-red-600'
                         }`}>
-                          {product.stock}
+                          {product.stock || 0}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">

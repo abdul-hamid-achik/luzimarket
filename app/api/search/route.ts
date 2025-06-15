@@ -61,7 +61,7 @@ export async function GET(request: Request) {
       .from(vendors)
       .where(
         and(
-          eq(vendors.isApproved, true),
+          eq(vendors.isActive, true),
           like(vendors.businessName, `%${query}%`)
         )
       )

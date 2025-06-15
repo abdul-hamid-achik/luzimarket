@@ -39,7 +39,6 @@ export async function POST(request: Request) {
         name: validatedData.name,
         email: validatedData.email,
         passwordHash: hashedPassword,
-        role: "customer",
       })
       .returning();
     

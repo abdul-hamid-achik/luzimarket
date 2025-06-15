@@ -5,9 +5,11 @@ import { eq, sql } from "drizzle-orm";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+    
     // In a real app, you'd want to track which users have marked reviews as helpful
     // to prevent multiple votes. For now, we'll just increment the count.
     
@@ -16,7 +18,7 @@ export async function POST(
       .set({
         helpfulCount: sql`${reviews.helpfulCount} + 1`,
       })
-      .where(eq(reviews.id, params.id));
+      .where(eq(reviews.id, id));
 
     return NextResponse.json({ success: true });
   } catch (error) {

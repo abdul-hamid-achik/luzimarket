@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { vendorRegistrationSchema, type VendorRegistration } from "@/lib/schemas/vendor";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { InputWithValidation } from "@/components/ui/input-with-validation";
 import { Label } from "@/components/ui/label";
@@ -17,11 +18,19 @@ export default function VendorRegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const form = useForm<VendorRegistration>({
+  const form = useForm<z.infer<typeof vendorRegistrationSchema>>({
     resolver: zodResolver(vendorRegistrationSchema),
     defaultValues: {
       hasDelivery: false,
       country: "México",
+      businessName: "",
+      contactName: "",
+      email: "",
+      businessPhone: "",
+      street: "",
+      city: "",
+      state: "",
+      description: "",
     },
     mode: "onChange", // Enable real-time validation
   });

@@ -38,10 +38,12 @@ const categoryInfo: Record<string, { title: string; description: string; gradien
   },
 };
 
-export default async function CategoryPage({ params }: { params: { slug: string } }) {
+export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  
   // Get category from database
   const category = await db.query.categories.findFirst({
-    where: eq(categories.slug, params.slug),
+    where: eq(categories.slug, slug),
   });
 
   if (!category) {
@@ -49,7 +51,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
   }
 
   // Get category display info
-  const info = categoryInfo[params.slug] || {
+  const info = categoryInfo[slug] || {
     title: category.name,
     description: category.description || "Descubre nuestra selección curada de productos.",
     gradientFrom: "from-gray-400",

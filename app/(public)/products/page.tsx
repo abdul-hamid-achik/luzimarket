@@ -8,25 +8,27 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 interface ProductsPageProps {
-  searchParams: {
+  searchParams: Promise<{
     categories?: string;
     vendors?: string;
     minPrice?: string;
     maxPrice?: string;
     sortBy?: string;
     page?: string;
-  };
+  }>;
 }
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+  const params = await searchParams;
+  
   // Parse search params
   const filters = {
-    categoryIds: searchParams.categories?.split(",").filter(Boolean),
-    vendorIds: searchParams.vendors?.split(",").filter(Boolean),
-    minPrice: searchParams.minPrice ? parseFloat(searchParams.minPrice) : undefined,
-    maxPrice: searchParams.maxPrice ? parseFloat(searchParams.maxPrice) : undefined,
-    sortBy: searchParams.sortBy as any,
-    page: searchParams.page ? parseInt(searchParams.page) : 1,
+    categoryIds: params.categories?.split(",").filter(Boolean),
+    vendorIds: params.vendors?.split(",").filter(Boolean),
+    minPrice: params.minPrice ? parseFloat(params.minPrice) : undefined,
+    maxPrice: params.maxPrice ? parseFloat(params.maxPrice) : undefined,
+    sortBy: params.sortBy as any,
+    page: params.page ? parseInt(params.page) : 1,
   };
 
   // Fetch products and filter options
@@ -56,9 +58,9 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
       <form action={async (formData: FormData) => {
         "use server";
         const sortBy = formData.get("sortBy") as string;
-        const params = new URLSearchParams(searchParams as any);
-        params.set("sortBy", sortBy);
-        redirect(`/products?${params.toString()}`);
+        const urlParams = new URLSearchParams(params as any);
+        urlParams.set("sortBy", sortBy);
+        redirect(`/products?${urlParams.toString()}`);
       }}>
         <Select name="sortBy" defaultValue={defaultValue || "newest"}>
           <SelectTrigger className="w-[180px] border-0 font-univers text-sm">
@@ -100,14 +102,14 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                   vendors={formattedVendors}
                   priceRange={filterOptions.priceRange}
                 />
-                <SortSelect defaultValue={searchParams.sortBy} />
+                <SortSelect defaultValue={params.sortBy} />
                 <span className="text-sm font-univers text-gray-600">
                   {pagination.totalCount} productos
                 </span>
               </div>
               <div className="text-sm font-univers text-gray-500 hidden sm:block">
-                {searchParams.sortBy === "price-asc" && "Precio más bajo a más alto"}
-                {searchParams.sortBy === "price-desc" && "Precio más alto a más bajo"}
+                {params.sortBy === "price-asc" && "Precio más bajo a más alto"}
+                {params.sortBy === "price-desc" && "Precio más alto a más bajo"}
               </div>
             </div>
 
@@ -126,7 +128,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 {pagination.hasPreviousPage && (
                   <Link
                     href={`/products?${new URLSearchParams({
-                      ...searchParams,
+                      ...params,
                       page: String(pagination.page - 1),
                     }).toString()}`}
                   >
@@ -143,7 +145,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 {pagination.hasNextPage && (
                   <Link
                     href={`/products?${new URLSearchParams({
-                      ...searchParams,
+                      ...params,
                       page: String(pagination.page + 1),
                     }).toString()}`}
                   >

@@ -10,7 +10,8 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
-  const signature = headers().get("stripe-signature")!;
+  const headersList = await headers();
+  const signature = headersList.get("stripe-signature")!;
 
   let event: Stripe.Event;
 
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
             .update(orders)
             .set({
               status: "processing",
-              stripePaymentIntentId: session.payment_intent as string,
+              paymentIntentId: session.payment_intent as string,
               updatedAt: new Date(),
             })
             .where(eq(orders.id, session.metadata.orderId));
@@ -73,7 +74,7 @@ export async function POST(req: NextRequest) {
         
         // Update order status to failed
         const order = await db.query.orders.findFirst({
-          where: eq(orders.stripePaymentIntentId, paymentIntent.id),
+          where: eq(orders.paymentIntentId, paymentIntent.id),
         });
 
         if (order) {
@@ -126,7 +127,7 @@ export async function POST(req: NextRequest) {
         const invoice = event.data.object as Stripe.Invoice;
         
         // Handle successful invoice payment
-        if (invoice.subscription && invoice.billing_reason === "subscription_cycle") {
+        if ((invoice as any).subscription && (invoice as any).billing_reason === "subscription_cycle") {
           console.log("Subscription invoice paid:", invoice.id);
         }
         break;
@@ -136,7 +137,7 @@ export async function POST(req: NextRequest) {
         const invoice = event.data.object as Stripe.Invoice;
         
         // Handle failed invoice payment
-        if (invoice.subscription) {
+        if ((invoice as any).subscription) {
           console.log("Subscription invoice payment failed:", invoice.id);
           // TODO: Send payment failed email
         }

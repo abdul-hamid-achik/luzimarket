@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { loadStripe } from "@stripe/stripe-js";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
+import { ProgressSteps, MobileProgressSteps } from "@/components/ui/progress-steps";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -128,10 +129,26 @@ export default function CheckoutPage() {
     );
   }
 
+  const checkoutSteps = [
+    { id: "cart", title: "Carrito", description: "Revisa tus productos" },
+    { id: "info", title: "Información", description: "Datos de contacto y envío" },
+    { id: "payment", title: "Pago", description: "Método de pago" },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="container mx-auto px-4 max-w-6xl">
         <h1 className="text-3xl font-times-now mb-8">Finalizar compra</h1>
+
+        {/* Progress Steps */}
+        <div className="mb-8">
+          <div className="hidden md:block">
+            <ProgressSteps steps={checkoutSteps} currentStep={1} />
+          </div>
+          <div className="md:hidden">
+            <MobileProgressSteps steps={checkoutSteps} currentStep={1} />
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Checkout Form */}
