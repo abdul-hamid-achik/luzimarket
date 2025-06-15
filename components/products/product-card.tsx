@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { Heart, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -22,9 +22,10 @@ interface ProductCardProps {
     } | null;
   };
   className?: string;
+  onQuickView?: (product: any) => void;
 }
 
-export function ProductCard({ product, className }: ProductCardProps) {
+export function ProductCard({ product, className, onQuickView }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const isWishlisted = isInWishlist(product.id);
@@ -88,23 +89,42 @@ export function ProductCard({ product, className }: ProductCardProps) {
           />
         </Button>
         
-        {/* Quick add to cart on hover */}
+        {/* Quick actions on hover */}
         <div className={cn(
           "absolute bottom-0 left-0 right-0 p-3 transition-all duration-300",
           "opacity-0 group-hover:opacity-100 translate-y-full group-hover:translate-y-0"
         )}>
-          <AddToCartButton
-            product={{
-              id: product.id,
+          <div className="flex gap-2">
+            {onQuickView && (
+              <Button
+                variant="secondary"
+                size="sm"
+                className="flex-1 bg-white/90 hover:bg-white"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onQuickView(product);
+                }}
+              >
+                <Eye className="h-4 w-4 mr-1" />
+                Vista rápida
+              </Button>
+            )}
+            <AddToCartButton
+              product={{
+                id: product.id,
               name: product.name,
               price: parseFloat(product.price),
               image: product.images[0] || "/images/links/pia-riverola.webp",
               vendorId: product.vendor?.id || "",
               vendorName: product.vendor?.businessName || "Vendedor",
             }}
-            className="w-full h-10 text-sm"
-            showIcon={false}
-          />
+              className={cn(
+                "h-10 text-sm",
+                onQuickView ? "flex-1" : "w-full"
+              )}
+              showIcon={false}
+            />
+          </div>
         </div>
       </div>
       
