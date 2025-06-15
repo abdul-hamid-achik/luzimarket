@@ -12,6 +12,7 @@ import {
   LogOut
 } from "lucide-react";
 import { auth } from "@/lib/auth";
+import { LogoutButton } from "@/components/admin/logout-button";
 
 export default async function AdminLayout({
   children,
@@ -84,7 +85,7 @@ export default async function AdminLayout({
             </Link>
 
             <Link
-              href="/admin/emails"
+              href="/admin/email-templates"
               className="flex items-center gap-3 px-3 py-2 text-sm font-univers text-gray-700 rounded-md hover:bg-gray-100 hover:text-black transition-colors"
             >
               <Mail className="h-4 w-4" />
@@ -102,10 +103,7 @@ export default async function AdminLayout({
 
           {/* Logout */}
           <div className="p-4 border-t border-gray-200">
-            <button className="flex items-center gap-3 px-3 py-2 w-full text-sm font-univers text-red-600 rounded-md hover:bg-red-50 transition-colors">
-              <LogOut className="h-4 w-4" />
-              Cerrar sesión
-            </button>
+            <LogoutButton />
           </div>
         </div>
       </aside>
@@ -116,7 +114,7 @@ export default async function AdminLayout({
         <div className="h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between">
           <h2 className="text-lg font-univers">Panel de Administración</h2>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600 font-univers">admin@luzimarket.com</span>
+            <span className="text-sm text-gray-600 font-univers">{session.user?.email || 'Admin'}</span>
           </div>
         </div>
 

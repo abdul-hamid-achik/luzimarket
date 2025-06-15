@@ -20,7 +20,7 @@ interface AddToCartButtonProps {
   showIcon?: boolean;
 }
 
-export default function AddToCartButton({ 
+export function AddToCartButton({ 
   product, 
   className,
   showIcon = true 

@@ -6,7 +6,7 @@ import { Heart, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import AddToCartButton from "@/components/cart/add-to-cart-button";
+import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import { useWishlist } from "@/contexts/wishlist-context";
 import { toast } from "sonner";
 import { useTranslations } from 'next-intl';

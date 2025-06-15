@@ -36,7 +36,10 @@
     "viewAllResults": "View all results for \"{query}\"",
     "searchCategories": "Categories",
     "searchProducts": "Products",
-    "searchStores": "Stores"
+    "searchStores": "Stores",
+    "myAccount": "My Account",
+    "myOrders": "My Orders",
+    "user": "User"
   },
   
   "Navigation": {

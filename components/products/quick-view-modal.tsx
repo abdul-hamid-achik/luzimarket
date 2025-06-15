@@ -9,7 +9,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
-import AddToCartButton from "@/components/cart/add-to-cart-button";
+import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import Link from "next/link";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 

@@ -1,14 +1,16 @@
 "use client";
 
 import { Link } from '@/i18n/navigation';
+import NextLink from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Heart, ShoppingBag, User, Menu } from "lucide-react";
+import { Heart, ShoppingBag, User, Menu, LogOut } from "lucide-react";
 import { SearchBox } from "./search-box";
 import { useState } from "react";
 import { useCart } from "@/contexts/cart-context";
 import { useWishlist } from "@/contexts/wishlist-context";
 import { useTranslations } from 'next-intl';
+import { useSession, signOut } from "next-auth/react";
 import {
   Sheet,
   SheetContent,
@@ -16,6 +18,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -23,6 +32,11 @@ export function Header() {
   const { getTotalItems: getWishlistItems } = useWishlist();
   const t = useTranslations('Common');
   const tNav = useTranslations('Navigation');
+  const { data: session, status } = useSession();
+
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: '/' });
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b">
@@ -135,11 +149,47 @@ export function Header() {
                 )}
               </Button>
             </Link>
-            <Link href="/login">
-              <Button variant="ghost" size="icon" aria-label={t('userAccount')}>
+            {status === "loading" ? (
+              <Button variant="ghost" size="icon" disabled>
                 <User className="h-5 w-5" />
               </Button>
-            </Link>
+            ) : session ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" aria-label={t('userAccount')}>
+                    <User className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <div className="px-2 py-1.5">
+                    <p className="text-sm font-medium">{session.user?.name || t('user')}</p>
+                    <p className="text-xs text-gray-500">{session.user?.email}</p>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <NextLink href="/account" className="cursor-pointer">
+                      {t('myAccount')}
+                    </NextLink>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <NextLink href="/orders" className="cursor-pointer">
+                      {t('myOrders')}
+                    </NextLink>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    {t('logout')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link href="/login">
+                <Button variant="ghost" size="icon" aria-label={t('userAccount')}>
+                  <User className="h-5 w-5" />
+                </Button>
+              </Link>
+            )}
             <Button 
               variant="ghost" 
               size="icon" 
@@ -163,7 +213,7 @@ export function Header() {
         </div>
 
         {/* Navigation - Desktop only */}
-        <nav className="hidden md:flex items-center gap-8 py-3 px-8">
+        <nav className="hidden md:flex items-center justify-center gap-8 py-3 px-8">
           <Link href="/best-sellers" className="text-xs font-univers hover:text-gray-600 tracking-wide">
             {tNav('bestSellers')}
           </Link>

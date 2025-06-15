@@ -20,15 +20,19 @@ interface FilterOption {
 }
 
 interface FilterSidebarProps {
-  categories: FilterOption[];
-  vendors: FilterOption[];
-  priceRange: {
+  categories?: FilterOption[];
+  vendors?: FilterOption[];
+  priceRange?: {
     min: number;
     max: number;
   };
 }
 
-export function FilterSidebar({ categories, vendors, priceRange }: FilterSidebarProps) {
+export function FilterSidebar({ 
+  categories = [], 
+  vendors = [], 
+  priceRange = { min: 0, max: 10000 } 
+}: FilterSidebarProps = {}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   

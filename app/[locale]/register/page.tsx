@@ -1,0 +1,286 @@
+"use client";
+
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from 'next-intl';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Loader2, User, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
+
+const registerSchema = z.object({
+  name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+  email: z.string().email("Correo electrónico inválido"),
+  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+  confirmPassword: z.string(),
+  acceptTerms: z.boolean().refine(val => val === true, "Debes aceptar los términos y condiciones"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Las contraseñas no coinciden",
+  path: ["confirmPassword"],
+});
+
+type RegisterForm = z.infer<typeof registerSchema>;
+
+export default function RegisterPage() {
+  const router = useRouter();
+  const t = useTranslations('Auth');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const form = useForm<RegisterForm>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      acceptTerms: false,
+    },
+  });
+
+  const handleRegister = async (data: RegisterForm) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          password: data.password,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setSuccess(true);
+        setTimeout(() => {
+          router.push("/login");
+        }, 2000);
+      } else {
+        setError(result.error || "Error al crear la cuenta");
+      }
+    } catch (error) {
+      setError("Error de conexión. Inténtalo de nuevo.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (success) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
+        <div className="max-w-md w-full space-y-8 text-center">
+          <div className="bg-white p-8 rounded-lg shadow-sm border">
+            <div className="mb-6">
+              <div className="mx-auto h-16 w-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-times-now text-gray-900">¡Cuenta creada exitosamente!</h2>
+              <p className="text-sm text-gray-600 font-univers mt-2">
+                Te redirigiremos a la página de inicio de sesión en unos segundos...
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
+      <div className="max-w-md w-full space-y-8">
+        {/* Header */}
+        <div className="text-center">
+          <h1 className="text-3xl font-times-now">LUZIMARKET</h1>
+          <p className="mt-2 text-sm text-gray-600 font-univers">
+            Crea tu cuenta
+          </p>
+          <p className="text-xs text-gray-500 font-univers mt-1">
+            Únete a nuestra comunidad de regalos extraordinarios
+          </p>
+        </div>
+
+        {/* Registration Form */}
+        <div className="bg-white py-8 px-6 shadow-sm rounded-lg border border-gray-200">
+          <form onSubmit={form.handleSubmit(handleRegister)} className="space-y-6">
+            {/* Name Field */}
+            <div>
+              <Label htmlFor="name" className="block text-sm font-univers text-gray-700">
+                Nombre completo
+              </Label>
+              <div className="mt-1 relative">
+                <Input
+                  id="name"
+                  type="text"
+                  {...form.register("name")}
+                  disabled={isLoading}
+                  className="block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-black focus:border-black"
+                  placeholder="Tu nombre completo"
+                />
+                <User className="h-4 w-4 text-gray-400 absolute left-3 top-3" />
+              </div>
+              {form.formState.errors.name && (
+                <p className="mt-1 text-sm text-red-600 font-univers">
+                  {form.formState.errors.name.message}
+                </p>
+              )}
+            </div>
+
+            {/* Email Field */}
+            <div>
+              <Label htmlFor="email" className="block text-sm font-univers text-gray-700">
+                Correo electrónico
+              </Label>
+              <div className="mt-1 relative">
+                <Input
+                  id="email"
+                  type="email"
+                  {...form.register("email")}
+                  disabled={isLoading}
+                  className="block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-black focus:border-black"
+                  placeholder="tu@email.com"
+                />
+                <Mail className="h-4 w-4 text-gray-400 absolute left-3 top-3" />
+              </div>
+              {form.formState.errors.email && (
+                <p className="mt-1 text-sm text-red-600 font-univers">
+                  {form.formState.errors.email.message}
+                </p>
+              )}
+            </div>
+
+            {/* Password Field */}
+            <div>
+              <Label htmlFor="password" className="block text-sm font-univers text-gray-700">
+                Contraseña
+              </Label>
+              <div className="mt-1 relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  {...form.register("password")}
+                  disabled={isLoading}
+                  className="block w-full px-3 py-2 pl-10 pr-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-black focus:border-black"
+                  placeholder="Mínimo 6 caracteres"
+                />
+                <Lock className="h-4 w-4 text-gray-400 absolute left-3 top-3" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              {form.formState.errors.password && (
+                <p className="mt-1 text-sm text-red-600 font-univers">
+                  {form.formState.errors.password.message}
+                </p>
+              )}
+            </div>
+
+            {/* Confirm Password Field */}
+            <div>
+              <Label htmlFor="confirmPassword" className="block text-sm font-univers text-gray-700">
+                Confirmar contraseña
+              </Label>
+              <div className="mt-1 relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  {...form.register("confirmPassword")}
+                  disabled={isLoading}
+                  className="block w-full px-3 py-2 pl-10 pr-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-black focus:border-black"
+                  placeholder="Repite tu contraseña"
+                />
+                <Lock className="h-4 w-4 text-gray-400 absolute left-3 top-3" />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                >
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              {form.formState.errors.confirmPassword && (
+                <p className="mt-1 text-sm text-red-600 font-univers">
+                  {form.formState.errors.confirmPassword.message}
+                </p>
+              )}
+            </div>
+
+            {/* Terms Checkbox */}
+            <div className="flex items-start">
+              <Checkbox
+                id="acceptTerms"
+                checked={form.watch("acceptTerms")}
+                onCheckedChange={(checked) => form.setValue("acceptTerms", checked as boolean)}
+                disabled={isLoading}
+                className="mt-1"
+              />
+              <Label htmlFor="acceptTerms" className="ml-2 text-sm font-univers text-gray-700">
+                Acepto los{" "}
+                <Link href="/terms" className="text-black hover:underline">
+                  términos y condiciones
+                </Link>{" "}
+                y la{" "}
+                <Link href="/privacy" className="text-black hover:underline">
+                  política de privacidad
+                </Link>
+              </Label>
+            </div>
+            {form.formState.errors.acceptTerms && (
+              <p className="mt-1 text-sm text-red-600 font-univers">
+                {form.formState.errors.acceptTerms.message}
+              </p>
+            )}
+
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                <p className="text-sm text-red-600 font-univers">{error}</p>
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              className="w-full bg-black text-white hover:bg-gray-800 font-univers"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creando cuenta...
+                </>
+              ) : (
+                "Crear cuenta"
+              )}
+            </Button>
+
+            {/* Login Link */}
+            <div className="text-center">
+              <Link href="/login" className="text-sm text-gray-600 hover:text-black font-univers">
+                ¿Ya tienes cuenta? Inicia sesión
+              </Link>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
