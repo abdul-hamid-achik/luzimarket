@@ -6,6 +6,7 @@ import { vendorRegistrationSchema } from "@/lib/schemas/vendor";
 import { revalidatePath } from "next/cache";
 import { sendVendorNotification } from "@/lib/email";
 import { eq } from "drizzle-orm";
+import { generateSlug } from "@/lib/utils/slug";
 
 export async function registerVendor(data: unknown) {
   try {
@@ -22,6 +23,7 @@ export async function registerVendor(data: unknown) {
     
     const [vendor] = await db.insert(vendors).values({
       ...validatedData,
+      slug: generateSlug(validatedData.businessName),
       isActive: false, // Vendors need to be approved
     }).returning();
     

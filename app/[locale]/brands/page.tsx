@@ -15,6 +15,7 @@ async function getActiveVendors() {
     .select({
       id: vendors.id,
       businessName: vendors.businessName,
+      slug: vendors.slug,
       description: vendors.description,
       city: vendors.city,
       state: vendors.state,
@@ -39,19 +40,19 @@ export default async function BrandsPage({ params }: BrandsPageProps) {
   return (
     <main className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gray-50 py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl font-times-now mb-4">
+      <section className="py-16">
+        <div className="text-center px-8">
+          <h1 className="text-4xl md:text-5xl font-times-now mb-4">
             Tiendas + Marcas
           </h1>
-          <p className="text-lg font-univers text-gray-600 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg font-univers text-gray-600 max-w-2xl mx-auto">
             Descubre nuestras tiendas y marcas cuidadosamente seleccionadas
           </p>
         </div>
       </section>
 
       {/* Brands Grid */}
-      <section className="container mx-auto px-4 py-16">
+      <section className="py-16 px-4 md:px-8">
         {activeVendors.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 font-univers">
@@ -63,7 +64,7 @@ export default async function BrandsPage({ params }: BrandsPageProps) {
             {activeVendors.map((vendor) => (
               <Link
                 key={vendor.id}
-                href={`/brands/${vendor.id}`}
+                href={`/brands/${vendor.slug}`}
                 className="group"
               >
                 <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
@@ -100,7 +101,7 @@ export default async function BrandsPage({ params }: BrandsPageProps) {
 
       {/* CTA Section */}
       <section className="bg-black text-white py-16">
-        <div className="container mx-auto px-4 text-center">
+        <div className="text-center px-8">
           <h2 className="text-3xl font-times-now mb-4">
             ¿Quieres ser parte de LUZIMARKET?
           </h2>

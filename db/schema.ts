@@ -5,6 +5,7 @@ import { relations } from "drizzle-orm";
 export const vendors = pgTable("vendors", {
   id: uuid("id").primaryKey().defaultRandom(),
   businessName: text("business_name").notNull(),
+  slug: text("slug").notNull().unique(),
   contactName: text("contact_name").notNull(),
   email: text("email").notNull().unique(),
   phone: text("phone"),
@@ -31,6 +32,7 @@ export const vendors = pgTable("vendors", {
   return {
     emailIdx: index("vendors_email_idx").on(table.email),
     businessNameIdx: index("vendors_business_name_idx").on(table.businessName),
+    slugIdx: index("vendors_slug_idx").on(table.slug),
   }
 });
 
@@ -56,7 +58,7 @@ export const products = pgTable("products", {
   vendorId: uuid("vendor_id").notNull().references(() => vendors.id),
   categoryId: integer("category_id").notNull().references(() => categories.id),
   name: text("name").notNull(),
-  slug: text("slug").notNull(),
+  slug: text("slug").notNull().unique(),
   description: text("description"),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   images: json("images").$type<string[]>().default([]),

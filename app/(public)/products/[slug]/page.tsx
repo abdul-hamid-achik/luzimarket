@@ -8,12 +8,14 @@ import { Button } from "@/components/ui/button";
 import AddToCartButton from "@/components/cart/add-to-cart-button";
 import { ProductReviews } from "@/components/products/product-reviews";
 import { auth } from "@/lib/auth";
+import type { Metadata, ResolvingMetadata } from 'next';
 
-async function getProduct(id: string) {
+async function getProduct(slug: string) {
   const product = await db
     .select({
       id: products.id,
       name: products.name,
+      slug: products.slug,
       description: products.description,
       price: products.price,
       images: products.images,
@@ -21,13 +23,14 @@ async function getProduct(id: string) {
       stock: products.stock,
       vendorName: vendors.businessName,
       vendorId: vendors.id,
+      vendorSlug: vendors.slug,
       categoryName: categories.name,
       categorySlug: categories.slug,
     })
     .from(products)
     .leftJoin(vendors, eq(products.vendorId, vendors.id))
     .leftJoin(categories, eq(products.categoryId, categories.id))
-    .where(eq(products.id, id))
+    .where(eq(products.slug, slug))
     .limit(1);
 
   return product[0] || null;
@@ -51,13 +54,61 @@ async function getRelatedProducts(categorySlug: string, currentProductId: string
   return relatedProducts.filter(p => p.id !== currentProductId);
 }
 
+type Props = {
+  params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const { slug } = await params;
+  const product = await getProduct(slug);
+
+  if (!product) {
+    return {
+      title: 'Producto no encontrado',
+      description: 'El producto que buscas no está disponible',
+    };
+  }
+
+  // Get parent metadata for fallbacks
+  const previousImages = (await parent).openGraph?.images || [];
+
+  return {
+    title: `${product.name} - ${product.vendorName} | Luzimarket`,
+    description: product.description || `Compra ${product.name} de ${product.vendorName} en Luzimarket. ${product.categoryName} de alta calidad.`,
+    openGraph: {
+      title: product.name,
+      description: product.description || `${product.name} - ${product.categoryName}`,
+      images: product.images && (product.images as string[]).length > 0 
+        ? (product.images as string[])
+        : [...previousImages],
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: product.name,
+      description: product.description || `${product.name} - ${product.categoryName}`,
+      images: product.images && (product.images as string[]).length > 0 
+        ? [(product.images as string[])[0]]
+        : undefined,
+    },
+    alternates: {
+      canonical: `/productos/${slug}`,
+      languages: {
+        'es': `/es/productos/${slug}`,
+        'en': `/en/products/${slug}`,
+      },
+    },
+  };
+}
+
 export default async function ProductDetailPage({
   params
-}: {
-  params: Promise<{ id: string }>
-}) {
-  const { id } = await params;
-  const product = await getProduct(id);
+}: Props) {
+  const { slug } = await params;
+  const product = await getProduct(slug);
 
   if (!product) {
     notFound();

@@ -1,5 +1,7 @@
 import { config } from "dotenv";
 import bcrypt from "bcryptjs";
+import { generateSlug } from "../lib/utils/slug";
+import { eq } from "drizzle-orm";
 
 // Load environment variables before importing db
 config({ path: ".env.local" });
@@ -93,6 +95,7 @@ async function seed() {
     const vendorsData = [
       {
         businessName: "Flores del Valle",
+        slug: generateSlug("Flores del Valle"),
         contactName: "María Elena González",
         email: "contacto@floresdelvalle.mx",
         phone: "5551234567",
@@ -114,6 +117,7 @@ async function seed() {
       },
       {
         businessName: "Chocolatería Artesanal Cacao",
+        slug: generateSlug("Chocolatería Artesanal Cacao"),
         contactName: "Carlos Mendoza Ruiz",
         email: "info@chocolateriacacao.mx",
         phone: "5559876543",
@@ -135,6 +139,7 @@ async function seed() {
       },
       {
         businessName: "Luzia Candles",
+        slug: generateSlug("Luzia Candles"),
         contactName: "Ana Sofía Herrera",
         email: "hola@luziacandles.mx",
         phone: "5555555555",
@@ -156,6 +161,7 @@ async function seed() {
       },
       {
         businessName: "Regalo Perfecto MX",
+        slug: generateSlug("Regalo Perfecto MX"),
         contactName: "Sofía Hernández López",
         email: "contacto@regaloperfecto.mx",
         phone: "5552223333",
@@ -177,6 +183,7 @@ async function seed() {
       },
       {
         businessName: "Casa Décor Studio",
+        slug: generateSlug("Casa Décor Studio"),
         contactName: "Roberto Jiménez",
         email: "info@casadecor.mx",
         phone: "5554445555",
@@ -195,6 +202,7 @@ async function seed() {
       },
       {
         businessName: "Joyería Plata y Oro",
+        slug: generateSlug("Joyería Plata y Oro"),
         contactName: "Isabella Martínez",
         email: "ventas@platayoro.mx",
         phone: "5556667777",
@@ -215,6 +223,7 @@ async function seed() {
       },
       {
         businessName: "Delicias Gourmet",
+        slug: generateSlug("Delicias Gourmet"),
         contactName: "Chef Pierre Dubois",
         email: "pedidos@deliciasgourmet.mx",
         phone: "5557778888",

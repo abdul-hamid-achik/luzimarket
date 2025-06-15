@@ -56,6 +56,7 @@ export async function GET(request: Request) {
       .select({
         id: vendors.id,
         name: vendors.businessName,
+        slug: vendors.slug,
         type: sql<string>`'vendor'`,
       })
       .from(vendors)

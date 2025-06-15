@@ -21,7 +21,22 @@
     "back": "Volver",
     "next": "Siguiente",
     "previous": "Anterior",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "openMenu": "Abrir menú de navegación",
+    "userAccount": "Cuenta de usuario",
+    "shoppingCart": "Carrito de compras",
+    "shoppingCartWithItems": "Carrito con {count} productos",
+    "wishlist": "Lista de deseos",
+    "wishlistWithItems": "Lista de deseos con {count} productos",
+    "currencyLocale": "ESP → MXN",
+    "shippingTo": "Envío a: {location}",
+    "searchPlaceholder": "Buscar productos, categorías o tiendas...",
+    "searching": "Buscando...",
+    "noSearchResults": "No se encontraron resultados para \"{query}\"",
+    "viewAllResults": "Ver todos los resultados para \"{query}\"",
+    "searchCategories": "Categorías",
+    "searchProducts": "Productos",
+    "searchStores": "Tiendas"
   },
   
   "Navigation": {
@@ -31,6 +46,7 @@
     "categories": "Categorías",
     "occasions": "Ocasiones",
     "editorial": "Editorial",
+    "brandsAndStores": "Tiendas + Marcas",
     "contact": "Contacto",
     "about": "Acerca de",
     "instagram": "Instagram",
@@ -48,6 +64,21 @@
     "featuredCategories": "Categorías destacadas",
     "trendingNow": "Tendencias",
     "newArrivals": "Nuevos productos"
+  },
+  
+  "HandpickedPage": {
+    "title": "Selección Especial",
+    "subtitle": "Regalos cuidadosamente seleccionados por nuestros expertos",
+    "description": "Descubre nuestra colección exclusiva de productos artesanales y únicos, elegidos especialmente para momentos inolvidables.",
+    "filterBy": "Filtrar por",
+    "sortBy": "Ordenar por",
+    "occasion": "Ocasión",
+    "priceRange": "Rango de precio",
+    "vendor": "Vendedor",
+    "showFilters": "Mostrar filtros",
+    "hideFilters": "Ocultar filtros",
+    "noProducts": "No se encontraron productos",
+    "tryAdjustingFilters": "Intenta ajustar los filtros para ver más resultados"
   },
   
   "ComingSoon": {
@@ -85,7 +116,12 @@
     "newest": "Más reciente",
     "priceLowToHigh": "Precio: Menor a Mayor",
     "priceHighToLow": "Precio: Mayor a Menor",
-    "bestSelling": "Más vendido"
+    "bestSelling": "Más vendido",
+    "addToWishlist": "Agregar a favoritos",
+    "removeFromWishlist": "Quitar de favoritos",
+    "quickView": "Vista rápida",
+    "addedToWishlist": "Agregado a favoritos",
+    "removedFromWishlist": "Eliminado de favoritos"
   },
   
   "Cart": {

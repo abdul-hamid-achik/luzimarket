@@ -1,11 +1,10 @@
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
-import { setRequestLocale } from 'next-intl/server';
+import { setRequestLocale, getMessages } from 'next-intl/server';
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { CartProvider } from "@/contexts/cart-context";
-import { WishlistProvider } from "@/contexts/wishlist-context";
+import { Providers } from "@/components/providers";
 import CartSheet from "@/components/cart/cart-sheet";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -24,20 +23,22 @@ export default async function LocaleLayout({
 
   // Enable static rendering
   setRequestLocale(locale);
+  
+  // Providing all messages to the client
+  // side is the easiest way to get started
+  const messages = await getMessages();
 
   return (
     <html lang={locale}>
       <body>
-        <NextIntlClientProvider>
-          <CartProvider>
-            <WishlistProvider>
-              <Header />
-              {children}
-              <Footer />
-              <CartSheet />
-              <Toaster />
-            </WishlistProvider>
-          </CartProvider>
+        <NextIntlClientProvider messages={messages}>
+          <Providers>
+            <Header />
+            {children}
+            <Footer />
+            <CartSheet />
+            <Toaster />
+          </Providers>
         </NextIntlClientProvider>
       </body>
     </html>

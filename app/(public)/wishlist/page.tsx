@@ -49,6 +49,7 @@ export default function WishlistPage() {
               product={{
                 id: item.id,
                 name: item.name,
+                slug: item.id, // Using id as slug for wishlist items
                 price: item.price.toString(),
                 images: [item.image],
                 vendor: {

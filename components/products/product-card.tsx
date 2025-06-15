@@ -9,11 +9,13 @@ import { useState } from "react";
 import AddToCartButton from "@/components/cart/add-to-cart-button";
 import { useWishlist } from "@/contexts/wishlist-context";
 import { toast } from "sonner";
+import { useTranslations } from 'next-intl';
 
 interface ProductCardProps {
   product: {
     id: string;
     name: string;
+    slug: string;
     price: string;
     images: string[];
     vendor?: {
@@ -29,6 +31,7 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
   const [isHovered, setIsHovered] = useState(false);
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const isWishlisted = isInWishlist(product.id);
+  const t = useTranslations('Products');
 
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -36,7 +39,7 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
     
     if (isWishlisted) {
       removeFromWishlist(product.id);
-      toast.success("Eliminado de favoritos");
+      toast.success(t('removedFromWishlist'));
     } else {
       addToWishlist({
         id: product.id,
@@ -44,15 +47,15 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
         price: parseFloat(product.price),
         image: product.images[0] || "/images/links/pia-riverola.webp",
         vendorId: product.vendor?.id || "",
-        vendorName: product.vendor?.businessName || "Vendedor",
+        vendorName: product.vendor?.businessName || t('vendor'),
       });
-      toast.success("Agregado a favoritos");
+      toast.success(t('addedToWishlist'));
     }
   };
 
   return (
     <Link 
-      href={`/products/${product.id}`} 
+      href={`/products/${product.slug}`} 
       className={cn("group block", className)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -80,6 +83,7 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
             "opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0"
           )}
           onClick={handleWishlistToggle}
+          aria-label={isWishlisted ? t('removeFromWishlist') : t('addToWishlist')}
         >
           <Heart 
             className={cn(
@@ -104,9 +108,10 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
                   e.preventDefault();
                   onQuickView(product);
                 }}
+                aria-label={t('quickView')}
               >
                 <Eye className="h-4 w-4 mr-1" />
-                Vista rápida
+                {t('quickView')}
               </Button>
             )}
             <AddToCartButton
@@ -116,7 +121,7 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
               price: parseFloat(product.price),
               image: product.images[0] || "/images/links/pia-riverola.webp",
               vendorId: product.vendor?.id || "",
-              vendorName: product.vendor?.businessName || "Vendedor",
+              vendorName: product.vendor?.businessName || t('vendor'),
             }}
               className={cn(
                 "h-10 text-sm",

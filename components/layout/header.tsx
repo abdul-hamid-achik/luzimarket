@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from '@/i18n/navigation';
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Heart, ShoppingBag, User, Menu } from "lucide-react";
@@ -8,6 +8,7 @@ import { SearchBox } from "./search-box";
 import { useState } from "react";
 import { useCart } from "@/contexts/cart-context";
 import { useWishlist } from "@/contexts/wishlist-context";
+import { useTranslations } from 'next-intl';
 import {
   Sheet,
   SheetContent,
@@ -20,26 +21,28 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { toggleCart, getTotalItems } = useCart();
   const { getTotalItems: getWishlistItems } = useWishlist();
+  const t = useTranslations('Common');
+  const tNav = useTranslations('Navigation');
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b">
-      <div className="container mx-auto">
+      <div>
         {/* Top bar - Desktop only */}
-        <div className="hidden md:flex items-center justify-between py-2 text-xs border-b">
+        <div className="hidden md:flex items-center justify-between py-2 text-xs border-b px-8">
           <div className="flex items-center gap-4">
-            <span className="text-gray-600">ESP - MXN</span>
+            <span className="text-gray-600">{t('currencyLocale')}</span>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-gray-600">Envío a: MONTERREY, NL</span>
+            <span className="text-gray-600">{t('shippingTo', { location: 'MONTERREY, NL' })}</span>
           </div>
         </div>
 
         {/* Main header */}
-        <div className="flex items-center justify-between py-4 gap-4">
+        <div className="flex items-center justify-between py-4 gap-4 px-4 md:px-8">
           {/* Mobile Menu */}
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
+              <Button variant="ghost" size="icon" className="md:hidden" aria-label={t('openMenu')}>
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
@@ -61,42 +64,42 @@ export function Header() {
                   className="block py-2 text-sm font-univers"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Best Sellers
+                  {tNav('bestSellers')}
                 </Link>
                 <Link 
                   href="/handpicked" 
                   className="block py-2 text-sm font-univers"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Handpicked
+                  {tNav('handpicked')}
                 </Link>
                 <Link 
-                  href="/tiendas-marcas" 
+                  href="/brands" 
                   className="block py-2 text-sm font-univers"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Tiendas + Marcas
+                  {tNav('brandsAndStores')}
                 </Link>
                 <Link 
-                  href="/categorias" 
+                  href="/categories" 
                   className="block py-2 text-sm font-univers"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Categorías
+                  {tNav('categories')}
                 </Link>
                 <Link 
-                  href="/ocasiones" 
+                  href="/occasions" 
                   className="block py-2 text-sm font-univers"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Ocasiones
+                  {tNav('occasions')}
                 </Link>
                 <Link 
                   href="/editorial" 
                   className="block py-2 text-sm font-univers"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Editorial
+                  {tNav('editorial')}
                 </Link>
               </nav>
             </SheetContent>
@@ -118,7 +121,12 @@ export function Header() {
               FAMILY
             </Button>
             <Link href="/wishlist">
-              <Button variant="ghost" size="icon" className="hidden md:inline-flex relative">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="hidden md:inline-flex relative"
+                aria-label={getWishlistItems() > 0 ? t('wishlistWithItems', { count: getWishlistItems() }) : t('wishlist')}
+              >
                 <Heart className="h-5 w-5" />
                 {getWishlistItems() > 0 && (
                   <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
@@ -128,11 +136,17 @@ export function Header() {
               </Button>
             </Link>
             <Link href="/login">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" aria-label={t('userAccount')}>
                 <User className="h-5 w-5" />
               </Button>
             </Link>
-            <Button variant="ghost" size="icon" onClick={toggleCart} className="relative">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={toggleCart} 
+              className="relative"
+              aria-label={getTotalItems() > 0 ? t('shoppingCartWithItems', { count: getTotalItems() }) : t('shoppingCart')}
+            >
               <ShoppingBag className="h-5 w-5" />
               {getTotalItems() > 0 && (
                 <span className="absolute -top-1 -right-1 h-5 w-5 bg-black text-white text-xs rounded-full flex items-center justify-center">
@@ -144,29 +158,29 @@ export function Header() {
         </div>
 
         {/* Search - Mobile */}
-        <div className="md:hidden pb-3">
+        <div className="md:hidden pb-3 px-4">
           <SearchBox />
         </div>
 
         {/* Navigation - Desktop only */}
-        <nav className="hidden md:flex items-center gap-8 py-3">
+        <nav className="hidden md:flex items-center gap-8 py-3 px-8">
           <Link href="/best-sellers" className="text-xs font-univers hover:text-gray-600 tracking-wide">
-            Best Sellers
+            {tNav('bestSellers')}
           </Link>
           <Link href="/handpicked" className="text-xs font-univers hover:text-gray-600 tracking-wide">
-            Handpicked
+            {tNav('handpicked')}
           </Link>
-          <Link href="/tiendas-marcas" className="text-xs font-univers hover:text-gray-600 tracking-wide">
-            Tiendas + Marcas
+          <Link href="/brands" className="text-xs font-univers hover:text-gray-600 tracking-wide">
+            {tNav('brandsAndStores')}
           </Link>
-          <Link href="/categorias" className="text-xs font-univers hover:text-gray-600 tracking-wide">
-            Categorías
+          <Link href="/categories" className="text-xs font-univers hover:text-gray-600 tracking-wide">
+            {tNav('categories')}
           </Link>
-          <Link href="/ocasiones" className="text-xs font-univers hover:text-gray-600 tracking-wide">
-            Ocasiones
+          <Link href="/occasions" className="text-xs font-univers hover:text-gray-600 tracking-wide">
+            {tNav('occasions')}
           </Link>
           <Link href="/editorial" className="text-xs font-univers hover:text-gray-600 tracking-wide">
-            Editorial
+            {tNav('editorial')}
           </Link>
         </nav>
       </div>

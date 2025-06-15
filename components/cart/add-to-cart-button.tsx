@@ -5,6 +5,7 @@ import { useCart } from "@/contexts/cart-context";
 import { Plus, Check } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useTranslations } from 'next-intl';
 
 interface AddToCartButtonProps {
   product: {
@@ -26,6 +27,7 @@ export default function AddToCartButton({
 }: AddToCartButtonProps) {
   const { addToCart, toggleCart } = useCart();
   const [isAdded, setIsAdded] = useState(false);
+  const t = useTranslations('Products');
 
   const handleAddToCart = () => {
     addToCart(product);
@@ -59,7 +61,7 @@ export default function AddToCartButton({
           <Plus className="h-4 w-4 mr-2" />
         )
       )}
-      {isAdded ? "Agregado" : "Agregar al carrito"}
+      {isAdded ? t('added') : t('addToCart')}
     </Button>
   );
 }

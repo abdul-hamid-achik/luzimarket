@@ -16,7 +16,7 @@ export function Footer() {
     <>
       <Newsletter />
       <footer className="bg-gradient-to-r from-green-400 via-yellow-300 to-cyan-400 text-black">
-        <div className="container mx-auto py-12">
+        <div className="px-8 py-12">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Logo and Description */}

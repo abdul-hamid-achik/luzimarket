@@ -7,10 +7,11 @@ import { QuickViewModal } from "./quick-view-modal";
 interface Product {
   id: string;
   name: string;
+  slug: string;
   description: string | null;
   price: string;
   images: string[] | null;
-  stock: number;
+  stock: number | null;
   vendor: {
     id: string;
     businessName: string;

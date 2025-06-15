@@ -39,11 +39,11 @@ export default async function HomePage({ params }: HomePageProps) {
   return (
     <main className="min-h-screen">
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16 text-center">
-        <h1 className="text-6xl font-times-now mb-6 leading-tight">
+      <section className="py-16 text-center px-8">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-times-now mb-6 leading-tight">
           Regalos handpicked extraordinarios
         </h1>
-        <p className="text-lg font-univers text-gray-600 max-w-2xl mx-auto">
+        <p className="text-base md:text-lg font-univers text-gray-600 max-w-2xl mx-auto">
           Experiencias y productos seleccionados a mano para momentos especiales.
           Lorem ipsum dolor sit amet, consectetur adipiscing elit.
         </p>

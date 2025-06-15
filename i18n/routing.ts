@@ -17,9 +17,9 @@ export const routing = defineRouting({
       es: '/productos',
       en: '/products'
     },
-    '/products/[id]': {
-      es: '/productos/[id]',
-      en: '/products/[id]'
+    '/products/[slug]': {
+      es: '/productos/[slug]',
+      en: '/products/[slug]'
     },
     '/category/[slug]': {
       es: '/categoria/[slug]',
@@ -45,6 +45,38 @@ export const routing = defineRouting({
     '/coming-soon': {
       es: '/proximamente',
       en: '/coming-soon'
+    },
+    '/brands': {
+      es: '/tiendas-marcas',
+      en: '/brands'
+    },
+    '/best-sellers': {
+      es: '/mas-vendidos',
+      en: '/best-sellers'
+    },
+    '/handpicked': {
+      es: '/seleccionados',
+      en: '/handpicked'
+    },
+    '/categories': {
+      es: '/categorias',
+      en: '/categories'
+    },
+    '/occasions': {
+      es: '/ocasiones',
+      en: '/occasions'
+    },
+    '/editorial': {
+      es: '/editorial',
+      en: '/editorial'
+    },
+    '/wishlist': {
+      es: '/favoritos',
+      en: '/wishlist'
+    },
+    '/login': {
+      es: '/iniciar-sesion',
+      en: '/login'
     }
   }
 });

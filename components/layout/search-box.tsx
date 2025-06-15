@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { useDebounce } from "@/lib/hooks/use-debounce";
+import { useTranslations } from 'next-intl';
 
 interface SearchResult {
   id: string;
@@ -26,6 +27,7 @@ export function SearchBox() {
   const [isOpen, setIsOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const t = useTranslations('Common');
   
   const debouncedQuery = useDebounce(query, 300);
 
@@ -96,7 +98,7 @@ export function SearchBox() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => query.length >= 2 && results.length > 0 && setIsOpen(true)}
-            placeholder="Buscar productos, categorías o tiendas..."
+            placeholder={t('searchPlaceholder')}
             className="pl-10 pr-10 w-full border-gray-300 rounded-none font-univers"
           />
           {query && (
@@ -116,7 +118,7 @@ export function SearchBox() {
         <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 max-h-96 overflow-y-auto">
           {isLoading ? (
             <div className="p-4 text-center text-sm text-gray-500 font-univers">
-              Buscando...
+              {t('searching')}
             </div>
           ) : results.length > 0 ? (
             <div className="py-2">
@@ -124,14 +126,14 @@ export function SearchBox() {
               {results.filter(r => r.type === "product").length > 0 && (
                 <div>
                   <div className="px-4 py-2 text-xs font-univers text-gray-500 uppercase">
-                    Productos
+                    {t('searchProducts')}
                   </div>
                   {results
                     .filter(r => r.type === "product")
                     .map((result) => (
                       <Link
                         key={result.id}
-                        href={`/products/${result.id}`}
+                        href={`/products/${result.slug || result.id}`}
                         onClick={handleResultClick}
                         className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
                       >
@@ -161,7 +163,7 @@ export function SearchBox() {
               {results.filter(r => r.type === "category").length > 0 && (
                 <div>
                   <div className="px-4 py-2 text-xs font-univers text-gray-500 uppercase border-t">
-                    Categorías
+                    {t('searchCategories')}
                   </div>
                   {results
                     .filter(r => r.type === "category")
@@ -185,14 +187,14 @@ export function SearchBox() {
               {results.filter(r => r.type === "vendor").length > 0 && (
                 <div>
                   <div className="px-4 py-2 text-xs font-univers text-gray-500 uppercase border-t">
-                    Tiendas
+                    {t('searchStores')}
                   </div>
                   {results
                     .filter(r => r.type === "vendor")
                     .map((result) => (
                       <Link
                         key={result.id}
-                        href={`/vendors/${result.id}`}
+                        href={`/brands/${result.slug || result.id}`}
                         onClick={handleResultClick}
                         className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
                       >
@@ -211,13 +213,13 @@ export function SearchBox() {
                   onClick={handleResultClick}
                   className="block px-4 py-3 text-sm font-univers text-center text-gray-600 hover:bg-gray-50"
                 >
-                  Ver todos los resultados para &quot;{query}&quot;
+                  {t('viewAllResults', { query })}
                 </Link>
               </div>
             </div>
           ) : query.length >= 2 ? (
             <div className="p-4 text-center text-sm text-gray-500 font-univers">
-              No se encontraron resultados para &quot;{query}&quot;
+              {t('noSearchResults', { query })}
             </div>
           ) : null}
         </div>

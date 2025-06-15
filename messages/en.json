@@ -21,7 +21,22 @@
     "back": "Back",
     "next": "Next",
     "previous": "Previous",
-    "close": "Close"
+    "close": "Close",
+    "openMenu": "Open navigation menu",
+    "userAccount": "User account",
+    "shoppingCart": "Shopping cart",
+    "shoppingCartWithItems": "Cart with {count} items",
+    "wishlist": "Wishlist",
+    "wishlistWithItems": "Wishlist with {count} items",
+    "currencyLocale": "ENG → USD",
+    "shippingTo": "Shipping to: {location}",
+    "searchPlaceholder": "Search products, categories or stores...",
+    "searching": "Searching...",
+    "noSearchResults": "No results found for \"{query}\"",
+    "viewAllResults": "View all results for \"{query}\"",
+    "searchCategories": "Categories",
+    "searchProducts": "Products",
+    "searchStores": "Stores"
   },
   
   "Navigation": {
@@ -31,6 +46,7 @@
     "categories": "Categories",
     "occasions": "Occasions",
     "editorial": "Editorial",
+    "brandsAndStores": "Brands + Stores",
     "contact": "Contact",
     "about": "About",
     "instagram": "Instagram",
@@ -48,6 +64,21 @@
     "featuredCategories": "Featured Categories",
     "trendingNow": "Trending Now",
     "newArrivals": "New Arrivals"
+  },
+  
+  "HandpickedPage": {
+    "title": "Handpicked Selection",
+    "subtitle": "Gifts carefully selected by our experts",
+    "description": "Discover our exclusive collection of artisanal and unique products, specially chosen for unforgettable moments.",
+    "filterBy": "Filter by",
+    "sortBy": "Sort by",
+    "occasion": "Occasion",
+    "priceRange": "Price range",
+    "vendor": "Vendor",
+    "showFilters": "Show filters",
+    "hideFilters": "Hide filters",
+    "noProducts": "No products found",
+    "tryAdjustingFilters": "Try adjusting filters to see more results"
   },
   
   "ComingSoon": {
@@ -85,7 +116,12 @@
     "newest": "Newest",
     "priceLowToHigh": "Price: Low to High",
     "priceHighToLow": "Price: High to Low",
-    "bestSelling": "Best selling"
+    "bestSelling": "Best selling",
+    "addToWishlist": "Add to wishlist",
+    "removeFromWishlist": "Remove from wishlist",
+    "quickView": "Quick view",
+    "addedToWishlist": "Added to wishlist",
+    "removedFromWishlist": "Removed from wishlist"
   },
   
   "Cart": {
