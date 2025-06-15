@@ -41,7 +41,7 @@ docker-compose up -d postgres
 Create a `.env.local` file:
 ```env
 DATABASE_URL=postgresql://postgres:password@localhost:5432/luzimarket
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=https://luzimarket.shop
 ```
 
 5. **Set up the database**
@@ -61,7 +61,7 @@ npm run db:seed
 npm run dev
 ```
 
-Visit http://localhost:3000 to see the application.
+Visit http://localhost:3000 to see the application in development, or https://luzimarket.shop in production.
 
 ### Docker Setup (Full Stack)
 

@@ -12,7 +12,7 @@ export interface EmailOptions {
 export async function sendEmail({ to, subject, html, text }: EmailOptions) {
   try {
     const { data, error } = await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'noreply@luzimarket.com',
+      from: process.env.EMAIL_FROM || 'noreply@luzimarket.shop',
       to,
       subject,
       html,

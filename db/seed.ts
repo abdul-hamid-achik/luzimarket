@@ -1,9 +1,11 @@
-import { db } from "./index";
-import { categories, vendors, products, users, adminUsers, emailTemplates, subscriptions, orders, orderItems, reviews } from "./schema";
 import { config } from "dotenv";
 import bcrypt from "bcryptjs";
 
+// Load environment variables before importing db
 config({ path: ".env.local" });
+
+import { db } from "./index";
+import { categories, vendors, products, users, adminUsers, emailTemplates, subscriptions, orders, orderItems, reviews } from "./schema";
 
 async function seed() {
   console.log("🌱 Starting seed...");
@@ -604,14 +606,14 @@ async function seed() {
     const adminPassword = await bcrypt.hash("admin123", 10);
     const adminUsersData = [
       {
-        email: "admin@luzimarket.mx",
+        email: "admin@luzimarket.shop",
         name: "Administrador Principal",
         passwordHash: adminPassword,
         role: "super_admin",
         isActive: true,
       },
       {
-        email: "soporte@luzimarket.mx",
+        email: "soporte@luzimarket.shop",
         name: "Soporte Técnico",
         passwordHash: adminPassword,
         role: "admin",
@@ -658,47 +660,28 @@ async function seed() {
       {
         name: "welcome",
         subject: "¡Bienvenido a Luzimarket!",
-        htmlTemplate: `
-          <h1>¡Hola {{name}}!</h1>
-          <p>Bienvenido a Luzimarket, tu destino para regalos especiales.</p>
-          <p>Gracias por unirte a nuestra comunidad.</p>
-        `,
+        htmlTemplate: "<h1>¡Hola {{name}}!</h1><p>Bienvenido a Luzimarket, tu destino para regalos especiales.</p><p>Gracias por unirte a nuestra comunidad.</p>",
         textTemplate: "Hola {{name}}, Bienvenido a Luzimarket!",
         variables: ["name"],
       },
       {
         name: "order_confirmation",
         subject: "Confirmación de pedido #{{orderNumber}}",
-        htmlTemplate: `
-          <h1>¡Gracias por tu compra!</h1>
-          <p>Hola {{customerName}},</p>
-          <p>Hemos recibido tu pedido #{{orderNumber}}.</p>
-          <p>Total: ${{total}} MXN</p>
-        `,
+        htmlTemplate: "<h1>¡Gracias por tu compra!</h1><p>Hola {{customerName}},</p><p>Hemos recibido tu pedido #{{orderNumber}}.</p><p>Total: ${{total}} MXN</p>",
         textTemplate: "Confirmación de pedido #{{orderNumber}}. Total: ${{total}} MXN",
         variables: ["customerName", "orderNumber", "total"],
       },
       {
         name: "order_shipped",
         subject: "Tu pedido #{{orderNumber}} ha sido enviado",
-        htmlTemplate: `
-          <h1>¡Tu pedido está en camino!</h1>
-          <p>Hola {{customerName}},</p>
-          <p>Tu pedido #{{orderNumber}} ha sido enviado.</p>
-          <p>Número de guía: {{trackingNumber}}</p>
-        `,
+        htmlTemplate: "<h1>¡Tu pedido está en camino!</h1><p>Hola {{customerName}},</p><p>Tu pedido #{{orderNumber}} ha sido enviado.</p><p>Número de guía: {{trackingNumber}}</p>",
         textTemplate: "Tu pedido #{{orderNumber}} ha sido enviado. Guía: {{trackingNumber}}",
         variables: ["customerName", "orderNumber", "trackingNumber"],
       },
       {
         name: "vendor_approved",
         subject: "¡Tu solicitud de vendedor ha sido aprobada!",
-        htmlTemplate: `
-          <h1>¡Bienvenido a Luzimarket como vendedor!</h1>
-          <p>Hola {{vendorName}},</p>
-          <p>Tu solicitud para {{businessName}} ha sido aprobada.</p>
-          <p>Ya puedes comenzar a publicar tus productos.</p>
-        `,
+        htmlTemplate: "<h1>¡Bienvenido a Luzimarket como vendedor!</h1><p>Hola {{vendorName}},</p><p>Tu solicitud para {{businessName}} ha sido aprobada.</p><p>Ya puedes comenzar a publicar tus productos.</p>",
         textTemplate: "Tu solicitud de vendedor ha sido aprobada. ¡Bienvenido!",
         variables: ["vendorName", "businessName"],
       }
@@ -839,7 +822,7 @@ async function seed() {
     console.log(`- Reviews: ${insertedReviews.length}`);
     
     console.log("\n🔐 Login credentials:");
-    console.log("Admin: admin@luzimarket.mx / admin123");
+    console.log("Admin: admin@luzimarket.shop / admin123");
     console.log("Customer: maria.garcia@email.com / customer123");
 
   } catch (error) {
