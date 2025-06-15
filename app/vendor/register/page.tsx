@@ -126,8 +126,8 @@ export default function VendorRegisterPage() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             {/* Business Information */}
             <div className="space-y-6">
-              <h3 className="text-xl font-univers flex items-center gap-2">
-                <span className="text-2xl">→</span> Información de la marca
+              <h3 className="text-lg font-univers flex items-center gap-2">
+                <span className="text-xl">+</span> Información de la marca
               </h3>
               
               <div className="grid md:grid-cols-2 gap-6">
@@ -302,9 +302,9 @@ export default function VendorRegisterPage() {
             </div>
 
             {/* Delivery Service */}
-            <div className="space-y-6">
-              <h3 className="text-xl font-univers flex items-center gap-2">
-                <span className="text-2xl">→</span> Servicio a domicilio
+            <div className="space-y-6 border-t pt-6">
+              <h3 className="text-lg font-univers flex items-center gap-2">
+                <span className="text-xl">+</span> Servicio a domicilio
               </h3>
               
               <div className="space-y-4">
@@ -380,9 +380,9 @@ export default function VendorRegisterPage() {
             </div>
 
             {/* Social Media */}
-            <div className="space-y-6">
-              <h3 className="text-xl font-univers flex items-center gap-2">
-                <span className="text-2xl">→</span> Social Media
+            <div className="space-y-6 border-t pt-6">
+              <h3 className="text-lg font-univers flex items-center gap-2">
+                <span className="text-xl">+</span> Social Media
               </h3>
               
               <div className="grid md:grid-cols-2 gap-4">
@@ -440,7 +440,7 @@ export default function VendorRegisterPage() {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-black text-white px-12 py-3 font-univers hover:bg-gray-800"
+                className="bg-black text-white px-16 py-6 font-univers text-base tracking-wider hover:bg-gray-900 rounded-none"
               >
                 {isSubmitting ? "Enviando..." : "¡Listo!"}
               </Button>

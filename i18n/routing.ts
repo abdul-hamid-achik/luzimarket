@@ -8,13 +8,7 @@ export const routing = defineRouting({
   defaultLocale: 'es',
   
   // Locale prefix configuration
-  localePrefix: {
-    mode: 'as-needed', // Don't show /es for default Spanish
-    prefixes: {
-      'es': '/', // Spanish at root
-      'en': '/en' // English with prefix
-    }
-  },
+  localePrefix: 'as-needed', // Spanish URLs won't have /es prefix
   
   // Define localized pathnames
   pathnames: {

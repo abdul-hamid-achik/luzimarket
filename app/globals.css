@@ -4,6 +4,48 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Custom styles to match Luzimarket design system */
+@layer base {
+  body {
+    font-family: var(--font-univers);
+    letter-spacing: 0.01em;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-times-now);
+    font-weight: 400;
+  }
+
+  /* Form inputs consistent with mockups */
+  input:not([type="checkbox"]):not([type="radio"]),
+  textarea,
+  select {
+    border-radius: 9999px !important;
+    border-color: rgb(229 231 235);
+    font-family: var(--font-univers);
+    font-size: 0.875rem;
+  }
+
+  textarea {
+    border-radius: 1rem !important;
+  }
+
+  /* Black buttons as in mockups */
+  button[type="submit"],
+  .btn-primary {
+    background-color: black !important;
+    color: white !important;
+    font-family: var(--font-univers);
+    letter-spacing: 0.05em;
+    padding: 0.75rem 3rem;
+  }
+
+  /* Product price formatting */
+  .price {
+    font-family: var(--font-univers);
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

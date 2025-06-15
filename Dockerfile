@@ -1,5 +1,5 @@
 # Multi-stage build for production
-FROM node:20-alpine AS dependencies
+FROM node:22-alpine AS dependencies
 # Install Python and build dependencies for native modules
 RUN apk add --no-cache python3 make g++
 WORKDIR /app
