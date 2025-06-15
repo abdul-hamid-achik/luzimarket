@@ -175,8 +175,6 @@ The app is configured for containerized deployment with Docker. The production b
 ## TODO - Features from Mockups
 
 ### Remaining Tasks
-- [ ] **Vendor Product Management** - CRUD operations for vendors to manage their products
-- [ ] **Order Success Page & Webhooks** - Implement order confirmation page and payment webhooks
 - [ ] **Email Template Management** - UI for managing transactional email templates
 - [ ] **Product Reviews/Ratings** - Implement review system with star ratings
 - [ ] **Quick View Modal** - Add product preview without navigating to detail page
@@ -198,6 +196,9 @@ The app is configured for containerized deployment with Docker. The production b
 - [x] **Customer Account Dashboard** - Profile, orders, addresses, payment methods
 - [x] **Authentication Pages** - Login and registration with proper styling
 - [x] **About Page** - Company mission with signature decoration
+- [x] **Vendor Product Management** - Complete CRUD operations with image upload
+- [x] **Order Success Page** - Detailed order confirmation with Stripe integration
+- [x] **Stripe Webhooks** - Payment and subscription event handlers
 - [x] Basic vendor registration form
 - [x] Category and product listing pages
 - [x] Internationalization setup (es/en)

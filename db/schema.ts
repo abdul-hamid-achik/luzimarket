@@ -199,10 +199,12 @@ export const productsRelations = relations(products, ({ one, many }) => ({
     references: [categories.id],
   }),
   orderItems: many(orderItems),
+  reviews: many(reviews),
 }));
 
 export const userRelations = relations(users, ({ many }) => ({
   orders: many(orders),
+  reviews: many(reviews),
 }));
 
 export const orderRelations = relations(orders, ({ one, many }) => ({
@@ -225,5 +227,42 @@ export const orderItemRelations = relations(orderItems, ({ one }) => ({
   product: one(products, {
     fields: [orderItems.productId],
     references: [products.id],
+  }),
+}));
+
+// Product Reviews table
+export const reviews = pgTable("reviews", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  productId: uuid("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  orderId: uuid("order_id").references(() => orders.id),
+  rating: integer("rating").notNull(), // 1-5
+  title: text("title"),
+  comment: text("comment"),
+  isVerifiedPurchase: boolean("is_verified_purchase").default(false),
+  helpfulCount: integer("helpful_count").default(0),
+  images: json("images").$type<string[]>(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => {
+  return {
+    productIdx: index("reviews_product_idx").on(table.productId),
+    userIdx: index("reviews_user_idx").on(table.userId),
+    ratingIdx: index("reviews_rating_idx").on(table.rating),
+  }
+});
+
+export const reviewRelations = relations(reviews, ({ one }) => ({
+  product: one(products, {
+    fields: [reviews.productId],
+    references: [products.id],
+  }),
+  user: one(users, {
+    fields: [reviews.userId],
+    references: [users.id],
+  }),
+  order: one(orders, {
+    fields: [reviews.orderId],
+    references: [orders.id],
   }),
 }));

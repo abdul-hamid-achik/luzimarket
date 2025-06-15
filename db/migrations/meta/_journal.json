@@ -15,6 +15,20 @@
       "when": 1749942429802,
       "tag": "0001_wealthy_patch",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1749956731220,
+      "tag": "0002_massive_lady_vermin",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1749956753529,
+      "tag": "0003_peaceful_owl",
+      "breakpoints": true
     }
   ]
 }
