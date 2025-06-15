@@ -58,7 +58,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
 
   // Fetch products for this category
   const { products } = await getFilteredProducts({
-    categoryIds: [category.id],
+    categoryIds: [category.id.toString()],
     limit: 12,
   });
 

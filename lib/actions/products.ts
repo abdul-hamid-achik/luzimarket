@@ -62,7 +62,7 @@ export async function getFilteredProducts(filters: ProductFilters = {}) {
     }
     
     if (categoryIds.length > 0) {
-      conditions.push(inArray(products.categoryId, categoryIds));
+      conditions.push(inArray(products.categoryId, categoryIds.map(id => parseInt(id))));
     }
     
     if (vendorIds.length > 0) {
@@ -125,6 +125,7 @@ export async function getFilteredProducts(filters: ProductFilters = {}) {
     // Format the results
     const formattedProducts: ProductWithRelations[] = result.map(({ product, category, vendor }) => ({
       ...product,
+      images: product.images || [],
       category: category ? {
         id: category.id,
         name: category.name,

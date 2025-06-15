@@ -39,7 +39,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
   // Format filter options for sidebar
   const formattedCategories = filterOptions.categories.map(cat => ({
-    id: cat.id,
+    id: cat.id.toString(),
     name: cat.name,
     count: Number(cat.count),
   }));

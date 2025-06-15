@@ -13,12 +13,7 @@ const loginSchema = z.object({
   userType: z.enum(["customer", "vendor", "admin"]),
 });
 
-export const {
-  handlers,
-  auth,
-  signIn,
-  signOut,
-} = NextAuth({
+export const authOptions = {
   adapter: DrizzleAdapter(db),
   session: {
     strategy: "jwt",
@@ -118,4 +113,11 @@ export const {
     signIn: "/login",
     error: "/login",
   },
-});
+};
+
+export const {
+  handlers,
+  auth,
+  signIn,
+  signOut,
+} = NextAuth(authOptions);

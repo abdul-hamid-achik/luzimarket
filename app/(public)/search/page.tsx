@@ -76,7 +76,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   // Format filter options
   const formattedCategories = filterOptions.categories.map(cat => ({
-    id: cat.id,
+    id: cat.id.toString(),
     name: cat.name,
     count: Number(cat.count),
   }));
@@ -93,7 +93,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         {/* Search Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-univers mb-2">
-            Resultados de búsqueda para "{query}"
+            Resultados de búsqueda para &quot;{query}&quot;
           </h1>
           <p className="text-sm font-univers text-gray-600">
             {pagination.totalCount} {pagination.totalCount === 1 ? "producto encontrado" : "productos encontrados"}

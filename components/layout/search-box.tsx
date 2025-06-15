@@ -211,13 +211,13 @@ export function SearchBox() {
                   onClick={handleResultClick}
                   className="block px-4 py-3 text-sm font-univers text-center text-gray-600 hover:bg-gray-50"
                 >
-                  Ver todos los resultados para "{query}"
+                  Ver todos los resultados para &quot;{query}&quot;
                 </Link>
               </div>
             </div>
           ) : query.length >= 2 ? (
             <div className="p-4 text-center text-sm text-gray-500 font-univers">
-              No se encontraron resultados para "{query}"
+              No se encontraron resultados para &quot;{query}&quot;
             </div>
           ) : null}
         </div>
