@@ -8,17 +8,16 @@ import {
   CreditCard,
   LogOut
 } from "lucide-react";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 
 export default async function AccountLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   
-  if (!session || session.user.role !== "customer") {
+  if (!session || !session.user || session.user.role !== "customer") {
     redirect("/login");
   }
 
@@ -30,8 +29,8 @@ export default async function AccountLayout({
           <aside className="lg:w-64">
             <div className="bg-white rounded-lg shadow-sm p-6">
               <div className="mb-6">
-                <h2 className="text-xl font-times-now mb-1">{session.user.name}</h2>
-                <p className="text-sm text-gray-600 font-univers">{session.user.email}</p>
+                <h2 className="text-xl font-times-now mb-1">{session.user?.name}</h2>
+                <p className="text-sm text-gray-600 font-univers">{session.user?.email}</p>
               </div>
               
               <nav className="space-y-1">

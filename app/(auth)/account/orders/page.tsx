@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { orders, orderItems, products } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
@@ -9,7 +8,7 @@ import { Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default async function OrdersPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   
   if (!session) {
     return null;

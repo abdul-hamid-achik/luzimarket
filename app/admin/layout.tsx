@@ -11,22 +11,17 @@ import {
   Settings,
   LogOut
 } from "lucide-react";
-
-// TODO: Add proper auth check
-async function checkAdminAuth() {
-  // For now, return true. In production, check session/JWT
-  return true;
-}
+import { auth } from "@/lib/auth";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const isAuthenticated = await checkAdminAuth();
+  const session = await auth();
   
-  if (!isAuthenticated) {
-    redirect("/admin/login");
+  if (!session || session.user?.role !== "admin") {
+    redirect("/login");
   }
 
   return (

@@ -1,11 +1,10 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Package, Heart, MapPin, CreditCard } from "lucide-react";
 
 export default async function AccountPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   const quickActions = [
     {
