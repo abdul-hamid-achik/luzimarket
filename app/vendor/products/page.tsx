@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { products, categories } from "@/db/schema";
@@ -147,19 +148,27 @@ export default async function VendorProductsPage() {
                               <Edit className="h-4 w-4" />
                             </Button>
                           </Link>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              // TODO: Toggle product visibility
-                            }}
-                          >
+                          <form action={async () => {
+                            "use server";
+                            const newStatus = !product.isActive;
+                            await db
+                              .update(products)
+                              .set({ isActive: newStatus })
+                              .where(eq(products.id, product.id));
+                            revalidatePath("/vendor/products");
+                          }}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              type="submit"
+                            >
                             {product.isActive ? (
                               <EyeOff className="h-4 w-4" />
                             ) : (
                               <Eye className="h-4 w-4" />
                             )}
-                          </Button>
+                            </Button>
+                          </form>
                         </div>
                       </td>
                     </tr>
