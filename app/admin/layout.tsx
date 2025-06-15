@@ -30,7 +30,7 @@ export default async function AdminLayout({
       <aside className="w-64 bg-white border-r border-gray-200">
         <div className="h-full flex flex-col">
           {/* Logo */}
-          <div className="h-16 flex items-center justify-center border-b border-gray-200 bg-black">
+          <div className="h-16 flex items-center justify-center border-b border-gray-200 bg-white">
             <Image 
               src="/images/logos/logo-operations.png" 
               alt="Luzimarket Operations" 

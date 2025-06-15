@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { signIn } from "next-auth/react";
 import { useRouter } from "@/i18n/navigation";
+import { useRouter as useNextRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,6 +23,7 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
+  const nextRouter = useNextRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,13 +57,13 @@ export default function LoginPage() {
         // Redirect based on user type
         switch (userType) {
           case "admin":
-            router.push("/admin");
+            nextRouter.push("/admin"); // Admin routes are not internationalized
             break;
           case "vendor":
-            router.push("/vendor/dashboard");
+            nextRouter.push("/vendor/dashboard"); // Vendor routes are not internationalized
             break;
           default:
-            router.push("/");
+            router.push("/"); // Customer routes are internationalized
         }
       }
     } catch (error) {

@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { getMessages } from '../helpers/i18n';
 
 test.describe('Homepage', () => {
+  const messages = getMessages('es'); // Default to Spanish
   test('should load the homepage', async ({ page }) => {
     await page.goto('/');
     
@@ -37,17 +39,17 @@ test.describe('Homepage', () => {
     await page.goto('/');
     
     // Check main navigation items
-    await expect(page.locator('nav').locator('text=Best Sellers')).toBeVisible();
-    await expect(page.locator('nav').locator('text=Handpicked')).toBeVisible();
-    await expect(page.locator('nav').locator('text=Tiendas + Marcas')).toBeVisible();
-    await expect(page.locator('nav').locator('text=Categorías')).toBeVisible();
+    await expect(page.locator('nav').locator(`text=${messages.navigation.bestSellers}`)).toBeVisible();
+    await expect(page.locator('nav').locator(`text=${messages.navigation.handpicked}`)).toBeVisible();
+    await expect(page.locator('nav').locator(`text=${messages.navigation.brands}`)).toBeVisible();
+    await expect(page.locator('nav').locator(`text=${messages.navigation.categories}`)).toBeVisible();
   });
 
   test('should have search functionality', async ({ page }) => {
     await page.goto('/');
     
     // Look for search button/input
-    const searchButton = page.locator('[aria-label="Search"], button:has-text("Buscar")').first();
+    const searchButton = page.locator(`[aria-label="${messages.search.search}"], button:has-text("${messages.search.search}")`).first();
     await expect(searchButton).toBeVisible();
   });
 
@@ -55,7 +57,7 @@ test.describe('Homepage', () => {
     await page.goto('/');
     
     // Look for cart icon/button
-    const cartButton = page.locator('[aria-label="Cart"], button:has-text("Carrito"), button:has(svg)').first();
+    const cartButton = page.locator(`[aria-label="${messages.cart.cart}"], button:has-text("${messages.cart.cart}"), [aria-label*="carrito" i], button:has(svg)`).first();
     await expect(cartButton).toBeVisible();
   });
 

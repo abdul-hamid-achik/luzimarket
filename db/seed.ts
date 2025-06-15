@@ -9,6 +9,13 @@ config({ path: ".env.local" });
 import { db } from "./index";
 import { categories, vendors, products, users, adminUsers, emailTemplates, subscriptions, orders, orderItems, reviews } from "./schema";
 
+// Generate SKU from vendor name and product name
+function generateSKU(vendorName: string, productName: string, index: number): string {
+  const vendorCode = vendorName.substring(0, 3).toUpperCase();
+  const productCode = productName.substring(0, 3).toUpperCase();
+  return `${vendorCode}-${productCode}-${String(index).padStart(4, '0')}`;
+}
+
 async function seed() {
   console.log("🌱 Starting seed...");
 
@@ -607,7 +614,17 @@ async function seed() {
       }
     ];
 
-    const insertedProducts = await db.insert(products).values(productsData).returning();
+    // Map products data with SKUs
+    const productsDataWithSKU = productsData.map((product, index) => {
+      const vendorIndex = insertedVendors.findIndex(v => v.id === product.vendorId);
+      const vendorName = vendorIndex >= 0 ? vendorsData[vendorIndex].businessName : "VND";
+      return {
+        ...product,
+        sku: generateSKU(vendorName, product.name, index + 1)
+      };
+    });
+
+    const insertedProducts = await db.insert(products).values(productsDataWithSKU).returning();
     console.log(`✅ Inserted ${insertedProducts.length} products`);
 
     // Insert admin users

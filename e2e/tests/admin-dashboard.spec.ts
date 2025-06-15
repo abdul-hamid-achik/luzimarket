@@ -2,18 +2,21 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Admin Dashboard', () => {
   test.beforeEach(async ({ page }) => {
-    // Login as admin
-    await page.goto('/login');
-    await page.fill('input[type="email"]', 'admin@luzimarket.shop');
-    await page.fill('input[type="password"]', 'admin123');
+    // Login as admin - use Spanish locale
+    await page.goto('/es/login');
     
-    const userTypeSelector = page.locator('select[name="userType"]').first();
-    if (await userTypeSelector.isVisible()) {
-      await userTypeSelector.selectOption('admin');
-    }
+    // Click on Admin tab
+    await page.click('button[role="tab"]:has-text("Admin")');
     
-    await page.click('button[type="submit"]');
-    await page.waitForURL('/admin/**', { timeout: 10000 });
+    // Fill admin credentials
+    await page.fill('#admin-email', 'admin@luzimarket.shop');
+    await page.fill('#admin-password', 'admin123');
+    
+    // Submit form
+    await page.click('button[type="submit"]:has-text("Iniciar sesión")');
+    
+    // Wait for navigation to admin dashboard (no locale prefix for admin routes)
+    await page.waitForURL('/admin', { timeout: 10000 });
   });
 
   test('should display admin dashboard', async ({ page }) => {
