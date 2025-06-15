@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # Next.js app for development
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: luzimarket-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env.local
+    environment:
+      # Override database URL to use Docker network
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/luzimarket
+      REDIS_URL: redis://redis:6379
+      # Email settings for development
+      SMTP_HOST: mailcatcher
+      SMTP_PORT: 1025
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
+
+  # Extend services from main docker-compose.yml
+  postgres:
+    extends:
+      file: docker-compose.yml
+      service: postgres
+
+  redis:
+    extends:
+      file: docker-compose.yml
+      service: redis
+
+  mailcatcher:
+    extends:
+      file: docker-compose.yml
+      service: mailcatcher

@@ -24,9 +24,11 @@ cp .env.example .env.local
 
 3. **Start Docker services:**
 ```bash
-npm run docker:up
-# or for development only:
-npm run docker:dev
+# For local development (recommended):
+npm run docker:dev   # Only starts DB, Redis, Mail
+
+# Or run everything in Docker:
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 ```
 
 4. **Set up database:**
@@ -80,6 +82,12 @@ npm run docker:up     # Start all services
 npm run docker:down   # Stop all services
 npm run docker:logs   # View service logs
 npm run docker:clean  # Stop and remove volumes
+
+# For development with Next.js in Docker:
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+# For production build:
+docker build -f Dockerfile.production -t luzimarket:prod .
 ```
 
 ### Testing
