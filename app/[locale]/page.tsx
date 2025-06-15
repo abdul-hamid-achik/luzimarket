@@ -20,12 +20,12 @@ const categories = [
   },
   {
     title: "Events + Dinners",
-    image: "/images/links/saul-hernandez.jpg",
+    image: "/images/links/game-wwe-19-1507733870-150-911.jpg",
     slug: "eventos-cenas"
   },
   {
     title: "Giftshop",
-    image: "/images/links/shutterstock_130149286.jpg",
+    image: "/images/links/pia-riverola.webp",
     slug: "regalos-personalizados"
   }
 ];
