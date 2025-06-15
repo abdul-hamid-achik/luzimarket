@@ -24,7 +24,14 @@ export function Header() {
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
-            <span className="text-2xl font-univers tracking-wider">LUZIMARKET</span>
+            <Image 
+              src="/images/logos/logo-full.png" 
+              alt="Luzimarket" 
+              width={150} 
+              height={40}
+              className="h-8 w-auto"
+              priority
+            />
           </Link>
 
           {/* Search */}

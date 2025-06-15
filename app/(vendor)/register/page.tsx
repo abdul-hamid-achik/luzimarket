@@ -42,15 +42,22 @@ export default function VendorRegisterPage() {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-3xl font-univers tracking-wider mb-8">
-            LUZIMARKET<span className="text-xs align-super font-normal bg-gray-100 px-2 py-1 ml-2 rounded">FAMILY</span>
-          </h1>
+          <div className="mb-8">
+            <Image
+              src="/images/logos/logo-family.png"
+              alt="Luzimarket Family"
+              width={180}
+              height={50}
+              className="mx-auto h-12 w-auto"
+              priority
+            />
+          </div>
           
           <h2 className="text-6xl font-times-now mb-8">¡Gracias!</h2>
           
           <div className="mb-8">
             <Image
-              src="/images/logos/Asset 6.png"
+              src="/images/logos/flower-icon-1.png"
               alt="Success"
               width={100}
               height={100}
@@ -75,8 +82,17 @@ export default function VendorRegisterPage() {
     <div className="min-h-screen py-12 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-3xl font-univers tracking-wider mb-4">
-            LUZIMARKET<span className="text-xs align-super font-normal bg-gray-100 px-2 py-1 ml-2 rounded">FAMILY</span>
+          <div className="mb-4">
+            <Image
+              src="/images/logos/logo-family.png"
+              alt="Luzimarket Family"
+              width={180}
+              height={50}
+              className="mx-auto h-12 w-auto"
+              priority
+            />
+          </div>
+          <h1 className="text-3xl font-univers tracking-wider">
           </h1>
           <h2 className="text-5xl font-times-now mb-4">Bienvenidx, Family!</h2>
           <p className="text-lg font-univers text-gray-600 max-w-2xl mx-auto">

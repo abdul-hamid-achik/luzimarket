@@ -1,32 +1,31 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import Image from "next/image";
+import { redirect } from "next/navigation";
 import { 
   LayoutDashboard, 
   Package, 
-  Store, 
-  Users, 
-  ShoppingCart,
-  Mail,
+  ShoppingBag, 
+  BarChart3,
   Settings,
-  LogOut
+  LogOut,
+  Heart
 } from "lucide-react";
 
-// TODO: Add proper auth check
-async function checkAdminAuth() {
+// TODO: Add proper vendor auth check
+async function checkVendorAuth() {
   // For now, return true. In production, check session/JWT
   return true;
 }
 
-export default async function AdminLayout({
+export default async function VendorLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const isAuthenticated = await checkAdminAuth();
+  const isAuthenticated = await checkVendorAuth();
   
   if (!isAuthenticated) {
-    redirect("/admin/login");
+    redirect("/vendor/login");
   }
 
   return (
@@ -35,10 +34,10 @@ export default async function AdminLayout({
       <aside className="w-64 bg-white border-r border-gray-200">
         <div className="h-full flex flex-col">
           {/* Logo */}
-          <div className="h-16 flex items-center justify-center border-b border-gray-200 bg-black">
+          <div className="h-16 flex items-center justify-center border-b border-gray-200">
             <Image 
-              src="/images/logos/logo-operations.png" 
-              alt="Luzimarket Operations" 
+              src="/images/logos/logo-family.png" 
+              alt="Luzimarket Family" 
               width={150} 
               height={40}
               className="h-10 w-auto"
@@ -49,7 +48,7 @@ export default async function AdminLayout({
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-1">
             <Link
-              href="/admin"
+              href="/vendor/dashboard"
               className="flex items-center gap-3 px-3 py-2 text-sm font-univers text-gray-700 rounded-md hover:bg-gray-100 hover:text-black transition-colors"
             >
               <LayoutDashboard className="h-4 w-4" />
@@ -57,47 +56,39 @@ export default async function AdminLayout({
             </Link>
 
             <Link
-              href="/admin/orders"
+              href="/vendor/products"
               className="flex items-center gap-3 px-3 py-2 text-sm font-univers text-gray-700 rounded-md hover:bg-gray-100 hover:text-black transition-colors"
             >
-              <ShoppingCart className="h-4 w-4" />
+              <Package className="h-4 w-4" />
+              Mis Productos
+            </Link>
+
+            <Link
+              href="/vendor/orders"
+              className="flex items-center gap-3 px-3 py-2 text-sm font-univers text-gray-700 rounded-md hover:bg-gray-100 hover:text-black transition-colors"
+            >
+              <ShoppingBag className="h-4 w-4" />
               Órdenes
             </Link>
 
             <Link
-              href="/admin/products"
+              href="/vendor/analytics"
               className="flex items-center gap-3 px-3 py-2 text-sm font-univers text-gray-700 rounded-md hover:bg-gray-100 hover:text-black transition-colors"
             >
-              <Package className="h-4 w-4" />
-              Productos
+              <BarChart3 className="h-4 w-4" />
+              Analíticas
             </Link>
 
             <Link
-              href="/admin/vendors"
+              href="/vendor/favorites"
               className="flex items-center gap-3 px-3 py-2 text-sm font-univers text-gray-700 rounded-md hover:bg-gray-100 hover:text-black transition-colors"
             >
-              <Store className="h-4 w-4" />
-              Vendedores
+              <Heart className="h-4 w-4" />
+              Favoritos
             </Link>
 
             <Link
-              href="/admin/users"
-              className="flex items-center gap-3 px-3 py-2 text-sm font-univers text-gray-700 rounded-md hover:bg-gray-100 hover:text-black transition-colors"
-            >
-              <Users className="h-4 w-4" />
-              Usuarios
-            </Link>
-
-            <Link
-              href="/admin/emails"
-              className="flex items-center gap-3 px-3 py-2 text-sm font-univers text-gray-700 rounded-md hover:bg-gray-100 hover:text-black transition-colors"
-            >
-              <Mail className="h-4 w-4" />
-              Emails
-            </Link>
-
-            <Link
-              href="/admin/settings"
+              href="/vendor/settings"
               className="flex items-center gap-3 px-3 py-2 text-sm font-univers text-gray-700 rounded-md hover:bg-gray-100 hover:text-black transition-colors"
             >
               <Settings className="h-4 w-4" />
@@ -119,9 +110,9 @@ export default async function AdminLayout({
       <main className="flex-1 overflow-y-auto">
         {/* Top bar */}
         <div className="h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between">
-          <h2 className="text-lg font-univers">Panel de Administración</h2>
+          <h2 className="text-lg font-univers">Portal de Vendedor</h2>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600 font-univers">admin@luzimarket.com</span>
+            <span className="text-sm text-gray-600 font-univers">Mi Tienda</span>
           </div>
         </div>
 

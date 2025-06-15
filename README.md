@@ -172,6 +172,35 @@ This will start:
 
 The app is configured for containerized deployment with Docker. The production build uses Next.js standalone output for optimal container size.
 
+## TODO - Features from Mockups
+
+### High Priority
+- [ ] **Product Filtering Sidebar** - Add category, brand, color, and price range filters with collapsible sections
+- [ ] **Category Page Hero Banners** - Implement gradient overlays and split layouts for category pages
+- [ ] **Search Functionality** - Add search results page with filters and suggestions
+- [ ] **Mobile Responsiveness** - Implement filter drawer and touch-friendly interfaces
+
+### Medium Priority
+- [ ] **Product Grid Enhancements** - Add vendor info, sort options, and hover effects
+- [ ] **Form Validation Indicators** - Add visual feedback (checkmarks/crosses) for form fields
+- [ ] **Typography Refinements** - Ensure proper font hierarchy and consistent spacing
+- [ ] **Wishlist Functionality** - Implement favorites/wishlist for logged-in users
+- [ ] **Quick View Modal** - Add product preview without navigating to detail page
+
+### Low Priority
+- [ ] **Loading States** - Add skeletons and loading indicators throughout
+- [ ] **Empty States** - Design and implement "no results" states
+- [ ] **Newsletter Component** - Style signup form to match brand aesthetic
+- [ ] **Progress Indicators** - Add step indicators for multi-page forms
+- [ ] **Decorative Elements** - Add gradient circles, hand gestures, and flower icons where appropriate
+
+### Completed ✓
+- [x] Logo implementation across different user contexts (public, admin, vendor)
+- [x] Social media icons in footer
+- [x] Basic vendor registration form
+- [x] Category and product listing pages
+- [x] Internationalization setup (es/en)
+
 ## License
 
 All rights reserved - MOMENTO ESPECIAL SAPI DE CV © 2024
