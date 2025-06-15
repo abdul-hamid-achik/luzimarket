@@ -14,7 +14,7 @@
     "db:seed": "tsx db/seed.ts",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "docker:dev": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d postgres redis mailcatcher",
+    "docker:dev": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d postgres mailcatcher",
     "docker:logs": "docker-compose logs -f",
     "docker:clean": "docker-compose down -v",
     "test:e2e": "playwright test",
