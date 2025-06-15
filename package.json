@@ -23,7 +23,11 @@
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:report": "playwright show-report",
     "release": "semantic-release",
-    "release:dry": "semantic-release --dry-run"
+    "release:dry": "semantic-release --dry-run",
+    "vercel:deploy": "vercel --yes",
+    "vercel:deploy:prod": "vercel --prod --yes",
+    "vercel:env:pull": "vercel env pull",
+    "vercel:link": "vercel link --yes"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.9.1",
