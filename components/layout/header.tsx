@@ -104,14 +104,7 @@ export function Header() {
 
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
-            <Image 
-              src="/images/logos/logo-full.png" 
-              alt="Luzimarket" 
-              width={150} 
-              height={40}
-              className="h-6 md:h-8 w-auto"
-              priority
-            />
+            <span className="text-xl md:text-2xl font-times-now tracking-wider">LUZIMARKET</span>
           </Link>
 
           {/* Search - Desktop */}
@@ -121,7 +114,7 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-2 md:gap-6">
-            <Button variant="ghost" size="sm" className="font-univers hidden md:inline-flex">
+            <Button variant="ghost" size="sm" className="font-univers text-xs tracking-wider hidden md:inline-flex">
               FAMILY
             </Button>
             <Link href="/wishlist">
@@ -157,22 +150,22 @@ export function Header() {
 
         {/* Navigation - Desktop only */}
         <nav className="hidden md:flex items-center gap-8 py-3">
-          <Link href="/best-sellers" className="text-sm font-univers hover:text-gray-600">
+          <Link href="/best-sellers" className="text-xs font-univers hover:text-gray-600 tracking-wide">
             Best Sellers
           </Link>
-          <Link href="/handpicked" className="text-sm font-univers hover:text-gray-600">
+          <Link href="/handpicked" className="text-xs font-univers hover:text-gray-600 tracking-wide">
             Handpicked
           </Link>
-          <Link href="/tiendas-marcas" className="text-sm font-univers hover:text-gray-600">
+          <Link href="/tiendas-marcas" className="text-xs font-univers hover:text-gray-600 tracking-wide">
             Tiendas + Marcas
           </Link>
-          <Link href="/categorias" className="text-sm font-univers hover:text-gray-600">
+          <Link href="/categorias" className="text-xs font-univers hover:text-gray-600 tracking-wide">
             Categorías
           </Link>
-          <Link href="/ocasiones" className="text-sm font-univers hover:text-gray-600">
+          <Link href="/ocasiones" className="text-xs font-univers hover:text-gray-600 tracking-wide">
             Ocasiones
           </Link>
-          <Link href="/editorial" className="text-sm font-univers hover:text-gray-600">
+          <Link href="/editorial" className="text-xs font-univers hover:text-gray-600 tracking-wide">
             Editorial
           </Link>
         </nav>

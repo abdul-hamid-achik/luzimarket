@@ -11,22 +11,22 @@ const categories = [
   {
     title: "Flowershop",
     image: "/images/links/pia-riverola.webp",
-    slug: "flowershop"
+    slug: "flores-arreglos"
   },
   {
     title: "Sweet",
     image: "/images/links/game-wwe-19-1507733870-150-911.jpg",
-    slug: "sweet"
+    slug: "chocolates-dulces"
   },
   {
     title: "Events + Dinners",
     image: "/images/links/saul-hernandez.jpg",
-    slug: "events-dinners"
+    slug: "eventos-cenas"
   },
   {
     title: "Giftshop",
     image: "/images/links/shutterstock_130149286.jpg",
-    slug: "giftshop"
+    slug: "regalos-personalizados"
   }
 ];
 
@@ -68,8 +68,8 @@ export default async function HomePage({ params }: HomePageProps) {
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300" />
               
               {/* Category title */}
-              <div className="absolute bottom-8 left-8 right-8">
-                <h3 className="text-white text-sm font-univers tracking-wider bg-white/90 text-black px-4 py-2 inline-block">
+              <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+                <h3 className="text-black text-sm font-univers tracking-wider bg-white px-6 py-2 inline-block">
                   {category.title}
                 </h3>
               </div>

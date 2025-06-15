@@ -129,16 +129,16 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
       </div>
       
       <div className="space-y-1">
-        <h3 className="font-univers text-sm group-hover:text-gray-700 transition-colors">
+        <h3 className="font-univers text-sm font-medium">
           {product.name}
         </h3>
         {product.vendor && (
-          <p className="text-xs text-gray-600 font-univers">
-            + {product.vendor.businessName}
+          <p className="text-xs text-gray-500 font-univers">
+            + {product.vendor.businessName.toUpperCase()}
           </p>
         )}
-        <p className="font-univers font-medium">
-          ${parseFloat(product.price).toLocaleString('es-MX')} MXN
+        <p className="font-univers text-sm mt-2">
+          ${parseFloat(product.price).toLocaleString('es-MX')}
         </p>
       </div>
     </Link>
