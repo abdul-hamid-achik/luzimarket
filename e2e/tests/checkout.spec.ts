@@ -30,16 +30,16 @@ test.describe('Checkout Flow', () => {
   });
 
   test('should open cart sidebar', async ({ page }) => {
-    // Click cart button - it's in the header
-    const cartButton = page.locator('button:has-text("Shopping cart")');
+    // Close any open dialogs first
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(500);
     
-    if (await cartButton.count() === 0) {
-      // Try alternative selector
-      const altCartButton = page.locator('button[aria-label*="cart" i], button:has(svg[aria-label*="cart" i])');
-      await altCartButton.first().click();
-    } else {
-      await cartButton.click();
-    }
+    // Click cart button - look for button with ShoppingBag icon
+    const cartButton = page.locator('button[aria-label*="Shopping cart" i], button[aria-label*="cart" i]').filter({
+      has: page.locator('svg')
+    }).last(); // Use last() to avoid mobile menu button
+    
+    await cartButton.click();
     
     // Cart sidebar should be visible
     const cartSidebar = page.locator('aside, [role="dialog"]').filter({
@@ -50,8 +50,14 @@ test.describe('Checkout Flow', () => {
   });
 
   test('should update quantity in cart', async ({ page }) => {
-    // Open cart
-    const cartButton = page.locator('[aria-label="Cart"], button').first();
+    // Close any open dialogs first
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(500);
+    
+    // Open cart - use the shopping cart button
+    const cartButton = page.locator('button[aria-label*="Shopping cart" i], button[aria-label*="cart" i]').filter({
+      has: page.locator('svg')
+    }).last();
     await cartButton.click();
     
     // Find quantity controls
@@ -68,8 +74,14 @@ test.describe('Checkout Flow', () => {
   });
 
   test('should remove item from cart', async ({ page }) => {
-    // Open cart
-    const cartButton = page.locator('[aria-label="Cart"], button').first();
+    // Close any open dialogs first
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(500);
+    
+    // Open cart - use the shopping cart button
+    const cartButton = page.locator('button[aria-label*="Shopping cart" i], button[aria-label*="cart" i]').filter({
+      has: page.locator('svg')
+    }).last();
     await cartButton.click();
     
     // Find remove button
@@ -86,8 +98,14 @@ test.describe('Checkout Flow', () => {
   });
 
   test('should proceed to checkout', async ({ page }) => {
-    // Open cart
-    const cartButton = page.locator('[aria-label="Cart"], button').first();
+    // Close any open dialogs first
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(500);
+    
+    // Open cart - use the shopping cart button
+    const cartButton = page.locator('button[aria-label*="Shopping cart" i], button[aria-label*="cart" i]').filter({
+      has: page.locator('svg')
+    }).last();
     await cartButton.click();
     
     // Click checkout button
@@ -171,14 +189,13 @@ test.describe('Checkout Flow', () => {
   test('should show shipping options', async ({ page }) => {
     await page.goto('/checkout');
     
-    // Look for shipping options
-    const shippingSection = page.locator('text=/Shipping|Envío/').first();
+    // Since shipping is now handled by Stripe, just verify the shipping cost is shown
+    const shippingInfo = page.locator('text=/Envío|Shipping/');
+    await expect(shippingInfo.first()).toBeVisible();
     
-    if (await shippingSection.isVisible()) {
-      // Should have shipping method options
-      const shippingOptions = page.locator('input[type="radio"][name*="shipping"]');
-      await expect(shippingOptions).toHaveCount(2, { timeout: 5000 });
-    }
+    // Verify shipping cost is displayed in the order summary
+    const shippingCost = page.locator('text=/\$99|Envío.*99/');
+    await expect(shippingCost.first()).toBeVisible();
   });
 
   test('should calculate totals correctly', async ({ page }) => {
