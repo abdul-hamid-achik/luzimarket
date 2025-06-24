@@ -1,855 +1,664 @@
 import { config } from "dotenv";
+import { reset } from "drizzle-seed";
+import { fakerES_MX as faker } from "@faker-js/faker";
+import * as schema from "./schema";
+import { generateAndUploadImage, generateProductImagePrompt, generateCategoryImagePrompt } from "../lib/openai";
+import { eq, sql } from "drizzle-orm";
+import slugify from "slugify";
 import bcrypt from "bcryptjs";
-import { generateSlug } from "../lib/utils/slug";
-import { eq } from "drizzle-orm";
 
 // Load environment variables before importing db
 config({ path: ".env.local" });
 
 import { db } from "./index";
-import { categories, vendors, products, users, adminUsers, emailTemplates, subscriptions, orders, orderItems, reviews } from "./schema";
 
-// Generate SKU from vendor name and product name
-function generateSKU(vendorName: string, productName: string, index: number): string {
-  const vendorCode = vendorName.substring(0, 3).toUpperCase();
-  const productCode = productName.substring(0, 3).toUpperCase();
-  return `${vendorCode}-${productCode}-${String(index).padStart(4, '0')}`;
-}
 
-async function seed() {
+// Fixed data
+const CATEGORIES = [
+  {
+    name: "Flores y Arreglos",
+    slug: "flores-arreglos",
+    description: "Hermosos arreglos florales para toda ocasión: cumpleaños, aniversarios, condolencias y más",
+    imageUrl: null, // Will be generated with AI
+    displayOrder: 1
+  },
+  {
+    name: "Chocolates y Dulces",
+    slug: "chocolates-dulces",
+    description: "Deliciosos chocolates artesanales, bombones y dulces gourmet",
+    imageUrl: null, // Will be generated with AI
+    displayOrder: 2
+  },
+  {
+    name: "Velas y Aromas",
+    slug: "velas-aromas",
+    description: "Velas aromáticas, difusores y productos para crear ambientes especiales",
+    imageUrl: null, // Will be generated with AI
+    displayOrder: 3
+  },
+  {
+    name: "Regalos Personalizados",
+    slug: "regalos-personalizados",
+    description: "Regalos únicos y personalizados para ocasiones especiales",
+    imageUrl: null, // Will be generated with AI
+    displayOrder: 4
+  },
+  {
+    name: "Cajas de Regalo",
+    slug: "cajas-regalo",
+    description: "Cajas curadas con productos selectos para regalar",
+    imageUrl: null, // Will be generated with AI
+    displayOrder: 5
+  },
+  {
+    name: "Decoración y Hogar",
+    slug: "decoracion-hogar",
+    description: "Artículos decorativos y accesorios para el hogar",
+    imageUrl: null, // Will be generated with AI
+    displayOrder: 6
+  },
+  {
+    name: "Joyería y Accesorios",
+    slug: "joyeria-accesorios",
+    description: "Joyería fina y accesorios de moda",
+    imageUrl: null, // Will be generated with AI
+    displayOrder: 7
+  },
+  {
+    name: "Gourmet y Delicatessen",
+    slug: "gourmet-delicatessen",
+    description: "Productos gourmet, vinos y delicatessen",
+    imageUrl: null, // Will be generated with AI
+    displayOrder: 8
+  }
+];
+
+const PRODUCT_NAMES = [
+  // Flores y Arreglos
+  "Ramo de Rosas Premium",
+  "Bouquet de Girasoles",
+  "Orquídea en Maceta",
+  "Arreglo Floral Primaveral",
+  "Ramo de Tulipanes",
+  "Centro de Mesa Floral",
+  "Bouquet de Peonías",
+  "Arreglo de Flores Silvestres",
+  "Ramo de Lirios Blancos",
+  "Arreglo de Alcatraces",
+  "Bouquet de Gerberas",
+  "Corona Floral",
+  "Ramo de Lavanda",
+  "Arreglo de Suculentas",
+  "Bouquet de Flores Mixtas",
+  
+  // Chocolates y Dulces
+  "Caja de Chocolates Artesanales",
+  "Trufas de Chocolate Belga",
+  "Chocolates Ferrero Rocher",
+  "Brownies Artesanales",
+  "Bombones de Licor",
+  "Chocolate Oaxaqueño",
+  "Macarons Franceses",
+  "Galletas Decoradas",
+  "Paletas de Chocolate",
+  "Caja de Chocolates Suizos",
+  "Dulces Típicos Mexicanos",
+  "Chocolates Rellenos",
+  "Barras de Chocolate Gourmet",
+  "Pretzels Cubiertos",
+  "Chocolates Sin Azúcar",
+  
+  // Velas y Aromas
+  "Vela Aromática de Lavanda",
+  "Set de Velas Aromáticas",
+  "Difusor de Aromas",
+  "Vela de Soya Natural",
+  "Incienso Natural",
+  "Aceites Esenciales",
+  "Vela de Masaje",
+  "Aromatizador de Ambiente",
+  "Velas Flotantes",
+  "Set de Spa Aromático",
+  "Vela de Citronela",
+  "Difusor de Bambú",
+  "Sales de Baño Aromáticas",
+  "Potpurrí Natural",
+  "Velas Decorativas",
+  
+  // Regalos Personalizados
+  "Album Fotográfico Personalizado",
+  "Taza Personalizada",
+  "Marco Digital Inteligente",
+  "Libro de Recuerdos",
+  "Cojín Personalizado",
+  "Llavero Grabado",
+  "Placa Conmemorativa",
+  "Retrato Personalizado",
+  "Joyero Grabado",
+  "Reloj Personalizado",
+  "Termo Personalizado",
+  "Agenda Personalizada",
+  "Funda de Celular Personalizada",
+  "Puzzle Personalizado",
+  "Manta Personalizada",
+  
+  // Cajas de Regalo
+  "Caja Regalo Spa",
+  "Caja Desayuno Sorpresa",
+  "Caja Romántica",
+  "Kit de Café Especialidad",
+  "Caja de Té Premium",
+  "Box de Cuidado Personal",
+  "Caja de Vinos",
+  "Kit de Barbacoa",
+  "Caja de Snacks Gourmet",
+  "Box de Productos Orgánicos",
+  "Caja de Cerveza Artesanal",
+  "Kit de Coctelería",
+  "Box de Productos Mexicanos",
+  "Caja de Bienestar",
+  "Kit de Arte y Manualidades",
+  
+  // Decoración y Hogar
+  "Jarrón de Talavera",
+  "Espejo Decorativo",
+  "Maceta Artesanal",
+  "Cuadro Decorativo",
+  "Tapete Artesanal",
+  "Lámpara Decorativa",
+  "Reloj de Pared",
+  "Portavelas de Cristal",
+  "Cesta Decorativa",
+  "Figura Decorativa",
+  "Cortina de Macramé",
+  "Portarretratos Vintage",
+  "Adorno de Mesa",
+  "Móvil Decorativo",
+  "Escultura Artesanal",
+  
+  // Joyería y Accesorios
+  "Collar de Plata",
+  "Pulsera de Oro",
+  "Aretes de Perlas",
+  "Anillo de Compromiso",
+  "Reloj de Lujo",
+  "Brazalete de Cuero",
+  "Dije de Plata",
+  "Cadena de Oro",
+  "Anillo de Plata",
+  "Broche Vintage",
+  "Gemelos de Plata",
+  "Tobillera de Oro",
+  "Piercing de Oro",
+  "Set de Joyería",
+  "Collar de Piedras Preciosas",
+  
+  // Gourmet y Delicatessen
+  "Canasta Gourmet Premium",
+  "Tabla de Quesos Gourmet",
+  "Vino Tinto Reserva",
+  "Aceite de Oliva Extra Virgen",
+  "Miel Artesanal",
+  "Mermeladas Gourmet",
+  "Café de Especialidad",
+  "Té Premium Importado",
+  "Especias Exóticas",
+  "Conservas Gourmet",
+  "Vinagre Balsámico",
+  "Pasta Italiana Premium",
+  "Caviar Premium",
+  "Jamón Serrano",
+  "Queso Artesanal"
+];
+
+// Realistic price ranges for each category (in MXN)
+const CATEGORY_PRICE_RANGES: Record<string, { min: number; max: number }> = {
+  "flores-arreglos": { min: 399, max: 2499 },
+  "chocolates-dulces": { min: 199, max: 999 },
+  "velas-aromas": { min: 149, max: 599 },
+  "regalos-personalizados": { min: 299, max: 1499 },
+  "cajas-regalo": { min: 499, max: 2999 },
+  "decoracion-hogar": { min: 299, max: 1999 },
+  "joyeria-accesorios": { min: 599, max: 4999 },
+  "gourmet-delicatessen": { min: 399, max: 2499 }
+};
+
+const BUSINESS_HOURS = [
+  "Lun-Sab: 8:00-20:00, Dom: 9:00-18:00",
+  "Lun-Vie: 10:00-19:00, Sab: 10:00-17:00",
+  "Lun-Vie: 11:00-19:00, Sab: 11:00-16:00",
+  "Lun-Dom: 9:00-21:00",
+  "Mar-Dom: 10:00-18:00"
+];
+
+const CITIES = ["Ciudad de México", "Guadalajara", "Monterrey", "Puebla", "Querétaro"];
+const STATES = ["CDMX", "Jalisco", "Nuevo León", "Puebla", "Querétaro"];
+
+const VENDOR_PREFIXES = [
+  "Boutique", "Casa", "Tienda", "Atelier", "Estudio", "Galería", "Rincón", 
+  "Jardín", "Tesoro", "Arte", "Dulce", "Bella", "Luna", "Sol", "Magia"
+];
+
+const VENDOR_SUFFIXES = [
+  "de Regalos", "Floral", "Gourmet", "Artesanal", "Creativo", "Exclusivo",
+  "Premium", "Deluxe", "& Co.", "Mexicano", "Boutique", "Studio", "Express"
+];
+
+async function main() {
   console.log("🌱 Starting seed...");
 
+  // Check if --no-reset flag is passed
+  const shouldReset = !process.argv.includes('--no-reset');
+
   try {
-    // Clear existing data in correct order (respecting foreign key constraints)
-    console.log("🧹 Clearing existing data...");
-    await db.delete(reviews);
-    await db.delete(orderItems);
-    await db.delete(orders);
-    await db.delete(products);
-    await db.delete(vendors);
-    await db.delete(categories);
-    await db.delete(users);
-    await db.delete(adminUsers);
-    await db.delete(emailTemplates);
-    await db.delete(subscriptions);
+    // Reset database if needed
+    if (shouldReset) {
+      console.log("🧹 Resetting database...");
+      await reset(db, schema);
+      console.log("✅ Database reset complete");
+    } else {
+      console.log("⚡ Skipping database reset (--no-reset flag detected)");
+    }
 
-    // Insert categories
-    console.log("📦 Inserting categories...");
-    const categoriesData = [
-      {
-        name: "Flores y Arreglos",
-        slug: "flores-arreglos",
-        description: "Hermosos arreglos florales para toda ocasión: cumpleaños, aniversarios, condolencias y más",
-        imageUrl: "/images/categories/flores.jpg",
-        displayOrder: 1,
-      },
-      {
-        name: "Chocolates y Dulces",
-        slug: "chocolates-dulces",
-        description: "Deliciosos chocolates artesanales, bombones y dulces gourmet",
-        imageUrl: "/images/categories/chocolates.jpg",
-        displayOrder: 2,
-      },
-      {
-        name: "Velas y Aromas",
-        slug: "velas-aromas",
-        description: "Velas aromáticas, difusores y productos para crear ambientes especiales",
-        imageUrl: "/images/categories/velas.jpg",
-        displayOrder: 3,
-      },
-      {
-        name: "Regalos Personalizados",
-        slug: "regalos-personalizados",
-        description: "Regalos únicos y personalizados para ocasiones especiales",
-        imageUrl: "/images/categories/regalos.jpg",
-        displayOrder: 4,
-      },
-      {
-        name: "Cajas de Regalo",
-        slug: "cajas-regalo",
-        description: "Cajas curadas con productos selectos para regalar",
-        imageUrl: "/images/categories/cajas.jpg",
-        displayOrder: 5,
-      },
-      {
-        name: "Decoración y Hogar",
-        slug: "decoracion-hogar",
-        description: "Artículos decorativos y accesorios para el hogar",
-        imageUrl: "/images/categories/decoracion.jpg",
-        displayOrder: 6,
-      },
-      {
-        name: "Joyería y Accesorios",
-        slug: "joyeria-accesorios",
-        description: "Joyería fina y accesorios de moda",
-        imageUrl: "/images/categories/joyeria.jpg",
-        displayOrder: 7,
-      },
-      {
-        name: "Gourmet y Delicatessen",
-        slug: "gourmet-delicatessen",
-        description: "Productos gourmet, vinos y delicatessen",
-        imageUrl: "/images/categories/gourmet.jpg",
-        displayOrder: 8,
-      }
-    ];
+    console.log("📦 Seeding database...");
 
-    const insertedCategories = await db.insert(categories).values(categoriesData).returning();
-    console.log(`✅ Inserted ${insertedCategories.length} categories`);
+    // 1. Seed Categories
+    console.log("🏷️  Creating categories...");
+    const categories = await db.insert(schema.categories).values(CATEGORIES).returning();
+    console.log(`✅ Created ${categories.length} categories`);
 
-    // Insert vendors
-    console.log("🏪 Inserting vendors...");
-    const vendorsData = [
-      {
-        businessName: "Flores del Valle",
-        slug: generateSlug("Flores del Valle"),
-        contactName: "María Elena González",
-        email: "contacto@floresdelvalle.mx",
-        phone: "5551234567",
-        whatsapp: "5551234567",
-        businessPhone: "5551234567",
-        businessHours: "Lun-Sab: 8:00-20:00, Dom: 9:00-18:00",
-        street: "Av. Presidente Masaryk 123",
-        city: "Ciudad de México",
-        state: "CDMX",
-        country: "México",
-        postalCode: "11560",
-        websiteUrl: "https://floresdelvalle.mx",
-        description: "Floristería boutique con más de 20 años de experiencia, especializados en arreglos florales únicos y exclusivos para toda ocasión",
-        hasDelivery: true,
-        deliveryService: "own",
-        instagramUrl: "@floresdelvalle_mx",
-        facebookUrl: "floresdelvallemx",
-        isActive: true,
-      },
-      {
-        businessName: "Chocolatería Artesanal Cacao",
-        slug: generateSlug("Chocolatería Artesanal Cacao"),
-        contactName: "Carlos Mendoza Ruiz",
-        email: "info@chocolateriacacao.mx",
-        phone: "5559876543",
-        whatsapp: "5559876543",
-        businessPhone: "5559876543",
-        businessHours: "Lun-Vie: 10:00-19:00, Sab: 10:00-17:00",
-        street: "Polanco 456, Local 12",
-        city: "Ciudad de México",
-        state: "CDMX",
-        country: "México",
-        postalCode: "11550",
-        description: "Chocolatería artesanal con cacao mexicano de la más alta calidad. Creamos experiencias únicas con cada bocado",
-        hasDelivery: true,
-        deliveryService: "external",
-        instagramUrl: "@cacao_artesanal",
-        facebookUrl: "cacaoartesanal",
-        tiktokUrl: "@cacao_mx",
-        isActive: true,
-      },
-      {
-        businessName: "Luzia Candles",
-        slug: generateSlug("Luzia Candles"),
-        contactName: "Ana Sofía Herrera",
-        email: "hola@luziacandles.mx",
-        phone: "5555555555",
-        whatsapp: "5555555556",
-        businessPhone: "5555555555",
-        businessHours: "Lun-Vie: 11:00-19:00, Sab: 11:00-16:00",
-        street: "Roma Norte 789, Local A",
-        city: "Ciudad de México",
-        state: "CDMX",
-        country: "México",
-        postalCode: "06700",
-        description: "Velas artesanales hechas a mano con cera de soya 100% natural y aceites esenciales. Aromas únicos para cada espacio",
-        hasDelivery: true,
-        deliveryService: "own",
-        websiteUrl: "https://luziacandles.mx",
-        instagramUrl: "@luzia_candles",
-        tiktokUrl: "@luziacandles",
-        isActive: true,
-      },
-      {
-        businessName: "Regalo Perfecto MX",
-        slug: generateSlug("Regalo Perfecto MX"),
-        contactName: "Sofía Hernández López",
-        email: "contacto@regaloperfecto.mx",
-        phone: "5552223333",
-        whatsapp: "5552223334",
-        businessPhone: "5552223333",
-        businessHours: "Lun-Dom: 9:00-21:00",
-        street: "Condesa 321, Piso 2",
-        city: "Ciudad de México",
-        state: "CDMX",
-        country: "México",
-        postalCode: "06140",
-        description: "Especialistas en regalos personalizados y cajas de regalo curadas. Hacemos que cada regalo sea inolvidable",
-        hasDelivery: true,
-        deliveryService: "own",
-        websiteUrl: "https://regaloperfecto.mx",
-        instagramUrl: "@regalo_perfecto_mx",
-        facebookUrl: "regaloperfectomx",
-        isActive: true,
-      },
-      {
-        businessName: "Casa Décor Studio",
-        slug: generateSlug("Casa Décor Studio"),
-        contactName: "Roberto Jiménez",
-        email: "info@casadecor.mx",
-        phone: "5554445555",
-        businessPhone: "5554445555",
-        businessHours: "Lun-Sab: 10:00-19:00",
-        street: "San Ángel 234",
-        city: "Ciudad de México",
-        state: "CDMX",
-        country: "México",
-        postalCode: "01000",
-        description: "Artículos de decoración y diseño de interiores. Piezas únicas de diseñadores mexicanos",
-        hasDelivery: true,
-        deliveryService: "external",
-        instagramUrl: "@casadecor_studio",
-        isActive: true,
-      },
-      {
-        businessName: "Joyería Plata y Oro",
-        slug: generateSlug("Joyería Plata y Oro"),
-        contactName: "Isabella Martínez",
-        email: "ventas@platayoro.mx",
-        phone: "5556667777",
-        whatsapp: "5556667778",
-        businessPhone: "5556667777",
-        businessHours: "Lun-Sab: 11:00-19:00",
-        street: "Coyoacán 567",
-        city: "Ciudad de México", 
-        state: "CDMX",
-        country: "México",
-        postalCode: "04000",
-        description: "Joyería fina con diseños exclusivos en plata .925 y oro. Piezas únicas para ocasiones especiales",
-        hasDelivery: true,
-        deliveryService: "own",
-        websiteUrl: "https://platayoro.mx",
-        instagramUrl: "@platayoro_mx",
-        isActive: true,
-      },
-      {
-        businessName: "Delicias Gourmet",
-        slug: generateSlug("Delicias Gourmet"),
-        contactName: "Chef Pierre Dubois",
-        email: "pedidos@deliciasgourmet.mx",
-        phone: "5557778888",
-        businessPhone: "5557778888",
-        businessHours: "Mar-Dom: 10:00-18:00",
-        street: "Lomas de Chapultepec 890",
-        city: "Ciudad de México",
-        state: "CDMX",
-        country: "México",
-        postalCode: "11000",
-        description: "Productos gourmet importados y nacionales. Vinos, quesos, jamones y delicatessen selectos",
-        hasDelivery: true,
-        deliveryService: "own",
-        instagramUrl: "@delicias_gourmet_mx",
-        facebookUrl: "deliciasgourmetmx",
-        isActive: true,
-      }
-    ];
-
-    const insertedVendors = await db.insert(vendors).values(vendorsData).returning();
-    console.log(`✅ Inserted ${insertedVendors.length} vendors`);
-
-    // Insert products with realistic Mexican prices
-    console.log("🎁 Inserting products...");
-    const productsData = [
-      // Flores y Arreglos - Flores del Valle
-      {
-        vendorId: insertedVendors[0].id,
-        categoryId: insertedCategories[0].id,
-        name: "Ramo de 24 Rosas Rojas Premium",
-        slug: "ramo-24-rosas-rojas-premium",
-        description: "Elegante ramo de 24 rosas rojas de tallo largo, cultivadas en los mejores invernaderos. Incluye follaje verde, papel coreano premium y moño de seda. Perfecto para aniversarios y declaraciones de amor.",
-        price: "1899.00",
-        images: ["/images/products/rosas-rojas-24.jpg", "/images/products/rosas-rojas-24-2.jpg"],
-        tags: ["rosas", "amor", "aniversario", "premium", "tallo-largo"],
-        stock: 15,
-      },
-      {
-        vendorId: insertedVendors[0].id,
-        categoryId: insertedCategories[0].id,
-        name: "Arreglo Primaveral en Caja",
-        slug: "arreglo-primaveral-caja",
-        description: "Hermoso arreglo floral con girasoles, gerberas y flores de temporada en una elegante caja de madera. Incluye tarjeta personalizada.",
-        price: "1299.00",
-        images: ["/images/products/arreglo-primaveral.jpg"],
-        tags: ["girasoles", "gerberas", "primavera", "caja", "alegre"],
-        stock: 20,
-      },
-      {
-        vendorId: insertedVendors[0].id,
-        categoryId: insertedCategories[0].id,
-        name: "Orquídea Phalaenopsis Blanca",
-        slug: "orquidea-phalaenopsis-blanca",
-        description: "Elegante orquídea Phalaenopsis blanca de dos varas en maceta de cerámica. Una planta que dura meses con los cuidados adecuados.",
-        price: "1599.00",
-        images: ["/images/products/orquidea-blanca.jpg"],
-        tags: ["orquidea", "planta", "elegante", "duradero", "blanco"],
-        stock: 8,
-      },
-      {
-        vendorId: insertedVendors[0].id,
-        categoryId: insertedCategories[0].id,
-        name: "Ramo de Tulipanes Holandeses",
-        slug: "ramo-tulipanes-holandeses",
-        description: "Exclusivo ramo de 20 tulipanes importados de Holanda en colores variados. Disponible por temporada.",
-        price: "2299.00",
-        images: ["/images/products/tulipanes.jpg"],
-        tags: ["tulipanes", "importado", "exclusivo", "primavera"],
-        stock: 5,
-      },
-      {
-        vendorId: insertedVendors[0].id,
-        categoryId: insertedCategories[0].id,
-        name: "Corona Fúnebre Paz Eterna",
-        slug: "corona-funebre-paz-eterna",
-        description: "Corona fúnebre con rosas blancas, crisantemos y follaje verde. Incluye base y moño con mensaje de condolencias.",
-        price: "2899.00",
-        images: ["/images/products/corona-funebre.jpg"],
-        tags: ["funeral", "condolencias", "corona", "rosas-blancas"],
-        stock: 3,
-      },
-
-      // Chocolates y Dulces - Chocolatería Cacao
-      {
-        vendorId: insertedVendors[1].id,
-        categoryId: insertedCategories[1].id,
-        name: "Caja de 24 Trufas Artesanales",
-        slug: "caja-24-trufas-artesanales",
-        description: "Exquisita selección de 24 trufas artesanales con cacao mexicano 70%. Sabores: café de Veracruz, mezcal, chile, vainilla de Papantla y más.",
-        price: "899.00",
-        images: ["/images/products/trufas-24.jpg", "/images/products/trufas-24-2.jpg"],
-        tags: ["trufas", "artesanal", "cacao-mexicano", "gourmet", "regalo"],
-        stock: 25,
-      },
-      {
-        vendorId: insertedVendors[1].id,
-        categoryId: insertedCategories[1].id,
-        name: "Tableta de Chocolate Bean to Bar 85%",
-        slug: "tableta-chocolate-bean-to-bar-85",
-        description: "Tableta de chocolate negro 85% cacao de Chiapas, proceso bean to bar. Notas frutales y acabado aterciopelado. 100g.",
-        price: "189.00",
-        images: ["/images/products/tableta-85.jpg"],
-        tags: ["chocolate-negro", "bean-to-bar", "chiapas", "premium"],
-        stock: 40,
-      },
-      {
-        vendorId: insertedVendors[1].id,
-        categoryId: insertedCategories[1].id,
-        name: "Bombones de Mezcal (12 piezas)",
-        slug: "bombones-mezcal-12",
-        description: "Innovadores bombones rellenos de ganache con mezcal artesanal de Oaxaca. Una experiencia única que combina chocolate y destilado.",
-        price: "549.00",
-        images: ["/images/products/bombones-mezcal.jpg"],
-        tags: ["bombones", "mezcal", "oaxaca", "innovador", "alcohol"],
-        stock: 15,
-      },
-      {
-        vendorId: insertedVendors[1].id,
-        categoryId: insertedCategories[1].id,
-        name: "Caja Degustación Cacao Mexicano",
-        slug: "caja-degustacion-cacao-mexicano",
-        description: "Caja con 6 tabletas de diferentes regiones de México: Tabasco, Chiapas, Oaxaca. Incluye guía de cata y maridaje.",
-        price: "1299.00",
-        images: ["/images/products/caja-degustacion.jpg"],
-        tags: ["degustacion", "cacao-mexicano", "gourmet", "educativo"],
-        stock: 10,
-      },
-
-      // Velas y Aromas - Luzia Candles
-      {
-        vendorId: insertedVendors[2].id,
-        categoryId: insertedCategories[2].id,
-        name: "Vela de Soya Lavanda y Vainilla 300g",
-        slug: "vela-soya-lavanda-vainilla-300g",
-        description: "Vela artesanal de cera de soya 100% natural con aceites esenciales de lavanda francesa y vainilla. Duración aproximada: 60 horas.",
-        price: "449.00",
-        images: ["/images/products/vela-lavanda.jpg"],
-        tags: ["vela-soya", "lavanda", "vainilla", "aromaterapia", "relajante"],
-        stock: 30,
-      },
-      {
-        vendorId: insertedVendors[2].id,
-        categoryId: insertedCategories[2].id,
-        name: "Set de 3 Velas Mini Cítricos",
-        slug: "set-3-velas-mini-citricos",
-        description: "Set de 3 velas pequeñas (100g c/u) con aromas cítricos: limón siciliano, toronja rosa y mandarina. Perfectas para regalar.",
-        price: "599.00",
-        images: ["/images/products/set-velas-citricos.jpg"],
-        tags: ["set-velas", "citricos", "mini", "regalo", "energizante"],
-        stock: 25,
-      },
-      {
-        vendorId: insertedVendors[2].id,
-        categoryId: insertedCategories[2].id,
-        name: "Difusor de Varillas Sándalo y Jazmín",
-        slug: "difusor-varillas-sandalo-jazmin",
-        description: "Elegante difusor de varillas con fragancia de sándalo y jazmín. Incluye 8 varillas de ratán y 200ml de fragancia. Duración: 3 meses.",
-        price: "799.00",
-        images: ["/images/products/difusor-sandalo.jpg"],
-        tags: ["difusor", "sandalo", "jazmin", "aromatizador", "elegante"],
-        stock: 18,
-      },
-      {
-        vendorId: insertedVendors[2].id,
-        categoryId: insertedCategories[2].id,
-        name: "Vela Especial Navidad - Canela y Naranja",
-        slug: "vela-navidad-canela-naranja",
-        description: "Vela edición especial de Navidad con aroma a canela de Ceilán y naranja. Presentación en frasco de vidrio ámbar. 400g.",
-        price: "649.00",
-        images: ["/images/products/vela-navidad.jpg"],
-        tags: ["navidad", "canela", "naranja", "edicion-especial", "festivo"],
-        stock: 50,
-      },
-
-      // Regalos Personalizados - Regalo Perfecto MX
-      {
-        vendorId: insertedVendors[3].id,
-        categoryId: insertedCategories[3].id,
-        name: "Caja de Madera Grabada con Vino",
-        slug: "caja-madera-grabada-vino",
-        description: "Elegante caja de madera de pino grabada con láser. Incluye botella de vino tinto reserva y 2 copas. Personalización incluida.",
-        price: "1899.00",
-        images: ["/images/products/caja-vino-grabada.jpg"],
-        tags: ["personalizado", "vino", "grabado", "madera", "elegante"],
-        stock: 12,
-      },
-      {
-        vendorId: insertedVendors[3].id,
-        categoryId: insertedCategories[3].id,
-        name: "Album Fotográfico Personalizado Premium",
-        slug: "album-fotografico-personalizado-premium",
-        description: "Álbum fotográfico de 30x30cm con portada personalizada en piel genuina. 50 páginas, impresión profesional. Incluye caja de presentación.",
-        price: "2499.00",
-        images: ["/images/products/album-personalizado.jpg"],
-        tags: ["album", "fotos", "personalizado", "piel", "recuerdos"],
-        stock: 8,
-      },
-      {
-        vendorId: insertedVendors[3].id,
-        categoryId: insertedCategories[3].id,
-        name: "Taza Mágica con Foto y Mensaje",
-        slug: "taza-magica-foto-mensaje",
-        description: "Taza de cerámica que revela tu foto y mensaje al agregar líquido caliente. Capacidad 350ml. Incluye caja de regalo.",
-        price: "299.00",
-        images: ["/images/products/taza-magica.jpg"],
-        tags: ["taza", "personalizado", "foto", "magica", "economico"],
-        stock: 40,
-      },
-
-      // Cajas de Regalo - Regalo Perfecto MX
-      {
-        vendorId: insertedVendors[3].id,
-        categoryId: insertedCategories[4].id,
-        name: "Caja Spa en Casa Deluxe",
-        slug: "caja-spa-casa-deluxe",
-        description: "Caja de regalo con productos spa: sales de baño, aceites esenciales, vela aromática, mascarilla facial, toalla de bambú y más.",
-        price: "1799.00",
-        images: ["/images/products/caja-spa.jpg"],
-        tags: ["spa", "relajacion", "autocuidado", "mujer", "bienestar"],
-        stock: 15,
-      },
-      {
-        vendorId: insertedVendors[3].id,
-        categoryId: insertedCategories[4].id,
-        name: "Caja Gourmet Mexicana",
-        slug: "caja-gourmet-mexicana",
-        description: "Selección de productos gourmet mexicanos: mezcal artesanal, chocolates, café de especialidad, miel de agave, sal de gusano y más.",
-        price: "2299.00",
-        images: ["/images/products/caja-gourmet-mx.jpg"],
-        tags: ["gourmet", "mexicano", "mezcal", "cafe", "premium"],
-        stock: 10,
-      },
-      {
-        vendorId: insertedVendors[3].id,
-        categoryId: insertedCategories[4].id,
-        name: "Caja Desayuno Sorpresa",
-        slug: "caja-desayuno-sorpresa",
-        description: "Desayuno completo en caja: jugo natural, fruta, pan artesanal, mermeladas, queso, jamón serrano, croissant y mensaje personalizado.",
-        price: "899.00",
-        images: ["/images/products/caja-desayuno.jpg"],
-        tags: ["desayuno", "sorpresa", "mañana", "romantico", "completo"],
-        stock: 20,
-      },
-
-      // Decoración y Hogar - Casa Décor Studio
-      {
-        vendorId: insertedVendors[4].id,
-        categoryId: insertedCategories[5].id,
-        name: "Jarrón de Talavera Artesanal Grande",
-        slug: "jarron-talavera-artesanal-grande",
-        description: "Hermoso jarrón de Talavera poblana hecho a mano. Diseño tradicional con colores vibrantes. Altura: 40cm. Pieza única.",
-        price: "2899.00",
-        images: ["/images/products/jarron-talavera.jpg"],
-        tags: ["talavera", "artesanal", "mexicano", "decorativo", "unico"],
-        stock: 5,
-      },
-      {
-        vendorId: insertedVendors[4].id,
-        categoryId: insertedCategories[5].id,
-        name: "Set de 3 Macetas Colgantes Macramé",
-        slug: "set-3-macetas-colgantes-macrame",
-        description: "Set de 3 macetas colgantes de macramé hechas a mano con algodón natural. Incluye macetas de cerámica. Diferentes tamaños.",
-        price: "1299.00",
-        images: ["/images/products/macetas-macrame.jpg"],
-        tags: ["macrame", "plantas", "colgante", "boho", "natural"],
-        stock: 12,
-      },
-      {
-        vendorId: insertedVendors[4].id,
-        categoryId: insertedCategories[5].id,
-        name: "Espejo Sol de Madera Tallada",
-        slug: "espejo-sol-madera-tallada",
-        description: "Espejo decorativo en forma de sol con marco de madera de pino tallada a mano. Diámetro: 80cm. Acabado natural.",
-        price: "3499.00",
-        images: ["/images/products/espejo-sol.jpg"],
-        tags: ["espejo", "madera", "tallado", "sol", "artesanal"],
-        stock: 4,
-      },
-      {
-        vendorId: insertedVendors[4].id,
-        categoryId: insertedCategories[5].id,
-        name: "Cojines Bordados Otomí (Par)",
-        slug: "cojines-bordados-otomi-par",
-        description: "Par de cojines con bordado Otomí tradicional hecho a mano. Funda de algodón 100%, relleno incluido. 45x45cm.",
-        price: "1899.00",
-        images: ["/images/products/cojines-otomi.jpg"],
-        tags: ["cojines", "otomi", "bordado", "tradicional", "colorido"],
-        stock: 8,
-      },
-
-      // Joyería y Accesorios - Joyería Plata y Oro
-      {
-        vendorId: insertedVendors[5].id,
-        categoryId: insertedCategories[6].id,
-        name: "Collar de Plata con Ámbar de Chiapas",
-        slug: "collar-plata-ambar-chiapas",
-        description: "Elegante collar de plata .925 con dije de ámbar auténtico de Chiapas. Cadena de 45cm. Incluye certificado de autenticidad.",
-        price: "3299.00",
-        images: ["/images/products/collar-ambar.jpg"],
-        tags: ["plata", "ambar", "chiapas", "collar", "elegante"],
-        stock: 6,
-      },
-      {
-        vendorId: insertedVendors[5].id,
-        categoryId: insertedCategories[6].id,
-        name: "Aretes de Oro 14k con Perlas Cultivadas",
-        slug: "aretes-oro-14k-perlas",
-        description: "Finos aretes de oro amarillo 14k con perlas cultivadas de 8mm. Cierre de mariposa. Presentación en estuche de terciopelo.",
-        price: "4899.00",
-        images: ["/images/products/aretes-perlas.jpg"],
-        tags: ["oro", "perlas", "aretes", "fino", "clasico"],
-        stock: 4,
-      },
-      {
-        vendorId: insertedVendors[5].id,
-        categoryId: insertedCategories[6].id,
-        name: "Pulsera de Plata con Dijes Mexicanos",
-        slug: "pulsera-plata-dijes-mexicanos",
-        description: "Pulsera de plata .925 con 7 dijes representativos de México: catrina, corazón, cactus, chile, sombrero y más. 19cm.",
-        price: "2499.00",
-        images: ["/images/products/pulsera-dijes.jpg"],
-        tags: ["plata", "pulsera", "mexicano", "dijes", "tradicional"],
-        stock: 10,
-      },
-      {
-        vendorId: insertedVendors[5].id,
-        categoryId: insertedCategories[6].id,
-        name: "Anillo de Plata con Turquesa",
-        slug: "anillo-plata-turquesa",
-        description: "Anillo de plata .925 con piedra turquesa natural. Diseño artesanal único. Disponible en varias tallas.",
-        price: "1899.00",
-        images: ["/images/products/anillo-turquesa.jpg"],
-        tags: ["plata", "anillo", "turquesa", "artesanal", "natural"],
-        stock: 8,
-      },
-
-      // Gourmet y Delicatessen - Delicias Gourmet
-      {
-        vendorId: insertedVendors[6].id,
-        categoryId: insertedCategories[7].id,
-        name: "Canasta de Vinos Premium",
-        slug: "canasta-vinos-premium",
-        description: "Selección de 3 vinos premium: tinto reserva del Valle de Guadalupe, blanco de Coahuila y rosado. Incluye canasta de mimbre.",
-        price: "3499.00",
-        images: ["/images/products/canasta-vinos.jpg"],
-        tags: ["vino", "premium", "valle-guadalupe", "canasta", "regalo"],
-        stock: 5,
-      },
-      {
-        vendorId: insertedVendors[6].id,
-        categoryId: insertedCategories[7].id,
-        name: "Tabla de Quesos Artesanales Mexicanos",
-        slug: "tabla-quesos-artesanales-mexicanos",
-        description: "Selección de 5 quesos artesanales mexicanos (500g total), mermeladas, nueces y galletas. Tabla de madera de encino incluida.",
-        price: "1899.00",
-        images: ["/images/products/tabla-quesos.jpg"],
-        tags: ["quesos", "artesanal", "mexicano", "tabla", "gourmet"],
-        stock: 8,
-      },
-      {
-        vendorId: insertedVendors[6].id,
-        categoryId: insertedCategories[7].id,
-        name: "Kit de Café de Especialidad",
-        slug: "kit-cafe-especialidad",
-        description: "3 bolsas de café de especialidad (250g c/u) de Veracruz, Chiapas y Oaxaca. Incluye prensa francesa y taza de cerámica.",
-        price: "1599.00",
-        images: ["/images/products/kit-cafe.jpg"],
-        tags: ["cafe", "especialidad", "mexicano", "kit", "gourmet"],
-        stock: 12,
-      },
-      {
-        vendorId: insertedVendors[6].id,
-        categoryId: insertedCategories[7].id,
-        name: "Aceite de Oliva Extra Virgen Premium 750ml",
-        slug: "aceite-oliva-extra-virgen-750ml",
-        description: "Aceite de oliva extra virgen de primera prensada en frío. Importado de España. Notas frutales y picante equilibrado.",
-        price: "899.00",
-        images: ["/images/products/aceite-oliva.jpg"],
-        tags: ["aceite-oliva", "extra-virgen", "importado", "gourmet", "cocina"],
-        stock: 20,
-      }
-    ];
-
-    // Map products data with SKUs
-    const productsDataWithSKU = productsData.map((product, index) => {
-      const vendorIndex = insertedVendors.findIndex(v => v.id === product.vendorId);
-      const vendorName = vendorIndex >= 0 ? vendorsData[vendorIndex].businessName : "VND";
-      return {
-        ...product,
-        sku: generateSKU(vendorName, product.name, index + 1)
-      };
-    });
-
-    const insertedProducts = await db.insert(products).values(productsDataWithSKU).returning();
-    console.log(`✅ Inserted ${insertedProducts.length} products`);
-
-    // Insert admin users
-    console.log("👤 Inserting admin users...");
-    const adminPassword = await bcrypt.hash("admin123", 10);
-    const adminUsersData = [
+    // 2. Seed Admin Users
+    console.log("👤 Creating admin users...");
+    const hashedPassword = await bcrypt.hash("admin123", 10);
+    const adminUsers = await db.insert(schema.adminUsers).values([
       {
         email: "admin@luzimarket.shop",
         name: "Administrador Principal",
-        passwordHash: adminPassword,
+        passwordHash: hashedPassword,
         role: "super_admin",
-        isActive: true,
+        isActive: true
       },
       {
-        email: "soporte@luzimarket.shop",
+        email: "support@luzimarket.shop",
         name: "Soporte Técnico",
-        passwordHash: adminPassword,
+        passwordHash: hashedPassword,
         role: "admin",
-        isActive: true,
-      }
-    ];
-
-    const insertedAdmins = await db.insert(adminUsers).values(adminUsersData).returning();
-    console.log(`✅ Inserted ${insertedAdmins.length} admin users`);
-
-    // Insert test customers
-    console.log("👥 Inserting test customers...");
-    const customerPassword = await bcrypt.hash("customer123", 10);
-    const customersData = [
-      {
-        email: "maria.garcia@email.com",
-        name: "María García",
-        passwordHash: customerPassword,
-        stripeCustomerId: "cus_test_maria",
-        isActive: true,
+        isActive: true
       },
       {
-        email: "carlos.lopez@email.com",
-        name: "Carlos López",
-        passwordHash: customerPassword,
-        stripeCustomerId: "cus_test_carlos",
-        isActive: true,
-      },
-      {
-        email: "ana.martinez@email.com",
-        name: "Ana Martínez",
-        passwordHash: customerPassword,
-        stripeCustomerId: "cus_test_ana",
-        isActive: true,
+        email: "manager@luzimarket.shop",
+        name: "Gerente de Ventas",
+        passwordHash: hashedPassword,
+        role: "admin",
+        isActive: true
       }
-    ];
+    ]).returning();
+    console.log(`✅ Created ${adminUsers.length} admin users`);
 
-    const insertedCustomers = await db.insert(users).values(customersData).returning();
-    console.log(`✅ Inserted ${insertedCustomers.length} customers`);
-
-    // Insert email templates
-    console.log("📧 Inserting email templates...");
-    const emailTemplatesData = [
+    // 3. Seed Email Templates
+    console.log("📧 Creating email templates...");
+    const emailTemplates = await db.insert(schema.emailTemplates).values([
       {
         name: "welcome",
         subject: "¡Bienvenido a Luzimarket!",
-        htmlTemplate: "<h1>¡Hola {{name}}!</h1><p>Bienvenido a Luzimarket, tu destino para regalos especiales.</p><p>Gracias por unirte a nuestra comunidad.</p>",
-        textTemplate: "Hola {{name}}, Bienvenido a Luzimarket!",
-        variables: ["name"],
+        htmlTemplate: "<h1>Bienvenido {{name}}</h1><p>Gracias por unirte a Luzimarket.</p>",
+        textTemplate: "Bienvenido {{name}}. Gracias por unirte a Luzimarket.",
+        variables: ["name", "email"],
+        isActive: true
       },
       {
         name: "order_confirmation",
         subject: "Confirmación de pedido #{{orderNumber}}",
-        htmlTemplate: "<h1>¡Gracias por tu compra!</h1><p>Hola {{customerName}},</p><p>Hemos recibido tu pedido #{{orderNumber}}.</p><p>Total: ${{total}} MXN</p>",
-        textTemplate: "Confirmación de pedido #{{orderNumber}}. Total: ${{total}} MXN",
-        variables: ["customerName", "orderNumber", "total"],
+        htmlTemplate: "<h1>Pedido Confirmado</h1><p>Tu pedido #{{orderNumber}} ha sido confirmado.</p>",
+        textTemplate: "Tu pedido #{{orderNumber}} ha sido confirmado.",
+        variables: ["name", "email", "orderNumber"],
+        isActive: true
       },
       {
         name: "order_shipped",
         subject: "Tu pedido #{{orderNumber}} ha sido enviado",
-        htmlTemplate: "<h1>¡Tu pedido está en camino!</h1><p>Hola {{customerName}},</p><p>Tu pedido #{{orderNumber}} ha sido enviado.</p><p>Número de guía: {{trackingNumber}}</p>",
-        textTemplate: "Tu pedido #{{orderNumber}} ha sido enviado. Guía: {{trackingNumber}}",
-        variables: ["customerName", "orderNumber", "trackingNumber"],
+        htmlTemplate: "<h1>Pedido Enviado</h1><p>Tu pedido #{{orderNumber}} está en camino.</p>",
+        textTemplate: "Tu pedido #{{orderNumber}} está en camino.",
+        variables: ["name", "email", "orderNumber", "trackingNumber"],
+        isActive: true
       },
       {
         name: "vendor_approved",
         subject: "¡Tu solicitud de vendedor ha sido aprobada!",
-        htmlTemplate: "<h1>¡Bienvenido a Luzimarket como vendedor!</h1><p>Hola {{vendorName}},</p><p>Tu solicitud para {{businessName}} ha sido aprobada.</p><p>Ya puedes comenzar a publicar tus productos.</p>",
-        textTemplate: "Tu solicitud de vendedor ha sido aprobada. ¡Bienvenido!",
-        variables: ["vendorName", "businessName"],
+        htmlTemplate: "<h1>¡Felicidades!</h1><p>Tu tienda {{businessName}} ha sido aprobada.</p>",
+        textTemplate: "Tu tienda {{businessName}} ha sido aprobada.",
+        variables: ["name", "email", "businessName"],
+        isActive: true
       }
-    ];
+    ]).returning();
+    console.log(`✅ Created ${emailTemplates.length} email templates`);
 
-    const insertedTemplates = await db.insert(emailTemplates).values(emailTemplatesData).returning();
-    console.log(`✅ Inserted ${insertedTemplates.length} email templates`);
+    // 4. Seed Vendors
+    console.log("🏪 Creating vendors...");
+    const vendorData = [];
+    for (let i = 0; i < 20; i++) {
+      const prefix = faker.helpers.arrayElement(VENDOR_PREFIXES);
+      const suffix = faker.helpers.arrayElement(VENDOR_SUFFIXES);
+      const businessName = `${prefix} ${suffix}`;
+      vendorData.push({
+        businessName,
+        slug: slugify(businessName, { lower: true, strict: true }),
+        contactName: faker.person.fullName(),
+        email: faker.internet.email(),
+        phone: faker.phone.number(),
+        whatsapp: faker.phone.number(),
+        businessPhone: faker.phone.number(),
+        businessHours: faker.helpers.arrayElement(BUSINESS_HOURS),
+        street: faker.location.streetAddress(),
+        city: faker.helpers.arrayElement(CITIES),
+        state: faker.helpers.arrayElement(STATES),
+        country: "México",
+        postalCode: faker.location.zipCode("#####"),
+        websiteUrl: faker.datatype.boolean(0.7) ? faker.internet.url() : "",
+        description: faker.lorem.sentences(2),
+        hasDelivery: faker.datatype.boolean(0.8),
+        deliveryService: faker.helpers.arrayElement(["own", "external", "both"]),
+        instagramUrl: faker.datatype.boolean(0.6) ? `@${faker.internet.username()}` : "",
+        facebookUrl: faker.datatype.boolean(0.6) ? faker.internet.username() : "",
+        tiktokUrl: faker.datatype.boolean(0.4) ? `@${faker.internet.username()}` : "",
+        isActive: faker.datatype.boolean(0.9)
+      });
+    }
+    const vendors = await db.insert(schema.vendors).values(vendorData).returning();
+    console.log(`✅ Created ${vendors.length} vendors`);
 
-    // Insert sample subscriptions
-    console.log("📮 Inserting newsletter subscriptions...");
-    const subscriptionsData = [
-      { email: "newsletter1@email.com" },
-      { email: "newsletter2@email.com" },
-      { email: "newsletter3@email.com" },
-    ];
-
-    const insertedSubscriptions = await db.insert(subscriptions).values(subscriptionsData).returning();
-    console.log(`✅ Inserted ${insertedSubscriptions.length} subscriptions`);
-
-    // Insert sample orders with realistic data
-    console.log("📦 Inserting sample orders...");
-    const ordersData = [
-      {
-        orderNumber: "LM-2024-001",
-        userId: insertedCustomers[0].id,
-        vendorId: insertedVendors[0].id,
-        status: "delivered",
-        subtotal: "1899.00",
-        tax: "303.84",
-        shipping: "150.00",
-        total: "2352.84",
-        paymentIntentId: "pi_test_001",
-        paymentStatus: "succeeded",
-        shippingAddress: {
-          street: "Av. Reforma 123",
-          city: "Ciudad de México",
-          state: "CDMX",
-          postalCode: "06500",
-          country: "México"
-        },
-        notes: "Entregar en recepción del edificio",
-        createdAt: new Date("2024-01-15"),
-      },
-      {
-        orderNumber: "LM-2024-002",
-        userId: insertedCustomers[1].id,
-        vendorId: insertedVendors[1].id,
-        status: "shipped",
-        subtotal: "899.00",
-        tax: "143.84",
-        shipping: "99.00",
-        total: "1141.84",
-        paymentIntentId: "pi_test_002",
-        paymentStatus: "succeeded",
-        shippingAddress: {
-          street: "Calle Madero 456",
-          city: "Ciudad de México",
-          state: "CDMX",
-          postalCode: "06000",
-          country: "México"
-        },
-        createdAt: new Date("2024-01-20"),
-      }
-    ];
-
-    const insertedOrders = await db.insert(orders).values(ordersData).returning();
-    console.log(`✅ Inserted ${insertedOrders.length} orders`);
-
-    // Insert order items
-    console.log("🛒 Inserting order items...");
-    const orderItemsData = [
-      {
-        orderId: insertedOrders[0].id,
-        productId: insertedProducts[0].id, // Ramo de 24 Rosas
-        quantity: 1,
-        price: "1899.00",
-        total: "1899.00",
-      },
-      {
-        orderId: insertedOrders[1].id,
-        productId: insertedProducts[5].id, // Caja de Trufas
-        quantity: 1,
-        price: "899.00",
-        total: "899.00",
-      }
-    ];
-
-    const insertedOrderItems = await db.insert(orderItems).values(orderItemsData).returning();
-    console.log(`✅ Inserted ${insertedOrderItems.length} order items`);
-
-    // Insert sample reviews
-    console.log("⭐ Inserting sample reviews...");
-    const reviewsData = [
-      {
-        productId: insertedProducts[0].id,
-        userId: insertedCustomers[0].id,
-        orderId: insertedOrders[0].id,
-        rating: 5,
-        title: "Hermosas rosas, excelente calidad",
-        comment: "Las rosas llegaron frescas y hermosas. El arreglo estaba tal cual la foto. Mi esposa quedó encantada. Definitivamente volveré a comprar.",
-        isVerifiedPurchase: true,
-        helpfulCount: 12,
-      },
-      {
-        productId: insertedProducts[5].id,
-        userId: insertedCustomers[1].id,
-        orderId: insertedOrders[1].id,
-        rating: 5,
-        title: "Deliciosas trufas artesanales",
-        comment: "El sabor es increíble, se nota la calidad del cacao. La presentación es elegante, perfecta para regalo. Las de mezcal son mis favoritas.",
-        isVerifiedPurchase: true,
-        helpfulCount: 8,
-      },
-      {
-        productId: insertedProducts[0].id,
-        userId: insertedCustomers[2].id,
-        rating: 4,
-        title: "Muy bonitas pero un poco caras",
-        comment: "Las rosas son de muy buena calidad y el arreglo es hermoso. Solo me pareció un poco elevado el precio, pero la calidad lo justifica.",
-        isVerifiedPurchase: false,
-        helpfulCount: 5,
-      }
-    ];
-
-    const insertedReviews = await db.insert(reviews).values(reviewsData).returning();
-    console.log(`✅ Inserted ${insertedReviews.length} reviews`);
-
-    console.log("\n✨ Seed completed successfully!");
-    console.log("\n📋 Summary:");
-    console.log(`- Categories: ${insertedCategories.length}`);
-    console.log(`- Vendors: ${insertedVendors.length}`);
-    console.log(`- Products: ${insertedProducts.length}`);
-    console.log(`- Admin users: ${insertedAdmins.length}`);
-    console.log(`- Customers: ${insertedCustomers.length}`);
-    console.log(`- Email templates: ${insertedTemplates.length}`);
-    console.log(`- Subscriptions: ${insertedSubscriptions.length}`);
-    console.log(`- Orders: ${insertedOrders.length}`);
-    console.log(`- Reviews: ${insertedReviews.length}`);
+    // 5. Seed Products
+    console.log("📦 Creating products...");
+    const productData = [];
     
+    // Group product names by category
+    const CATEGORY_PRODUCT_NAMES: Record<string, string[]> = {
+      "flores-arreglos": PRODUCT_NAMES.slice(0, 15),
+      "chocolates-dulces": PRODUCT_NAMES.slice(15, 30),
+      "velas-aromas": PRODUCT_NAMES.slice(30, 45),
+      "regalos-personalizados": PRODUCT_NAMES.slice(45, 60),
+      "cajas-regalo": PRODUCT_NAMES.slice(60, 75),
+      "decoracion-hogar": PRODUCT_NAMES.slice(75, 90),
+      "joyeria-accesorios": PRODUCT_NAMES.slice(90, 105),
+      "gourmet-delicatessen": PRODUCT_NAMES.slice(105, 120)
+    };
+    
+    for (let i = 0; i < 500; i++) {
+      const category = faker.helpers.arrayElement(categories);
+      const categoryProducts = CATEGORY_PRODUCT_NAMES[category.slug] || PRODUCT_NAMES;
+      const baseName = faker.helpers.arrayElement(categoryProducts);
+      const name = baseName + " " + faker.commerce.productAdjective();
+      const priceRange = CATEGORY_PRICE_RANGES[category.slug] || { min: 299, max: 1999 };
+      const price = faker.number.int({ min: priceRange.min, max: priceRange.max });
+      
+      productData.push({
+        name,
+        slug: slugify(name + "-" + faker.string.alphanumeric(6), { lower: true, strict: true }),
+        description: faker.lorem.sentences(3),
+        categoryId: category.id,
+        vendorId: faker.helpers.arrayElement(vendors).id,
+        price: String(Math.round(price / 50) * 50), // Round to nearest 50
+        images: null, // Will be generated with AI
+        tags: faker.helpers.arrayElements(["nuevo", "popular", "oferta", "exclusivo", "limitado"], { min: 1, max: 3 }),
+        stock: faker.number.int({ min: 0, max: 100 }),
+        sku: faker.string.alphanumeric(8).toUpperCase(),
+        isActive: faker.datatype.boolean(0.95)
+      });
+    }
+    const products = await db.insert(schema.products).values(productData).returning();
+    console.log(`✅ Created ${products.length} products`);
+
+    // 6. Seed Users (Customers)
+    console.log("👥 Creating users...");
+    const userPassword = await bcrypt.hash("password123", 10);
+    const userData = [];
+    for (let i = 0; i < 50; i++) {
+      userData.push({
+        email: faker.internet.email(),
+        name: faker.person.fullName(),
+        passwordHash: userPassword,
+        stripeCustomerId: `cus_${faker.string.alphanumeric(14)}`,
+        isActive: faker.datatype.boolean(0.95)
+      });
+    }
+    const users = await db.insert(schema.users).values(userData).returning();
+    console.log(`✅ Created ${users.length} users`);
+
+    // 7. Seed Newsletter Subscriptions
+    console.log("📰 Creating newsletter subscriptions...");
+    const subscriptionData = [];
+    for (let i = 0; i < 100; i++) {
+      subscriptionData.push({
+        email: faker.internet.email(),
+        isActive: faker.datatype.boolean(0.9)
+      });
+    }
+    await db.insert(schema.subscriptions).values(subscriptionData);
+    console.log(`✅ Created ${subscriptionData.length} subscriptions`);
+
+    // 8. Seed Orders
+    console.log("🛒 Creating orders...");
+    const orderData = [];
+    for (let i = 0; i < 150; i++) {
+      const subtotal = faker.number.int({ min: 199, max: 9999 });
+      const tax = Math.round(subtotal * 0.16);
+      const shipping = faker.helpers.arrayElement([0, 99, 149, 199]);
+      const total = subtotal + tax + shipping;
+
+      orderData.push({
+        userId: faker.helpers.arrayElement(users).id,
+        vendorId: faker.helpers.arrayElement(vendors).id,
+        orderNumber: `ORD-${faker.string.numeric(8)}`,
+        status: faker.helpers.weightedArrayElement([
+          { value: "delivered", weight: 4 },
+          { value: "shipped", weight: 3 },
+          { value: "processing", weight: 2 },
+          { value: "pending", weight: 1 }
+        ]),
+        subtotal: String(subtotal),
+        tax: String(tax),
+        shipping: String(shipping),
+        total: String(total),
+        currency: "MXN",
+        paymentIntentId: `pi_${faker.string.alphanumeric(24)}`,
+        paymentStatus: faker.helpers.weightedArrayElement([
+          { value: "succeeded", weight: 9 },
+          { value: "pending", weight: 1 }
+        ]),
+        shippingAddress: {
+          name: faker.person.fullName(),
+          street: faker.location.streetAddress(),
+          city: faker.helpers.arrayElement(CITIES),
+          state: faker.helpers.arrayElement(STATES),
+          postalCode: faker.location.zipCode("#####"),
+          country: "México"
+        },
+        notes: faker.datatype.boolean(0.3) ? faker.lorem.sentence() : null
+      });
+    }
+    const orders = await db.insert(schema.orders).values(orderData).returning();
+    console.log(`✅ Created ${orders.length} orders`);
+
+    // 9. Seed Order Items
+    console.log("📋 Creating order items...");
+    const orderItemData = [];
+    for (const order of orders) {
+      const itemCount = faker.number.int({ min: 1, max: 5 });
+      const selectedProducts = faker.helpers.arrayElements(products, itemCount);
+
+      for (const product of selectedProducts) {
+        const quantity = faker.number.int({ min: 1, max: 3 });
+        const price = parseInt(product.price);
+        orderItemData.push({
+          orderId: order.id,
+          productId: product.id,
+          quantity,
+          price: String(price),
+          total: String(price * quantity)
+        });
+      }
+    }
+    await db.insert(schema.orderItems).values(orderItemData);
+    console.log(`✅ Created ${orderItemData.length} order items`);
+
+    // 10. Seed Reviews
+    console.log("⭐ Creating reviews...");
+    const reviewData = [];
+    const reviewTitles = [
+      "Excelente producto",
+      "Muy buena calidad",
+      "Recomendado",
+      "Superó mis expectativas",
+      "Buen servicio",
+      "Producto como se describe",
+      "Entrega rápida",
+      "Volveré a comprar"
+    ];
+
+    // Create reviews for random products
+    const productsWithReviews = faker.helpers.arrayElements(products, 120);
+    for (const product of productsWithReviews) {
+      const reviewCount = faker.number.int({ min: 1, max: 5 });
+      for (let i = 0; i < reviewCount; i++) {
+        const user = faker.helpers.arrayElement(users);
+        // Check if user has ordered this product
+        const hasOrdered = faker.datatype.boolean(0.8);
+
+        reviewData.push({
+          productId: product.id,
+          userId: user.id,
+          orderId: hasOrdered ? faker.helpers.arrayElement(orders).id : null,
+          rating: faker.helpers.weightedArrayElement([
+            { value: 5, weight: 5 },
+            { value: 4, weight: 3 },
+            { value: 3, weight: 1.5 },
+            { value: 2, weight: 0.5 }
+          ]),
+          title: faker.helpers.arrayElement(reviewTitles),
+          comment: faker.lorem.sentences(2),
+          isVerifiedPurchase: hasOrdered,
+          helpfulCount: faker.number.int({ min: 0, max: 50 })
+        });
+      }
+    }
+    await db.insert(schema.reviews).values(reviewData);
+    console.log(`✅ Created ${reviewData.length} reviews`);
+
+    // Generate AI images if OpenAI key is available
+    if (process.env.OPENAI_SECRET_KEY) {
+      console.log("\n🎨 Generating AI images for products and categories...");
+
+      // Create uploads directory for local development
+      if (process.env.NODE_ENV === 'development' && !process.env.BLOB_READ_WRITE_TOKEN) {
+        const fs = await import('fs/promises');
+        const path = await import('path');
+        const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'ai-generated');
+        await fs.mkdir(uploadsDir, { recursive: true });
+        console.log('📁 Created local uploads directory\n');
+      }
+
+      // Generate category images
+      console.log('🖼️  Generating category images...');
+      for (const category of categories) {
+        try {
+          console.log(`🖼️  Generating image for category: ${category.name}`);
+
+          const prompt = generateCategoryImagePrompt({
+            name: category.name,
+            description: category.description || '',
+          });
+
+          const imageUrl = await generateAndUploadImage(
+            prompt,
+            `category-${category.slug}.png`,
+            {
+              size: '1792x1024',
+              quality: 'hd',
+              style: 'natural',
+            }
+          );
+
+          await db.update(schema.categories)
+            .set({ imageUrl })
+            .where(eq(schema.categories.id, category.id));
+
+          console.log(`✅ Generated image for ${category.name}`);
+
+          // Add delay to respect rate limits
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } catch (error) {
+          console.error(`❌ Error generating image for ${category.name}:`, error);
+        }
+      }
+
+      // Generate product images (limit to 20 for cost control)
+      // Increase the limit or remove .slice() to generate images for all products
+      console.log('\n🖼️  Generating product images...');
+      const productsToImage = products; // Generate images for all products
+      for (const product of productsToImage) {
+        try {
+          console.log(`🖼️  Generating image for product: ${product.name}`);
+
+          const prompt = generateProductImagePrompt({
+            name: product.name,
+            description: product.description || '',
+            tags: product.tags as string[],
+          });
+
+          const imageUrl = await generateAndUploadImage(
+            prompt,
+            `product-${product.slug}.png`,
+            {
+              size: '1024x1024',
+              quality: 'standard',
+              style: 'natural',
+            }
+          );
+
+          await db.update(schema.products)
+            .set({
+              images: [imageUrl]
+            })
+            .where(eq(schema.products.id, product.id));
+
+          console.log(`✅ Generated image for ${product.name}`);
+
+          // Add delay to respect rate limits
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } catch (error) {
+          console.error(`❌ Error generating image for ${product.name}:`, error);
+        }
+      }
+
+      console.log('\n✨ AI image generation completed!');
+    } else {
+      console.log("\n⚠️  Skipping AI image generation (OPENAI_SECRET_KEY not found)");
+    }
+
+    // Print summary
+    console.log("\n📋 Summary:");
+    const counts = await db.select({
+      categories: sql<number>`(SELECT COUNT(*) FROM ${schema.categories})`,
+      vendors: sql<number>`(SELECT COUNT(*) FROM ${schema.vendors})`,
+      products: sql<number>`(SELECT COUNT(*) FROM ${schema.products})`,
+      users: sql<number>`(SELECT COUNT(*) FROM ${schema.users})`,
+      orders: sql<number>`(SELECT COUNT(*) FROM ${schema.orders})`,
+      reviews: sql<number>`(SELECT COUNT(*) FROM ${schema.reviews})`
+    }).from(schema.categories);
+
+    const summary = counts[0];
+    console.log(`- Categories: ${summary.categories}`);
+    console.log(`- Vendors: ${summary.vendors}`);
+    console.log(`- Products: ${summary.products}`);
+    console.log(`- Users: ${summary.users}`);
+    console.log(`- Orders: ${summary.orders}`);
+    console.log(`- Reviews: ${summary.reviews}`);
+
     console.log("\n🔐 Login credentials:");
     console.log("Admin: admin@luzimarket.shop / admin123");
-    console.log("Customer: maria.garcia@email.com / customer123");
+    console.log("User: any user email / password123");
+
+    console.log("\n✅ Database seeded successfully!");
 
   } catch (error) {
     console.error("❌ Seed failed:", error);
@@ -859,4 +668,4 @@ async function seed() {
   }
 }
 
-seed();
+main();

@@ -25,6 +25,12 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '2mb',
     },
   },
+  compiler: {
+    // Remove data-testid attributes in production
+    reactRemoveProperties: process.env.NODE_ENV === 'production' ? {
+      properties: ['^data-testid$']
+    } : false,
+  },
 };
 
 export default withNextIntl(nextConfig);

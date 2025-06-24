@@ -85,9 +85,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
         {/* Breadcrumb */}
         <nav className="text-sm font-univers mb-8">
           <ol className="flex items-center gap-2 text-gray-600">
-            <li><a href={`/${locale}`} className="hover:text-black">Inicio</a></li>
+            <li><a href={`/${locale}`} className="hover:text-black">{locale === 'es' ? 'Inicio' : 'Home'}</a></li>
             <li>/</li>
-            <li><a href={`/${locale}/categories`} className="hover:text-black">Categorías</a></li>
+            <li><a href={`/${locale}/categories`} className="hover:text-black">{locale === 'es' ? 'Categorías' : 'Categories'}</a></li>
             <li>/</li>
             <li><a href={`/${locale}/category/${product.category?.slug}`} className="hover:text-black">{product.category?.name}</a></li>
             <li>/</li>
@@ -136,12 +136,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <div>
               <h1 className="text-3xl font-times-now mb-2">{product.name}</h1>
               <p className="text-sm font-univers text-gray-600 uppercase tracking-wider">
-                POR {product.vendor?.businessName || 'VENDEDOR'}
+                {locale === 'es' ? 'POR' : 'BY'} {product.vendor?.businessName || (locale === 'es' ? 'VENDEDOR' : 'VENDOR')}
               </p>
             </div>
 
             <div className="text-3xl font-univers">
-              ${Number(product.price).toLocaleString('es-MX')} MXN
+              ${Number(product.price).toLocaleString(locale === 'es' ? 'es-MX' : 'en-US')} MXN
             </div>
 
             <div className="prose prose-sm font-univers">
@@ -227,19 +227,19 @@ export default async function ProductPage({ params }: ProductPageProps) {
           
           <TabsContent value="specifications" className="mt-6">
             <div className="prose prose-sm font-univers max-w-none">
-              <p>Especificaciones técnicas del producto.</p>
+              <p>{locale === 'es' ? 'Especificaciones técnicas del producto.' : 'Product technical specifications.'}</p>
             </div>
           </TabsContent>
           
           <TabsContent value="shipping" className="mt-6">
             <div className="prose prose-sm font-univers max-w-none">
-              <p>Información sobre envío y tiempos de entrega.</p>
+              <p>{locale === 'es' ? 'Información sobre envío y tiempos de entrega.' : 'Shipping information and delivery times.'}</p>
             </div>
           </TabsContent>
           
           <TabsContent value="returns" className="mt-6">
             <div className="prose prose-sm font-univers max-w-none">
-              <p>Política de devoluciones y cambios.</p>
+              <p>{locale === 'es' ? 'Política de devoluciones y cambios.' : 'Returns and exchange policy.'}</p>
             </div>
           </TabsContent>
         </Tabs>

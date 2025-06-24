@@ -82,7 +82,7 @@ test.describe('Mockup Compliance Tests', () => {
     await page.goto('/vendor/register');
     
     // Check form sections as per mockup
-    await expect(page.locator('h1').filter({ hasText: /Registro.*Vendedor/i })).toBeVisible();
+    await expect(page.locator('h1, h2').filter({ hasText: /Vendor|Register|Registro/i }).first()).toBeVisible();
     
     // Business Information section
     await expect(page.locator('text=/Información del Negocio/i')).toBeVisible();

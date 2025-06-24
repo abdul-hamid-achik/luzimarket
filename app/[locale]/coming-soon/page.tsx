@@ -1,7 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from 'next-intl';
 
 export default function ComingSoonPage() {
+  const t = useTranslations('ComingSoon');
+  const tCommon = useTranslations('Common');
+  
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* Header */}
@@ -15,7 +18,7 @@ export default function ComingSoonPage() {
           Instagram
         </Link>
         <h1 className="text-3xl font-univers tracking-[0.15em] text-black">
-          LUZIMARKET
+          {tCommon('brand')}
         </h1>
         <Link 
           href="mailto:hola@luzimarket.shop" 
@@ -84,9 +87,7 @@ export default function ComingSoonPage() {
           </div>
 
           <p className="text-base md:text-lg font-univers max-w-3xl mx-auto mb-12 leading-relaxed text-gray-700 px-4">
-            LUZIMARKET® es una nueva plataforma online que ofrece curaduría, venta y envío 
-            a domicilio de regalos excepcionales para momentos especiales, con un catálogo de 
-            marcas y tiendas seleccionadas en todo México.
+            {t('description')}
           </p>
 
           <Link
@@ -94,7 +95,7 @@ export default function ComingSoonPage() {
             className="inline-block bg-black text-white px-10 py-4 font-univers text-sm tracking-wider hover:bg-gray-900 transition-colors"
             data-testid="affiliate-button"
           >
-            Afiliate
+            {t('affiliate')}
           </Link>
         </div>
       </div>
@@ -102,13 +103,13 @@ export default function ComingSoonPage() {
       {/* Bottom gradient bar */}
       <div className="fixed bottom-0 left-0 right-0 h-14 bg-gradient-to-r from-green-400 via-yellow-300 to-cyan-400 flex items-center justify-center">
         <div className="flex items-center gap-12 text-sm font-univers tracking-wider text-gray-800 overflow-x-auto whitespace-nowrap px-4">
-          <span className="flex-shrink-0">COMING SOON</span>
+          <span className="flex-shrink-0">{t('comingSoonEn')}</span>
           <span className="text-gray-600">/</span>
-          <span className="flex-shrink-0">PRÓXIMAMENTE</span>
+          <span className="flex-shrink-0">{t('comingSoon')}</span>
           <span className="text-gray-600">/</span>
-          <span className="flex-shrink-0">BIENTÔT</span>
+          <span className="flex-shrink-0">{t('comingSoonFr')}</span>
           <span className="text-gray-600">/</span>
-          <span className="flex-shrink-0">곧 출시</span>
+          <span className="flex-shrink-0">{t('comingSoonKr')}</span>
         </div>
       </div>
     </div>

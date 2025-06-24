@@ -59,6 +59,7 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
       className={cn("group block", className)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      data-testid={`product-card-${product.slug}`}
     >
       <div className="relative aspect-square mb-4 overflow-hidden bg-gray-100 rounded-lg">
         <Image
@@ -84,6 +85,7 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
           )}
           onClick={handleWishlistToggle}
           aria-label={isWishlisted ? t('removeFromWishlist') : t('addToWishlist')}
+          data-testid={`wishlist-button-${product.slug}`}
         >
           <Heart 
             className={cn(
@@ -109,6 +111,7 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
                   onQuickView(product);
                 }}
                 aria-label={t('quickView')}
+                data-testid={`quick-view-${product.slug}`}
               >
                 <Eye className="h-4 w-4 mr-1" />
                 {t('quickView')}

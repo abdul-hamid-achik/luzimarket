@@ -39,7 +39,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b">
+    <header className="sticky top-0 z-50 bg-white border-b" data-testid="header">
       <div>
         {/* Top bar - Desktop only */}
         <div className="hidden md:flex items-center justify-between py-2 text-xs border-b px-8">
@@ -56,7 +56,7 @@ export function Header() {
           {/* Mobile Menu */}
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden" aria-label={t('openMenu')}>
+              <Button variant="ghost" size="icon" className="md:hidden" aria-label={t('openMenu')} data-testid="mobile-menu-button">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
@@ -120,7 +120,7 @@ export function Header() {
           </Sheet>
 
           {/* Logo */}
-          <Link href="/" className="flex-shrink-0">
+          <Link href="/" className="flex-shrink-0" data-testid="logo-link">
             <span className="text-xl md:text-2xl font-times-now tracking-wider">LUZIMARKET</span>
           </Link>
 
@@ -150,7 +150,7 @@ export function Header() {
               </Button>
             </Link>
             {status === "loading" ? (
-              <Button variant="ghost" size="icon" disabled>
+              <Button variant="ghost" size="icon" disabled aria-label={t('userAccount')}>
                 <User className="h-5 w-5" />
               </Button>
             ) : session ? (
@@ -196,6 +196,7 @@ export function Header() {
               onClick={toggleCart} 
               className="relative"
               aria-label={getTotalItems() > 0 ? t('shoppingCartWithItems', { count: getTotalItems() }) : t('shoppingCart')}
+              data-testid="cart-button"
             >
               <ShoppingBag className="h-5 w-5" />
               {getTotalItems() > 0 && (

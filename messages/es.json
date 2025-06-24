@@ -28,7 +28,7 @@
     "shoppingCartWithItems": "Carrito con {count} productos",
     "wishlist": "Lista de deseos",
     "wishlistWithItems": "Lista de deseos con {count} productos",
-    "currencyLocale": "ESP → MXN",
+    "currencyLocale": "MXN",
     "shippingTo": "Envío a: {location}",
     "searchPlaceholder": "Buscar productos, categorías o tiendas...",
     "searching": "Buscando...",
@@ -39,7 +39,8 @@
     "searchStores": "Tiendas",
     "myAccount": "Mi cuenta",
     "myOrders": "Mis pedidos",
-    "user": "Usuario"
+    "user": "Usuario",
+    "clearSearch": "Limpiar búsqueda"
   },
   
   "Navigation": {
@@ -138,7 +139,11 @@
     "total": "Total",
     "remove": "Eliminar",
     "quantity": "Cantidad",
-    "updateQuantity": "Actualizar cantidad"
+    "by": "Por",
+    "updateQuantity": "Actualizar cantidad",
+    "removeItem": "Quitar {name} del carrito",
+    "increaseQuantity": "Aumentar cantidad",
+    "decreaseQuantity": "Disminuir cantidad"
   },
   
   "Checkout": {

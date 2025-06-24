@@ -28,7 +28,7 @@
     "shoppingCartWithItems": "Cart with {count} items",
     "wishlist": "Wishlist",
     "wishlistWithItems": "Wishlist with {count} items",
-    "currencyLocale": "ENG → USD",
+    "currencyLocale": "MXN",
     "shippingTo": "Shipping to: {location}",
     "searchPlaceholder": "Search products, categories or stores...",
     "searching": "Searching...",
@@ -39,7 +39,8 @@
     "searchStores": "Stores",
     "myAccount": "My Account",
     "myOrders": "My Orders",
-    "user": "User"
+    "user": "User",
+    "clearSearch": "Clear search"
   },
   
   "Navigation": {
@@ -138,7 +139,11 @@
     "total": "Total",
     "remove": "Remove",
     "quantity": "Quantity",
-    "updateQuantity": "Update quantity"
+    "by": "By",
+    "updateQuantity": "Update quantity",
+    "removeItem": "Remove {name} from cart",
+    "increaseQuantity": "Increase quantity",
+    "decreaseQuantity": "Decrease quantity"
   },
   
   "Checkout": {

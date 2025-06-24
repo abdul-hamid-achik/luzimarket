@@ -113,6 +113,32 @@ e2e/
    });
    ```
 
+## Test Selectors
+
+We use `data-testid` attributes throughout the application for reliable test selectors. Key selectors include:
+
+### Navigation & Layout
+- `data-testid="header"` - Main header
+- `data-testid="logo-link"` - Logo/brand link
+- `data-testid="mobile-menu-button"` - Mobile menu toggle
+- `data-testid="cart-button"` - Cart toggle button
+
+### Products
+- `data-testid="product-card-{slug}"` - Product card
+- `data-testid="wishlist-button-{slug}"` - Wishlist toggle
+- `data-testid="quick-view-{slug}"` - Quick view button
+
+### Cart
+- `data-testid="cart-sheet"` - Cart sidebar
+- `data-testid="cart-item-{id}"` - Cart item container
+- `data-testid="remove-item-{id}"` - Remove item button
+- `data-testid="decrease-quantity-{id}"` - Decrease quantity
+- `data-testid="increase-quantity-{id}"` - Increase quantity
+- `data-testid="checkout-link"` - Proceed to checkout
+
+### Coming Soon Page
+- `data-testid="affiliate-button"` - Vendor registration button
+
 ## Best Practices
 
 1. **Use data-testid attributes** for reliable element selection
@@ -167,7 +193,78 @@ Tests use the same `.env.local` file as the application. For CI/CD, set:
 - Use Playwright Inspector: `npx playwright test --debug`
 - Check if element has different text in Spanish/English
 - Add data-testid attributes to components
+- For shadcn/ui components, use role selectors (e.g., `role="dialog"` for Sheet)
 
 ### Authentication issues
 - Ensure test users exist in database (run `npm run db:seed`)
 - Check session handling in global.setup.ts
+- Verify AUTH_SECRET and NEXTAUTH_SECRET are set in `.env.local`
+
+### Cart state not persisting
+- Cart uses local storage/cookies, ensure tests don't clear storage between navigations
+- Use `test.beforeEach` to set up cart state for checkout tests
+- Check if cart context is properly initialized
+
+### Checkout tests failing
+- Ensure products are added to cart before navigating to checkout
+- For Radix UI checkboxes (like terms acceptance), click the label not the checkbox
+- Submit button may have dynamic text with price - use regex matcher
+- Stripe integration requires proper API keys in environment variables
+
+### Testing shadcn/ui Components
+
+When testing shadcn/ui components (which use Radix UI primitives):
+
+1. **Sheet/Dialog Components**:
+   - Use `role="dialog"` selector instead of looking for `aside` elements
+   - Example: `await page.getByRole('dialog')`
+
+2. **Checkbox Components**:
+   - Not standard `<input type="checkbox">` elements
+   - Click the label instead: `await page.locator('label[for="checkboxId"]').click()`
+   - Or use: `await page.getByRole('checkbox', { name: 'Label text' })`
+
+3. **Buttons with Lucide Icons**:
+   - Don't search for text in buttons containing only SVG icons
+   - Use parent selectors: `await page.locator('button:has(svg.h-3.w-3)').nth(1)`
+   - Or use accessible names: `await page.getByRole('button', { name: 'aria-label value' })`
+
+4. **Best Practices**:
+   - Wait for animations: `await page.waitForTimeout(300)` after opening dialogs
+   - Use role-based selectors when possible
+   - Check for `data-slot` attributes added by shadcn components
+
+### Common Patterns
+
+#### Waiting for Elements
+```typescript
+// Wait for element with timeout
+await page.waitForSelector('[data-testid="cart-sheet"]', { timeout: 5000 });
+
+// Wait for multiple elements
+await page.waitForSelector('[data-testid^="product-card-"]');
+```
+
+#### Handling Dynamic Content
+```typescript
+// Wait for network idle
+await page.waitForLoadState('networkidle');
+
+// Wait for specific API response
+await page.waitForResponse(response => 
+  response.url().includes('/api/products') && response.status() === 200
+);
+```
+
+#### Testing Internationalization
+```typescript
+// Test with different locales
+test.describe('Spanish locale', () => {
+  test.use({ locale: 'es-MX' });
+  
+  test('should show Spanish content', async ({ page }) => {
+    await page.goto('/es');
+    // Test Spanish content
+  });
+});
+```

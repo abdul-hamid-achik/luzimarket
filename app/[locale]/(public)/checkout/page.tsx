@@ -404,6 +404,7 @@ export default function CheckoutPage() {
                     type="submit"
                     className="w-full bg-black text-white hover:bg-gray-800 py-3"
                     disabled={isLoading}
+                    data-testid="checkout-submit-button"
                   >
                     {isLoading ? (
                       <>

@@ -51,6 +51,7 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
         {/* Close Button */}
         <button
           onClick={onClose}
+          aria-label="Cerrar vista rápida"
           className="absolute right-4 top-4 z-10 rounded-full bg-white p-2 shadow-md hover:bg-gray-100"
         >
           <X className="h-4 w-4" />
@@ -76,6 +77,7 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
+                    aria-label={`Ver imagen ${index + 1}`}
                     className={`relative w-16 h-16 rounded-md overflow-hidden border-2 transition-colors ${
                       index === selectedImageIndex
                         ? "border-black"

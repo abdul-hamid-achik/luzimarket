@@ -2,37 +2,196 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Commands
+## Important Notes
 
-### Development
+- **NO scripts folder** - All commands are defined in package.json
+- **NO Docker** - Using Vercel managed services (Postgres, Blob Storage)
+- **Single seed script** - One db/seed.ts file that handles everything: reset, seeding, and AI image generation
+- **Database reset integrated** - The seed script uses drizzle-seed's reset functionality (can be skipped with --no-reset)
+- **AI image generation** - Images are generated directly in seed.ts if OPENAI_SECRET_KEY is present
+- **Realistic data** - Uses faker.js with Spanish (Mexico) locale for authentic vendor and product names
+- **Category-aware pricing** - Products have realistic prices based on their category
+- **Keep it simple** - Avoid creating duplicate scripts or complex variations
+- **Vercel Services** - Using Vercel Postgres for database and Vercel Blob for file storage
+
+## Local Development Setup
+
+### Prerequisites
+- Node.js 22+ and npm 10+
+- Vercel account with Postgres addon
+- OpenAI API key (optional, for AI image generation)
+- Stripe account (for payment testing)
+
+### Initial Setup
 ```bash
-npm run dev              # Start development server on http://localhost:3000
-docker-compose up -d     # Start all services (PostgreSQL, Redis, Mailcatcher, Stripe CLI)
+# 1. Clone the repository
+git clone <repo-url>
+cd luzimarket
+
+# 2. Install dependencies
+npm install
+
+# 3. Set up Vercel and link project
+npm run vercel:link
+
+# 4. Add Vercel Postgres addon
+# Go to https://vercel.com/dashboard/stores
+# Create a Postgres database and connect it to your project
+
+# 5. Pull environment variables from Vercel
+npm run vercel:env:pull
+
+# 6. Set up database schema
+npm run db:push
+
+# 7. Seed database (optional)
+npm run db:seed
+
+# 8. Start development server
+npm run dev
 ```
 
-### Database Management
+### Daily Development
 ```bash
-npm run db:generate      # Generate migrations from schema changes
-npm run db:push         # Apply schema directly to database (development)
-npm run db:migrate      # Run migrations (production)
-npm run db:studio       # Open Drizzle Studio GUI
-npm run db:seed         # Seed database with sample data
+# Start dev server
+npm run dev
+
+# Optional: Run Stripe CLI for webhook testing
+npm run dev:stripe
 ```
 
-### Build & Deployment
+### Commands
+
+#### Development
 ```bash
-npm run build           # Build for production
-npm run start           # Start production server
-npm run lint            # Run ESLint
-docker-compose up --build  # Build and run full stack with Docker
+npm run dev                 # Start Next.js development server
+npm run dev:stripe          # Start Stripe CLI for webhook testing
 ```
 
-### Testing
+#### Database Management
 ```bash
-npm run test:e2e        # Run end-to-end tests with Playwright
-npm run test:e2e:ui     # Run tests with Playwright UI
-npm run test:e2e:debug  # Debug tests with Playwright
+npm run db:generate         # Generate migrations from schema changes
+npm run db:push            # Apply schema to database
+npm run db:migrate         # Run migrations (for production)
+npm run db:migrate:prod    # Run migrations with production env
+npm run db:push:prod       # Push schema to production database
+npm run db:studio          # Open Drizzle Studio GUI
+npm run db:seed            # Seed database (uses AI if OPENAI_SECRET_KEY exists)
+npm run db:seed:prod       # Seed production database
+npm run db:reset           # Reset and re-seed database (same as db:seed)
+npm run db:setup           # Run db:push + db:seed (initial setup)
+
+# Seed options:
+# - Default: Resets database and seeds with fresh data
+# - With --no-reset flag: Seeds without resetting (appends data)
+# Example: npm run db:seed -- --no-reset
 ```
+
+#### Build & Deployment
+```bash
+npm run build              # Build for production
+npm run start              # Start production server
+npm run lint               # Run ESLint
+npm run vercel:deploy      # Deploy to Vercel preview
+npm run vercel:deploy:prod # Deploy to Vercel production
+```
+
+#### Testing
+```bash
+npm run test:e2e           # Run end-to-end tests with Playwright
+npm run test:e2e:ui        # Run tests with Playwright UI
+npm run test:e2e:debug     # Debug tests with Playwright
+npm run test:e2e:headed    # Run tests in headed mode
+```
+
+### Environment Variables
+
+The project uses environment variables from Vercel. Use `npm run vercel:env:pull` to sync them locally.
+
+#### Required Environment Variables
+```bash
+# Database (automatically set by Vercel Postgres addon)
+POSTGRES_URL=...
+POSTGRES_PRISMA_URL=...
+POSTGRES_URL_NON_POOLING=...
+POSTGRES_USER=...
+POSTGRES_HOST=...
+POSTGRES_PASSWORD=...
+POSTGRES_DATABASE=...
+
+# Email (Resend)
+RESEND_API_KEY=...
+EMAIL_FROM=noreply@luzimarket.shop
+
+# Stripe
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=...
+STRIPE_SECRET_KEY=...
+STRIPE_WEBHOOK_SECRET=...
+
+# NextAuth
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=...
+```
+
+#### AI Image Generation
+The seed script automatically uses AI for images if you have an OpenAI key:
+```bash
+OPENAI_SECRET_KEY=sk-...  # Optional: If present, generates product/category images with DALL-E 3
+```
+- Single `npm run db:seed` command handles both cases
+- With key: Generates unique AI images for all products and categories
+- Without key: Uses placeholder images
+- No need for separate scripts or commands
+
+For Vercel Blob storage (production only):
+```bash
+BLOB_READ_WRITE_TOKEN=...  # Optional: Falls back to local file storage in dev
+```
+
+### Vercel Services Setup
+
+#### 1. Vercel Postgres
+1. Go to https://vercel.com/dashboard/stores
+2. Click "Create Database" → Select "Postgres"
+3. Choose a region close to your users
+4. Connect it to your project
+5. Environment variables are automatically added
+
+#### 2. Vercel Blob Storage
+1. Go to https://vercel.com/dashboard/stores
+2. Click "Create Database" → Select "Blob"
+3. Connect it to your project
+4. Get the `BLOB_READ_WRITE_TOKEN` from the dashboard
+
+#### 3. Local Development
+- Use `npm run vercel:env:pull` to sync all environment variables
+- The `.env.local` file will be created with all necessary values
+- For local file storage during dev, the app falls back when `BLOB_READ_WRITE_TOKEN` is not set
+
+### Testing with Playwright
+
+#### Testing shadcn/ui Components
+
+When writing tests for shadcn/ui components (which use Radix UI primitives):
+
+1. **Sheet/Dialog Components**:
+   - Use `role="dialog"` selector instead of looking for `aside` elements
+   - Example: `await page.getByRole('dialog')`
+
+2. **Checkbox Components**:
+   - Not standard `<input type="checkbox">` elements
+   - Click the label instead: `await page.locator('label[for="checkboxId"]').click()`
+   - Or use: `await page.getByRole('checkbox', { name: 'Label text' })`
+
+3. **Buttons with Lucide Icons**:
+   - Don't search for text in buttons containing only SVG icons
+   - Use parent selectors: `await page.locator('button:has(svg.h-3.w-3)').nth(1)`
+   - Or use accessible names: `await page.getByRole('button', { name: 'aria-label value' })`
+
+4. **Best Practices**:
+   - Wait for animations: `await page.waitForTimeout(300)` after opening dialogs
+   - Use role-based selectors when possible
+   - Check for `data-slot` attributes added by shadcn components
 
 ## Architecture Overview
 
@@ -79,6 +238,21 @@ This is a Next.js 15 e-commerce platform using App Router with the following key
    - shadcn/ui for component library
    - Custom fonts: Adobe Myungjo (headings), Times Now (body), Univers (UI)
    - CSS variables for theming in `app/globals.css`
+
+7. **File Storage**:
+   - Production: Vercel Blob storage via `@vercel/blob`
+   - Development: Local file storage in `/public/uploads/` (gitignored)
+   - Automatic fallback when `BLOB_READ_WRITE_TOKEN` is not present
+
+8. **Testing Architecture**:
+   - E2E tests with Playwright
+   - `data-testid` attributes throughout for reliable selectors
+   - Automatic removal of test attributes in production builds via Next.js compiler
+
+9. **AI Image Generation**:
+   - Uses OpenAI DALL-E 3 for generating product and category images
+   - Integrated into seed script - runs automatically if `OPENAI_SECRET_KEY` is present
+   - Generates contextually appropriate e-commerce photography
 
 ### Project Structure
 
