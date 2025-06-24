@@ -27,6 +27,13 @@ npm run lint            # Run ESLint
 docker-compose up --build  # Build and run full stack with Docker
 ```
 
+### Testing
+```bash
+npm run test:e2e        # Run end-to-end tests with Playwright
+npm run test:e2e:ui     # Run tests with Playwright UI
+npm run test:e2e:debug  # Debug tests with Playwright
+```
+
 ## Architecture Overview
 
 This is a Next.js 15 e-commerce platform using App Router with the following key architectural decisions:

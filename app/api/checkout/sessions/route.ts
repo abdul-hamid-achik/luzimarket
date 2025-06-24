@@ -4,7 +4,22 @@ import { stripe } from "@/lib/stripe";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { items, customerInfo, shippingAddress, billingAddress } = body;
+    const { items, shippingAddress, billingAddress, paymentMethod } = body;
+
+    // Validate required fields
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return NextResponse.json(
+        { error: 'No items provided' },
+        { status: 400 }
+      );
+    }
+
+    if (!shippingAddress || !shippingAddress.email) {
+      return NextResponse.json(
+        { error: 'Customer email is required' },
+        { status: 400 }
+      );
+    }
 
     // Calculate totals
     const subtotal = items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
@@ -19,7 +34,9 @@ export async function POST(request: NextRequest) {
           currency: 'mxn',
           product_data: {
             name: item.name,
-            images: [item.image],
+            images: item.image && item.image.startsWith('/') 
+              ? [`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}${item.image}`]
+              : item.image ? [item.image] : [],
             metadata: {
               vendorId: item.vendorId,
               vendorName: item.vendorName,
@@ -62,16 +79,17 @@ export async function POST(request: NextRequest) {
       line_items: lineItems,
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout`,
-      customer_email: customerInfo.email,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/cancel`,
+      customer_email: shippingAddress.email,
       shipping_address_collection: {
         allowed_countries: ['MX'],
       },
       metadata: {
-        customerName: customerInfo.name,
-        customerPhone: customerInfo.phone,
-        shippingAddress: JSON.stringify(shippingAddress),
-        billingAddress: JSON.stringify(billingAddress),
+        customerName: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
+        customerPhone: shippingAddress.phone || '',
+        shippingAddress: shippingAddress ? JSON.stringify(shippingAddress) : '',
+        billingAddress: billingAddress ? JSON.stringify(billingAddress) : '',
+        paymentMethod: paymentMethod || 'card',
       },
       // OXXO specific settings
       payment_method_options: {
@@ -82,7 +100,10 @@ export async function POST(request: NextRequest) {
       locale: 'es', // Spanish for Mexico
     });
 
-    return NextResponse.json({ sessionId: session.id });
+    return NextResponse.json({ 
+      sessionId: session.id,
+      url: session.url 
+    });
   } catch (error) {
     console.error('Checkout session error:', error);
     return NextResponse.json(

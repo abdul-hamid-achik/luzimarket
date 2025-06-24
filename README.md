@@ -1,23 +1,29 @@
 # LUZIMARKET
 
-A modern e-commerce platform for curated gifts and experiences in Mexico.
+A modern e-commerce platform for curated gifts and unique experiences in Mexico.
 
 ## Tech Stack
 
-- **Frontend**: Next.js 15, TypeScript, Tailwind CSS, shadcn/ui
+- **Frontend**: Next.js 15.3.3, React 19, TypeScript, Tailwind CSS v4, shadcn/ui
 - **Backend**: Next.js Server Actions, Drizzle ORM
-- **Database**: PostgreSQL
+- **Database**: PostgreSQL (Neon serverless)
+- **Authentication**: NextAuth.js with email/password and OAuth
+- **Payments**: Stripe integration
+- **Email**: Resend API with React Email templates
+- **Internationalization**: next-intl (Spanish/English)
 - **Validation**: Zod
 - **Forms**: React Hook Form
 - **Containerization**: Docker & Docker Compose
+- **File Storage**: Uploadthing for image uploads
+- **Deployment**: Vercel
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 20+
-- Docker and Docker Compose
-- npm
+- Docker and Docker Compose (optional for local development)
+- npm or pnpm
 
 ### Development Setup
 
@@ -32,28 +38,52 @@ cd luzimarket
 npm install
 ```
 
-3. **Start the database with Docker**
-```bash
-docker-compose up -d postgres
-```
-
-4. **Set up environment variables**
-Create a `.env.local` file:
+3. **Set up environment variables**
+Create a `.env.local` file with all required variables (see `.env.example` for reference):
 ```env
-DATABASE_URL=postgresql://postgres:password@localhost:5432/luzimarket
-NEXT_PUBLIC_APP_URL=https://luzimarket.shop
+# Database (Neon)
+DATABASE_URL=postgresql://...
+DIRECT_URL=postgresql://...
+
+# NextAuth
+NEXTAUTH_SECRET=your-secret-here
+NEXTAUTH_URL=http://localhost:3000
+
+# Stripe
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+
+# Email (Resend)
+RESEND_API_KEY=re_...
+EMAIL_FROM=Luzimarket <no-reply@luzimarket.shop>
+
+# Uploadthing
+UPLOADTHING_TOKEN=...
+
+# App URLs
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-5. **Set up the database**
+4. **Set up the database**
 ```bash
-# Generate database migrations
+# Generate database client
 npm run db:generate
 
-# Apply migrations to database
+# Push schema to database (development)
 npm run db:push
+
+# Run migrations (production)
+npm run db:migrate
 
 # Seed the database with sample data
 npm run db:seed
+```
+
+5. **Start development services (optional)**
+```bash
+# Start PostgreSQL, Redis, Mailcatcher, and Stripe CLI
+docker-compose up -d
 ```
 
 6. **Start the development server**
@@ -61,7 +91,7 @@ npm run db:seed
 npm run dev
 ```
 
-Visit http://localhost:3000 to see the application in development, or https://luzimarket.shop in production.
+Visit http://localhost:3000 to see the application.
 
 ### Docker Setup (Full Stack)
 
@@ -114,41 +144,100 @@ This will start:
 
 ## Available Scripts
 
-- `npm run dev` - Start development server
+### Development
+- `npm run dev` - Start development server on http://localhost:3000
 - `npm run build` - Build for production
 - `npm run start` - Start production server
-- `npm run db:generate` - Generate database migrations
-- `npm run db:push` - Apply migrations to database
-- `npm run db:migrate` - Run migrations
+- `npm run lint` - Run ESLint
+
+### Database
+- `npm run db:generate` - Generate migrations from schema changes
+- `npm run db:push` - Apply schema directly to database (development)
+- `npm run db:migrate` - Run migrations (production)
 - `npm run db:seed` - Seed database with sample data
-- `npm run db:studio` - Open Drizzle Studio for database management
+- `npm run db:studio` - Open Drizzle Studio GUI for database management
+
+### Testing
+- `npm run test:e2e` - Run end-to-end tests with Playwright
+- `npm run test:e2e:ui` - Run tests with Playwright UI
+- `npm run test:e2e:debug` - Debug tests with Playwright
 
 ## Features
 
-- 🛍️ Product browsing by category
-- 🔍 Product search and filtering
-- 👥 Vendor registration system
-- 🎨 Beautiful, responsive design with custom fonts
-- 🔒 Type-safe with TypeScript and Zod validation
-- ⚡ Fast with Next.js server components
-- 🗄️ PostgreSQL database with Drizzle ORM
-- 🐳 Docker support for easy deployment
-- 📱 Mobile-responsive design
+### Core E-commerce
+- 🛍️ Product browsing with advanced filtering (category, vendor, price)
+- 🔍 Real-time search with autocomplete
+- 🛒 Shopping cart with persistent state
+- ❤️ Wishlist functionality
+- ⭐ Product reviews and ratings system
+- 👁️ Quick view modal for products
+- 💳 Stripe checkout integration
+- 📦 Order tracking and history
 
-## Pages
+### Multi-vendor Platform
+- 👥 Vendor registration and onboarding
+- 📊 Vendor dashboard with analytics
+- 📝 Product management (CRUD operations)
+- 📈 Sales and revenue tracking
 
-1. **Coming Soon Landing** (`/coming-soon`) - Pre-launch page with vendor registration CTA
-2. **Home** (`/`) - Category grid showcasing main product categories
-3. **Product Listing** (`/products`) - Filtered product browsing with sidebar
-4. **Category Pages** (`/category/[slug]`) - Category-specific product listings
-5. **Vendor Registration** (`/vendor/register`) - Multi-step form for vendor onboarding
+### Technical Features
+- 🌐 Internationalization (Spanish/English)
+- 🔒 Authentication with NextAuth.js
+- 📧 Transactional emails with React Email
+- 🎨 Custom typography (Adobe Myungjo, Times Now, Univers)
+- 📱 Fully responsive design
+- ⚡ Optimized with React Server Components
+- 🔄 Real-time updates with Server Actions
+- 🖼️ Image optimization and uploads
+
+## Key Pages
+
+### Public
+- **Home** (`/[locale]`) - Category grid and featured products
+- **Products** (`/[locale]/products`) - Product catalog with filters
+- **Product Detail** (`/[locale]/products/[slug]`) - Product info, reviews, related items
+- **Categories** (`/[locale]/category/[slug]`) - Category-specific listings
+- **Search** (`/[locale]/search`) - Search results page
+- **Cart** (`/[locale]/cart`) - Shopping cart management
+- **Checkout** (`/[locale]/checkout`) - Stripe-powered checkout flow
+
+### Account
+- **Login/Register** (`/[locale]/login`, `/[locale]/register`) - Authentication
+- **Account Dashboard** (`/[locale]/account`) - User profile and settings
+- **Orders** (`/[locale]/orders`) - Order history and tracking
+
+### Vendor
+- **Vendor Dashboard** (`/vendor/dashboard`) - Sales overview and analytics
+- **Product Management** (`/vendor/products`) - CRUD operations for products
+- **Order Management** (`/vendor/orders`) - Vendor order fulfillment
+
+### Admin
+- **Admin Dashboard** (`/admin`) - Platform overview
+- **User Management** (`/admin/users`) - Manage all users
+- **Vendor Management** (`/admin/vendors`) - Approve/reject vendors
+- **Order Management** (`/admin/orders`) - All platform orders
 
 ## Database Schema
 
-- **vendors** - Store vendor/business information
-- **categories** - Product categories
-- **products** - Product catalog with images and tags
-- **subscriptions** - Email newsletter subscriptions
+### Core Tables
+- **users** - User accounts with roles (customer, vendor, admin)
+- **vendors** - Vendor profiles and business information
+- **categories** - Product categories with slugs and images
+- **products** - Product catalog with variants and inventory
+- **product_images** - Multiple images per product
+- **product_tags** - Tag system for products
+
+### E-commerce
+- **carts** - Shopping cart items
+- **wishlists** - User wishlists
+- **orders** - Order records with status tracking
+- **order_items** - Individual items in orders
+- **reviews** - Product reviews and ratings
+
+### Supporting Tables
+- **subscriptions** - Newsletter subscriptions
+- **addresses** - User shipping/billing addresses
+- **payment_methods** - Stored payment methods (Stripe)
 
 ## Development Tips
 
@@ -172,36 +261,29 @@ This will start:
 
 The app is configured for containerized deployment with Docker. The production build uses Next.js standalone output for optimal container size.
 
-## TODO - Features from Mockups
+## Testing
 
-### Remaining Tasks
-- [ ] **Email Template Management** - UI for managing transactional email templates
-- [ ] **Multi-step Progress Indicators** - Add visual progress for checkout and registration flows
+The project includes comprehensive end-to-end tests using Playwright:
 
-### Completed ✓
-- [x] **Logo implementation** - Across different user contexts (public, admin, vendor)
-- [x] **Social media icons** - In footer with proper links
-- [x] **Product Filtering Sidebar** - Category, vendor, price filters with collapsible sections
-- [x] **Category Page Hero Banners** - Gradient overlays with decorative elements
-- [x] **Search Functionality** - Autocomplete search with debouncing
-- [x] **Mobile Responsiveness** - Filter drawer and responsive layouts
-- [x] **Product Grid Enhancements** - Vendor info, hover effects, wishlist button
-- [x] **Form Validation Indicators** - Green checkmarks and red X visual feedback
-- [x] **Wishlist Functionality** - Complete wishlist with localStorage persistence
-- [x] **Loading States** - Skeleton loaders throughout the app
-- [x] **Newsletter Component** - Styled signup with validation
-- [x] **Decorative Elements** - All mockup decorations implemented
-- [x] **Customer Account Dashboard** - Profile, orders, addresses, payment methods
-- [x] **Authentication Pages** - Login and registration with proper styling
-- [x] **About Page** - Company mission with signature decoration
-- [x] **Vendor Product Management** - Complete CRUD operations with image upload
-- [x] **Order Success Page** - Detailed order confirmation with Stripe integration
-- [x] **Stripe Webhooks** - Payment and subscription event handlers
-- [x] **Product Reviews/Ratings** - Complete review system with verified purchase badges
-- [x] **Quick View Modal** - Product preview with gallery and actions
-- [x] Basic vendor registration form
-- [x] Category and product listing pages
-- [x] Internationalization setup (es/en)
+```bash
+# Run all tests
+npm run test:e2e
+
+# Run tests with UI
+npm run test:e2e:ui
+
+# Debug tests
+npm run test:e2e:debug
+```
+
+Test coverage includes:
+- Authentication flows
+- Product browsing and search
+- Shopping cart operations
+- Checkout process
+- Vendor operations
+- Admin functionality
+- Accessibility compliance
 
 ## License
 

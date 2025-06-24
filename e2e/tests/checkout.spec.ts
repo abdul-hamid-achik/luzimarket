@@ -5,38 +5,48 @@ test.describe('Checkout Flow', () => {
     // Add a product to cart before each test
     await page.goto('/products');
     
-    // Wait for products to load
-    await page.waitForSelector('[data-testid="product-card"], article');
+    // Wait for products to load with updated selector
+    await page.waitForSelector('a[href*="/products/"]', { timeout: 10000 });
     
     // Add first product to cart
-    const firstProduct = page.locator('[data-testid="product-card"], article').first();
+    const firstProduct = page.locator('main').locator('a[href*="/products/"]').first();
     await firstProduct.hover();
     
-    const addToCartButton = firstProduct.locator('button').filter({ 
-      hasText: /Add to Cart|Agregar/ 
-    }).first();
+    const addToCartButton = firstProduct.locator('button:has-text("Add to cart")').first();
     
     if (await addToCartButton.isVisible()) {
       await addToCartButton.click();
       // Wait for cart to update
       await page.waitForTimeout(1000);
+    } else {
+      // If hover doesn't work, click product and add from detail page
+      await firstProduct.click();
+      await page.waitForLoadState('networkidle');
+      const detailAddButton = page.locator('button:has-text("Add to cart"), button:has-text("Agregar al carrito")');
+      if (await detailAddButton.count() > 0) {
+        await detailAddButton.first().click();
+      }
     }
   });
 
   test('should open cart sidebar', async ({ page }) => {
-    // Click cart button
-    const cartButton = page.locator('[aria-label="Cart"], button').filter({
-      has: page.locator('svg, text=/Cart|Carrito/')
-    }).first();
+    // Click cart button - it's in the header
+    const cartButton = page.locator('button:has-text("Shopping cart")');
     
-    await cartButton.click();
+    if (await cartButton.count() === 0) {
+      // Try alternative selector
+      const altCartButton = page.locator('button[aria-label*="cart" i], button:has(svg[aria-label*="cart" i])');
+      await altCartButton.first().click();
+    } else {
+      await cartButton.click();
+    }
     
     // Cart sidebar should be visible
-    const cartSidebar = page.locator('[data-testid="cart-sidebar"], aside').filter({
-      hasText: /Cart|Carrito/
+    const cartSidebar = page.locator('aside, [role="dialog"]').filter({
+      hasText: /Shopping cart|Your Cart|Tu carrito/i
     });
     
-    await expect(cartSidebar).toBeVisible();
+    await expect(cartSidebar.first()).toBeVisible();
   });
 
   test('should update quantity in cart', async ({ page }) => {
@@ -106,13 +116,13 @@ test.describe('Checkout Flow', () => {
     
     // Try to submit empty form
     const submitButton = page.locator('button[type="submit"], button').filter({
-      hasText: /Place Order|Realizar Pedido|Pagar/
+      hasText: /Finalizar compra|Place Order|Pagar/
     }).first();
     
     await submitButton.click();
     
     // Should show validation errors
-    const errorMessages = page.locator('.error, [role="alert"], text=/required|requerido/i');
+    const errorMessages = page.locator('text=/requerido|inválido|required|invalid/i');
     await expect(errorMessages.first()).toBeVisible();
   });
 
@@ -120,15 +130,16 @@ test.describe('Checkout Flow', () => {
     await page.goto('/checkout');
     
     // Fill customer information
-    await page.fill('input[name="email"], input[type="email"]', 'test@example.com');
-    await page.fill('input[name*="name"], input[placeholder*="Nombre"]', 'Test User');
-    await page.fill('input[name*="phone"], input[type="tel"]', '5551234567');
+    await page.fill('input[type="email"]', 'test@example.com');
+    await page.fill('input[id="firstName"]', 'Test');
+    await page.fill('input[id="lastName"]', 'User');
+    await page.fill('input[type="tel"]', '5551234567');
     
     // Fill shipping address
-    await page.fill('input[name*="address"], input[placeholder*="Dirección"]', 'Av. Reforma 123');
-    await page.fill('input[name*="city"], input[placeholder*="Ciudad"]', 'Ciudad de México');
-    await page.fill('input[name*="state"], input[placeholder*="Estado"]', 'CDMX');
-    await page.fill('input[name*="zip"], input[name*="postal"]', '06500');
+    await page.fill('input[id="address"]', 'Av. Reforma 123');
+    await page.fill('input[id="city"]', 'Ciudad de México');
+    await page.fill('input[id="state"]', 'CDMX');
+    await page.fill('input[id="postalCode"]', '06500');
   });
 
   test('should show order summary', async ({ page }) => {
@@ -186,17 +197,68 @@ test.describe('Checkout Flow', () => {
     
     // Fill required fields first
     await page.fill('input[type="email"]', 'test@example.com');
-    await page.fill('input[name*="name"]', 'Test User');
+    await page.fill('input[id="firstName"]', 'Test');
+    await page.fill('input[id="lastName"]', 'User');
     
-    // Look for Stripe iframe or payment section
-    const paymentSection = page.locator('text=/Payment|Pago|Card/').first();
+    // Look for payment section
+    const paymentSection = page.locator('text=/Método de Pago|Payment Method/').first();
     await expect(paymentSection).toBeVisible();
     
-    // Check for Stripe elements (might be in iframe)
-    const stripeFrame = page.frameLocator('iframe[title*="Stripe"], iframe[src*="stripe"]').first();
-    if (await page.locator('iframe[title*="Stripe"]').isVisible()) {
-      // Stripe is integrated
-      expect(true).toBeTruthy();
+    // Check for payment options
+    const cardOption = page.locator('text=/Tarjeta|Card/');
+    const paypalOption = page.locator('text=/PayPal/');
+    const oxxoOption = page.locator('text=/OXXO/');
+    
+    // At least one payment option should be visible
+    const hasPaymentOptions = (await cardOption.count() > 0) || 
+                             (await paypalOption.count() > 0) || 
+                             (await oxxoOption.count() > 0);
+    expect(hasPaymentOptions).toBeTruthy();
+  });
+
+  test('should handle successful checkout submission', async ({ page }) => {
+    await page.goto('/checkout');
+    
+    // Fill all required fields
+    await page.fill('input[type="email"]', 'test@example.com');
+    await page.fill('input[id="firstName"]', 'Test');
+    await page.fill('input[id="lastName"]', 'User');
+    await page.fill('input[type="tel"]', '5551234567');
+    await page.fill('input[id="address"]', 'Av. Reforma 123');
+    await page.fill('input[id="city"]', 'Ciudad de México');
+    await page.fill('input[id="state"]', 'CDMX');
+    await page.fill('input[id="postalCode"]', '06500');
+    
+    // Accept terms
+    const termsCheckbox = page.locator('input[type="checkbox"]#acceptTerms');
+    await termsCheckbox.check();
+    
+    // Select payment method
+    const cardOption = page.locator('input[type="radio"][value="card"]');
+    if (await cardOption.isVisible()) {
+      await cardOption.check();
     }
+    
+    // Submit form (this will create Stripe session)
+    const submitButton = page.locator('button[type="submit"]').filter({
+      hasText: /Finalizar compra/
+    });
+    
+    // Intercept the API call to verify it works
+    const responsePromise = page.waitForResponse(response => 
+      response.url().includes('/api/checkout/sessions') && 
+      response.request().method() === 'POST'
+    );
+    
+    await submitButton.click();
+    
+    const response = await responsePromise;
+    
+    // Check if the API call was successful
+    expect(response.status()).toBe(200);
+    
+    // Response should contain sessionId
+    const responseData = await response.json();
+    expect(responseData).toHaveProperty('sessionId');
   });
 });

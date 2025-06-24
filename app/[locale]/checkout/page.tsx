@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -18,6 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, CreditCard, MapPin, User, Phone, Mail, Truck, Shield, Package } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import Script from "next/script";
 
 const checkoutSchema = z.object({
   // Personal Information
@@ -123,9 +124,23 @@ export default function CheckoutPage() {
 
       const result = await response.json();
 
-      if (response.ok && result.url) {
+      if (response.ok && result.sessionId) {
         // Redirect to Stripe checkout
-        window.location.href = result.url;
+        // First try direct URL redirect (works without Stripe.js)
+        if (result.url) {
+          window.location.href = result.url;
+        } else if ((window as any).Stripe && process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+          // Fallback to Stripe.js redirect
+          const stripe = (window as any).Stripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+          const { error } = await stripe.redirectToCheckout({
+            sessionId: result.sessionId,
+          });
+          if (error) {
+            setError(error.message || "Error al procesar el pago");
+          }
+        } else {
+          setError("Error: Missing Stripe configuration. Please add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY to your environment variables.");
+        }
       } else {
         setError(result.error || "Error al procesar el pago");
       }
@@ -137,8 +152,19 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
+    <>
+      <Script 
+        src="https://js.stripe.com/v3/"
+        strategy="afterInteractive"
+        onLoad={() => {
+          console.log('Stripe.js loaded successfully');
+        }}
+        onError={() => {
+          console.error('Failed to load Stripe.js');
+        }}
+      />
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-times-now">LUZIMARKET</h1>
@@ -512,5 +538,6 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
