@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, CreditCard, MapPin, User, Phone, Mail, Truck, Shield, Package } from "lucide-react";
@@ -42,9 +41,6 @@ const checkoutSchema = z.object({
   // Billing
   sameAsBilling: z.boolean(),
   
-  // Payment
-  paymentMethod: z.enum(["card", "paypal", "oxxo"]),
-  
   // Terms
   acceptTerms: z.boolean().refine(val => val === true, "Debes aceptar los términos"),
   newsletter: z.boolean().optional(),
@@ -64,7 +60,6 @@ export default function CheckoutPage() {
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
       sameAsBilling: true,
-      paymentMethod: "card",
       acceptTerms: false,
       newsletter: false,
       country: "México",
@@ -118,7 +113,6 @@ export default function CheckoutPage() {
             country: data.country,
             instructions: data.instructions,
           },
-          paymentMethod: data.paymentMethod,
         }),
       });
 
@@ -345,49 +339,21 @@ export default function CheckoutPage() {
                   </CardContent>
                 </Card>
 
-                {/* Payment Method */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 font-times-now">
-                      <CreditCard className="h-5 w-5" />
-                      Método de Pago
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <RadioGroup
-                      value={form.watch("paymentMethod")}
-                      onValueChange={(value) => form.setValue("paymentMethod", value as any)}
-                    >
-                      <div className="flex items-center space-x-2 p-3 border rounded-lg">
-                        <RadioGroupItem value="card" id="card" />
-                        <Label htmlFor="card" className="flex-1 cursor-pointer">
-                          <div className="flex items-center gap-3">
-                            <CreditCard className="h-5 w-5" />
-                            <span>Tarjeta de crédito o débito</span>
-                          </div>
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2 p-3 border rounded-lg">
-                        <RadioGroupItem value="paypal" id="paypal" />
-                        <Label htmlFor="paypal" className="flex-1 cursor-pointer">
-                          <div className="flex items-center gap-3">
-                            <div className="h-5 w-5 bg-blue-600 rounded"></div>
-                            <span>PayPal</span>
-                          </div>
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2 p-3 border rounded-lg">
-                        <RadioGroupItem value="oxxo" id="oxxo" />
-                        <Label htmlFor="oxxo" className="flex-1 cursor-pointer">
-                          <div className="flex items-center gap-3">
-                            <div className="h-5 w-5 bg-red-600 rounded"></div>
-                            <span>OXXO</span>
-                          </div>
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </CardContent>
-                </Card>
+                {/* Payment Info */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <CreditCard className="h-5 w-5 text-blue-600 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-univers font-medium text-blue-900">
+                        Métodos de pago seguros
+                      </p>
+                      <p className="text-sm font-univers text-blue-700 mt-1">
+                        Acepta tarjetas de crédito/débito, OXXO y otros métodos de pago. 
+                        Selecciona tu método preferido en la siguiente pantalla.
+                      </p>
+                    </div>
+                  </div>
+                </div>
 
                 {/* Terms and Submit */}
                 <div className="space-y-4">

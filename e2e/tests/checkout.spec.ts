@@ -200,20 +200,13 @@ test.describe('Checkout Flow', () => {
     await page.fill('input[id="firstName"]', 'Test');
     await page.fill('input[id="lastName"]', 'User');
     
-    // Look for payment section
-    const paymentSection = page.locator('text=/Método de Pago|Payment Method/').first();
-    await expect(paymentSection).toBeVisible();
+    // Since payment methods are now handled by Stripe,
+    // just verify the checkout button exists
+    const checkoutButton = page.locator('button[type="submit"]').filter({
+      hasText: /Finalizar compra/
+    });
     
-    // Check for payment options
-    const cardOption = page.locator('text=/Tarjeta|Card/');
-    const paypalOption = page.locator('text=/PayPal/');
-    const oxxoOption = page.locator('text=/OXXO/');
-    
-    // At least one payment option should be visible
-    const hasPaymentOptions = (await cardOption.count() > 0) || 
-                             (await paypalOption.count() > 0) || 
-                             (await oxxoOption.count() > 0);
-    expect(hasPaymentOptions).toBeTruthy();
+    await expect(checkoutButton).toBeVisible();
   });
 
   test('should handle successful checkout submission', async ({ page }) => {
@@ -232,12 +225,6 @@ test.describe('Checkout Flow', () => {
     // Accept terms
     const termsCheckbox = page.locator('input[type="checkbox"]#acceptTerms');
     await termsCheckbox.check();
-    
-    // Select payment method
-    const cardOption = page.locator('input[type="radio"][value="card"]');
-    if (await cardOption.isVisible()) {
-      await cardOption.check();
-    }
     
     // Submit form (this will create Stripe session)
     const submitButton = page.locator('button[type="submit"]').filter({
