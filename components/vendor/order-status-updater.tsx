@@ -36,10 +36,10 @@ interface OrderStatusUpdaterProps {
 }
 
 const statusOptions = [
-  { value: "processing", label: "En proceso", icon: Package, color: "bg-blue-500" },
-  { value: "shipped", label: "Enviado", icon: Truck, color: "bg-orange-500" },
-  { value: "delivered", label: "Entregado", icon: CheckCircle, color: "bg-green-500" },
-  { value: "cancelled", label: "Cancelado", icon: XCircle, color: "bg-red-500" },
+  { value: "processing", label: "📦 Procesando orden", icon: Package, color: "bg-blue-500" },
+  { value: "shipped", label: "🚚 Enviado", icon: Truck, color: "bg-orange-500" },
+  { value: "delivered", label: "✅ Entregado", icon: CheckCircle, color: "bg-green-500" },
+  { value: "cancelled", label: "❌ Cancelado", icon: XCircle, color: "bg-red-500" },
 ];
 
 export function OrderStatusUpdater({ order, onStatusUpdate }: OrderStatusUpdaterProps) {
@@ -76,8 +76,8 @@ export function OrderStatusUpdater({ order, onStatusUpdate }: OrderStatusUpdater
 
       const result = await response.json();
       
-      toast.success("Estado actualizado", {
-        description: `La orden #${order.orderNumber} ha sido actualizada.`,
+      toast.success("✅ Estado actualizado exitosamente", {
+        description: `La orden #${order.orderNumber} ha sido actualizada. El cliente será notificado automáticamente.`,
       });
 
       // Reset form

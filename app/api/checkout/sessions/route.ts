@@ -35,14 +35,16 @@ export async function POST(request: NextRequest) {
     const stockValidation = await validateCartStock(cartItems);
     if (!stockValidation.isValid) {
       const errorMessages = stockValidation.errors.map(error => 
-        `${error.productName}: solicitado ${error.requestedQuantity}, disponible ${error.availableStock}`
+        `${error.productName}: ${error.requestedQuantity === 1 ? 'solicitas 1 unidad' : `solicitas ${error.requestedQuantity} unidades`}, ${error.availableStock === 0 ? 'agotado' : error.availableStock === 1 ? 'solo queda 1' : `solo quedan ${error.availableStock}`}`
       ).join('; ');
       
       return NextResponse.json(
         { 
-          error: 'Stock insuficiente',
+          error: '🚫 No podemos procesar tu compra',
+          message: 'Algunos productos en tu carrito no tienen suficiente stock disponible.',
           details: errorMessages,
-          stockErrors: stockValidation.errors
+          stockErrors: stockValidation.errors,
+          suggestion: 'Por favor, ajusta las cantidades en tu carrito o elimina los productos agotados.'
         },
         { status: 400 }
       );
@@ -165,7 +167,7 @@ export async function POST(request: NextRequest) {
               amount: shipping * 100, // Convert to cents
               currency: 'mxn',
             },
-            display_name: 'Envío estándar',
+            display_name: '📦 Envío estándar en México',
             delivery_estimate: {
               minimum: {
                 unit: 'business_day',
@@ -186,7 +188,7 @@ export async function POST(request: NextRequest) {
       // Pre-fill customer information
       customer_creation: 'if_required',
       payment_intent_data: {
-        description: 'Compra en Luzimarket',
+        description: '🇲🇽 Compra de productos únicos mexicanos - Luzimarket',
         shipping: {
           name: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
           phone: shippingAddress.phone,

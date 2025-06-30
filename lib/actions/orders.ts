@@ -286,29 +286,56 @@ async function sendVendorNewOrderNotification(order: OrderWithDetails): Promise<
   ).join('\n');
 
   const emailContent = `
-    <h2>¡Nueva orden recibida!</h2>
-    <p>Hola ${order.vendor.businessName},</p>
-    <p>Has recibido una nueva orden en Luzimarket:</p>
+    <h2>🎉 ¡Nueva orden recibida en Luzimarket!</h2>
+    <p>Estimado(a) ${order.vendor.businessName},</p>
+    <p>Has recibido una nueva orden en tu tienda de Luzimarket:</p>
     
-    <h3>Detalles de la orden:</h3>
-    <ul>
-      <li><strong>Número de orden:</strong> ${order.orderNumber}</li>
-      <li><strong>Total:</strong> $${order.total} ${order.currency}</li>
-      <li><strong>Fecha:</strong> ${order.createdAt.toLocaleDateString('es-MX')}</li>
-    </ul>
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+      <h3>📋 Detalles de la orden:</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li><strong>🔢 Número de orden:</strong> ${order.orderNumber}</li>
+        <li><strong>💰 Total:</strong> $${Number(order.total).toLocaleString('es-MX', { minimumFractionDigits: 2 })} ${order.currency}</li>
+        <li><strong>📅 Fecha:</strong> ${order.createdAt.toLocaleDateString('es-MX', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        })}</li>
+      </ul>
+    </div>
     
-    <h3>Productos:</h3>
-    <pre>${itemsList}</pre>
+    <h3>🛍️ Productos ordenados:</h3>
+    <div style="background-color: #fff; border: 1px solid #e9ecef; border-radius: 8px; padding: 15px;">
+      <pre style="margin: 0; font-family: Arial, sans-serif;">${itemsList}</pre>
+    </div>
     
-    <h3>Dirección de envío:</h3>
-    <p>
-      ${order.shippingAddress.street}<br>
-      ${order.shippingAddress.city}, ${order.shippingAddress.state}<br>
-      ${order.shippingAddress.postalCode}, ${order.shippingAddress.country}
+    <h3>📍 Dirección de envío:</h3>
+    <div style="background-color: #e3f2fd; padding: 15px; border-radius: 8px; border-left: 4px solid #2196f3;">
+      <p style="margin: 0;">
+        ${order.shippingAddress.street}<br>
+        ${order.shippingAddress.city}, ${order.shippingAddress.state}<br>
+        C.P. ${order.shippingAddress.postalCode}<br>
+        ${order.shippingAddress.country}
+      </p>
+    </div>
+    
+    <div style="margin: 30px 0; padding: 20px; background-color: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+      <p style="margin: 0;"><strong>⏰ Acción requerida:</strong> Por favor, procesa esta orden dentro de las próximas 24 horas para mantener una excelente experiencia del cliente.</p>
+    </div>
+    
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="${process.env.NEXT_PUBLIC_APP_URL}/vendor/orders/${order.id}" 
+         style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
+        📦 Ver orden completa
+      </a>
+    </div>
+    
+    <hr style="margin: 30px 0; border: none; border-top: 1px solid #e9ecef;">
+    <p style="font-size: 12px; color: #6c757d; text-align: center;">
+      Este correo fue enviado automáticamente por Luzimarket. Si tienes alguna pregunta, contacta a nuestro equipo de soporte.
     </p>
-    
-    <p>Por favor, procesa esta orden lo antes posible.</p>
-    <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/vendor/orders/${order.id}">Ver orden completa</a></p>
   `;
 
   await sendEmail({
@@ -329,25 +356,51 @@ async function sendCustomerOrderConfirmation(order: OrderWithDetails): Promise<v
   ).join('\n');
 
   const emailContent = `
-    <h2>¡Gracias por tu compra!</h2>
-    <p>Hola ${order.user.name},</p>
-    <p>Tu orden ha sido confirmada y está siendo procesada.</p>
+    <h2>🎉 ¡Gracias por tu compra en Luzimarket!</h2>
+    <p>Estimado(a) ${order.user.name},</p>
+    <p>Tu orden ha sido confirmada exitosamente y está siendo procesada por nuestro vendedor. ¡Estamos emocionados de que hayas elegido productos únicos de México!</p>
     
-    <h3>Detalles de tu orden:</h3>
-    <ul>
-      <li><strong>Número de orden:</strong> ${order.orderNumber}</li>
-      <li><strong>Vendedor:</strong> ${order.vendor.businessName}</li>
-      <li><strong>Subtotal:</strong> $${order.subtotal} ${order.currency}</li>
-      <li><strong>Impuestos:</strong> $${order.tax} ${order.currency}</li>
-      <li><strong>Envío:</strong> $${order.shipping} ${order.currency}</li>
-      <li><strong>Total:</strong> $${order.total} ${order.currency}</li>
-    </ul>
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+      <h3>📋 Resumen de tu orden:</h3>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr><td><strong>🔢 Número de orden:</strong></td><td>${order.orderNumber}</td></tr>
+        <tr><td><strong>🏪 Vendedor:</strong></td><td>${order.vendor.businessName}</td></tr>
+        <tr><td><strong>💵 Subtotal:</strong></td><td>$${Number(order.subtotal).toLocaleString('es-MX', { minimumFractionDigits: 2 })} ${order.currency}</td></tr>
+        <tr><td><strong>🧾 IVA (16%):</strong></td><td>$${Number(order.tax).toLocaleString('es-MX', { minimumFractionDigits: 2 })} ${order.currency}</td></tr>
+        <tr><td><strong>📦 Envío:</strong></td><td>$${Number(order.shipping).toLocaleString('es-MX', { minimumFractionDigits: 2 })} ${order.currency}</td></tr>
+        <tr style="border-top: 2px solid #007bff; font-size: 18px; font-weight: bold;">
+          <td><strong>💰 Total:</strong></td>
+          <td><strong>$${Number(order.total).toLocaleString('es-MX', { minimumFractionDigits: 2 })} ${order.currency}</strong></td>
+        </tr>
+      </table>
+    </div>
     
-    <h3>Productos:</h3>
-    <pre>${itemsList}</pre>
+    <h3>🛍️ Productos ordenados:</h3>
+    <div style="background-color: #fff; border: 1px solid #e9ecef; border-radius: 8px; padding: 15px;">
+      <pre style="margin: 0; font-family: Arial, sans-serif;">${itemsList}</pre>
+    </div>
     
-    <p>Te notificaremos cuando tu orden sea enviada.</p>
-    <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/orders/${order.id}">Rastrear mi orden</a></p>
+    <div style="margin: 30px 0; padding: 20px; background-color: #d4edda; border-radius: 8px; border-left: 4px solid #28a745;">
+      <p style="margin: 0;"><strong>📱 ¿Qué sigue?</strong></p>
+      <p style="margin: 5px 0 0 0;">Te notificaremos por correo cuando tu orden sea enviada. Normalmente esto ocurre dentro de 1-2 días hábiles.</p>
+    </div>
+    
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="${process.env.NEXT_PUBLIC_APP_URL}/orders/${order.id}" 
+         style="background-color: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-right: 10px;">
+        📱 Rastrear mi orden
+      </a>
+      <a href="${process.env.NEXT_PUBLIC_APP_URL}/support" 
+         style="background-color: #6c757d; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
+        💬 Contactar soporte
+      </a>
+    </div>
+    
+    <hr style="margin: 30px 0; border: none; border-top: 1px solid #e9ecef;">
+    <p style="font-size: 12px; color: #6c757d; text-align: center;">
+      ¡Gracias por apoyar a los artesanos y emprendedores mexicanos! 🇲🇽<br>
+      Este correo fue enviado automáticamente por Luzimarket.
+    </p>
   `;
 
   await sendEmail({
@@ -368,14 +421,38 @@ async function sendCustomerShippingNotification(order: OrderWithDetails, trackin
     : '';
 
   const emailContent = `
-    <h2>¡Tu orden ha sido enviada!</h2>
-    <p>Hola ${order.user.name},</p>
-    <p>Tu orden #${order.orderNumber} ha sido enviada por ${order.vendor.businessName}.</p>
+    <h2>📦 ¡Tu orden está en camino!</h2>
+    <p>Estimado(a) ${order.user.name},</p>
+    <p>¡Excelentes noticias! Tu orden #${order.orderNumber} ha sido enviada por <strong>${order.vendor.businessName}</strong> y está en camino hacia ti.</p>
     
-    ${trackingInfo}
+    <div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2196f3;">
+      <h3>🚚 Información de envío:</h3>
+      ${trackingInfo}
+      <p style="margin: 10px 0 0 0;"><strong>⏰ Tiempo estimado de entrega:</strong> 3-5 días hábiles</p>
+      <p style="margin: 5px 0 0 0;"><strong>📍 Destino:</strong> ${order.shippingAddress.city}, ${order.shippingAddress.state}</p>
+    </div>
     
-    <p>Recibirás tu pedido en los próximos 3-5 días hábiles.</p>
-    <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/orders/${order.id}">Rastrear mi orden</a></p>
+    <div style="margin: 30px 0; padding: 20px; background-color: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+      <p style="margin: 0;"><strong>📱 Mantente informado:</strong></p>
+      <p style="margin: 5px 0 0 0;">Te notificaremos tan pronto como tu paquete sea entregado. Mientras tanto, puedes rastrear tu orden en tiempo real.</p>
+    </div>
+    
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="${process.env.NEXT_PUBLIC_APP_URL}/orders/${order.id}" 
+         style="background-color: #2196f3; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-right: 10px;">
+        📱 Rastrear mi orden
+      </a>
+      <a href="${process.env.NEXT_PUBLIC_APP_URL}/support" 
+         style="background-color: #6c757d; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
+        💬 ¿Necesitas ayuda?
+      </a>
+    </div>
+    
+    <hr style="margin: 30px 0; border: none; border-top: 1px solid #e9ecef;">
+    <p style="font-size: 12px; color: #6c757d; text-align: center;">
+      ¡Gracias por elegir productos mexicanos únicos! 🇲🇽<br>
+      Luzimarket - Conectando México con el mundo
+    </p>
   `;
 
   await sendEmail({

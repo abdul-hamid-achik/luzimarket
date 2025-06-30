@@ -12,14 +12,14 @@ import {
 // Create the i18n middleware
 const intlMiddleware = createMiddleware(routing);
 
-// Rate limiting configurations for different endpoints
+// Rate limiting configurations for different endpoints (Mexican market)
 const rateLimitConfigs = {
-  '/api/auth': { windowMs: 15 * 60 * 1000, maxRequests: 5 }, // 5 requests per 15 minutes
-  '/api/checkout': { windowMs: 60 * 1000, maxRequests: 3 }, // 3 requests per minute
-  '/api/newsletter': { windowMs: 60 * 1000, maxRequests: 2 }, // 2 requests per minute
-  '/api/reviews': { windowMs: 60 * 1000, maxRequests: 10 }, // 10 requests per minute
-  '/api/vendor': { windowMs: 60 * 1000, maxRequests: 30 }, // 30 requests per minute
-  '/api': { windowMs: 60 * 1000, maxRequests: 100 }, // 100 requests per minute (general API)
+  '/api/auth': { windowMs: 15 * 60 * 1000, maxRequests: 5, message: 'Demasiados intentos de autenticación. Intenta de nuevo en 15 minutos.' },
+  '/api/checkout': { windowMs: 60 * 1000, maxRequests: 3, message: 'Demasiados intentos de compra. Intenta de nuevo en un minuto.' },
+  '/api/newsletter': { windowMs: 60 * 1000, maxRequests: 2, message: 'Demasiadas suscripciones. Intenta de nuevo en un minuto.' },
+  '/api/reviews': { windowMs: 60 * 1000, maxRequests: 10, message: 'Demasiadas reseñas. Intenta de nuevo en un minuto.' },
+  '/api/vendor': { windowMs: 60 * 1000, maxRequests: 30, message: 'Demasiadas solicitudes de vendedor. Intenta de nuevo en un minuto.' },
+  '/api': { windowMs: 60 * 1000, maxRequests: 100, message: 'Demasiadas solicitudes. Intenta de nuevo en un minuto.' },
 };
 
 export default async function middleware(request: NextRequest) {

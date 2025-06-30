@@ -46,12 +46,12 @@ export function AddToCartButton({
       
       if (!stockCheck.isAvailable) {
         if (stockCheck.availableStock === 0) {
-          toast.error("Producto agotado", {
-            description: `${product.name} no está disponible en este momento.`
+          toast.error("😔 Producto agotado", {
+            description: `Lo sentimos, ${product.name} no está disponible en este momento. Te notificaremos cuando esté de vuelta.`
           });
         } else {
-          toast.error("Stock insuficiente", {
-            description: `Solo quedan ${stockCheck.availableStock} unidades de ${product.name}.`
+          toast.error("⚠️ Stock limitado", {
+            description: `Solo ${stockCheck.availableStock === 1 ? 'queda 1 unidad' : `quedan ${stockCheck.availableStock} unidades`} de ${product.name}. ¡Apresúrate!`
           });
         }
         return;
@@ -61,8 +61,8 @@ export function AddToCartButton({
       addToCart(product);
       setIsAdded(true);
       
-      toast.success("Agregado al carrito", {
-        description: `${product.name} se agregó a tu carrito.`
+      toast.success("🛒 ¡Agregado al carrito!", {
+        description: `${product.name} se agregó exitosamente. ¡Excelente elección!`
       });
       
       // Show the cart
@@ -76,8 +76,8 @@ export function AddToCartButton({
       }, 2000);
     } catch (error) {
       console.error("Error adding to cart:", error);
-      toast.error("Error", {
-        description: "No se pudo agregar el producto al carrito. Intenta de nuevo."
+      toast.error("❌ Error al agregar", {
+        description: "No pudimos agregar el producto al carrito. Por favor, intenta de nuevo o contacta a soporte."
       });
     } finally {
       setIsLoading(false);
@@ -104,7 +104,7 @@ export function AddToCartButton({
           <Plus className="h-4 w-4 mr-2" />
         )
       )}
-      {isLoading ? 'Verificando...' : isAdded ? t('added') : t('addToCart')}
+      {isLoading ? 'Verificando stock...' : isAdded ? t('added') : t('addToCart')}
     </Button>
   );
 }
