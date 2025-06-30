@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
+import { validateCartStock, type CartItem } from "@/lib/actions/inventory";
+import { db } from "@/db";
+import { orders, orderItems } from "@/db/schema";
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,6 +20,30 @@ export async function POST(request: NextRequest) {
     if (!shippingAddress || !shippingAddress.email) {
       return NextResponse.json(
         { error: 'Customer email is required' },
+        { status: 400 }
+      );
+    }
+
+    // Validate stock availability before proceeding
+    const cartItems: CartItem[] = items.map((item: any) => ({
+      id: item.id,
+      quantity: item.quantity,
+      name: item.name,
+      price: item.price,
+    }));
+
+    const stockValidation = await validateCartStock(cartItems);
+    if (!stockValidation.isValid) {
+      const errorMessages = stockValidation.errors.map(error => 
+        `${error.productName}: solicitado ${error.requestedQuantity}, disponible ${error.availableStock}`
+      ).join('; ');
+      
+      return NextResponse.json(
+        { 
+          error: 'Stock insuficiente',
+          details: errorMessages,
+          stockErrors: stockValidation.errors
+        },
         { status: 400 }
       );
     }
@@ -60,6 +87,66 @@ export async function POST(request: NextRequest) {
     ];
 
     // Shipping is now handled via shipping_options, not as a line item
+
+    // Create order record first
+    const orderNumber = `LM-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+    
+    // For multi-vendor orders, we'll create separate orders per vendor
+    const vendorGroups = items.reduce((groups: any, item: any) => {
+      const vendorId = item.vendorId;
+      if (!groups[vendorId]) {
+        groups[vendorId] = [];
+      }
+      groups[vendorId].push(item);
+      return groups;
+    }, {});
+
+    const orderIds: string[] = [];
+    
+    // Create orders for each vendor
+    for (const [vendorId, vendorItems] of Object.entries(vendorGroups)) {
+      const vendorSubtotal = (vendorItems as any[]).reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const vendorTax = vendorSubtotal * 0.16;
+      const vendorShipping = vendorSubtotal > 1000 ? 0 : 99;
+      const vendorTotal = vendorSubtotal + vendorTax + vendorShipping;
+
+      const [order] = await db.insert(orders).values({
+        orderNumber: `${orderNumber}-${vendorId.slice(-4)}`,
+        vendorId: vendorId,
+        status: "pending",
+        subtotal: vendorSubtotal.toString(),
+        tax: vendorTax.toString(),
+        shipping: vendorShipping.toString(),
+        total: vendorTotal.toString(),
+        currency: "MXN",
+        shippingAddress: {
+          street: `${shippingAddress.address} ${shippingAddress.apartment || ''}`.trim(),
+          city: shippingAddress.city,
+          state: shippingAddress.state,
+          postalCode: shippingAddress.postalCode,
+          country: 'MX',
+        },
+        billingAddress: billingAddress ? {
+          street: `${billingAddress.address} ${billingAddress.apartment || ''}`.trim(),
+          city: billingAddress.city,
+          state: billingAddress.state,
+          postalCode: billingAddress.postalCode,
+          country: 'MX',
+        } : null,
+      }).returning({ id: orders.id });
+
+      // Create order items
+      const orderItemsData = (vendorItems as any[]).map(item => ({
+        orderId: order.id,
+        productId: item.id,
+        quantity: item.quantity,
+        price: item.price.toString(),
+        total: (item.price * item.quantity).toString(),
+      }));
+
+      await db.insert(orderItems).values(orderItemsData);
+      orderIds.push(order.id);
+    }
 
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
@@ -118,6 +205,7 @@ export async function POST(request: NextRequest) {
         customerPhone: shippingAddress.phone || '',
         shippingAddress: shippingAddress ? JSON.stringify(shippingAddress) : '',
         billingAddress: billingAddress ? JSON.stringify(billingAddress) : '',
+        orderIds: orderIds.join(','),
       },
       // OXXO specific settings
       payment_method_options: {

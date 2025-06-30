@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { orders, orderItems, users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import Stripe from "stripe";
+import { reduceStock, restoreStock } from "@/lib/actions/inventory";
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -30,19 +31,51 @@ export async function POST(req: NextRequest) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         
-        // Update order status to paid
-        if (session.metadata?.orderId) {
+        // Handle multiple orders from metadata
+        const orderIds = session.metadata?.orderIds?.split(',') || [];
+        
+        if (orderIds.length > 0) {
+          // Update all orders to processing status
+          for (const orderId of orderIds) {
+            await db
+              .update(orders)
+              .set({
+                status: "processing",
+                paymentStatus: "succeeded",
+                paymentIntentId: session.payment_intent as string,
+                updatedAt: new Date(),
+              })
+              .where(eq(orders.id, orderId));
+
+            // Reduce stock for each order
+            const stockReduced = await reduceStock(orderId);
+            if (!stockReduced) {
+              console.error(`Failed to reduce stock for order ${orderId}`);
+              // In a production system, you might want to handle this more gracefully
+              // For now, we'll log the error but continue processing
+            }
+
+            console.log(`Order ${orderId} processed successfully`);
+          }
+
+          // TODO: Send order confirmation email
+          console.log("Orders paid:", orderIds.join(', '));
+        }
+
+        // Handle legacy single order metadata for backward compatibility
+        if (session.metadata?.orderId && !session.metadata?.orderIds) {
           await db
             .update(orders)
             .set({
               status: "processing",
+              paymentStatus: "succeeded",
               paymentIntentId: session.payment_intent as string,
               updatedAt: new Date(),
             })
             .where(eq(orders.id, session.metadata.orderId));
 
-          // TODO: Send order confirmation email
-          console.log("Order paid:", session.metadata.orderId);
+          await reduceStock(session.metadata.orderId);
+          console.log("Legacy order paid:", session.metadata.orderId);
         }
 
         // Create/update customer if needed
@@ -82,9 +115,13 @@ export async function POST(req: NextRequest) {
             .update(orders)
             .set({
               status: "cancelled",
+              paymentStatus: "failed",
               updatedAt: new Date(),
             })
             .where(eq(orders.id, order.id));
+
+          // Restore stock since payment failed
+          await restoreStock(order.id);
 
           // TODO: Send payment failed email
           console.log("Payment failed for order:", order.id);

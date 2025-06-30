@@ -2,10 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/cart-context";
-import { Plus, Check } from "lucide-react";
+import { Plus, Check, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useTranslations } from 'next-intl';
+import { checkProductStock } from "@/lib/actions/inventory";
+import { toast } from "sonner";
 
 interface AddToCartButtonProps {
   product: {
@@ -25,23 +27,61 @@ export function AddToCartButton({
   className,
   showIcon = true 
 }: AddToCartButtonProps) {
-  const { addToCart, toggleCart } = useCart();
+  const { addToCart, toggleCart, state } = useCart();
   const [isAdded, setIsAdded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const t = useTranslations('Products');
 
-  const handleAddToCart = () => {
-    addToCart(product);
-    setIsAdded(true);
+  const handleAddToCart = async () => {
+    setIsLoading(true);
     
-    // Show the cart
-    setTimeout(() => {
-      toggleCart();
-    }, 500);
+    try {
+      // Check current quantity in cart
+      const currentCartItem = state.items.find((item: any) => item.id === product.id);
+      const currentQuantity = currentCartItem ? currentCartItem.quantity : 0;
+      const requestedQuantity = currentQuantity + 1;
 
-    // Reset the button state after 2 seconds
-    setTimeout(() => {
-      setIsAdded(false);
-    }, 2000);
+      // Check stock availability
+      const stockCheck = await checkProductStock(product.id, requestedQuantity);
+      
+      if (!stockCheck.isAvailable) {
+        if (stockCheck.availableStock === 0) {
+          toast.error("Producto agotado", {
+            description: `${product.name} no está disponible en este momento.`
+          });
+        } else {
+          toast.error("Stock insuficiente", {
+            description: `Solo quedan ${stockCheck.availableStock} unidades de ${product.name}.`
+          });
+        }
+        return;
+      }
+
+      // Add to cart if stock is available
+      addToCart(product);
+      setIsAdded(true);
+      
+      toast.success("Agregado al carrito", {
+        description: `${product.name} se agregó a tu carrito.`
+      });
+      
+      // Show the cart
+      setTimeout(() => {
+        toggleCart();
+      }, 500);
+
+      // Reset the button state after 2 seconds
+      setTimeout(() => {
+        setIsAdded(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast.error("Error", {
+        description: "No se pudo agregar el producto al carrito. Intenta de nuevo."
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -50,18 +90,21 @@ export function AddToCartButton({
       className={cn(
         "bg-black text-white hover:bg-gray-800 transition-all",
         isAdded && "bg-green-600 hover:bg-green-600",
+        isLoading && "opacity-75 cursor-not-allowed",
         className
       )}
-      disabled={isAdded}
+      disabled={isAdded || isLoading}
     >
       {showIcon && (
         isAdded ? (
           <Check className="h-4 w-4 mr-2" />
+        ) : isLoading ? (
+          <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
         ) : (
           <Plus className="h-4 w-4 mr-2" />
         )
       )}
-      {isAdded ? t('added') : t('addToCart')}
+      {isLoading ? 'Verificando...' : isAdded ? t('added') : t('addToCart')}
     </Button>
   );
 }
