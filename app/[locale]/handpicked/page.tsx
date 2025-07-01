@@ -1,12 +1,12 @@
 import { Suspense } from "react";
 import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
-import { ProductGrid } from "@/components/product/product-grid";
-import { ProductFilters } from "@/components/product/product-filters";
-import { ProductSort } from "@/components/product/product-sort";
-import { getProducts } from "@/lib/actions/product.actions";
-import { getCategories } from "@/lib/actions/category.actions";
-import { getVendors } from "@/lib/actions/vendor.actions";
+import { ProductsGrid } from "@/components/products/products-grid";
+import { FilterSidebar } from "@/components/products/filter-sidebar";
+import { getFilteredProducts, getProductFilterOptions } from "@/lib/actions/products";
+import { db } from "@/db";
+import { vendors } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 interface HandpickedPageProps {
   params: Promise<{ locale: string }>;
@@ -27,17 +27,23 @@ export default async function HandpickedPage({ params, searchParams }: Handpicke
   const t = await getTranslations('HandpickedPage');
 
   // Get products with handpicked tag
-  const products = await getProducts({
-    category: filters.category,
-    vendor: filters.vendor,
-    sort: filters.sort as any,
+  const productsResult = await getFilteredProducts({
+    categoryIds: filters.category ? [filters.category] : undefined,
+    vendorIds: filters.vendor ? [filters.vendor] : undefined,
+    sortBy: filters.sort as any,
     minPrice: filters.minPrice ? parseInt(filters.minPrice) : undefined,
     maxPrice: filters.maxPrice ? parseInt(filters.maxPrice) : undefined,
     tags: ['handpicked'], // Filter for handpicked products
   });
 
-  const categories = await getCategories();
-  const vendors = await getVendors();
+  const filterOptions = await getProductFilterOptions();
+  const vendorsList = await db.query.vendors.findMany({
+    where: eq(vendors.isActive, true),
+    columns: {
+      id: true,
+      businessName: true,
+    }
+  });
 
   return (
     <div className="min-h-screen bg-white">
@@ -78,15 +84,18 @@ export default async function HandpickedPage({ params, searchParams }: Handpicke
           <aside className="lg:w-64 flex-shrink-0">
             <div className="sticky top-24">
               <h2 className="text-lg font-univers font-medium mb-6">{t('filterBy')}</h2>
-              <ProductFilters 
-                categories={categories}
-                vendors={vendors}
-                currentFilters={{
-                  category: filters.category,
-                  vendor: filters.vendor,
-                  minPrice: filters.minPrice,
-                  maxPrice: filters.maxPrice,
-                }}
+              <FilterSidebar 
+                categories={filterOptions.categories.map((cat: any) => ({
+                  id: cat.id.toString(),
+                  name: cat.name,
+                  count: Number(cat.count)
+                }))}
+                vendors={vendorsList.map((vendor: any) => ({
+                  id: vendor.id,
+                  name: vendor.businessName,
+                  count: 0 // We don't have count data for vendors in this context
+                }))}
+                priceRange={filterOptions.priceRange}
               />
             </div>
           </aside>
@@ -96,15 +105,27 @@ export default async function HandpickedPage({ params, searchParams }: Handpicke
             {/* Sort and Results */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
               <p className="text-sm font-univers text-gray-600">
-                {products.length} {products.length === 1 ? 'producto encontrado' : 'productos encontrados'}
+                {productsResult.products.length} {productsResult.products.length === 1 ? 'producto encontrado' : 'productos encontrados'}
               </p>
-              <ProductSort currentSort={filters.sort} />
+              <div className="flex items-center gap-2">
+                <label htmlFor="sort" className="text-sm font-univers text-gray-600">{t('sortBy')}:</label>
+                <select 
+                  id="sort" 
+                  defaultValue={filters.sort || 'newest'}
+                  className="border border-gray-300 rounded px-3 py-1 text-sm"
+                >
+                  <option value="newest">{t('newest')}</option>
+                  <option value="price-asc">Precio: Menor a Mayor</option>
+                  <option value="price-desc">Precio: Mayor a Menor</option>
+                  <option value="name">Nombre</option>
+                </select>
+              </div>
             </div>
 
             {/* Products */}
-            {products.length > 0 ? (
+            {productsResult.products.length > 0 ? (
               <Suspense fallback={<ProductGridSkeleton />}>
-                <ProductGrid products={products} />
+                <ProductsGrid products={productsResult.products} />
               </Suspense>
             ) : (
               <div className="text-center py-12">

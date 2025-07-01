@@ -29,7 +29,7 @@ export async function generateImage(options: GenerateImageOptions): Promise<stri
       n: options.n || 1,
     });
 
-    const imageUrl = response.data[0]?.url;
+    const imageUrl = response.data?.[0]?.url;
     if (!imageUrl) {
       throw new Error('No image URL returned from OpenAI');
     }

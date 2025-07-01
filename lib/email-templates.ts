@@ -9,7 +9,7 @@ interface OrderEmailData {
     tax: string;
     shipping: string;
     currency: string;
-    createdAt: Date;
+    createdAt: Date | null;
     shippingAddress: {
       street: string;
       city: string;
@@ -53,14 +53,14 @@ export async function generateVendorNewOrderEmail(data: OrderEmailData): Promise
       <ul style="list-style: none; padding: 0;">
         <li><strong>${t('orderNumber')}</strong> ${data.order.orderNumber}</li>
         <li><strong>${t('orderTotal')}</strong> $${Number(data.order.total).toLocaleString(locale === 'es' ? 'es-MX' : 'en-US', { minimumFractionDigits: 2 })} ${data.order.currency}</li>
-        <li><strong>${t('orderDate')}</strong> ${data.order.createdAt.toLocaleDateString(locale === 'es' ? 'es-MX' : 'en-US', { 
+        <li><strong>${t('orderDate')}</strong> ${data.order.createdAt?.toLocaleDateString(locale === 'es' ? 'es-MX' : 'en-US', { 
           weekday: 'long', 
           year: 'numeric', 
           month: 'long', 
           day: 'numeric',
           hour: '2-digit',
           minute: '2-digit'
-        })}</li>
+        }) || new Date().toLocaleDateString(locale === 'es' ? 'es-MX' : 'en-US')}</li>
       </ul>
     </div>
     

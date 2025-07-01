@@ -50,9 +50,11 @@ export async function checkProductStock(productId: string, requestedQuantity: nu
       };
     }
 
+    const currentStock = product.stock ?? 0;
+    
     return {
-      isAvailable: product.stock >= requestedQuantity,
-      availableStock: product.stock,
+      isAvailable: currentStock >= requestedQuantity,
+      availableStock: currentStock,
       productName: product.name,
     };
   } catch (error) {
@@ -95,12 +97,14 @@ export async function validateCartStock(items: CartItem[]): Promise<StockValidat
         continue;
       }
 
-      if (product.stock < item.quantity) {
+      const currentStock = product.stock ?? 0;
+      
+      if (currentStock < item.quantity) {
         errors.push({
           productId: item.id,
           productName: product.name,
           requestedQuantity: item.quantity,
-          availableStock: product.stock,
+          availableStock: currentStock,
         });
       }
     }
