@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import { db } from "@/db";
+import { db, getDbInstance } from "@/db";
 import { users, vendors, adminUsers } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
@@ -14,7 +14,8 @@ const loginSchema = z.object({
 });
 
 export const authOptions = {
-  adapter: DrizzleAdapter(db),
+  // Only use adapter when DATABASE_URL is available (not during build)
+  ...(process.env.DATABASE_URL ? { adapter: DrizzleAdapter(getDbInstance()) } : {}),
   session: {
     strategy: "jwt" as const,
   },

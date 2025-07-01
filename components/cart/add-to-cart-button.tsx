@@ -2,10 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/cart-context";
-import { Plus, Check } from "lucide-react";
+import { Plus, Check, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useTranslations } from 'next-intl';
+import { checkProductStock } from "@/lib/actions/inventory";
+import { toast } from "sonner";
 
 interface AddToCartButtonProps {
   product: {
@@ -25,23 +27,67 @@ export function AddToCartButton({
   className,
   showIcon = true 
 }: AddToCartButtonProps) {
-  const { addToCart, toggleCart } = useCart();
+  const { addToCart, toggleCart, state } = useCart();
   const [isAdded, setIsAdded] = useState(false);
-  const t = useTranslations('Products');
+  const [isLoading, setIsLoading] = useState(false);
+  const t = useTranslations('Cart');
+  const tProducts = useTranslations('Products');
 
-  const handleAddToCart = () => {
-    addToCart(product);
-    setIsAdded(true);
+  const handleAddToCart = async () => {
+    setIsLoading(true);
     
-    // Show the cart
-    setTimeout(() => {
-      toggleCart();
-    }, 500);
+    try {
+      // Check current quantity in cart
+      const currentCartItem = state.items.find((item: any) => item.id === product.id);
+      const currentQuantity = currentCartItem ? currentCartItem.quantity : 0;
+      const requestedQuantity = currentQuantity + 1;
 
-    // Reset the button state after 2 seconds
-    setTimeout(() => {
-      setIsAdded(false);
-    }, 2000);
+      // Check stock availability
+      const stockCheck = await checkProductStock(product.id, requestedQuantity);
+      
+      if (!stockCheck.isAvailable) {
+        if (stockCheck.availableStock === 0) {
+          toast.error(t('stockValidation.outOfStock'), {
+            description: t('stockValidation.outOfStockDescription', { productName: product.name })
+          });
+        } else {
+          toast.error(t('stockValidation.limitedStock'), {
+            description: stockCheck.availableStock === 1 
+              ? t('stockValidation.limitedStockDescriptionSingle', { productName: product.name })
+              : t('stockValidation.limitedStockDescriptionMultiple', { 
+                  count: stockCheck.availableStock, 
+                  productName: product.name 
+                })
+          });
+        }
+        return;
+      }
+
+      // Add to cart if stock is available
+      addToCart(product);
+      setIsAdded(true);
+      
+      toast.success(t('stockValidation.addedSuccess'), {
+        description: t('stockValidation.addedSuccessDescription', { productName: product.name })
+      });
+      
+      // Show the cart
+      setTimeout(() => {
+        toggleCart();
+      }, 500);
+
+      // Reset the button state after 2 seconds
+      setTimeout(() => {
+        setIsAdded(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast.error(t('stockValidation.addError'), {
+        description: t('stockValidation.addErrorDescription')
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -50,18 +96,21 @@ export function AddToCartButton({
       className={cn(
         "bg-black text-white hover:bg-gray-800 transition-all",
         isAdded && "bg-green-600 hover:bg-green-600",
+        isLoading && "opacity-75 cursor-not-allowed",
         className
       )}
-      disabled={isAdded}
+      disabled={isAdded || isLoading}
     >
       {showIcon && (
         isAdded ? (
           <Check className="h-4 w-4 mr-2" />
+        ) : isLoading ? (
+          <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
         ) : (
           <Plus className="h-4 w-4 mr-2" />
         )
       )}
-      {isAdded ? t('added') : t('addToCart')}
+      {isLoading ? t('stockValidation.checking') : isAdded ? tProducts('added') : tProducts('addToCart')}
     </Button>
   );
 }
