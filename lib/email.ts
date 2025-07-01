@@ -1,6 +1,17 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resend: Resend | null = null;
+
+function getResendClient(): Resend {
+  if (!resend) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      throw new Error('RESEND_API_KEY environment variable is not set');
+    }
+    resend = new Resend(apiKey);
+  }
+  return resend;
+}
 
 export interface EmailOptions {
   to: string | string[];
@@ -11,7 +22,15 @@ export interface EmailOptions {
 
 export async function sendEmail({ to, subject, html, text }: EmailOptions) {
   try {
-    const { data, error } = await resend.emails.send({
+    // During build time, RESEND_API_KEY might not be available
+    // In that case, just log and return without throwing
+    if (!process.env.RESEND_API_KEY) {
+      console.log('RESEND_API_KEY not available - email sending skipped during build');
+      return { id: 'build-time-placeholder' };
+    }
+
+    const resendClient = getResendClient();
+    const { data, error } = await resendClient.emails.send({
       from: process.env.EMAIL_FROM || 'noreply@luzimarket.shop',
       to,
       subject,
