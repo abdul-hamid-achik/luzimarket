@@ -143,7 +143,19 @@
     "updateQuantity": "Update quantity",
     "removeItem": "Remove {name} from cart",
     "increaseQuantity": "Increase quantity",
-    "decreaseQuantity": "Decrease quantity"
+    "decreaseQuantity": "Decrease quantity",
+    "stockValidation": {
+      "checking": "Checking stock...",
+      "outOfStock": "😔 Out of stock",
+      "outOfStockDescription": "Sorry, {productName} is not available at the moment. We'll notify you when it's back.",
+      "limitedStock": "⚠️ Limited stock",
+      "limitedStockDescriptionSingle": "Only 1 unit left of {productName}. Hurry up!",
+      "limitedStockDescriptionMultiple": "Only {count} units left of {productName}. Hurry up!",
+      "addedSuccess": "🛒 Added to cart!",
+      "addedSuccessDescription": "{productName} was added successfully. Great choice!",
+      "addError": "❌ Error adding item",
+      "addErrorDescription": "We couldn't add the product to your cart. Please try again or contact support."
+    }
   },
   
   "Checkout": {

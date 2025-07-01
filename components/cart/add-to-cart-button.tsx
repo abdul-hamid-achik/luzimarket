@@ -30,7 +30,8 @@ export function AddToCartButton({
   const { addToCart, toggleCart, state } = useCart();
   const [isAdded, setIsAdded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const t = useTranslations('Products');
+  const t = useTranslations('Cart');
+  const tProducts = useTranslations('Products');
 
   const handleAddToCart = async () => {
     setIsLoading(true);
@@ -46,12 +47,17 @@ export function AddToCartButton({
       
       if (!stockCheck.isAvailable) {
         if (stockCheck.availableStock === 0) {
-          toast.error("😔 Producto agotado", {
-            description: `Lo sentimos, ${product.name} no está disponible en este momento. Te notificaremos cuando esté de vuelta.`
+          toast.error(t('stockValidation.outOfStock'), {
+            description: t('stockValidation.outOfStockDescription', { productName: product.name })
           });
         } else {
-          toast.error("⚠️ Stock limitado", {
-            description: `Solo ${stockCheck.availableStock === 1 ? 'queda 1 unidad' : `quedan ${stockCheck.availableStock} unidades`} de ${product.name}. ¡Apresúrate!`
+          toast.error(t('stockValidation.limitedStock'), {
+            description: stockCheck.availableStock === 1 
+              ? t('stockValidation.limitedStockDescriptionSingle', { productName: product.name })
+              : t('stockValidation.limitedStockDescriptionMultiple', { 
+                  count: stockCheck.availableStock, 
+                  productName: product.name 
+                })
           });
         }
         return;
@@ -61,8 +67,8 @@ export function AddToCartButton({
       addToCart(product);
       setIsAdded(true);
       
-      toast.success("🛒 ¡Agregado al carrito!", {
-        description: `${product.name} se agregó exitosamente. ¡Excelente elección!`
+      toast.success(t('stockValidation.addedSuccess'), {
+        description: t('stockValidation.addedSuccessDescription', { productName: product.name })
       });
       
       // Show the cart
@@ -76,8 +82,8 @@ export function AddToCartButton({
       }, 2000);
     } catch (error) {
       console.error("Error adding to cart:", error);
-      toast.error("❌ Error al agregar", {
-        description: "No pudimos agregar el producto al carrito. Por favor, intenta de nuevo o contacta a soporte."
+      toast.error(t('stockValidation.addError'), {
+        description: t('stockValidation.addErrorDescription')
       });
     } finally {
       setIsLoading(false);
@@ -104,7 +110,7 @@ export function AddToCartButton({
           <Plus className="h-4 w-4 mr-2" />
         )
       )}
-      {isLoading ? 'Verificando stock...' : isAdded ? t('added') : t('addToCart')}
+      {isLoading ? t('stockValidation.checking') : isAdded ? tProducts('added') : tProducts('addToCart')}
     </Button>
   );
 }

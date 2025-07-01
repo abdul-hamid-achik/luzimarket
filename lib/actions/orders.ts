@@ -4,6 +4,11 @@ import { db } from "@/db";
 import { orders, orderItems, vendors, users, products } from "@/db/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { sendEmail } from "@/lib/email";
+import { 
+  generateVendorNewOrderEmail, 
+  generateCustomerConfirmationEmail, 
+  generateShippingNotificationEmail 
+} from "@/lib/email-templates";
 
 export type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded";
 
@@ -281,68 +286,20 @@ async function handleStatusChangeNotifications(
  * Sends new order notification to vendor
  */
 async function sendVendorNewOrderNotification(order: OrderWithDetails): Promise<void> {
-  const itemsList = order.items.map(item => 
-    `- ${item.product.name} (Cantidad: ${item.quantity}) - $${item.total} MXN`
-  ).join('\n');
+  try {
+    const { subject, html } = await generateVendorNewOrderEmail({
+      order,
+      locale: 'es' // Default to Spanish for Mexican market
+    });
 
-  const emailContent = `
-    <h2>🎉 ¡Nueva orden recibida en Luzimarket!</h2>
-    <p>Estimado(a) ${order.vendor.businessName},</p>
-    <p>Has recibido una nueva orden en tu tienda de Luzimarket:</p>
-    
-    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-      <h3>📋 Detalles de la orden:</h3>
-      <ul style="list-style: none; padding: 0;">
-        <li><strong>🔢 Número de orden:</strong> ${order.orderNumber}</li>
-        <li><strong>💰 Total:</strong> $${Number(order.total).toLocaleString('es-MX', { minimumFractionDigits: 2 })} ${order.currency}</li>
-        <li><strong>📅 Fecha:</strong> ${order.createdAt.toLocaleDateString('es-MX', { 
-          weekday: 'long', 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        })}</li>
-      </ul>
-    </div>
-    
-    <h3>🛍️ Productos ordenados:</h3>
-    <div style="background-color: #fff; border: 1px solid #e9ecef; border-radius: 8px; padding: 15px;">
-      <pre style="margin: 0; font-family: Arial, sans-serif;">${itemsList}</pre>
-    </div>
-    
-    <h3>📍 Dirección de envío:</h3>
-    <div style="background-color: #e3f2fd; padding: 15px; border-radius: 8px; border-left: 4px solid #2196f3;">
-      <p style="margin: 0;">
-        ${order.shippingAddress.street}<br>
-        ${order.shippingAddress.city}, ${order.shippingAddress.state}<br>
-        C.P. ${order.shippingAddress.postalCode}<br>
-        ${order.shippingAddress.country}
-      </p>
-    </div>
-    
-    <div style="margin: 30px 0; padding: 20px; background-color: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
-      <p style="margin: 0;"><strong>⏰ Acción requerida:</strong> Por favor, procesa esta orden dentro de las próximas 24 horas para mantener una excelente experiencia del cliente.</p>
-    </div>
-    
-    <div style="text-align: center; margin: 30px 0;">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL}/vendor/orders/${order.id}" 
-         style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-        📦 Ver orden completa
-      </a>
-    </div>
-    
-    <hr style="margin: 30px 0; border: none; border-top: 1px solid #e9ecef;">
-    <p style="font-size: 12px; color: #6c757d; text-align: center;">
-      Este correo fue enviado automáticamente por Luzimarket. Si tienes alguna pregunta, contacta a nuestro equipo de soporte.
-    </p>
-  `;
-
-  await sendEmail({
-    to: order.vendor.email,
-    subject: `Nueva orden #${order.orderNumber} - Luzimarket`,
-    html: emailContent,
-  });
+    await sendEmail({
+      to: order.vendor.email,
+      subject,
+      html,
+    });
+  } catch (error) {
+    console.error('Error sending vendor notification email:', error);
+  }
 }
 
 /**

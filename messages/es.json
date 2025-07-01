@@ -143,7 +143,19 @@
     "updateQuantity": "Actualizar cantidad",
     "removeItem": "Quitar {name} del carrito",
     "increaseQuantity": "Aumentar cantidad",
-    "decreaseQuantity": "Disminuir cantidad"
+    "decreaseQuantity": "Disminuir cantidad",
+    "stockValidation": {
+      "checking": "Verificando stock...",
+      "outOfStock": "😔 Producto agotado",
+      "outOfStockDescription": "Lo sentimos, {productName} no está disponible en este momento. Te notificaremos cuando esté de vuelta.",
+      "limitedStock": "⚠️ Stock limitado",
+      "limitedStockDescriptionSingle": "Solo queda 1 unidad de {productName}. ¡Apresúrate!",
+      "limitedStockDescriptionMultiple": "Solo quedan {count} unidades de {productName}. ¡Apresúrate!",
+      "addedSuccess": "🛒 ¡Agregado al carrito!",
+      "addedSuccessDescription": "{productName} se agregó exitosamente. ¡Excelente elección!",
+      "addError": "❌ Error al agregar",
+      "addErrorDescription": "No pudimos agregar el producto al carrito. Por favor, intenta de nuevo o contacta a soporte."
+    }
   },
   
   "Checkout": {
@@ -167,7 +179,19 @@
     "cardNumber": "Número de tarjeta",
     "expiryDate": "Fecha de vencimiento",
     "cvv": "CVV",
-    "saveInfo": "Guardar información para futuras compras"
+    "saveInfo": "Guardar información para futuras compras",
+    "stockErrors": {
+      "title": "🚫 No podemos procesar tu compra",
+      "message": "Algunos productos en tu carrito no tienen suficiente stock disponible.",
+      "suggestion": "Por favor, ajusta las cantidades en tu carrito o elimina los productos agotados.",
+      "requestedSingle": "solicitas 1 unidad",
+      "requestedMultiple": "solicitas {count} unidades",
+      "availableNone": "agotado",
+      "availableSingle": "solo queda 1",
+      "availableMultiple": "solo quedan {count}",
+      "shippingStandard": "📦 Envío estándar en México",
+      "paymentDescription": "🇲🇽 Compra de productos únicos mexicanos - Luzimarket"
+    }
   },
   
   "VendorRegistration": {
@@ -244,7 +268,33 @@
     "customerInfo": "Información del cliente",
     "shippingAddress": "Dirección de envío",
     "productsSold": "Productos vendidos",
-    "viewFullOrder": "Ver orden completa"
+    "viewFullOrder": "Ver orden completa",
+    "orderManagement": {
+      "updateStatus": "Actualizar Estado",
+      "orderNumber": "Orden #",
+      "total": "Total",
+      "date": "Fecha",
+      "customer": "Cliente",
+      "products": "Productos",
+      "quantity": "Cantidad",
+      "newStatus": "Nuevo Estado",
+      "trackingNumber": "Número de Rastreo (Opcional)",
+      "trackingPlaceholder": "Ingresa el número de rastreo",
+      "additionalNotes": "Notas Adicionales (Opcional)",
+      "notesPlaceholder": "Agrega notas sobre esta actualización...",
+      "updateButton": "Actualizar Estado",
+      "updating": "Actualizando...",
+      "noChanges": "No hay cambios para actualizar",
+      "updateSuccess": "✅ Estado actualizado exitosamente",
+      "updateSuccessDescription": "La orden #{orderNumber} ha sido actualizada. El cliente será notificado automáticamente.",
+      "updateError": "Error al actualizar el estado",
+      "statusOptions": {
+        "processing": "📦 Procesando orden",
+        "shipped": "🚚 Enviado",
+        "delivered": "✅ Entregado",
+        "cancelled": "❌ Cancelado"
+      }
+    }
   },
   
   "Errors": {
@@ -260,6 +310,65 @@
     "passwordsDontMatch": "Las contraseñas no coinciden"
   },
   
+  "Emails": {
+    "vendor": {
+      "newOrderSubject": "Nueva orden #{orderNumber} - Luzimarket",
+      "newOrderTitle": "🎉 ¡Nueva orden recibida en Luzimarket!",
+      "newOrderGreeting": "Estimado(a) {businessName},",
+      "newOrderMessage": "Has recibido una nueva orden en tu tienda de Luzimarket:",
+      "orderDetailsTitle": "📋 Detalles de la orden:",
+      "orderNumber": "🔢 Número de orden:",
+      "orderTotal": "💰 Total:",
+      "orderDate": "📅 Fecha:",
+      "productsTitle": "🛍️ Productos ordenados:",
+      "shippingTitle": "📍 Dirección de envío:",
+      "actionRequired": "⏰ Acción requerida:",
+      "actionMessage": "Por favor, procesa esta orden dentro de las próximas 24 horas para mantener una excelente experiencia del cliente.",
+      "viewOrderButton": "📦 Ver orden completa",
+      "emailFooter": "Este correo fue enviado automáticamente por Luzimarket. Si tienes alguna pregunta, contacta a nuestro equipo de soporte."
+    },
+    "customer": {
+      "confirmationSubject": "Confirmación de orden #{orderNumber} - Luzimarket",
+      "confirmationTitle": "🎉 ¡Gracias por tu compra en Luzimarket!",
+      "confirmationGreeting": "Estimado(a) {customerName},",
+      "confirmationMessage": "Tu orden ha sido confirmada exitosamente y está siendo procesada por nuestro vendedor. ¡Estamos emocionados de que hayas elegido productos únicos de México!",
+      "orderSummaryTitle": "📋 Resumen de tu orden:",
+      "vendor": "🏪 Vendedor:",
+      "subtotal": "💵 Subtotal:",
+      "tax": "🧾 IVA (16%):",
+      "shipping": "📦 Envío:",
+      "total": "💰 Total:",
+      "whatNext": "📱 ¿Qué sigue?",
+      "whatNextMessage": "Te notificaremos por correo cuando tu orden sea enviada. Normalmente esto ocurre dentro de 1-2 días hábiles.",
+      "trackOrderButton": "📱 Rastrear mi orden",
+      "supportButton": "💬 Contactar soporte",
+      "thankYouMessage": "¡Gracias por apoyar a los artesanos y emprendedores mexicanos! 🇲🇽",
+      "brandMessage": "Este correo fue enviado automáticamente por Luzimarket.",
+      "shippingSubject": "Tu orden #{orderNumber} ha sido enviada - Luzimarket",
+      "shippingTitle": "📦 ¡Tu orden está en camino!",
+      "shippingMessage": "¡Excelentes noticias! Tu orden #{orderNumber} ha sido enviada por {vendorName} y está en camino hacia ti.",
+      "shippingInfoTitle": "🚚 Información de envío:",
+      "trackingNumber": "Número de rastreo:",
+      "estimatedDelivery": "⏰ Tiempo estimado de entrega:",
+      "estimatedDeliveryTime": "3-5 días hábiles",
+      "destination": "📍 Destino:",
+      "stayInformed": "📱 Mantente informado:",
+      "stayInformedMessage": "Te notificaremos tan pronto como tu paquete sea entregado. Mientras tanto, puedes rastrear tu orden en tiempo real.",
+      "needHelpButton": "💬 ¿Necesitas ayuda?",
+      "mexicanProducts": "¡Gracias por elegir productos mexicanos únicos! 🇲🇽",
+      "connectingMessage": "Luzimarket - Conectando México con el mundo"
+    }
+  },
+  
+  "Security": {
+    "rateLimitAuth": "Demasiados intentos de autenticación. Intenta de nuevo en 15 minutos.",
+    "rateLimitCheckout": "Demasiados intentos de compra. Intenta de nuevo en un minuto.",
+    "rateLimitNewsletter": "Demasiadas suscripciones. Intenta de nuevo en un minuto.",
+    "rateLimitReviews": "Demasiadas reseñas. Intenta de nuevo en un minuto.",
+    "rateLimitVendor": "Demasiadas solicitudes de vendedor. Intenta de nuevo en un minuto.",
+    "rateLimitGeneral": "Demasiadas solicitudes. Intenta de nuevo en un minuto."
+  },
+
   "Footer": {
     "aboutUs": "Acerca de nosotros",
     "help": "Ayuda",
