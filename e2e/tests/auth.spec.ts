@@ -1,8 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { routes, uiText } from '../helpers/navigation';
+import { testMessages, getMessage } from '../helpers/i18n-messages';
 
 test.describe('Authentication', () => {
   test('should display login page', async ({ page }) => {
-    await page.goto('/es/login');
+    await page.goto(routes.login);
     
     // Check page elements
     await expect(page.locator('h1:has-text("LUZIMARKET")')).toBeVisible();
@@ -20,7 +22,7 @@ test.describe('Authentication', () => {
   });
 
   test('should show user type tabs', async ({ page }) => {
-    await page.goto('/es/login');
+    await page.goto(routes.login);
     
     // Check tabs exist
     const tabsList = page.locator('[role="tablist"]');
@@ -40,7 +42,7 @@ test.describe('Authentication', () => {
   });
 
   test('should validate login form', async ({ page }) => {
-    await page.goto('/es/login');
+    await page.goto(routes.login);
     
     // Try to submit empty form
     const submitButton = page.locator('button[type="submit"]:has-text("Iniciar sesión")').first();
@@ -52,7 +54,7 @@ test.describe('Authentication', () => {
   });
 
   test('should handle invalid credentials', async ({ page }) => {
-    await page.goto('/es/login');
+    await page.goto(routes.login);
     
     // Fill invalid credentials in customer form
     await page.fill('#customer-email', 'invalid@email.com');
@@ -68,7 +70,7 @@ test.describe('Authentication', () => {
   });
 
   test('should login as customer', async ({ page }) => {
-    await page.goto('/es/login');
+    await page.goto(routes.login);
     
     // Customer tab is selected by default
     // Fill credentials
@@ -84,7 +86,7 @@ test.describe('Authentication', () => {
   });
 
   test('should login as admin', async ({ page }) => {
-    await page.goto('/es/login');
+    await page.goto(routes.login);
     
     // Switch to admin tab
     const adminTab = page.locator('button[role="tab"]:has-text("Admin")');
@@ -100,13 +102,13 @@ test.describe('Authentication', () => {
     // Submit form - find the submit button within the admin form context
     await page.locator('form:has(#admin-email) button[type="submit"]:has-text("Iniciar sesión")').click();
     
-    // Should redirect to admin dashboard
-    await page.waitForURL('/admin', { timeout: 10000 });
+    // Should redirect to admin dashboard (accepts both /admin and /en/admin)
+    await page.waitForURL(/\/(?:en\/)?admin/, { timeout: 10000 });
   });
 
   test.skip('should logout', async ({ page }) => {
     // First login
-    await page.goto('/es/login');
+    await page.goto(routes.login);
     await page.fill('#customer-email', 'maria.garcia@email.com');
     await page.fill('#customer-password', 'customer123');
     
@@ -128,7 +130,7 @@ test.describe('Authentication', () => {
   });
 
   test.skip('should show register link', async ({ page }) => {
-    await page.goto('/es/login');
+    await page.goto(routes.login);
     
     // Skip because register page doesn't exist yet
     // Check for register link
@@ -137,7 +139,7 @@ test.describe('Authentication', () => {
   });
 
   test.skip('should show forgot password link', async ({ page }) => {
-    await page.goto('/es/login');
+    await page.goto(routes.login);
     
     // Skip this test as forgot password link is not visible in current implementation
     // Check for forgot password link
@@ -148,7 +150,7 @@ test.describe('Authentication', () => {
 
 test.describe.skip('Registration', () => {
   test('should display registration form', async ({ page }) => {
-    await page.goto('/es/register');
+    await page.goto(routes.register);
     
     // Check form fields
     await expect(page.locator('input[name="name"]')).toBeVisible();
@@ -158,7 +160,7 @@ test.describe.skip('Registration', () => {
   });
 
   test('should validate password match', async ({ page }) => {
-    await page.goto('/es/register');
+    await page.goto(routes.register);
     
     // Fill form with mismatched passwords
     await page.fill('input[name="name"]', 'Test User');
@@ -175,7 +177,7 @@ test.describe.skip('Registration', () => {
   });
 
   test('should register new user', async ({ page }) => {
-    await page.goto('/es/register');
+    await page.goto(routes.register);
     
     // Fill form with unique email
     const uniqueEmail = `test${Date.now()}@example.com`;

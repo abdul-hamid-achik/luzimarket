@@ -18,7 +18,9 @@ export const authOptions = {
   ...(process.env.DATABASE_URL ? { adapter: DrizzleAdapter(getDbInstance()) } : {}),
   session: {
     strategy: "jwt" as const,
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -56,9 +58,8 @@ export const authOptions = {
               
               if (vendor.length === 0) return null;
               user = vendor[0];
-              // For vendors, we'll need to add password field to schema
-              // For now, vendors register and admin approves
-              return null;
+              hashedPassword = user.passwordHash;
+              break;
 
             case "admin":
               const admin = await db

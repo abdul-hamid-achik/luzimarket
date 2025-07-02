@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { sendVendorNotification } from "@/lib/email";
 import { eq } from "drizzle-orm";
 import { generateSlug } from "@/lib/utils/slug";
+import bcrypt from "bcryptjs";
 
 export async function registerVendor(data: unknown) {
   try {
@@ -21,8 +22,13 @@ export async function registerVendor(data: unknown) {
       return { success: false, error: "Este correo electrónico ya está registrado" };
     }
     
+    // Hash the password before storing
+    const { password, ...vendorData } = validatedData;
+    const passwordHash = await bcrypt.hash(password, 10);
+    
     const [vendor] = await db.insert(vendors).values({
-      ...validatedData,
+      ...vendorData,
+      passwordHash,
       slug: generateSlug(validatedData.businessName),
       isActive: false, // Vendors need to be approved
     }).returning();

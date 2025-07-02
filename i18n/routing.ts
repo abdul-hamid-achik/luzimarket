@@ -41,6 +41,10 @@ export const routing = defineRouting({
       es: '/vendedor/panel',
       en: '/vendor/dashboard'
     },
+    '/vendor/products': {
+      es: '/vendedor/productos',
+      en: '/vendor/products'
+    },
     '/admin': '/admin', // Keep admin routes in English
     '/coming-soon': {
       es: '/proximamente',

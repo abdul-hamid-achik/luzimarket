@@ -8,6 +8,7 @@ export const vendors = pgTable("vendors", {
   slug: text("slug").notNull().unique(),
   contactName: text("contact_name").notNull(),
   email: text("email").notNull().unique(),
+  passwordHash: text("password_hash"),
   phone: text("phone"),
   whatsapp: text("whatsapp"),
   businessPhone: text("business_phone"),

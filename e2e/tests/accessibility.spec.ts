@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { routes } from '../helpers/navigation';
 
 test.describe('Accessibility Tests', () => {
   test('homepage should have no accessibility violations', async ({ page }) => {
-    await page.goto('/');
+    await page.goto(routes.home);
     
     // Run axe accessibility scan
     const accessibilityScanResults = await new AxeBuilder({ page })
@@ -15,7 +16,7 @@ test.describe('Accessibility Tests', () => {
   });
 
   test('should have proper heading hierarchy', async ({ page }) => {
-    await page.goto('/');
+    await page.goto(routes.home);
     
     // Check heading hierarchy
     const headings = await page.evaluate(() => {
@@ -41,7 +42,7 @@ test.describe('Accessibility Tests', () => {
   });
 
   test('all interactive elements should be keyboard accessible', async ({ page }) => {
-    await page.goto('/');
+    await page.goto(routes.home);
     
     // Tab through page
     let activeElement;
@@ -74,7 +75,7 @@ test.describe('Accessibility Tests', () => {
   });
 
   test('images should have alt text', async ({ page }) => {
-    await page.goto('/');
+    await page.goto(routes.home);
     
     // Get all images
     const images = await page.evaluate(() => {
@@ -95,7 +96,7 @@ test.describe('Accessibility Tests', () => {
   });
 
   test('forms should have proper labels', async ({ page }) => {
-    await page.goto('/vendor/register');
+    await page.goto(routes.vendorRegister);
     
     // Check form accessibility
     const formAccessibility = await page.evaluate(() => {
@@ -126,7 +127,7 @@ test.describe('Accessibility Tests', () => {
   });
 
   test('should have sufficient color contrast', async ({ page }) => {
-    await page.goto('/');
+    await page.goto(routes.home);
     
     // Run color contrast check
     const accessibilityScanResults = await new AxeBuilder({ page })
@@ -144,7 +145,7 @@ test.describe('Accessibility Tests', () => {
   });
 
   test('modals should trap focus', async ({ page }) => {
-    await page.goto('/products');
+    await page.goto(routes.products);
     
     // Open quick view modal
     await page.locator('[data-testid="product-card"]').first().hover();
@@ -181,7 +182,7 @@ test.describe('Accessibility Tests', () => {
   });
 
   test('should have skip navigation link', async ({ page }) => {
-    await page.goto('/');
+    await page.goto(routes.home);
     
     // Check for skip link
     const skipLink = await page.evaluate(() => {
@@ -198,7 +199,7 @@ test.describe('Accessibility Tests', () => {
   });
 
   test('error messages should be announced', async ({ page }) => {
-    await page.goto('/login');
+    await page.goto(routes.login);
     
     // Submit empty form
     await page.click('button[type="submit"]');
@@ -223,7 +224,7 @@ test.describe('Accessibility Tests', () => {
   });
 
   test('should support screen reader landmarks', async ({ page }) => {
-    await page.goto('/');
+    await page.goto(routes.home);
     
     // Check for ARIA landmarks
     const landmarks = await page.evaluate(() => {
@@ -248,7 +249,7 @@ test.describe('Accessibility Tests', () => {
   });
 
   test('loading states should be announced', async ({ page }) => {
-    await page.goto('/products');
+    await page.goto(routes.products);
     
     // Trigger a loading state (e.g., by filtering)
     const filterCheckbox = page.locator('input[type="checkbox"]').first();
@@ -280,7 +281,7 @@ test.describe('Accessibility Tests', () => {
   });
 
   test('custom components should have proper ARIA', async ({ page }) => {
-    await page.goto('/products');
+    await page.goto(routes.products);
     
     // Check custom dropdown/select components
     const customSelects = await page.evaluate(() => {
@@ -304,7 +305,7 @@ test.describe('Accessibility Tests', () => {
 
   test('tables should have proper structure', async ({ page }) => {
     // Go to admin orders page (has tables)
-    await page.goto('/admin/orders').catch(() => {
+    await page.goto(routes.adminOrders).catch(() => {
       // If not accessible, skip this test
     });
     
@@ -326,7 +327,7 @@ test.describe('Accessibility Tests', () => {
   });
 
   test('focus should be visible', async ({ page }) => {
-    await page.goto('/');
+    await page.goto(routes.home);
     
     // Tab to first link
     await page.keyboard.press('Tab');

@@ -75,29 +75,20 @@ export default defineConfig({
     // },
   ],
 
-  /* Run your local dev server and Stripe CLI before starting the tests */
-  webServer: [
-    {
-      command: 'npm run dev',
-      url: 'http://localhost:3000',
-      reuseExistingServer: !process.env.CI,
-      timeout: 120 * 1000,
-      env: {
-        ...process.env,
-        AUTH_SECRET: 'test-secret-for-e2e-tests',
-        NEXTAUTH_SECRET: 'test-secret-for-e2e-tests',
-      },
-    },
-    // Stripe CLI for webhook testing
-    {
-      command: process.env.STRIPE_SECRET_KEY ? 'stripe listen --forward-to localhost:3000/api/webhooks/stripe --skip-verify' : 'echo "Skipping Stripe CLI - no STRIPE_SECRET_KEY"',
-      url: 'http://localhost:3000', // We just need to wait for the main server
-      reuseExistingServer: !process.env.CI,
-      timeout: 60 * 1000,
-      env: {
-        ...process.env,
-        STRIPE_API_KEY: process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder',
-      },
-    },
-  ],
+  /* Run your local dev server before running tests:
+   * npm run dev
+   * 
+   * Then run tests:
+   * npm test
+   */
+  
+  // Commented out to use existing dev server
+  // webServer: [
+  //   {
+  //     command: 'npm run dev',
+  //     url: 'http://localhost:3000/en',
+  //     reuseExistingServer: true,
+  //     timeout: 180 * 1000,
+  //   },
+  // ],
 });

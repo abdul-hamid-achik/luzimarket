@@ -13,6 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle2, Circle } from "lucide-react";
 import Image from "next/image";
+import { registerVendor } from "@/lib/actions/vendor";
+import { toast } from "sonner";
 
 export default function VendorRegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,6 +28,7 @@ export default function VendorRegisterPage() {
       businessName: "",
       contactName: "",
       email: "",
+      password: "",
       businessPhone: "",
       street: "",
       city: "",
@@ -38,11 +41,16 @@ export default function VendorRegisterPage() {
   async function onSubmit(data: VendorRegistration) {
     setIsSubmitting(true);
     try {
-      // TODO: Submit to API
-      console.log(data);
-      setIsSuccess(true);
+      const result = await registerVendor(data);
+      
+      if (result.success) {
+        setIsSuccess(true);
+      } else {
+        toast.error(result.error || "Error al registrar vendedor");
+      }
     } catch (error) {
       console.error(error);
+      toast.error("Error al registrar vendedor");
     } finally {
       setIsSubmitting(false);
     }
@@ -170,6 +178,19 @@ export default function VendorRegisterPage() {
                     <FormItem>
                       <FormControl>
                         <InputWithValidation type="email" placeholder="Email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <InputWithValidation type="password" placeholder="Contraseña (mínimo 6 caracteres)" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

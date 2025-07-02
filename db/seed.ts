@@ -336,6 +336,9 @@ async function main() {
     // 4. Seed Vendors
     console.log("🏪 Creating vendors...");
     const vendorData = [];
+    // Add a default password hash for all test vendors
+    const defaultPasswordHash = await bcrypt.hash("password123", 10);
+    
     for (let i = 0; i < 20; i++) {
       const prefix = faker.helpers.arrayElement(VENDOR_PREFIXES);
       const suffix = faker.helpers.arrayElement(VENDOR_SUFFIXES);
@@ -345,6 +348,7 @@ async function main() {
         slug: slugify(businessName, { lower: true, strict: true }),
         contactName: faker.person.fullName(),
         email: faker.internet.email(),
+        passwordHash: defaultPasswordHash, // All test vendors use password123
         phone: faker.phone.number(),
         whatsapp: faker.phone.number(),
         businessPhone: faker.phone.number(),
@@ -364,6 +368,33 @@ async function main() {
         isActive: faker.datatype.boolean(0.9)
       });
     }
+    
+    // Add a specific test vendor for e2e tests
+    vendorData.push({
+      businessName: "Test Vendor Shop",
+      slug: "test-vendor-shop",
+      contactName: "Test Vendor",
+      email: "vendor@luzimarket.shop",
+      passwordHash: defaultPasswordHash, // password123
+      phone: "+52 555 123 4567",
+      whatsapp: "+52 555 123 4567",
+      businessPhone: "+52 555 123 4567",
+      businessHours: "Lun-Vie 9:00-18:00",
+      street: "Calle Test 123",
+      city: "Ciudad de México",
+      state: "CDMX",
+      country: "México",
+      postalCode: "01000",
+      websiteUrl: "https://testvendor.com",
+      description: "Test vendor for e2e tests",
+      hasDelivery: true,
+      deliveryService: "own",
+      instagramUrl: "@testvendor",
+      facebookUrl: "testvendor",
+      tiktokUrl: "@testvendor",
+      isActive: true
+    });
+    
     const vendors = await db.insert(schema.vendors).values(vendorData).returning();
     console.log(`✅ Created ${vendors.length} vendors`);
 

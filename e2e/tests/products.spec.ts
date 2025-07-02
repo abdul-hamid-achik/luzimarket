@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { routes } from '../helpers/navigation';
 
 test.describe('Products', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to products page before each test
-    await page.goto('/products');
+    await page.goto(routes.products);
   });
 
   test('should display products grid', async ({ page }) => {

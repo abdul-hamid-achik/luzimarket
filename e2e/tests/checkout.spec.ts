@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { routes, uiText, enRoutes } from '../helpers/navigation';
 
 test.describe('Checkout Flow', () => {
   test.beforeEach(async ({ page }) => {
     // Add a product to cart before each test
-    await page.goto('/products');
+    await page.goto(routes.products);
     
     // Wait for products to load with updated selector
     await page.waitForSelector('a[href*="/products/"]', { timeout: 10000 });
@@ -145,7 +146,7 @@ test.describe('Checkout Flow', () => {
 
   test('should show checkout form', async ({ page }) => {
     // Go directly to checkout
-    await page.goto('/checkout');
+    await page.goto(routes.checkout);
     
     // Check form fields are present
     await expect(page.locator('input[name="email"], input[type="email"]').first()).toBeVisible();
@@ -154,7 +155,7 @@ test.describe('Checkout Flow', () => {
   });
 
   test('should validate checkout form', async ({ page }) => {
-    await page.goto('/checkout');
+    await page.goto(routes.checkout);
     
     // Try to submit empty form
     const submitButton = page.locator('button[type="submit"], button').filter({
@@ -169,7 +170,7 @@ test.describe('Checkout Flow', () => {
   });
 
   test('should fill checkout form', async ({ page }) => {
-    await page.goto('/checkout');
+    await page.goto(routes.checkout);
     
     // Fill customer information
     await page.fill('input[type="email"]', 'test@example.com');
@@ -185,7 +186,7 @@ test.describe('Checkout Flow', () => {
   });
 
   test('should show order summary', async ({ page }) => {
-    await page.goto('/checkout');
+    await page.goto(routes.checkout);
     
     // Check order summary is visible
     const orderSummary = page.locator('text=/Order Summary|Resumen|Total/').first();
@@ -197,7 +198,7 @@ test.describe('Checkout Flow', () => {
   });
 
   test('should handle guest checkout', async ({ page }) => {
-    await page.goto('/checkout');
+    await page.goto(routes.checkout);
     
     // Look for guest checkout option
     const guestOption = page.locator('text=/Guest|Invitado|Continue without/').first();
@@ -211,7 +212,7 @@ test.describe('Checkout Flow', () => {
   });
 
   test('should show shipping options', async ({ page }) => {
-    await page.goto('/checkout');
+    await page.goto(routes.checkout);
     
     // Wait for page to load
     await page.waitForLoadState('networkidle');
@@ -229,7 +230,7 @@ test.describe('Checkout Flow', () => {
   });
 
   test('should calculate totals correctly', async ({ page }) => {
-    await page.goto('/checkout');
+    await page.goto(routes.checkout);
     
     // Check for subtotal, tax, shipping, and total
     const subtotal = page.locator('text=/Subtotal/').first();
@@ -240,7 +241,7 @@ test.describe('Checkout Flow', () => {
   });
 
   test('should integrate with payment provider', async ({ page }) => {
-    await page.goto('/checkout');
+    await page.goto(routes.checkout);
     
     // Fill required fields first
     await page.fill('input[type="email"]', 'test@example.com');
@@ -269,7 +270,7 @@ test.describe('Checkout Flow', () => {
     // If no items in cart, add one
     if (cartItems.length === 0) {
       // Go to products page
-      await page.goto('/en/products');
+      await page.goto(enRoutes.products);
       await page.waitForLoadState('networkidle');
       
       // Add first product
@@ -283,7 +284,7 @@ test.describe('Checkout Flow', () => {
     // Now navigate to checkout
     const currentUrl = page.url();
     const locale = currentUrl.includes('/es/') ? 'es' : 'en';
-    await page.goto(`/${locale}/checkout`);
+    await page.goto(locale === 'en' ? enRoutes.checkout : routes.checkout);
     
     // Wait for page to fully load
     await page.waitForLoadState('networkidle');

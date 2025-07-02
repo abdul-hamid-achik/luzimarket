@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { routes } from '../helpers/navigation';
 
 test.describe('Vendor Registration', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/vendor/register');
+    await page.goto(routes.vendorRegister);
   });
 
   test('should display vendor registration form', async ({ page }) => {
@@ -117,7 +118,7 @@ test.describe('Vendor Dashboard', () => {
   // These tests would require authentication
   test.skip('should access vendor dashboard after login', async ({ page }) => {
     // This would need proper vendor authentication setup
-    await page.goto('/vendor/dashboard');
+    await page.goto(routes.vendorDashboard);
     
     // Should redirect to login if not authenticated
     await expect(page).toHaveURL(/\/login/);

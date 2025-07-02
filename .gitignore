@@ -45,3 +45,9 @@ next-env.d.ts
 
 # uploads
 /public/uploads/
+
+# e2e test fixtures
+/e2e/fixtures/*.jpg
+/e2e/fixtures/*.png
+/e2e/fixtures/*.pdf
+/e2e/fixtures/*.jpeg

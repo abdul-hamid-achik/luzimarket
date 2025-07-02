@@ -1,15 +1,16 @@
 import { test, expect } from '@playwright/test';
+import { routes, uiText } from '../helpers/navigation';
 
 test.describe('Admin Dashboard', () => {
   test.beforeEach(async ({ page }) => {
-    // Login as admin - use Spanish locale
-    await page.goto('/es/login');
+    // Login as admin
+    await page.goto(routes.login);
     
     // Wait for page to load
     await page.waitForLoadState('networkidle');
     
     // Click on Admin tab and wait a bit
-    const adminTab = page.locator('button[role="tab"]:has-text("Admin")');
+    const adminTab = page.locator(`button[role="tab"]:has-text("${uiText.es.adminTab}")`);
     await adminTab.click();
     
     // Force wait for tab animation to complete
@@ -20,10 +21,10 @@ test.describe('Admin Dashboard', () => {
     await page.locator('#admin-password').fill('admin123', { force: true });
     
     // Find and click submit button in admin form
-    await page.locator('form:has(#admin-email) button[type="submit"]:has-text("Iniciar sesión")').click();
+    await page.locator(`form:has(#admin-email) button[type="submit"]:has-text("${uiText.es.login}")`).click();
     
     // Wait for navigation to admin dashboard
-    await page.waitForURL('/admin', { timeout: 15000 });
+    await page.waitForURL(routes.admin, { timeout: 15000 });
   });
 
   test('should display admin dashboard', async ({ page }) => {
@@ -54,14 +55,14 @@ test.describe('Admin Dashboard', () => {
     await page.click('a:has-text("Órdenes")');
     
     // Wait for navigation
-    await page.waitForURL('/admin/orders');
+    await page.waitForURL(routes.adminOrders);
     
     // Should show orders page
     await expect(page.locator('h1:has-text("Órdenes")')).toBeVisible();
   });
 
   test('should view order details', async ({ page }) => {
-    await page.goto('/admin/orders');
+    await page.goto(routes.adminOrders);
     
     // Click first order
     const firstOrder = page.locator('tr').filter({ has: page.locator('td') }).first();
@@ -78,7 +79,7 @@ test.describe('Admin Dashboard', () => {
   });
 
   test('should update order status', async ({ page }) => {
-    await page.goto('/admin/orders');
+    await page.goto(routes.adminOrders);
     
     // Find status dropdown
     const statusDropdown = page.locator('select').filter({ hasText: /pending|shipped|delivered/ }).first();
@@ -150,7 +151,7 @@ test.describe('Admin Dashboard', () => {
   });
 
   test('should filter data by date range', async ({ page }) => {
-    await page.goto('/admin/orders');
+    await page.goto(routes.adminOrders);
     
     // Look for date filters
     const dateFilter = page.locator('input[type="date"], button').filter({ hasText: /Date|Fecha|Filter/ }).first();
@@ -177,7 +178,7 @@ test.describe('Admin Dashboard', () => {
   });
 
   test('should export data', async ({ page }) => {
-    await page.goto('/admin/orders');
+    await page.goto(routes.adminOrders);
     
     // Look for export button
     const exportButton = page.locator('button').filter({ hasText: /Export|Exportar|Download/ }).first();

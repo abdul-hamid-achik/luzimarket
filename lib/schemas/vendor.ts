@@ -5,6 +5,7 @@ export const vendorRegistrationSchema = z.object({
   businessName: z.string().min(2, "El nombre del negocio debe tener al menos 2 caracteres"),
   contactName: z.string().min(2, "El nombre del responsable debe tener al menos 2 caracteres"),
   email: z.string().email("Email inválido"),
+  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
   phone: z.string().optional(),
   whatsapp: z.string().optional(),
   businessPhone: z.string().min(10, "Teléfono inválido"),
