@@ -5,20 +5,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Important Notes
 
 - **NO scripts folder** - All commands are defined in package.json
-- **NO Docker** - Using Vercel managed services (Postgres, Blob Storage)
+- **NO Docker** - Using Vercel managed services (Neon DB, Blob Storage)
 - **Single seed script** - One db/seed.ts file that handles everything: reset, seeding, and AI image generation
 - **Database reset integrated** - The seed script uses drizzle-seed's reset functionality (can be skipped with --no-reset)
 - **AI image generation** - Images are generated directly in seed.ts if OPENAI_SECRET_KEY is present
 - **Realistic data** - Uses faker.js with Spanish (Mexico) locale for authentic vendor and product names
 - **Category-aware pricing** - Products have realistic prices based on their category
 - **Keep it simple** - Avoid creating duplicate scripts or complex variations
-- **Vercel Services** - Using Vercel Postgres for database and Vercel Blob for file storage
+- **Database** - Using Neon serverless PostgreSQL
+- **File Storage** - Using Vercel Blob for file storage
 
 ## Local Development Setup
 
 ### Prerequisites
 - Node.js 22+ and npm 10+
-- Vercel account with Postgres addon
+- Vercel account with Neon DB and Blob Storage addons
 - OpenAI API key (optional, for AI image generation)
 - Stripe account (for payment testing)
 
@@ -34,9 +35,9 @@ npm install
 # 3. Set up Vercel and link project
 npm run vercel:link
 
-# 4. Add Vercel Postgres addon
+# 4. Add Neon database
 # Go to https://vercel.com/dashboard/stores
-# Create a Postgres database and connect it to your project
+# Add Neon integration and create a database
 
 # 5. Pull environment variables from Vercel
 npm run vercel:env:pull
@@ -110,14 +111,9 @@ The project uses environment variables from Vercel. Use `npm run vercel:env:pull
 
 #### Required Environment Variables
 ```bash
-# Database (automatically set by Vercel Postgres addon)
-POSTGRES_URL=...
-POSTGRES_PRISMA_URL=...
-POSTGRES_URL_NON_POOLING=...
-POSTGRES_USER=...
-POSTGRES_HOST=...
-POSTGRES_PASSWORD=...
-POSTGRES_DATABASE=...
+# Database (Neon)
+DATABASE_URL=postgresql://...
+DIRECT_URL=postgresql://...
 
 # Email (Resend)
 RESEND_API_KEY=...
@@ -150,12 +146,12 @@ BLOB_READ_WRITE_TOKEN=...  # Optional: Falls back to local file storage in dev
 
 ### Vercel Services Setup
 
-#### 1. Vercel Postgres
-1. Go to https://vercel.com/dashboard/stores
-2. Click "Create Database" → Select "Postgres"
-3. Choose a region close to your users
+#### 1. Neon Database
+1. Go to https://vercel.com/dashboard/integrations
+2. Search for "Neon" and click "Add Integration"
+3. Follow the setup wizard to create a new database
 4. Connect it to your project
-5. Environment variables are automatically added
+5. Environment variables (DATABASE_URL, DIRECT_URL) are automatically added
 
 #### 2. Vercel Blob Storage
 1. Go to https://vercel.com/dashboard/stores
@@ -200,7 +196,7 @@ This is a Next.js 15 e-commerce platform using App Router with the following key
 ### Tech Stack
 - **Frontend**: Next.js 15.3.3 with React 19, TypeScript, Tailwind CSS, shadcn/ui components
 - **Backend**: Next.js Server Actions (no separate API needed)
-- **Database**: PostgreSQL with Drizzle ORM for type-safe queries
+- **Database**: PostgreSQL (Neon serverless) with Drizzle ORM for type-safe queries
 - **Internationalization**: next-intl supporting Spanish (es) and English (en)
 - **Authentication**: NextAuth.js with email/password and OAuth providers
 - **Payments**: Stripe integration for checkout

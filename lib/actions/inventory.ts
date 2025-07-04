@@ -3,6 +3,7 @@
 import { db } from "@/db";
 import { products, orderItems } from "@/db/schema";
 import { eq, sql, and, gte } from "drizzle-orm";
+import { checkStockWithReservations, cleanupExpiredReservations } from "./stock-reservation";
 
 export interface CartItem {
   id: string;
@@ -22,14 +23,17 @@ export interface StockValidationResult {
 }
 
 /**
- * Checks stock availability for a single product
+ * Checks stock availability for a single product considering reservations
  */
-export async function checkProductStock(productId: string, requestedQuantity: number = 1): Promise<{
+export async function checkProductStock(productId: string, requestedQuantity: number = 1, userId?: string, sessionId?: string): Promise<{
   isAvailable: boolean;
   availableStock: number;
   productName: string;
 }> {
   try {
+    // Clean up any expired reservations first
+    await cleanupExpiredReservations();
+
     const product = await db.query.products.findFirst({
       where: and(
         eq(products.id, productId),
@@ -50,11 +54,17 @@ export async function checkProductStock(productId: string, requestedQuantity: nu
       };
     }
 
-    const currentStock = product.stock ?? 0;
+    // Check stock with reservations
+    const stockCheck = await checkStockWithReservations(
+      productId,
+      requestedQuantity,
+      userId,
+      sessionId
+    );
     
     return {
-      isAvailable: currentStock >= requestedQuantity,
-      availableStock: currentStock,
+      isAvailable: stockCheck.isAvailable,
+      availableStock: stockCheck.availableStock,
       productName: product.name,
     };
   } catch (error) {

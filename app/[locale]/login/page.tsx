@@ -139,8 +139,11 @@ export default function LoginPage() {
               </Button>
 
               <div className="text-center space-y-2">
-                <Link href="/register" className="text-sm text-gray-600 hover:text-black font-univers">
+                <Link href="/register" className="text-sm text-gray-600 hover:text-black font-univers block">
                   ¿No tienes cuenta? Regístrate
+                </Link>
+                <Link href="/forgot-password" className="text-sm text-gray-600 hover:text-black font-univers block">
+                  ¿Olvidaste tu contraseña?
                 </Link>
               </div>
             </form>
@@ -195,8 +198,11 @@ export default function LoginPage() {
               </Button>
 
               <div className="text-center space-y-2">
-                <Link href="/vendor/register" className="text-sm text-gray-600 hover:text-black font-univers">
+                <Link href="/vendor/register" className="text-sm text-gray-600 hover:text-black font-univers block">
                   ¿Quieres ser vendedor? Regístrate
+                </Link>
+                <Link href="/forgot-password" className="text-sm text-gray-600 hover:text-black font-univers block">
+                  ¿Olvidaste tu contraseña?
                 </Link>
               </div>
             </form>
@@ -249,6 +255,12 @@ export default function LoginPage() {
                   "Iniciar sesión"
                 )}
               </Button>
+
+              <div className="text-center">
+                <Link href="/forgot-password" className="text-sm text-gray-600 hover:text-black font-univers">
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </div>
             </form>
           </TabsContent>
         </Tabs>

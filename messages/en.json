@@ -100,6 +100,8 @@
     "added": "Added",
     "outOfStock": "Out of stock",
     "inStock": "{count, plural, =0 {Out of stock} =1 {1 available} other {# available}}",
+    "quantity": "Quantity",
+    "lowStock": "Only {count} left",
     "price": "Price",
     "vendor": "Vendor",
     "category": "Category",
@@ -153,6 +155,7 @@
       "limitedStockDescriptionMultiple": "Only {count} units left of {productName}. Hurry up!",
       "addedSuccess": "🛒 Added to cart!",
       "addedSuccessDescription": "{productName} was added successfully. Great choice!",
+      "addedSuccessDescriptionMultiple": "{count} units of {productName} were added successfully. Great choice!",
       "addError": "❌ Error adding item",
       "addErrorDescription": "We couldn't add the product to your cart. Please try again or contact support."
     }

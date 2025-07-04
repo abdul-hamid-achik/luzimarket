@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { products, categories, vendors } from "@/db/schema";
-import { like, or, and, eq, sql } from "drizzle-orm";
+import { ilike, or, and, eq, sql } from "drizzle-orm";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -27,8 +27,8 @@ export async function GET(request: Request) {
         and(
           eq(products.isActive, true),
           or(
-            like(products.name, `%${query}%`),
-            like(products.description, `%${query}%`)
+            ilike(products.name, `%${query}%`),
+            ilike(products.description, `%${query}%`)
           )
         )
       )
@@ -46,7 +46,7 @@ export async function GET(request: Request) {
       .where(
         and(
           eq(categories.isActive, true),
-          like(categories.name, `%${query}%`)
+          ilike(categories.name, `%${query}%`)
         )
       )
       .limit(3);
@@ -63,7 +63,7 @@ export async function GET(request: Request) {
       .where(
         and(
           eq(vendors.isActive, true),
-          like(vendors.businessName, `%${query}%`)
+          ilike(vendors.businessName, `%${query}%`)
         )
       )
       .limit(3);

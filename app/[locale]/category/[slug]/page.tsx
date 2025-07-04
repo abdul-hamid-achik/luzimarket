@@ -56,26 +56,30 @@ async function getCategoryWithProducts(slug: string) {
 }
 
 // Map slugs to display names and descriptions
-const categoryInfo: Record<string, { title: string; subtitle: string; heroImage: string }> = {
+const categoryInfo: Record<string, { title: string; subtitle: string; heroImage: string; gradient: string }> = {
   'flores-arreglos': {
     title: 'Flores & Amores',
     subtitle: 'Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Nulla vitae elit libero, a pharetra augue. Sed posuere consectetur est at lobortis.',
-    heroImage: '/images/links/pia-riverola.webp'
+    heroImage: '/images/links/pia-riverola.webp',
+    gradient: 'bg-gradient-to-br from-luzi-pink via-luzi-coral to-luzi-yellow'
   },
   'chocolates-dulces': {
     title: 'Dulces & Chocolates',
     subtitle: 'Delicias artesanales y chocolates premium para endulzar momentos especiales.',
-    heroImage: '/images/links/game-wwe-19-1507733870-150-911.jpg'
+    heroImage: '/images/links/game-wwe-19-1507733870-150-911.jpg',
+    gradient: 'bg-gradient-to-br from-luzi-pink-light via-luzi-pink to-luzi-coral'
   },
   'eventos-cenas': {
     title: 'Eventos & Cenas',
     subtitle: 'Todo lo que necesitas para crear experiencias memorables.',
-    heroImage: '/images/links/placeholder-1.webp'
+    heroImage: '/images/links/placeholder-1.webp',
+    gradient: 'bg-gradient-to-br from-white via-luzi-yellow-light to-luzi-yellow'
   },
   'regalos-personalizados': {
     title: 'Regalos Personalizados',
     subtitle: 'Regalos únicos y personalizados que cuentan historias.',
-    heroImage: '/images/links/placeholder-2.jpg'
+    heroImage: '/images/links/placeholder-2.jpg',
+    gradient: 'bg-gradient-to-br from-luzi-yellow-light via-luzi-yellow to-luzi-coral'
   }
 };
 
@@ -93,7 +97,8 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const info = categoryInfo[slug] || {
     title: categoryData.category.name,
     subtitle: 'Descubre nuestra selección de productos',
-    heroImage: categoryData.category.imageUrl || '/images/links/placeholder-1.webp'
+    heroImage: categoryData.category.imageUrl || '/images/links/placeholder-1.webp',
+    gradient: 'bg-gradient-to-br from-luzi-pink via-luzi-pink-light to-luzi-yellow'
   };
 
   return (
@@ -102,7 +107,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <section className="relative h-[400px] overflow-hidden">
         <div className="absolute inset-0 grid grid-cols-2">
           {/* Left side - gradient background */}
-          <div className="relative bg-gradient-to-br from-pink-300 via-yellow-200 to-orange-300">
+          <div className={`relative ${info.gradient}`}>
             <div className="absolute inset-0 flex items-center justify-center p-12">
               <div className="max-w-md">
                 <h1 className="text-5xl font-times-now mb-6">{info.title}</h1>

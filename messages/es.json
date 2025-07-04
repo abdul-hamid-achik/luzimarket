@@ -100,6 +100,8 @@
     "added": "Agregado",
     "outOfStock": "Sin stock",
     "inStock": "{count, plural, =0 {Sin stock} =1 {1 disponible} other {# disponibles}}",
+    "quantity": "Cantidad",
+    "lowStock": "Solo quedan {count}",
     "price": "Precio",
     "vendor": "Vendedor",
     "category": "Categoría",
@@ -153,6 +155,7 @@
       "limitedStockDescriptionMultiple": "Solo quedan {count} unidades de {productName}. ¡Apresúrate!",
       "addedSuccess": "🛒 ¡Agregado al carrito!",
       "addedSuccessDescription": "{productName} se agregó exitosamente. ¡Excelente elección!",
+      "addedSuccessDescriptionMultiple": "{count} unidades de {productName} se agregaron exitosamente. ¡Excelente elección!",
       "addError": "❌ Error al agregar",
       "addErrorDescription": "No pudimos agregar el producto al carrito. Por favor, intenta de nuevo o contacta a soporte."
     }

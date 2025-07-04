@@ -70,6 +70,13 @@ const CATEGORIES = [
     description: "Productos gourmet, vinos y delicatessen",
     imageUrl: null, // Will be generated with AI
     displayOrder: 8
+  },
+  {
+    name: "Eventos y Cenas",
+    slug: "eventos-cenas",
+    description: "Servicios y productos para eventos especiales, cenas románticas y celebraciones",
+    imageUrl: null, // Will be generated with AI
+    displayOrder: 9
   }
 ];
 
@@ -418,26 +425,176 @@ async function main() {
       const category = faker.helpers.arrayElement(categories);
       const categoryProducts = CATEGORY_PRODUCT_NAMES[category.slug] || PRODUCT_NAMES;
       const baseName = faker.helpers.arrayElement(categoryProducts);
-      const name = baseName + " " + faker.commerce.productAdjective();
+      const adjective = faker.helpers.arrayElement([
+        "Premium", "Deluxe", "Exclusivo", "Artesanal", "Elegante", 
+        "Clásico", "Moderno", "Vintage", "Lujoso", "Especial"
+      ]);
+      const name = `${baseName} ${adjective}`;
       const priceRange = CATEGORY_PRICE_RANGES[category.slug] || { min: 299, max: 1999 };
       const price = faker.number.int({ min: priceRange.min, max: priceRange.max });
+      
+      // Generate more realistic descriptions based on category
+      let description = "";
+      if (category.slug === "flores-arreglos") {
+        description = `Hermoso arreglo floral con ${baseName.toLowerCase()} frescos, perfectos para ${faker.helpers.arrayElement(["celebraciones", "aniversarios", "cumpleaños", "ocasiones especiales"])}. Incluye ${faker.helpers.arrayElement(["follaje verde", "baby's breath", "decoración especial", "lazo elegante"])}.`;
+      } else if (category.slug === "chocolates-dulces") {
+        description = `Deliciosos chocolates ${faker.helpers.arrayElement(["belgas", "suizos", "artesanales", "gourmet"])} con ${faker.helpers.arrayElement(["cacao 70%", "relleno de trufa", "frutos secos", "caramelo"])}. Presentación ${faker.helpers.arrayElement(["en caja elegante", "envueltos individualmente", "con moño decorativo"])}.`;
+      } else if (category.slug === "velas-aromas") {
+        description = `Vela aromática de ${faker.helpers.arrayElement(["cera de soya", "cera de abeja", "parafina premium"])} con esencia de ${faker.helpers.arrayElement(["lavanda francesa", "vainilla de Madagascar", "sándalo", "jazmín"])}. Duración aproximada de ${faker.number.int({ min: 20, max: 60 })} horas.`;
+      } else {
+        description = faker.lorem.sentences(2) + ` ${faker.helpers.arrayElement(["Hecho a mano con amor.", "Producto exclusivo de temporada.", "Edición limitada.", "Diseño único."])}`;
+      }
       
       productData.push({
         name,
         slug: slugify(name + "-" + faker.string.alphanumeric(6), { lower: true, strict: true }),
-        description: faker.lorem.sentences(3),
+        description,
         categoryId: category.id,
         vendorId: faker.helpers.arrayElement(vendors).id,
         price: String(Math.round(price / 50) * 50), // Round to nearest 50
         images: null, // Will be generated with AI
-        tags: faker.helpers.arrayElements(["nuevo", "popular", "oferta", "exclusivo", "limitado"], { min: 1, max: 3 }),
-        stock: faker.number.int({ min: 0, max: 100 }),
-        sku: faker.string.alphanumeric(8).toUpperCase(),
+        tags: faker.helpers.arrayElements(["nuevo", "popular", "oferta", "exclusivo", "limitado", "artesanal", "eco-friendly", "premium"], { min: 1, max: 4 }),
+        stock: faker.helpers.weightedArrayElement([
+          { value: faker.number.int({ min: 1, max: 10 }), weight: 2 }, // Low stock
+          { value: faker.number.int({ min: 11, max: 50 }), weight: 5 }, // Normal stock
+          { value: faker.number.int({ min: 51, max: 100 }), weight: 3 }, // High stock
+          { value: 0, weight: 1 } // Out of stock
+        ]),
+        sku: `${category.slug.substring(0, 3).toUpperCase()}-${faker.string.alphanumeric(5).toUpperCase()}`,
         isActive: faker.datatype.boolean(0.95)
       });
     }
     const products = await db.insert(schema.products).values(productData).returning();
     console.log(`✅ Created ${products.length} products`);
+
+    // 5.5 Seed Product Variants
+    console.log("🎨 Creating product variants...");
+    const variantData = [];
+    
+    // Define variant configurations by category
+    const CATEGORY_VARIANTS: Record<string, { types: string[], values: Record<string, any[]> }> = {
+      "flores-arreglos": {
+        types: ["size", "color"],
+        values: {
+          size: [
+            { name: "Pequeño", price: 0 },
+            { name: "Mediano", price: 150 },
+            { name: "Grande", price: 300 },
+            { name: "Extra Grande", price: 500 }
+          ],
+          color: [
+            { name: "Rosa", attributes: { colorValue: "#FFB6C1" } },
+            { name: "Rojo", attributes: { colorValue: "#DC143C" } },
+            { name: "Blanco", attributes: { colorValue: "#FFFFFF" } },
+            { name: "Amarillo", attributes: { colorValue: "#FFD700" } },
+            { name: "Mixto", attributes: { colorValue: "linear-gradient(45deg, #FFB6C1, #FFD700)" } }
+          ]
+        }
+      },
+      "chocolates-dulces": {
+        types: ["size", "type"],
+        values: {
+          size: [
+            { name: "Individual", price: 0 },
+            { name: "Caja Pequeña (6 pz)", price: 100 },
+            { name: "Caja Mediana (12 pz)", price: 200 },
+            { name: "Caja Grande (24 pz)", price: 400 }
+          ],
+          type: [
+            { name: "Chocolate Oscuro" },
+            { name: "Chocolate con Leche" },
+            { name: "Chocolate Blanco" },
+            { name: "Mixto" }
+          ]
+        }
+      },
+      "velas-aromas": {
+        types: ["size", "scent"],
+        values: {
+          size: [
+            { name: "Vela Pequeña (100g)", price: 0 },
+            { name: "Vela Mediana (200g)", price: 150 },
+            { name: "Vela Grande (400g)", price: 300 }
+          ],
+          scent: [
+            { name: "Lavanda" },
+            { name: "Vainilla" },
+            { name: "Canela" },
+            { name: "Cítricos" },
+            { name: "Rosa" },
+            { name: "Sándalo" }
+          ]
+        }
+      },
+      "joyeria-accesorios": {
+        types: ["material", "size"],
+        values: {
+          material: [
+            { name: "Plata 925", price: 0 },
+            { name: "Oro 14k", price: 2000 },
+            { name: "Oro Rosa", price: 1500 },
+            { name: "Acero Inoxidable", price: -500 }
+          ],
+          size: [
+            { name: "XS" },
+            { name: "S" },
+            { name: "M" },
+            { name: "L" },
+            { name: "Ajustable" }
+          ]
+        }
+      },
+      "cajas-regalo": {
+        types: ["size", "theme"],
+        values: {
+          size: [
+            { name: "Caja Pequeña", price: 0 },
+            { name: "Caja Mediana", price: 300 },
+            { name: "Caja Grande", price: 600 },
+            { name: "Caja Premium", price: 1000 }
+          ],
+          theme: [
+            { name: "Cumpleaños" },
+            { name: "Aniversario" },
+            { name: "Día de las Madres" },
+            { name: "Navidad" },
+            { name: "San Valentín" },
+            { name: "Personalizada" }
+          ]
+        }
+      }
+    };
+
+    // Create variants for products that have variant configurations
+    for (const product of products.slice(0, 200)) { // Add variants to first 200 products
+      const category = categories.find(c => c.id === product.categoryId);
+      if (!category) continue;
+      
+      const variantConfig = CATEGORY_VARIANTS[category.slug];
+      if (!variantConfig) continue;
+
+      for (const variantType of variantConfig.types) {
+        const values = variantConfig.values[variantType];
+        for (const value of values) {
+          const stock = faker.number.int({ min: 0, max: 50 });
+          variantData.push({
+            productId: product.id,
+            name: value.name,
+            variantType,
+            sku: `${product.sku}-${variantType.charAt(0).toUpperCase()}-${value.name.substring(0, 3).toUpperCase()}`,
+            price: value.price ? String(Number(product.price) + value.price) : null,
+            stock,
+            attributes: value.attributes || {},
+            isActive: stock > 0
+          });
+        }
+      }
+    }
+
+    if (variantData.length > 0) {
+      await db.insert(schema.productVariants).values(variantData);
+      console.log(`✅ Created ${variantData.length} product variants`);
+    }
 
     // 6. Seed Users (Customers)
     console.log("👥 Creating users...");

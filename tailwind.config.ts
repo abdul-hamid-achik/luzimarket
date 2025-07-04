@@ -48,6 +48,14 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Luzimarket brand colors
+        luzi: {
+          pink: "hsl(var(--luzi-pink))",
+          coral: "hsl(var(--luzi-coral))",
+          yellow: "hsl(var(--luzi-yellow))",
+          "pink-light": "hsl(var(--luzi-pink-light))",
+          "yellow-light": "hsl(var(--luzi-yellow-light))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

@@ -10,6 +10,7 @@ import { Heart, ShoppingBag, Package, Shield, Gift } from "lucide-react";
 import { ProductReviews } from "@/components/products/product-reviews";
 import { ProductsGrid } from "@/components/products/products-grid";
 import { AddToCartButton } from "@/components/cart/add-to-cart-button";
+import { AddToCartWithQuantity } from "@/components/cart/add-to-cart-with-quantity";
 import { WishlistButton } from "@/components/wishlist/wishlist-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -150,18 +151,19 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
             {/* Actions */}
             <div className="space-y-4">
-              <div className="flex gap-4">
-                <AddToCartButton 
-                  product={{
-                    id: product.id,
-                    name: product.name,
-                    price: Number(product.price),
-                    image: images[0] || '',
-                    vendorId: product.vendorId,
-                    vendorName: product.vendor?.businessName || '',
-                  }}
-                  className="flex-1"
-                />
+              <AddToCartWithQuantity 
+                product={{
+                  id: product.id,
+                  name: product.name,
+                  price: Number(product.price),
+                  image: images[0] || '',
+                  vendorId: product.vendorId,
+                  vendorName: product.vendor?.businessName || '',
+                  stock: product.stock,
+                }}
+              />
+              
+              <div className="flex justify-center">
                 <WishlistButton 
                   product={{
                     id: product.id,
