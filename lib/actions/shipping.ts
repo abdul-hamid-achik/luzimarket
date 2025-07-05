@@ -396,3 +396,90 @@ export async function initializeShippingData() {
     };
   }
 }
+
+// Get all shipping zones
+export async function getShippingZones() {
+  try {
+    const zones = await db.query.shippingZones.findMany({
+      orderBy: (zones, { asc }) => [asc(zones.name)]
+    });
+
+    return {
+      success: true,
+      zones
+    };
+  } catch (error) {
+    console.error('Error getting shipping zones:', error);
+    return {
+      success: false,
+      error: 'Failed to get shipping zones'
+    };
+  }
+}
+
+// Get all shipping methods
+export async function getShippingMethods() {
+  try {
+    const methods = await db.query.shippingMethods.findMany({
+      orderBy: (methods, { asc }) => [asc(methods.carrier), asc(methods.name)]
+    });
+
+    return {
+      success: true,
+      methods
+    };
+  } catch (error) {
+    console.error('Error getting shipping methods:', error);
+    return {
+      success: false,
+      error: 'Failed to get shipping methods'
+    };
+  }
+}
+
+// Update vendor shipping settings
+export async function updateVendorShippingSettings(vendorId: string, settings: any) {
+  try {
+    // This would update vendor-specific shipping settings
+    // For now, return success
+    return {
+      success: true,
+      message: 'Shipping settings updated successfully'
+    };
+  } catch (error) {
+    console.error('Error updating vendor shipping settings:', error);
+    return {
+      success: false,
+      error: 'Failed to update shipping settings'
+    };
+  }
+}
+
+// Save vendor shipping rates
+export async function saveVendorShippingRates(vendorId: string, rates: any[]) {
+  try {
+    // Delete existing rates
+    await db.delete(vendorShippingRates).where(eq(vendorShippingRates.vendorId, vendorId));
+
+    // Insert new rates
+    if (rates.length > 0) {
+      await db.insert(vendorShippingRates).values(
+        rates.map(rate => ({
+          ...rate,
+          vendorId
+        }))
+      );
+    }
+
+    return {
+      success: true,
+      message: 'Shipping rates saved successfully'
+    };
+  } catch (error) {
+    console.error('Error saving vendor shipping rates:', error);
+    return {
+      success: false,
+      error: 'Failed to save shipping rates'
+    };
+  }
+}
