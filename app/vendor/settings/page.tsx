@@ -53,7 +53,7 @@ export default function VendorSettingsPage() {
   const { data: session } = useSession();
   const router = useRouter();
 
-  if (!session?.user?.vendor) {
+  if (!(session?.user as any)?.vendor) {
     router.push("/vendor/login");
     return null;
   }
