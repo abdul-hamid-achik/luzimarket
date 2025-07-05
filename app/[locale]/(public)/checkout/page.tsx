@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -76,6 +76,18 @@ export default function CheckoutPage() {
   const [selectedShipping, setSelectedShipping] = useState<any>(null);
   const tax = subtotal * 0.16; // 16% IVA
   const total = subtotal + shippingCost + tax;
+
+  // Memoize shipping items to prevent infinite loops
+  const shippingItems = useMemo(() => 
+    items.map(item => ({
+      productId: item.id,
+      quantity: item.quantity
+    })), 
+    [items]
+  );
+
+  const vendorId = useMemo(() => items[0]?.vendorId || '', [items]);
+  const postalCode = form.watch("postalCode");
 
   if (items.length === 0) {
     return (
@@ -406,12 +418,9 @@ export default function CheckoutPage() {
                 {/* Shipping Options */}
                 {items.length > 0 && (
                   <ShippingCalculator
-                    items={items.map(item => ({
-                      productId: item.id,
-                      quantity: item.quantity
-                    }))}
-                    vendorId={items[0]?.vendorId || ''}
-                    initialPostalCode={form.watch("postalCode") || ''}
+                    items={shippingItems}
+                    vendorId={vendorId}
+                    initialPostalCode={postalCode || ''}
                     onShippingChange={(option, postalCode) => {
                       if (option) {
                         setShippingCost(option.cost);

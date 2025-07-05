@@ -38,7 +38,7 @@ export function ShippingCalculator({
     if (initialPostalCode && initialPostalCode !== postalCode) {
       setPostalCode(initialPostalCode);
     }
-  }, [initialPostalCode]);
+  }, [initialPostalCode, postalCode]);
 
   // Debounce postal code changes
   useEffect(() => {
@@ -54,7 +54,8 @@ export function ShippingCalculator({
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [postalCode, items, vendorId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [postalCode]);
 
   const fetchShippingOptions = async () => {
     if (!validatePostalCode(postalCode)) {
