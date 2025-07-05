@@ -41,8 +41,8 @@ export default async function EmailTemplatePreviewPage({
     userEmail: "juan@example.com",
   };
 
-  let previewContent = content;
-  let previewSubject = subject;
+  let previewContent = content || "";
+  let previewSubject = subject || "";
 
   // Replace variables in content and subject
   Object.entries(sampleData).forEach(([key, value]) => {
