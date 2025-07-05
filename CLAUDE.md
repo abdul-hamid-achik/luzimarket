@@ -114,7 +114,24 @@ npm run test:ui            # Run tests with Playwright UI
 npm run test:debug         # Debug tests with Playwright
 npm run test:headed        # Run tests in headed mode
 npm run test:report        # View test results report
+npm run test:json          # Run tests with JSON output (test-results.json)
+npm run test:llm           # Run tests with LLM-friendly output (JSON + JUnit XML)
+npm run test:failed        # Re-run only failed tests from last run
+npm run test:failed:json   # Re-run failed tests with JSON output
 ```
+
+**IMPORTANT TESTING MEMORY:**
+- ALWAYS run tests in headless mode (never use --headed or take screenshots)
+- Run the complete test suite ONCE and wait for completion before analyzing
+- Use `--reporter=list` or `--reporter=json` for readable output
+- Don't spawn multiple test instances - be patient and let tests finish
+
+**LLM-FRIENDLY TESTING:**
+- Use `npm run test:llm` for comprehensive LLM analysis (creates JSON + JUnit XML)
+- Use `npm run test:json` for structured JSON output only
+- Use `npm run test:failed:json` to analyze only failed tests
+- Output files: `test-results.json` (structured data), `junit-results.xml` (compatibility)
+- Pass additional arguments: `npm run test:json -- --grep "login"` or `PLAYWRIGHT_JSON_OUTPUT_NAME=custom.json npm run test:json`
 
 ### Environment Variables
 
@@ -176,6 +193,15 @@ BLOB_READ_WRITE_TOKEN=...  # Optional: Falls back to local file storage in dev
 - For local file storage during dev, the app falls back when `BLOB_READ_WRITE_TOKEN` is not set
 
 ### Testing with Playwright
+
+#### Server Configuration for Tests
+
+**IMPORTANT**: Playwright is configured to automatically start its own dev server when running tests. The webServer configuration in `playwright.config.ts` handles this.
+
+**Testing Workflow**:
+1. **Just run tests**: `npm test` or `npx playwright test`
+2. **Playwright will automatically**: Start the dev server, run tests, then stop the server
+3. **Use `reuseExistingServer: !process.env.CI`** so it can reuse existing servers in development but start fresh in CI
 
 #### Testing shadcn/ui Components
 

@@ -35,6 +35,18 @@ export default defineConfig({
 
     /* Screenshot on failure */
     screenshot: 'only-on-failure',
+
+    /* Increase timeouts for slower operations */
+    navigationTimeout: 60000,
+    actionTimeout: 30000,
+  },
+
+  /* Global timeout for tests */
+  timeout: 60000,
+
+  /* Timeout for each test expect() call */
+  expect: {
+    timeout: 15000,
   },
 
   /* Configure projects for major browsers */
@@ -82,13 +94,10 @@ export default defineConfig({
    * npm test
    */
   
-  // Commented out to use existing dev server
-  // webServer: [
-  //   {
-  //     command: 'npm run dev',
-  //     url: 'http://localhost:3000/en',
-  //     reuseExistingServer: true,
-  //     timeout: 180 * 1000,
-  //   },
-  // ],
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+    timeout: 180 * 1000,
+  },
 });

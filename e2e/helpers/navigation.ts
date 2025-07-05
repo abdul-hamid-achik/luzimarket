@@ -2,30 +2,30 @@
  * Helper functions for locale-aware navigation in tests
  */
 
-// Spanish routes (no prefix needed as it's the default locale)
+// Spanish routes (with /es prefix for consistency)
 export const routes = {
-  home: '/',
-  login: '/iniciar-sesion',
-  register: '/register',
-  products: '/productos',
-  cart: '/carrito',
-  checkout: '/pagar',
-  categories: '/categorias',
-  vendorRegister: '/vendor/register',
+  home: '/es',
+  login: '/es/iniciar-sesion',
+  register: '/es/register',
+  products: '/es/productos',
+  cart: '/es/carrito',
+  checkout: '/es/pagar',
+  categories: '/es/categorias',
+  vendorRegister: '/vendor/register', // Vendor routes are not internationalized
   vendorDashboard: '/vendor/dashboard',
   vendorProducts: '/vendor/products',
-  admin: '/admin', // Admin routes stay in English
+  admin: '/admin', // Admin routes are not internationalized
   adminOrders: '/admin/orders',
   adminVendors: '/admin/vendors',
   adminProducts: '/admin/products',
   adminProductsPending: '/admin/products/pending',
   adminUsers: '/admin/users',
-  wishlist: '/favoritos',
-  bestSellers: '/mas-vendidos',
-  handpicked: '/seleccionados',
-  brands: '/tiendas-marcas',
-  occasions: '/ocasiones',
-  editorial: '/editorial'
+  wishlist: '/es/favoritos',
+  bestSellers: '/es/mas-vendidos',
+  handpicked: '/es/seleccionados',
+  brands: '/es/tiendas-marcas',
+  occasions: '/es/ocasiones',
+  editorial: '/es/editorial'
 };
 
 // English routes (with /en prefix)
@@ -37,10 +37,10 @@ export const enRoutes = {
   cart: '/en/cart',
   checkout: '/en/checkout',
   categories: '/en/categories',
-  vendorRegister: '/en/vendor/register',
-  vendorDashboard: '/en/vendor/dashboard',
-  vendorProducts: '/en/vendor/products',
-  admin: '/admin', // Admin routes stay in English
+  vendorRegister: '/vendor/register', // Vendor routes are not internationalized
+  vendorDashboard: '/vendor/dashboard',
+  vendorProducts: '/vendor/products',
+  admin: '/admin', // Admin routes are not internationalized
   adminOrders: '/admin/orders',
   adminVendors: '/admin/vendors',
   adminProducts: '/admin/products',

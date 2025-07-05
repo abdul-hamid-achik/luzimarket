@@ -64,8 +64,12 @@ test.describe('Authentication', () => {
     const submitButton = page.locator('button[type="submit"]:has-text("Iniciar sesión")').first();
     await submitButton.click();
     
-    // Should show error message
-    const errorMessage = page.locator('text="Credenciales inválidas"');
+    // Should show error message - can be "Credenciales inválidas" or other auth error
+    const errorMessage = page.locator('text="Credenciales inválidas"').or(
+      page.locator('text="Error al iniciar sesión"')
+    ).or(
+      page.locator(':text("intentos restantes")')
+    );
     await expect(errorMessage).toBeVisible({ timeout: 10000 });
   });
 

@@ -1,10 +1,14 @@
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import { db, getDbInstance } from "@/db";
+import { db } from "@/db";
 import { users, vendors, adminUsers } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+
+// Custom error class for invalid credentials
+class InvalidLoginError extends CredentialsSignin {
+  code = "Invalid credentials"
+}
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -13,8 +17,7 @@ const loginSchema = z.object({
 });
 
 export const authOptions = {
-  // Only use adapter when DATABASE_URL is available (not during build)
-  ...(process.env.DATABASE_URL ? { adapter: DrizzleAdapter(getDbInstance()) } : {}),
+  // Credentials provider requires JWT sessions - cannot use database adapter with credentials
   session: {
     strategy: "jwt" as const,
     maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -28,9 +31,32 @@ export const authOptions = {
         password: { label: "Password", type: "password" },
         userType: { label: "User Type", type: "text" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         try {
-          const { email, password, userType } = loginSchema.parse(credentials);
+          console.log("Authorize called with credentials:", credentials);
+          console.log("Request:", req ? "Present" : "Not present");
+          
+          if (!credentials) {
+            console.error("No credentials provided");
+            throw new InvalidLoginError();
+          }
+
+          // Handle different credential formats in NextAuth v5 beta
+          let parsedCredentials = credentials;
+          
+          // If credentials is a string or seems to be form data, try to parse it differently
+          if (typeof credentials === 'string') {
+            console.log("Credentials is a string, trying to parse");
+            try {
+              parsedCredentials = JSON.parse(credentials);
+            } catch {
+              // If JSON parsing fails, treat as invalid
+              throw new InvalidLoginError();
+            }
+          }
+
+          // Validate credentials with Zod schema
+          const { email, password, userType } = loginSchema.parse(parsedCredentials);
           
           // Import the authenticateUser function dynamically to avoid circular dependencies
           const { authenticateUser } = await import("@/lib/actions/auth");
@@ -38,15 +64,19 @@ export const authOptions = {
           const result = await authenticateUser(email, password, userType);
           
           if (!result.success) {
-            // NextAuth expects null for failed authentication
-            // The error message will be handled by the login page
-            return null;
+            // Throw custom error for better error handling
+            console.error("Authentication failed:", result.error);
+            throw new InvalidLoginError();
           }
           
           return result.user || null;
         } catch (error) {
           console.error("Auth error:", error);
-          return null;
+          if (error instanceof InvalidLoginError) {
+            throw error;
+          }
+          // For other errors, throw invalid login
+          throw new InvalidLoginError();
         }
       },
     }),
@@ -65,7 +95,7 @@ export const authOptions = {
         session.user.role = token.role;
         
         // If user is a vendor, fetch vendor details
-        if (token.role === "vendor" && process.env.DATABASE_URL) {
+        if (token.role === "vendor") {
           try {
             const [vendor] = await db
               .select()
