@@ -2,9 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { Newsletter } from "./newsletter";
 import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 
 export function Footer() {
   const t = useTranslations('Footer');
+  const locale = useLocale();
   const currentYear = new Date().getFullYear();
   const socialLinks = [
     { name: "Instagram", href: "#", icon: "/images/socials/Instagram.png" },
@@ -31,35 +33,37 @@ export function Footer() {
               height={30}
               className="h-8 w-auto mb-4"
             />
-            <p className="text-sm font-univers">Regalos curados y experiencias únicas en México.</p>
+            <p className="text-sm font-univers">{t('tagline')}</p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-univers font-bold mb-4">COMPRA</h3>
+            <h3 className="font-univers font-bold mb-4">{t('shop')}</h3>
             <ul className="space-y-2 text-sm font-univers">
-              <li><Link href="/products" className="hover:underline">Productos</Link></li>
-              <li><Link href="/best-sellers" className="hover:underline">Best Sellers</Link></li>
-              <li><Link href="/categorias" className="hover:underline">Categorías</Link></li>
-              <li><Link href="/ocasiones" className="hover:underline">Ocasiones</Link></li>
+              <li><Link href={`/${locale}/products`} className="hover:underline">{t('products')}</Link></li>
+              <li><Link href={`/${locale}/best-sellers`} className="hover:underline">{t('bestSellers')}</Link></li>
+              <li><Link href={`/${locale}/categories`} className="hover:underline">{t('categories')}</Link></li>
+              <li><Link href={`/${locale}/occasions`} className="hover:underline">{t('occasions')}</Link></li>
             </ul>
           </div>
 
           {/* Company */}
           <div>
-            <h3 className="font-univers font-bold mb-4">EMPRESA</h3>
+            <h3 className="font-univers font-bold mb-4">{t('company')}</h3>
             <ul className="space-y-2 text-sm font-univers">
-              <li><Link href="/about" className="hover:underline">Acerca de</Link></li>
-              <li><Link href="/vendor/register" className="hover:underline">Vende con nosotros</Link></li>
-              <li><Link href="/contact" className="hover:underline">Contacto</Link></li>
-              <li><Link href="/editorial" className="hover:underline">Editorial</Link></li>
-              <li><Link href="/orders/lookup" className="hover:underline">Buscar mi pedido</Link></li>
+              <li><Link href={`/${locale}/about`} className="hover:underline">{t('aboutUs')}</Link></li>
+              <li><Link href={`/${locale}/vendor/register`} className="hover:underline">{t('sellWithUs')}</Link></li>
+              <li><Link href={`/${locale}/contact`} className="hover:underline">{t('contact')}</Link></li>
+              <li><Link href={`/${locale}/editorial`} className="hover:underline">{t('editorial')}</Link></li>
+              <li><Link href={`/${locale}/orders/lookup`} className="hover:underline">{t('trackOrder')}</Link></li>
+              <li><Link href={`/${locale}/privacy`} className="hover:underline">{t('privacy')}</Link></li>
+              <li><Link href={`/${locale}/terms`} className="hover:underline">{t('terms')}</Link></li>
             </ul>
           </div>
 
           {/* Social Media */}
           <div>
-            <h3 className="font-univers font-bold mb-4">SÍGUENOS</h3>
+            <h3 className="font-univers font-bold mb-4">{t('followUs')}</h3>
             <div className="flex gap-4">
               {socialLinks.map((social) => (
                 <Link 

@@ -725,9 +725,19 @@
     }
   },
   "Footer": {
+    "shop": "COMPRA",
+    "company": "EMPRESA",
+    "followUs": "SÍGUENOS",
+    "products": "Productos",
+    "bestSellers": "Best Sellers",
+    "categories": "Categorías",
+    "occasions": "Ocasiones",
     "aboutUs": "Acerca de nosotros",
-    "help": "Ayuda",
+    "sellWithUs": "Vende con nosotros",
     "contact": "Contacto",
+    "editorial": "Editorial",
+    "trackOrder": "Buscar mi pedido",
+    "help": "Ayuda",
     "terms": "Términos y condiciones",
     "privacy": "Política de privacidad",
     "shipping": "Información de envío",
@@ -736,8 +746,376 @@
     "newsletter": "Boletín",
     "newsletterPlaceholder": "Tu correo electrónico",
     "subscribe": "Suscribirse",
-    "followUs": "Síguenos",
+    "tagline": "Regalos curados y experiencias únicas en México.",
     "copyright": "© {year} MOMENTO ESPECIAL SAPI DE CV",
     "allRightsReserved": "Todos los derechos reservados"
+  },
+  "Privacy": {
+    "metaTitle": "Política de Privacidad - Luzimarket",
+    "metaDescription": "Conoce cómo Luzimarket protege tus datos personales y tu privacidad al comprar en nuestra plataforma.",
+    "title": "Política de Privacidad",
+    "lastUpdated": "Última actualización: {date}",
+    "introduction": "En MOMENTO ESPECIAL SAPI DE CV (\"Luzimarket\"), nos comprometemos a proteger la privacidad y los datos personales de nuestros usuarios. Esta Política de Privacidad describe cómo recopilamos, usamos, almacenamos y protegemos tu información personal de conformidad con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP) y su Reglamento.",
+    "sections": {
+      "dataController": {
+        "title": "Responsable del Tratamiento de Datos",
+        "content": "El responsable del tratamiento de tus datos personales es:",
+        "companyName": "MOMENTO ESPECIAL SAPI DE CV",
+        "rfc": "RFC: MES240101ABC",
+        "address": "Ciudad de México, México",
+        "email": "Email: privacy@luzimarket.shop"
+      },
+      "dataCollected": {
+        "title": "Datos Personales que Recopilamos",
+        "intro": "Para brindarte nuestros servicios, recopilamos los siguientes datos personales:",
+        "items": {
+          "personalData": "Datos de identificación: nombre completo, fecha de nacimiento, género",
+          "contactData": "Datos de contacto: correo electrónico, número telefónico, dirección de envío y facturación",
+          "paymentData": "Datos financieros: información de tarjetas de crédito/débito (procesada de forma segura a través de Stripe)",
+          "navigationData": "Datos de navegación: dirección IP, tipo de navegador, páginas visitadas, tiempo de permanencia",
+          "purchaseHistory": "Historial de compras y preferencias de productos"
+        }
+      },
+      "purposes": {
+        "title": "Finalidades del Tratamiento",
+        "items": {
+          "processOrders": "Procesar tus pedidos y gestionar la entrega de productos",
+          "customerService": "Brindar servicio al cliente y resolver dudas o reclamaciones",
+          "marketing": "Enviarte comunicaciones promocionales y ofertas personalizadas (con tu consentimiento)",
+          "fraudPrevention": "Prevenir fraudes y garantizar la seguridad de las transacciones",
+          "legalCompliance": "Cumplir con obligaciones legales y requerimientos de autoridades",
+          "improvements": "Mejorar nuestros servicios y experiencia de usuario"
+        }
+      },
+      "legalBasis": {
+        "title": "Base Legal para el Tratamiento",
+        "content": "El tratamiento de tus datos personales se realiza con base en tu consentimiento y/o en la relación contractual que mantienes con nosotros al utilizar nuestra plataforma. Para ciertas finalidades, el tratamiento se basa en el cumplimiento de obligaciones legales o en nuestro interés legítimo."
+      },
+      "arcoRights": {
+        "title": "Derechos ARCO",
+        "intro": "Como titular de datos personales, tienes derecho a ejercer los siguientes derechos ARCO:",
+        "rights": {
+          "access": {
+            "title": "Acceso",
+            "description": "Conocer qué datos personales tenemos de ti y para qué los utilizamos"
+          },
+          "rectification": {
+            "title": "Rectificación",
+            "description": "Solicitar la corrección de tu información personal cuando sea inexacta o incompleta"
+          },
+          "cancellation": {
+            "title": "Cancelación",
+            "description": "Solicitar la eliminación de tus datos personales de nuestras bases de datos"
+          },
+          "opposition": {
+            "title": "Oposición",
+            "description": "Oponerte al tratamiento de tus datos personales para fines específicos"
+          }
+        },
+        "howToExercise": "Para ejercer tus derechos ARCO, envía una solicitud a privacy@luzimarket.shop con tu identificación oficial y una descripción clara de tu solicitud. Responderemos en un plazo máximo de 20 días hábiles."
+      },
+      "dataSharing": {
+        "title": "Transferencia de Datos",
+        "intro": "Podemos compartir tus datos personales con terceros en los siguientes casos:",
+        "parties": {
+          "vendors": "Vendedores en nuestra plataforma para procesar y entregar tus pedidos",
+          "stripe": "Stripe, Inc. para el procesamiento seguro de pagos (incluyendo pagos OXXO)",
+          "shipping": "Empresas de mensajería y logística para la entrega de productos",
+          "authorities": "Autoridades competentes cuando sea requerido por ley"
+        }
+      },
+      "paymentProcessing": {
+        "title": "Procesamiento de Pagos",
+        "stripeInfo": "Utilizamos Stripe como nuestro procesador de pagos. Stripe cumple con los más altos estándares de seguridad PCI-DSS. Tu información de pago es tokenizada y encriptada, y nunca almacenamos directamente los datos de tu tarjeta.",
+        "oxxoInfo": "Para pagos en efectivo a través de OXXO, solo recopilamos la información necesaria para generar tu referencia de pago. Los pagos OXXO no pueden ser reembolsados y tienen un límite de 10,000 MXN por transacción.",
+        "security": "Toda la información de pago se transmite a través de conexiones seguras SSL/TLS."
+      },
+      "cookies": {
+        "title": "Cookies y Tecnologías Similares",
+        "content": "Utilizamos cookies y tecnologías similares para mejorar tu experiencia de navegación, analizar el uso de nuestra plataforma y personalizar contenido. Puedes configurar tu navegador para rechazar cookies, aunque esto podría afectar algunas funcionalidades del sitio."
+      },
+      "security": {
+        "title": "Seguridad de los Datos",
+        "content": "Implementamos medidas de seguridad técnicas, administrativas y físicas para proteger tus datos personales contra acceso no autorizado, pérdida, alteración o destrucción. Esto incluye encriptación, firewalls, acceso restringido y capacitación de personal."
+      },
+      "retention": {
+        "title": "Conservación de Datos",
+        "content": "Conservaremos tus datos personales durante el tiempo necesario para cumplir con las finalidades descritas en esta política y conforme a los plazos establecidos por la legislación aplicable. Los datos de transacciones se conservarán por al menos 5 años para cumplir con obligaciones fiscales."
+      },
+      "minors": {
+        "title": "Menores de Edad",
+        "content": "Nuestros servicios no están dirigidos a menores de 18 años. No recopilamos conscientemente datos personales de menores de edad. Si eres padre o tutor y tienes conocimiento de que tu hijo nos ha proporcionado información personal, contáctanos para eliminar dichos datos."
+      },
+      "changes": {
+        "title": "Cambios a esta Política",
+        "content": "Nos reservamos el derecho de actualizar esta Política de Privacidad en cualquier momento. Los cambios serán publicados en esta página con la fecha de actualización. Te recomendamos revisar periódicamente esta política para estar informado sobre cómo protegemos tu información."
+      },
+      "contact": {
+        "title": "Contacto",
+        "intro": "Si tienes preguntas sobre esta Política de Privacidad o sobre el tratamiento de tus datos personales, contáctanos:",
+        "email": "Email",
+        "phone": "Teléfono",
+        "address": "Dirección"
+      },
+      "inai": {
+        "title": "Instituto Nacional de Transparencia",
+        "content": "Si consideras que tu derecho a la protección de datos personales ha sido vulnerado, puedes presentar una queja ante el Instituto Nacional de Transparencia, Acceso a la Información y Protección de Datos Personales (INAI):"
+      }
+    }
+  },
+  "Terms": {
+    "metaTitle": "Términos y Condiciones - Luzimarket",
+    "metaDescription": "Lee los términos y condiciones de uso de Luzimarket, el marketplace de regalos curados en México.",
+    "title": "Términos y Condiciones",
+    "lastUpdated": "Última actualización: {date}",
+    "introduction": "Bienvenido a Luzimarket. Al acceder y utilizar nuestra plataforma, aceptas cumplir con estos Términos y Condiciones. Por favor, léelos cuidadosamente antes de usar nuestros servicios. Estos términos constituyen un acuerdo legal entre tú y MOMENTO ESPECIAL SAPI DE CV.",
+    "sections": {
+      "definitions": {
+        "title": "Definiciones",
+        "terms": {
+          "platform": "\"Plataforma\"",
+          "user": "\"Usuario\"",
+          "vendor": "\"Vendedor\"",
+          "products": "\"Productos\"",
+          "services": "\"Servicios\""
+        },
+        "descriptions": {
+          "platform": "se refiere al sitio web luzimarket.shop y todas sus aplicaciones móviles y servicios relacionados",
+          "user": "cualquier persona que acceda o utilice la Plataforma",
+          "vendor": "comerciantes que ofrecen sus productos a través de nuestra Plataforma",
+          "products": "artículos, regalos y mercancías ofrecidas para la venta en la Plataforma",
+          "services": "todos los servicios proporcionados por Luzimarket, incluyendo la facilitación de transacciones"
+        }
+      },
+      "acceptance": {
+        "title": "Aceptación de los Términos",
+        "content": "Al registrarte, navegar o realizar compras en Luzimarket, confirmas que has leído, entendido y aceptado estos Términos y Condiciones, así como nuestra Política de Privacidad. Si no estás de acuerdo con estos términos, no debes utilizar nuestra Plataforma."
+      },
+      "platformUse": {
+        "title": "Uso de la Plataforma",
+        "intro": "Al utilizar Luzimarket, te comprometes a:",
+        "rules": {
+          "age": "Ser mayor de 18 años o contar con el consentimiento de tus padres o tutores",
+          "accuracy": "Proporcionar información verdadera, precisa y completa",
+          "lawful": "Usar la Plataforma solo para fines legales y de acuerdo con estos Términos",
+          "respect": "No interferir con el funcionamiento de la Plataforma ni intentar acceder a áreas restringidas"
+        }
+      },
+      "registration": {
+        "title": "Registro de Cuenta",
+        "content": "Para realizar compras, debes crear una cuenta proporcionando información precisa y completa. Eres responsable de mantener la confidencialidad de tu contraseña y de todas las actividades que ocurran bajo tu cuenta. Debes notificarnos inmediatamente sobre cualquier uso no autorizado de tu cuenta."
+      },
+      "purchases": {
+        "title": "Compras y Transacciones",
+        "process": {
+          "title": "Proceso de Compra",
+          "steps": {
+            "browse": "Navega y selecciona productos de nuestros vendedores curados",
+            "cart": "Agrega productos a tu carrito de compras",
+            "checkout": "Procede al checkout y proporciona información de envío",
+            "payment": "Selecciona método de pago (tarjeta, OXXO, transferencia)",
+            "confirmation": "Recibe confirmación de pedido por correo electrónico"
+          }
+        },
+        "pricing": {
+          "title": "Precios",
+          "content": "Todos los precios están expresados en pesos mexicanos (MXN) e incluyen IVA. Los precios pueden cambiar sin previo aviso, pero los cambios no afectarán pedidos ya confirmados. El precio final incluye impuestos aplicables pero no incluye costos de envío, que se calcularán durante el checkout."
+        },
+        "availability": {
+          "title": "Disponibilidad",
+          "content": "La disponibilidad de productos está sujeta a cambios. Nos reservamos el derecho de limitar las cantidades de compra. Si un producto no está disponible después de realizar tu pedido, te notificaremos y ofreceremos opciones de reemplazo o reembolso."
+        }
+      },
+      "payment": {
+        "title": "Métodos de Pago",
+        "intro": "Aceptamos los siguientes métodos de pago:",
+        "methods": {
+          "cards": "Tarjetas de crédito y débito (Visa, Mastercard, American Express) a través de Stripe",
+          "oxxo": "Pagos en efectivo en tiendas OXXO (límite de 10,000 MXN por transacción)",
+          "transfer": "Transferencia bancaria (para pedidos especiales)"
+        },
+        "stripe": "Todos los pagos con tarjeta son procesados de forma segura por Stripe, Inc., cumpliendo con los estándares PCI-DSS. Luzimarket no almacena información de tarjetas de crédito.",
+        "oxxoDetails": "Los pagos OXXO deben completarse dentro de 7 días después de generar la referencia. Los pagos OXXO no son reembolsables y están sujetos a las políticas de OXXO."
+      },
+      "shipping": {
+        "title": "Envío y Entrega",
+        "intro": "Los productos son enviados por los vendedores individuales. Los tiempos y costos de envío varían según:",
+        "details": {
+          "areas": "Área de envío (local, nacional, internacional)",
+          "times": "Tiempos de procesamiento del vendedor (1-5 días hábiles)",
+          "costs": "Costos calculados según peso, dimensiones y destino",
+          "tracking": "Se proporciona número de rastreo cuando esté disponible"
+        },
+        "responsibility": "Luzimarket facilita la transacción pero no es responsable por retrasos en el envío causados por el vendedor o la empresa de mensajería. Te recomendamos revisar las políticas de envío de cada vendedor antes de comprar."
+      },
+      "returns": {
+        "title": "Devoluciones y Reembolsos",
+        "intro": "Nuestra política de devoluciones cumple con la Ley Federal de Protección al Consumidor y PROFECO:",
+        "conditions": {
+          "title": "Condiciones para Devolución",
+          "items": {
+            "timeframe": "Tienes 30 días naturales desde la recepción para solicitar una devolución",
+            "condition": "El producto debe estar en condiciones originales, sin uso y con etiquetas",
+            "packaging": "Debe incluir empaque original y accesorios",
+            "proof": "Se requiere comprobante de compra"
+          }
+        },
+        "process": {
+          "title": "Proceso de Devolución",
+          "steps": {
+            "contact": "Contacta al vendedor a través de la plataforma",
+            "authorization": "Espera autorización y número de devolución",
+            "ship": "Envía el producto según las instrucciones del vendedor",
+            "inspection": "El vendedor inspecciona el producto",
+            "refund": "Reembolso procesado en 5-10 días hábiles"
+          }
+        },
+        "nonReturnable": {
+          "title": "Productos No Retornables",
+          "content": "Algunos productos personalizados, perecederos o de higiene personal no son elegibles para devolución según lo permitido por la ley."
+        }
+      },
+      "cancellations": {
+        "title": "Cancelaciones",
+        "content": "Puedes cancelar tu pedido dentro de las 24 horas posteriores a la compra, siempre que el vendedor no haya comenzado el procesamiento. Para pedidos con pago OXXO pendiente, la cancelación es automática si no se completa el pago en el plazo establecido."
+      },
+      "warranties": {
+        "title": "Garantías",
+        "intro": "Los productos vendidos en Luzimarket están cubiertos por las garantías legales establecidas en la Ley Federal de Protección al Consumidor. Además, algunos productos pueden incluir garantías adicionales del fabricante o vendedor.",
+        "profeco": "Como consumidor, tienes derecho a presentar quejas ante PROFECO si consideras que tus derechos han sido vulnerados. Luzimarket cooperará con las autoridades en la resolución de disputas."
+      },
+      "intellectualProperty": {
+        "title": "Propiedad Intelectual",
+        "content": "Todo el contenido de la Plataforma, incluyendo textos, gráficos, logos, imágenes, y software, es propiedad de MOMENTO ESPECIAL SAPI DE CV o sus licenciantes y está protegido por las leyes de propiedad intelectual. No puedes reproducir, distribuir o crear obras derivadas sin nuestro permiso expreso por escrito."
+      },
+      "liability": {
+        "title": "Limitación de Responsabilidad",
+        "intro": "Luzimarket actúa como intermediario entre compradores y vendedores. No somos responsables por:",
+        "limitations": {
+          "quality": "La calidad, seguridad o legalidad de los productos listados",
+          "availability": "La disponibilidad continua de la Plataforma",
+          "accuracy": "La exactitud de la información proporcionada por vendedores",
+          "thirdParty": "Acciones u omisiones de terceros, incluyendo vendedores y servicios de envío"
+        }
+      },
+      "indemnification": {
+        "title": "Indemnización",
+        "content": "Aceptas indemnizar y mantener indemne a Luzimarket, sus directivos, empleados y agentes de cualquier reclamo, daño o gasto (incluyendo honorarios legales) que surjan de tu uso de la Plataforma o violación de estos Términos."
+      },
+      "modifications": {
+        "title": "Modificaciones a los Términos",
+        "content": "Nos reservamos el derecho de modificar estos Términos en cualquier momento. Los cambios entrarán en vigor inmediatamente después de su publicación en la Plataforma. Tu uso continuado de Luzimarket después de los cambios constituye tu aceptación de los nuevos términos."
+      },
+      "termination": {
+        "title": "Terminación",
+        "content": "Podemos suspender o terminar tu cuenta y acceso a la Plataforma en cualquier momento, con o sin causa, y sin previo aviso. Tras la terminación, tu derecho a usar la Plataforma cesará inmediatamente."
+      },
+      "governingLaw": {
+        "title": "Ley Aplicable",
+        "content": "Estos Términos se rigen por las leyes de los Estados Unidos Mexicanos. Cualquier disputa será resuelta en los tribunales competentes de la Ciudad de México, renunciando expresamente a cualquier otro fuero que pudiera corresponder."
+      },
+      "disputeResolution": {
+        "title": "Resolución de Disputas",
+        "intro": "En caso de controversia, las partes buscarán primero una solución amistosa. Si no se logra un acuerdo, la disputa se someterá a mediación antes de recurrir a procedimientos judiciales.",
+        "profeco": "Los consumidores siempre mantienen su derecho de acudir a PROFECO para la resolución de conflictos de consumo."
+      },
+      "contact": {
+        "title": "Contacto",
+        "intro": "Para preguntas sobre estos Términos y Condiciones, contáctanos:",
+        "email": "Email",
+        "phone": "Teléfono",
+        "address": "Dirección",
+        "hours": "Horario de atención"
+      }
+    }
+  },
+  "About": {
+    "metaTitle": "Acerca de Nosotros - Luzimarket",
+    "metaDescription": "Conoce la historia de Luzimarket, el marketplace que conecta artesanos mexicanos con personas que buscan regalos únicos y especiales.",
+    "title": "Acerca de Luzimarket",
+    "subtitle": "Conectando corazones a través de regalos extraordinarios hechos en México",
+    "sections": {
+      "story": {
+        "title": "Nuestra Historia",
+        "paragraph1": "Luzimarket nació de la pasión por celebrar los momentos especiales de la vida y el deseo de apoyar a los talentosos artesanos y emprendedores mexicanos. Fundada en 2024, nuestra misión es crear un puente entre quienes buscan regalos únicos y significativos y los creadores que ponen su corazón en cada pieza.",
+        "paragraph2": "Creemos que cada regalo cuenta una historia. Por eso, cuidadosamente seleccionamos a vendedores que comparten nuestra visión de calidad, autenticidad y atención al detalle. Desde joyería artesanal hasta productos gourmet, desde arte decorativo hasta experiencias memorables, cada producto en Luzimarket ha sido elegido por su capacidad de crear momentos inolvidables.",
+        "paragraph3": "Somos más que un marketplace; somos una comunidad que celebra la creatividad mexicana, apoya el comercio justo y facilita conexiones significativas a través del arte de regalar."
+      },
+      "mission": {
+        "title": "Nuestra Misión",
+        "content": "Facilitar la conexión entre personas a través de regalos curados que celebran la artesanía mexicana, apoyan a emprendedores locales y crean momentos memorables en cada ocasión especial."
+      },
+      "vision": {
+        "title": "Nuestra Visión",
+        "content": "Ser la plataforma líder en México para descubrir y compartir regalos extraordinarios, transformando la manera en que las personas expresan amor, gratitud y celebración mientras impulsamos el crecimiento del talento artesanal mexicano."
+      },
+      "values": {
+        "title": "Nuestros Valores",
+        "items": {
+          "authenticity": {
+            "title": "Autenticidad",
+            "description": "Cada producto cuenta una historia real, hecha con pasión y dedicación por manos mexicanas."
+          },
+          "sustainability": {
+            "title": "Sostenibilidad",
+            "description": "Promovemos prácticas responsables y apoyamos a vendedores comprometidos con el medio ambiente."
+          },
+          "community": {
+            "title": "Comunidad",
+            "description": "Fomentamos relaciones duraderas entre creadores, compradores y nuestra plataforma."
+          }
+        }
+      },
+      "difference": {
+        "title": "¿Qué nos hace diferentes?",
+        "items": {
+          "curation": {
+            "title": "Curaduría Experta",
+            "description": "No somos un marketplace más. Cada vendedor y producto es cuidadosamente seleccionado para garantizar calidad excepcional y originalidad. Nuestro equipo de curadores busca las mejores propuestas de todo México."
+          },
+          "localSupport": {
+            "title": "Apoyo Local Real",
+            "description": "Trabajamos directamente con artesanos y pequeños empresarios mexicanos, asegurándonos de que reciban un trato justo y oportunidades de crecimiento. Tu compra tiene un impacto directo en familias y comunidades."
+          },
+          "experience": {
+            "title": "Experiencia Personalizada",
+            "description": "Entendemos que cada regalo es único. Por eso ofrecemos recomendaciones personalizadas, opciones de empaque especial y la posibilidad de incluir mensajes personalizados para hacer cada entrega inolvidable."
+          },
+          "trust": {
+            "title": "Confianza y Seguridad",
+            "description": "Con procesamiento de pagos seguro a través de Stripe, múltiples opciones de pago incluyendo OXXO, y políticas claras de devolución, comprar en Luzimarket es fácil y seguro."
+          }
+        }
+      },
+      "commitment": {
+        "title": "Nuestro Compromiso",
+        "content": "Nos comprometemos a mantener los más altos estándares de calidad y servicio, cumpliendo con todas las regulaciones mexicanas incluyendo PROFECO y la Ley Federal de Protección de Datos Personales.",
+        "points": {
+          "quality": {
+            "title": "Calidad Garantizada",
+            "description": "Cada producto pasa por un proceso de verificación para asegurar que cumple con nuestros estándares."
+          },
+          "service": {
+            "title": "Servicio Excepcional",
+            "description": "Nuestro equipo está disponible para ayudarte en cada paso de tu experiencia de compra."
+          },
+          "transparency": {
+            "title": "Transparencia Total",
+            "description": "Precios claros, políticas justas y comunicación honesta en cada interacción."
+          }
+        }
+      },
+      "joinUs": {
+        "title": "Únete a Nuestra Comunidad",
+        "content": "Ya sea que busques el regalo perfecto o seas un creador que quiere compartir su talento con el mundo, Luzimarket es tu lugar. Juntos, estamos redefiniendo el arte de regalar en México.",
+        "vendorButton": "Vende con Nosotros",
+        "contactButton": "Contáctanos"
+      },
+      "companyInfo": {
+        "title": "Información de la Empresa",
+        "location": "Ciudad de México, México",
+        "compliance": "Operamos en cumplimiento con todas las leyes mexicanas de comercio electrónico y protección al consumidor."
+      }
+    }
   }
 }
