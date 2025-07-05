@@ -172,7 +172,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Create Stripe checkout session
-    const session = await stripe.checkout.sessions.create({
+    try {
+      const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card', 'oxxo'], // Support OXXO for Mexico
       line_items: lineItems,
       mode: 'payment',
@@ -238,14 +239,36 @@ export async function POST(request: NextRequest) {
       locale: 'es', // Spanish for Mexico
     });
 
-    return NextResponse.json({ 
-      sessionId: session.id,
-      url: session.url 
-    });
-  } catch (error) {
+      return NextResponse.json({ 
+        sessionId: session.id,
+        url: session.url 
+      });
+    } catch (stripeError: any) {
+      console.error('Stripe session creation error:', {
+        type: stripeError.type,
+        message: stripeError.message,
+        code: stripeError.code,
+        detail: stripeError.detail,
+        raw: stripeError.raw,
+      });
+      
+      // If it's a connection error, it might be due to invalid API key
+      if (stripeError.type === 'StripeConnectionError') {
+        console.error('Stripe connection error - check STRIPE_SECRET_KEY for invalid characters');
+      }
+      
+      throw stripeError;
+    }
+  } catch (error: any) {
     console.error('Checkout session error:', error);
+    
+    // Provide more detailed error message
+    const errorMessage = error.type === 'StripeConnectionError' 
+      ? 'Failed to connect to Stripe. Please check your API configuration.'
+      : error.message || 'Error creating checkout session';
+    
     return NextResponse.json(
-      { error: 'Error creating checkout session' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

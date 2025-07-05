@@ -1,6 +1,30 @@
 import Stripe from 'stripe';
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+// Sanitize the API key to remove any whitespace or newline characters
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY?.trim();
+
+if (!stripeSecretKey) {
+  throw new Error('STRIPE_SECRET_KEY is not defined in environment variables');
+}
+
+// Validate the API key format (should start with sk_)
+if (!stripeSecretKey.startsWith('sk_')) {
+  console.error('Invalid STRIPE_SECRET_KEY format - should start with sk_');
+  throw new Error('Invalid STRIPE_SECRET_KEY format');
+}
+
+// Log key info for debugging (without exposing the actual key)
+if (process.env.NODE_ENV === 'development') {
+  console.log('Stripe key validation:', {
+    length: stripeSecretKey.length,
+    prefix: stripeSecretKey.substring(0, 7),
+    suffix: '...',
+    hasWhitespace: stripeSecretKey !== stripeSecretKey.trim(),
+    hasNewlines: stripeSecretKey.includes('\n') || stripeSecretKey.includes('\r'),
+  });
+}
+
+export const stripe = new Stripe(stripeSecretKey, {
   apiVersion: '2025-05-28.basil' as const,
   typescript: true,
 });
