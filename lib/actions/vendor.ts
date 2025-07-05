@@ -19,7 +19,7 @@ export async function registerVendor(data: unknown) {
       .limit(1);
       
     if (existingVendor.length > 0) {
-      return { success: false, error: "Este correo electrónico ya está registrado" };
+      return { success: false, error: "emailExists" };
     }
     
     // Hash the password before storing
@@ -82,9 +82,9 @@ export async function registerVendor(data: unknown) {
     console.error("Error registering vendor:", error);
     
     if (error instanceof Error && error.message.includes('unique')) {
-      return { success: false, error: "Este correo electrónico ya está registrado" };
+      return { success: false, error: "emailExists" };
     }
     
-    return { success: false, error: "Error al registrar vendedor. Por favor intenta de nuevo." };
+    return { success: false, error: "tryAgain" };
   }
 }

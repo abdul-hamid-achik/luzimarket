@@ -6,6 +6,7 @@ import { Check, X, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { approveVendor as approveVendorAction, rejectVendor as rejectVendorAction } from "@/lib/actions/admin/vendor";
 
 async function getVendors() {
   const vendorList = await db
@@ -26,26 +27,12 @@ async function getVendors() {
 
 async function approveVendor(vendorId: string) {
   "use server";
-  
-  await db
-    .update(vendors)
-    .set({ isActive: true })
-    .where(eq(vendors.id, vendorId));
-  
-  // Also update user role to vendor
-  
-  revalidatePath("/admin/vendors");
+  return approveVendorAction(vendorId);
 }
 
 async function rejectVendor(vendorId: string) {
   "use server";
-  
-  await db
-    .update(vendors)
-    .set({ isActive: false })
-    .where(eq(vendors.id, vendorId));
-  
-  revalidatePath("/admin/vendors");
+  return rejectVendorAction(vendorId);
 }
 
 export default async function AdminVendorsPage() {
