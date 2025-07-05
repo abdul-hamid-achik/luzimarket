@@ -85,6 +85,24 @@
     "noProducts": "No se encontraron productos",
     "tryAdjustingFilters": "Intenta ajustar los filtros para ver más resultados"
   },
+  "Auth": {
+    "invalidCredentials": "Credenciales inválidas",
+    "accountLocked": "Cuenta bloqueada temporalmente. Intenta de nuevo en {minutes} minutos.",
+    "accountInactive": "La cuenta está inactiva",
+    "emailNotVerified": "Por favor verifica tu correo electrónico antes de iniciar sesión.",
+    "authenticationFailed": "Error de autenticación",
+    "tooManyAttempts": "Demasiados intentos fallidos. Tu cuenta ha sido bloqueada por 30 minutos.",
+    "remainingAttempts": "Credenciales inválidas. {attempts} intentos restantes antes del bloqueo.",
+    "loginError": "Error al iniciar sesión",
+    "accountLockedEmailSubject": "Cuenta bloqueada por seguridad - Luzimarket",
+    "accountLockedEmailTitle": "Cuenta bloqueada por seguridad",
+    "accountLockedEmailGreeting": "Hola {name},",
+    "accountLockedEmailMessage": "Tu cuenta ha sido bloqueada temporalmente debido a múltiples intentos fallidos de inicio de sesión. Esta es una medida de seguridad para proteger tu cuenta.",
+    "accountLockedEmailDuration": "Tu cuenta estará bloqueada por 30 minutos.",
+    "accountLockedEmailContact": "Si no fuiste tú quien intentó acceder a tu cuenta, por favor contáctanos inmediatamente.",
+    "accountLockedEmailReset": "Si olvidaste tu contraseña, puedes restablecerla aquí:",
+    "resetPassword": "Restablecer contraseña"
+  },
   "ComingSoon": {
     "title": "Handpicked extraordinary gifts",
     "description": "LUZIMARKET® es una nueva plataforma online que ofrece curaduría, venta y envío a domicilio de regalos excepcionales para momentos especiales, con un catálogo de marcas y tiendas seleccionadas en todo México.",

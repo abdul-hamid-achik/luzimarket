@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, CheckCircle } from "lucide-react";
 import Link from "next/link";
+import { useLocale } from "next-intl";
 
 const loginSchema = z.object({
   email: z.string().email("Correo electrónico inválido"),
@@ -26,6 +27,7 @@ export default function LoginPage() {
   const router = useRouter();
   const nextRouter = useNextRouter();
   const searchParams = useSearchParams();
+  const locale = useLocale();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -66,7 +68,7 @@ export default function LoginPage() {
     try {
       // First, try to authenticate to get detailed error info
       const { authenticateUser } = await import("@/lib/actions/auth");
-      const authResult = await authenticateUser(data.email, data.password, userType);
+      const authResult = await authenticateUser(data.email, data.password, userType, locale);
 
       if (!authResult.success) {
         if (authResult.isLocked) {

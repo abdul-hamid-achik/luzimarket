@@ -6,27 +6,62 @@ test.describe('Checkout Flow', () => {
     // Add a product to cart before each test
     await page.goto(routes.products);
 
-    // Wait for products to load with updated selector
-    await page.waitForSelector('a[href*="/products/"]', { timeout: 10000 });
+    // Wait for products to load with updated selector (supports both /products/ and /productos/)
+    await page.waitForSelector('a[href*="/products/"], a[href*="/productos/"]', { timeout: 10000 });
 
-    // Add first product to cart
-    const firstProduct = page.locator('main').locator('a[href*="/products/"]').first();
-    await firstProduct.hover();
+    // Wait for any initial stock verification to complete
+    await page.waitForTimeout(2000);
 
-    const addToCartButton = firstProduct.locator('button:has-text("Add to cart")').first();
-
-    if (await addToCartButton.isVisible()) {
-      await addToCartButton.click();
-      // Wait for cart to update
-      await page.waitForTimeout(1000);
+    // Try to find enabled add to cart button on product listing
+    const enabledListingButton = page.locator('button').filter({ 
+      hasText: /add to cart/i 
+    }).filter({ hasNot: page.locator(':disabled') }).first();
+    
+    let addedToCart = false;
+    
+    if (await enabledListingButton.isVisible()) {
+      // Click add to cart on listing page
+      await enabledListingButton.click();
+      await page.waitForTimeout(1500);
+      addedToCart = true;
     } else {
-      // If hover doesn't work, click product and add from detail page
-      await firstProduct.click();
+      // Navigate to product detail page
+      const firstProductLink = page.locator('a[href*="/products/"], a[href*="/productos/"]').first();
+      await firstProductLink.click();
+      
+      // Wait for product detail page to load
+      await page.waitForURL(/\/(products|productos)\/[^\/]+$/);
       await page.waitForLoadState('networkidle');
-      const detailAddButton = page.locator('button:has-text("Add to cart"), button:has-text("Agregar al carrito")');
-      if (await detailAddButton.count() > 0) {
-        await detailAddButton.first().click();
-        await page.waitForTimeout(1000);
+      
+      // Wait for stock verification to complete on detail page
+      await page.waitForFunction(() => {
+        const buttons = Array.from(document.querySelectorAll('button'));
+        return buttons.some(btn => 
+          (btn.textContent?.toLowerCase().includes('agregar al carrito') || 
+           btn.textContent?.toLowerCase().includes('add to cart')) &&
+          !btn.disabled
+        );
+      }, { timeout: 10000 });
+      
+      // Find and click add to cart button on detail page
+      const detailAddButton = page.locator('button').filter({ 
+        hasText: /add to cart|agregar al carrito/i 
+      }).filter({ hasNot: page.locator(':disabled') }).first();
+      
+      await detailAddButton.click();
+      await page.waitForTimeout(1500);
+      addedToCart = true;
+    }
+
+    // Verify item was added to cart by checking localStorage
+    if (addedToCart) {
+      const cartItems = await page.evaluate(() => {
+        const cart = localStorage.getItem('luzimarket-cart');
+        return cart ? JSON.parse(cart) : [];
+      });
+      
+      if (cartItems.length === 0) {
+        throw new Error('Failed to add item to cart in beforeEach');
       }
     }
   });

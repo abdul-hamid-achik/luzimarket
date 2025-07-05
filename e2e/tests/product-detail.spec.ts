@@ -4,14 +4,16 @@ test.describe('Product Detail Page', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to a specific product
     await page.goto('/products');
-    await page.waitForSelector('[data-testid="product-card"], article');
     
-    // Click first product
-    const firstProduct = page.locator('[data-testid="product-card"], article').first();
-    const productLink = firstProduct.locator('a').first();
+    // Wait for products to load
+    await page.waitForSelector('a[href*="/products/"]', { timeout: 10000 });
+    
+    // Click first product link - look for the product link with href pattern
+    const productLink = page.locator('a[href*="/products/"]').first();
     await productLink.click();
     
-    // Wait for product page to load
+    // Wait for product detail page to load - verify we're on a product page
+    await page.waitForURL(/\/products\/[^\/]+$/);
     await page.waitForSelector('h1');
   });
 
@@ -89,8 +91,8 @@ test.describe('Product Detail Page', () => {
       await quantityInput.fill('2');
     }
     
-    // Add to cart
-    const addToCartButton = page.locator('button').filter({ hasText: /Add to Cart|Agregar al Carrito/ }).first();
+    // Add to cart - look for button with flexible text matching
+    const addToCartButton = page.locator('button').filter({ hasText: /add to cart|agregar al carrito/i }).first();
     await addToCartButton.click();
     
     // Verify added to cart
@@ -120,7 +122,7 @@ test.describe('Product Detail Page', () => {
     
     if (await outOfStock.isVisible()) {
       // Add to cart button should be disabled
-      const addToCartButton = page.locator('button').filter({ hasText: /Add to Cart|Agregar/ }).first();
+      const addToCartButton = page.locator('button').filter({ hasText: /add to cart|agregar/i }).first();
       await expect(addToCartButton).toBeDisabled();
       
       // Might show notify button

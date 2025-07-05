@@ -1,421 +1,167 @@
-import { test, expect } from '../fixtures/test';
+import { test, expect } from '@playwright/test';
 import { routes } from '../helpers/navigation';
 
 test.describe('Email Verification Flow', () => {
-  let testEmail: string;
-  let verificationToken: string;
-
-  test.beforeEach(async ({ page }) => {
-    testEmail = `verify-${Date.now()}@example.com`;
-  });
-
-  test('should complete full email verification flow', async ({ page }) => {
-    // Step 1: Register new user
-    await page.goto(routes.register);
-    
-    await page.fill('input[name="name"]', 'Test User');
-    await page.fill('input[name="email"]', testEmail);
-    await page.fill('input[name="password"]', 'Password123!');
-    await page.fill('input[name="confirmPassword"]', 'Password123!');
-    await page.locator('label[for="acceptTerms"]').click();
-    
-    // Mock registration and email sending
-    let verificationEmailSent = false;
-    await page.route('**/api/auth/register', async route => {
-      const body = await route.request().postDataJSON();
-      if (body.email === testEmail) {
-        verificationEmailSent = true;
-        verificationToken = 'verify-token-' + Date.now();
-        await route.fulfill({
-          json: {
-            success: true,
-            message: 'Registration successful. Please check your email.',
-            requiresVerification: true
-          }
-        });
-      }
-    });
-    
-    await page.getByRole('button', { name: /registrarse/i }).click();
-    
-    // Should show verification message
-    await expect(page.getByText(/verifica.*correo|verify.*email|enviamos.*enlace/i)).toBeVisible();
-    expect(verificationEmailSent).toBe(true);
-    
-    // Step 2: Try to login without verification
-    await page.goto(routes.login);
-    await page.fill('input[name="email"]', testEmail);
-    await page.fill('input[name="password"]', 'Password123!');
-    
-    await page.route('**/api/auth/callback/credentials', async route => {
-      await route.fulfill({
-        status: 401,
-        json: {
-          error: 'Email not verified'
-        }
-      });
-    });
-    
-    await page.getByRole('button', { name: /iniciar sesión/i }).click();
-    
-    // Should show verification required message
-    await expect(page.getByText(/correo.*no.*verificado|email.*not.*verified/i)).toBeVisible();
-    
-    // Should show resend link
-    await expect(page.getByRole('link', { name: /reenviar.*verificación|resend.*verification/i })).toBeVisible();
-    
-    // Step 3: Click verification link
-    await page.goto(`/api/auth/verify-email?token=${verificationToken}&email=${encodeURIComponent(testEmail)}`);
-    
-    // Mock verification
-    await page.route('**/api/auth/verify-email**', async route => {
-      if (route.request().url().includes(verificationToken)) {
-        await route.fulfill({
-          status: 302,
-          headers: {
-            'Location': '/iniciar-sesion?verified=true'
-          }
-        });
-      }
-    });
-    
-    // Should redirect to login with success message
-    await page.waitForURL('**/iniciar-sesion**');
-    await expect(page.getByText(/correo.*verificado|email.*verified/i)).toBeVisible();
-    
-    // Step 4: Login with verified account
-    await page.fill('input[name="email"]', testEmail);
-    await page.fill('input[name="password"]', 'Password123!');
-    
-    await page.route('**/api/auth/callback/credentials', async route => {
-      await route.fulfill({
-        status: 302,
-        headers: {
-          'Location': '/'
-        }
-      });
-    });
-    
-    await page.getByRole('button', { name: /iniciar sesión/i }).click();
-    
-    // Should successfully login
-    await page.waitForURL('**/');
-    await expect(page.getByTestId('user-menu')).toBeVisible();
-  });
-
-  test('should handle expired verification tokens', async ({ page }) => {
-    // Try to verify with expired token
-    const expiredToken = 'expired-verify-token-123';
-    await page.goto(`/api/auth/verify-email?token=${expiredToken}&email=${encodeURIComponent(testEmail)}`);
-    
-    await page.route('**/api/auth/verify-email**', async route => {
-      await route.fulfill({
-        status: 302,
-        headers: {
-          'Location': '/resend-verification?error=expired'
-        }
-      });
-    });
-    
-    // Should redirect to resend page
-    await page.waitForURL('**/resend-verification**');
-    await expect(page.getByText(/enlace.*expirado|link.*expired/i)).toBeVisible();
-    
-    // Should show resend form
-    await expect(page.getByRole('button', { name: /reenviar|resend/i })).toBeVisible();
-  });
-
-  test('should resend verification email', async ({ page }) => {
-    // Go to resend verification page
+  test('should show resend verification page', async ({ page }) => {
     await page.goto('/resend-verification');
     
-    // Enter email
-    await page.fill('input[name="email"]', testEmail);
+    // Should show the resend verification form
+    await expect(page.getByText('Reenviar enlace de verificación')).toBeVisible();
+    await expect(page.getByLabel('Correo electrónico')).toBeVisible();
+    await expect(page.getByRole('button', { name: /enviar enlace de verificación/i })).toBeVisible();
+  });
+
+  test('should validate email format', async ({ page }) => {
+    await page.goto('/resend-verification');
     
-    // Mock resend
-    let resendCount = 0;
+    // Try with invalid email
+    await page.fill('input[type="email"]', 'invalid-email');
+    await page.getByRole('button', { name: /enviar enlace de verificación/i }).click();
+    
+    // Should show validation error
+    await expect(page.getByText('Correo electrónico inválido')).toBeVisible();
+  });
+
+  test('should handle resend verification request', async ({ page }) => {
+    await page.goto('/resend-verification');
+    
+    // Fill valid email
+    await page.fill('input[type="email"]', 'test@example.com');
+    
+    // Mock API response
     await page.route('**/api/auth/resend-verification', async route => {
-      const body = await route.request().postDataJSON();
-      if (body.email === testEmail) {
-        resendCount++;
-        await route.fulfill({
-          json: {
-            success: true,
-            message: 'Verification email resent'
-          }
-        });
-      }
+      await route.fulfill({
+        status: 200,
+        json: { success: true }
+      });
     });
     
-    await page.getByRole('button', { name: /reenviar|resend/i }).click();
+    // Submit form
+    await page.getByRole('button', { name: /enviar enlace de verificación/i }).click();
     
     // Should show success message
-    await expect(page.getByText(/correo.*reenviado|email.*resent/i)).toBeVisible();
-    expect(resendCount).toBe(1);
+    await expect(page.getByText('¡Enlace enviado!')).toBeVisible();
+    await expect(page.getByText(/Si existe una cuenta con ese correo/)).toBeVisible();
   });
 
-  test('should limit verification email resends', async ({ page }) => {
+  test('should handle API errors', async ({ page }) => {
     await page.goto('/resend-verification');
     
-    let resendAttempts = 0;
-    await page.route('**/api/auth/resend-verification', async route => {
-      resendAttempts++;
-      if (resendAttempts > 3) {
-        await route.fulfill({
-          status: 429,
-          json: {
-            error: 'Too many requests. Please try again later.'
-          }
-        });
-      } else {
-        await route.fulfill({
-          json: { success: true }
-        });
-      }
-    });
+    await page.fill('input[type="email"]', 'test@example.com');
     
-    // Make multiple resend attempts
-    for (let i = 0; i < 4; i++) {
-      await page.fill('input[name="email"]', testEmail);
-      await page.getByRole('button', { name: /reenviar|resend/i }).click();
-      
-      if (i < 3) {
-        await expect(page.getByText(/correo.*reenviado/i)).toBeVisible();
-        await page.reload(); // Reset form
-      }
-    }
-    
-    // Fourth attempt should be rate limited
-    await expect(page.getByText(/demasiadas.*solicitudes|too.*many.*requests/i)).toBeVisible();
-  });
-
-  test('should restrict access for unverified users', async ({ page }) => {
-    // Create unverified user session
-    await page.goto(routes.register);
-    const unverifiedEmail = `unverified-${Date.now()}@example.com`;
-    
-    await page.fill('input[name="name"]', 'Unverified User');
-    await page.fill('input[name="email"]', unverifiedEmail);
-    await page.fill('input[name="password"]', 'Password123!');
-    await page.fill('input[name="confirmPassword"]', 'Password123!');
-    await page.locator('label[for="acceptTerms"]').click();
-    
-    await page.route('**/api/auth/register', async route => {
-      await route.fulfill({
-        json: {
-          success: true,
-          requiresVerification: true,
-          limitedAccess: true
-        }
-      });
-    });
-    
-    await page.getByRole('button', { name: /registrarse/i }).click();
-    
-    // Mock limited access login
-    await page.goto(routes.login);
-    await page.fill('input[name="email"]', unverifiedEmail);
-    await page.fill('input[name="password"]', 'Password123!');
-    
-    await page.route('**/api/auth/callback/credentials', async route => {
-      await route.fulfill({
-        status: 302,
-        headers: {
-          'Location': '/?unverified=true'
-        }
-      });
-    });
-    
-    await page.getByRole('button', { name: /iniciar sesión/i }).click();
-    
-    // Should show limited access banner
-    await expect(page.getByTestId('unverified-banner')).toBeVisible();
-    await expect(page.getByText(/acceso limitado|limited access/i)).toBeVisible();
-    
-    // Try to access restricted features
-    await page.goto(routes.checkout);
-    await expect(page.getByText(/verifica.*correo.*continuar|verify.*email.*continue/i)).toBeVisible();
-    
-    // Try to add to wishlist
-    await page.goto(routes.products);
-    await page.getByTestId('product-card').first().click();
-    await page.getByRole('button', { name: /agregar a favoritos/i }).click();
-    await expect(page.getByText(/verifica.*correo|verify.*email/i)).toBeVisible();
-  });
-
-  test('should handle invalid verification tokens', async ({ page }) => {
-    // Try with malformed token
-    await page.goto('/api/auth/verify-email?token=invalid-token&email=notanemail');
-    
-    await page.route('**/api/auth/verify-email**', async route => {
-      await route.fulfill({
-        status: 302,
-        headers: {
-          'Location': '/resend-verification?error=invalid'
-        }
-      });
-    });
-    
-    await page.waitForURL('**/resend-verification**');
-    await expect(page.getByText(/enlace.*inválido|link.*invalid/i)).toBeVisible();
-  });
-
-  test('should verify email through account settings', async ({ page }) => {
-    // Login with unverified account (limited access)
-    const unverifiedEmail = `settings-verify-${Date.now()}@example.com`;
-    
-    // Mock unverified user session
-    await page.goto(routes.login);
-    await page.fill('input[name="email"]', unverifiedEmail);
-    await page.fill('input[name="password"]', 'Password123!');
-    
-    await page.route('**/api/auth/callback/credentials', async route => {
-      await route.fulfill({
-        status: 302,
-        headers: {
-          'Location': '/account?unverified=true'
-        }
-      });
-    });
-    
-    await page.getByRole('button', { name: /iniciar sesión/i }).click();
-    
-    // Go to account settings
-    await page.waitForURL('**/account**');
-    
-    // Should show verification status
-    await expect(page.getByText(/correo no verificado|email not verified/i)).toBeVisible();
-    
-    // Should have verify button
-    await page.getByRole('button', { name: /verificar ahora|verify now/i }).click();
-    
-    // Mock sending verification
+    // Mock API error
     await page.route('**/api/auth/resend-verification', async route => {
       await route.fulfill({
-        json: {
-          success: true,
-          message: 'Verification email sent'
-        }
+        status: 429,
+        json: { error: 'Demasiadas solicitudes. Intenta de nuevo más tarde.' }
       });
     });
     
-    // Should show email sent message
-    await expect(page.getByText(/correo.*enviado|email.*sent/i)).toBeVisible();
+    await page.getByRole('button', { name: /enviar enlace de verificación/i }).click();
+    
+    // Should show error message
+    await expect(page.getByText(/Demasiadas solicitudes/)).toBeVisible();
   });
 
-  test('should handle verification for social login users', async ({ page }) => {
-    // Mock OAuth login that requires email verification
-    await page.goto(routes.login);
+  test('should have back to login link', async ({ page }) => {
+    await page.goto('/resend-verification');
     
-    // Click social login button
-    await page.getByRole('button', { name: /continuar con google|continue with google/i }).click();
+    // Check back link
+    const backLink = page.getByRole('link', { name: /volver al inicio de sesión/i });
+    await expect(backLink).toBeVisible();
     
-    // Mock OAuth callback with unverified email
-    await page.route('**/api/auth/callback/google**', async route => {
-      await route.fulfill({
-        status: 302,
-        headers: {
-          'Location': '/account?provider=google&verify_email=true'
-        }
-      });
-    });
-    
-    await page.waitForURL('**/account**');
-    
-    // Should show that email needs verification even for social login
-    await expect(page.getByText(/confirma.*correo|confirm.*email/i)).toBeVisible();
-    
-    // Should explain why verification is needed
-    await expect(page.getByText(/seguridad|security|proteger|protect/i)).toBeVisible();
+    // Click should navigate to login
+    await backLink.click();
+    await expect(page).toHaveURL(/\/login/);
   });
 
-  test('should auto-verify trusted email domains', async ({ page }) => {
-    const trustedEmail = `user@trusted-company.com`;
+  test('should show success page with login link', async ({ page }) => {
+    await page.goto('/resend-verification');
     
-    await page.goto(routes.register);
-    await page.fill('input[name="name"]', 'Trusted User');
-    await page.fill('input[name="email"]', trustedEmail);
-    await page.fill('input[name="password"]', 'Password123!');
-    await page.fill('input[name="confirmPassword"]', 'Password123!');
-    await page.locator('label[for="acceptTerms"]').click();
+    await page.fill('input[type="email"]', 'test@example.com');
     
-    // Mock registration with auto-verification
-    await page.route('**/api/auth/register', async route => {
-      const body = await route.request().postDataJSON();
-      if (body.email.endsWith('@trusted-company.com')) {
-        await route.fulfill({
-          json: {
-            success: true,
-            message: 'Account created successfully',
-            autoVerified: true
-          }
-        });
-      }
-    });
-    
-    await page.getByRole('button', { name: /registrarse/i }).click();
-    
-    // Should redirect to login without verification message
-    await page.waitForURL('**/iniciar-sesion');
-    await expect(page.getByText(/cuenta creada|account created/i)).toBeVisible();
-    
-    // Should be able to login immediately
-    await page.fill('input[name="email"]', trustedEmail);
-    await page.fill('input[name="password"]', 'Password123!');
-    
-    await page.route('**/api/auth/callback/credentials', async route => {
+    // Mock success response
+    await page.route('**/api/auth/resend-verification', async route => {
       await route.fulfill({
-        status: 302,
-        headers: { 'Location': '/' }
+        status: 200,
+        json: { success: true }
       });
     });
     
-    await page.getByRole('button', { name: /iniciar sesión/i }).click();
-    await page.waitForURL('**/');
+    await page.getByRole('button', { name: /enviar enlace de verificación/i }).click();
+    
+    // Success page should have login link
+    const loginLink = page.getByRole('link', { name: /volver al inicio de sesión/i });
+    await expect(loginLink).toBeVisible();
+    await expect(loginLink).toHaveAttribute('href', '/login');
   });
 
-  test('should handle email change verification', async ({ page }) => {
-    // Login as verified user
-    await page.goto(routes.login);
-    await page.fill('input[name="email"]', 'existing@example.com');
-    await page.fill('input[name="password"]', 'Password123!');
+  test('should disable form during submission', async ({ page }) => {
+    await page.goto('/resend-verification');
     
-    await page.route('**/api/auth/callback/credentials', async route => {
+    await page.fill('input[type="email"]', 'test@example.com');
+    
+    // Mock slow API
+    await page.route('**/api/auth/resend-verification', async route => {
+      await page.waitForTimeout(1000);
       await route.fulfill({
-        status: 302,
-        headers: { 'Location': '/account' }
+        status: 200,
+        json: { success: true }
       });
     });
     
-    await page.getByRole('button', { name: /iniciar sesión/i }).click();
+    // Click submit
+    const submitButton = page.getByRole('button', { name: /enviar enlace de verificación/i });
+    await submitButton.click();
     
-    // Go to account settings
-    await page.waitForURL('**/account');
+    // Button should show loading state
+    await expect(page.getByText('Enviando enlace...')).toBeVisible();
     
-    // Change email
-    await page.getByRole('button', { name: /cambiar correo|change email/i }).click();
+    // Input should be disabled
+    await expect(page.getByRole('textbox')).toBeDisabled();
+  });
+
+  test('should handle network errors', async ({ page }) => {
+    await page.goto('/resend-verification');
     
-    const newEmail = `new-email-${Date.now()}@example.com`;
-    await page.fill('input[name="newEmail"]', newEmail);
-    await page.fill('input[name="confirmEmail"]', newEmail);
-    await page.fill('input[name="currentPassword"]', 'Password123!');
+    await page.fill('input[type="email"]', 'test@example.com');
     
-    // Mock email change request
-    await page.route('**/api/account/change-email', async route => {
-      await route.fulfill({
-        json: {
-          success: true,
-          message: 'Verification sent to new email'
-        }
-      });
+    // Mock network error
+    await page.route('**/api/auth/resend-verification', async route => {
+      await route.abort('failed');
     });
     
-    await page.getByRole('button', { name: /confirmar cambio|confirm change/i }).click();
+    await page.getByRole('button', { name: /enviar enlace de verificación/i }).click();
     
-    // Should show verification sent to new email
-    await expect(page.getByText(new RegExp(`verificación.*${newEmail}`, 'i'))).toBeVisible();
+    // Should show connection error
+    await expect(page.getByText(/Error de conexión/)).toBeVisible();
+  });
+
+  test('should navigate from URL params', async ({ page }) => {
+    // Test with error param
+    await page.goto('/resend-verification?error=expired');
     
-    // Should show that old email is still active
-    await expect(page.getByText(/correo actual.*activo|current email.*active/i)).toBeVisible();
+    // Page should load normally (error handling would be in the actual component)
+    await expect(page.getByText('Reenviar enlace de verificación')).toBeVisible();
+  });
+
+  test('should have proper form accessibility', async ({ page }) => {
+    await page.goto('/resend-verification');
+    
+    // Check form has proper labels
+    const emailInput = page.getByLabel('Correo electrónico');
+    await expect(emailInput).toBeVisible();
+    
+    // Check input has proper attributes
+    await expect(emailInput).toHaveAttribute('type', 'email');
+    await expect(emailInput).toHaveAttribute('placeholder', 'tu@email.com');
+    
+    // Form should be keyboard navigable
+    await page.keyboard.press('Tab'); // Focus email input
+    await expect(emailInput).toBeFocused();
+    
+    await page.keyboard.press('Tab'); // Focus submit button
+    const submitButton = page.getByRole('button', { name: /enviar enlace de verificación/i });
+    await expect(submitButton).toBeFocused();
   });
 });

@@ -5,6 +5,7 @@ import { users, vendors, adminUsers } from "@/db/schema";
 import { eq, and, gt } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { sendEmail } from "@/lib/email";
+import { getTranslations } from "next-intl/server";
 
 const LOCKOUT_THRESHOLD = 5; // Number of failed attempts before lockout
 const LOCKOUT_WINDOW_MINUTES = 15; // Time window for counting failed attempts
@@ -26,7 +27,8 @@ interface AuthResult {
 export async function authenticateUser(
   email: string,
   password: string,
-  userType: "customer" | "vendor" | "admin"
+  userType: "customer" | "vendor" | "admin",
+  locale: string = "es"
 ): Promise<AuthResult> {
   try {
     let table;
@@ -50,29 +52,33 @@ export async function authenticateUser(
       .limit(1);
 
     if (!user) {
-      return { success: false, error: "Invalid credentials" };
+      const t = await getTranslations({ locale, namespace: "Auth" });
+      return { success: false, error: t("invalidCredentials") };
     }
 
     // Check if account is locked
     if (user.lockedUntil && new Date(user.lockedUntil) > new Date()) {
+      const t = await getTranslations({ locale, namespace: "Auth" });
       const minutesRemaining = Math.ceil(
         (new Date(user.lockedUntil).getTime() - new Date().getTime()) / (1000 * 60)
       );
       return {
         success: false,
-        error: `Account is locked. Please try again in ${minutesRemaining} minutes.`,
+        error: t("accountLocked", { minutes: minutesRemaining }),
         isLocked: true,
       };
     }
 
     // Check if account is active
     if (!user.isActive) {
-      return { success: false, error: "Account is inactive" };
+      const t = await getTranslations({ locale, namespace: "Auth" });
+      return { success: false, error: t("accountInactive") };
     }
 
     // Check if email is verified (only for customers)
     if (userType === "customer" && 'emailVerified' in user && !user.emailVerified) {
-      return { success: false, error: "Por favor verifica tu correo electrónico antes de iniciar sesión." };
+      const t = await getTranslations({ locale, namespace: "Auth" });
+      return { success: false, error: t("emailNotVerified") };
     }
 
     // Verify password
@@ -80,21 +86,22 @@ export async function authenticateUser(
 
     if (!isValidPassword) {
       // Handle failed login attempt
-      await handleFailedLoginAttempt(email, userType, user);
+      await handleFailedLoginAttempt(email, userType, user, locale);
       
+      const t = await getTranslations({ locale, namespace: "Auth" });
       const remainingAttempts = Math.max(0, LOCKOUT_THRESHOLD - ((user.failedLoginAttempts || 0) + 1));
       
       if (remainingAttempts === 0) {
         return {
           success: false,
-          error: "Too many failed login attempts. Your account has been locked for 30 minutes.",
+          error: t("tooManyAttempts"),
           isLocked: true,
         };
       }
       
       return {
         success: false,
-        error: "Invalid credentials",
+        error: t("invalidCredentials"),
         remainingAttempts,
       };
     }
@@ -120,14 +127,16 @@ export async function authenticateUser(
     };
   } catch (error) {
     console.error("Authentication error:", error);
-    return { success: false, error: "Authentication failed" };
+    const t = await getTranslations({ locale, namespace: "Auth" });
+    return { success: false, error: t("authenticationFailed") };
   }
 }
 
 async function handleFailedLoginAttempt(
   email: string,
   userType: "customer" | "vendor" | "admin",
-  user: any
+  user: any,
+  locale: string = "es"
 ) {
   let table;
   switch (userType) {
@@ -165,7 +174,7 @@ async function handleFailedLoginAttempt(
 
     // Send lockout notification email
     try {
-      await sendAccountLockoutNotification(user.email, user.name || user.contactName || user.email);
+      await sendAccountLockoutNotification(user.email, user.name || user.contactName || user.email, locale);
     } catch (error) {
       console.error("Failed to send lockout notification:", error);
     }
@@ -177,7 +186,8 @@ async function handleFailedLoginAttempt(
     .where(eq(table.email, email));
 }
 
-async function sendAccountLockoutNotification(email: string, name: string) {
+async function sendAccountLockoutNotification(email: string, name: string, locale: string = "es") {
+  const t = await getTranslations({ locale, namespace: "Auth" });
   const html = `
     <div style="font-family: 'Univers', Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <div style="background-color: #000; color: #fff; padding: 20px; text-align: center;">
@@ -185,36 +195,35 @@ async function sendAccountLockoutNotification(email: string, name: string) {
       </div>
       
       <div style="padding: 40px 20px;">
-        <h2 style="font-size: 24px; margin-bottom: 20px; color: #d10000;">Cuenta bloqueada por seguridad</h2>
+        <h2 style="font-size: 24px; margin-bottom: 20px; color: #d10000;">${t("accountLockedEmailTitle")}</h2>
         
         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-          Hola ${name},
+          ${t("accountLockedEmailGreeting", { name })}
         </p>
         
         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-          Tu cuenta ha sido bloqueada temporalmente debido a múltiples intentos fallidos de inicio de sesión.
-          Esta es una medida de seguridad para proteger tu cuenta.
+          ${t("accountLockedEmailMessage")}
         </p>
         
         <div style="background-color: #fef2f2; border: 1px solid #fecaca; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
           <p style="margin: 0; font-size: 16px; line-height: 1.6;">
-            <strong>Tu cuenta será desbloqueada automáticamente en 30 minutos.</strong>
+            <strong>${t("accountLockedEmailDuration")}</strong>
           </p>
         </div>
         
         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-          Si no fuiste tú quien intentó acceder a tu cuenta, te recomendamos:
+          ${t("accountLockedEmailContact")}
         </p>
         
-        <ul style="font-size: 16px; line-height: 1.8; margin-bottom: 30px;">
-          <li>Cambiar tu contraseña inmediatamente después de que se desbloquee tu cuenta</li>
-          <li>Revisar la actividad reciente de tu cuenta</li>
-          <li>Contactar a nuestro equipo de soporte si notas algo sospechoso</li>
-        </ul>
-        
-        <p style="font-size: 14px; color: #666; line-height: 1.6;">
-          Si necesitas ayuda adicional, no dudes en contactarnos.
+        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+          ${t("accountLockedEmailReset")}
         </p>
+        
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${process.env.NEXTAUTH_URL}/forgot-password" style="display: inline-block; background-color: #000; color: #fff; padding: 12px 30px; text-decoration: none; border-radius: 4px; font-weight: 500;">
+            ${t("resetPassword")}
+          </a>
+        </div>
       </div>
       
       <div style="background: linear-gradient(to right, #86efac, #fde047, #5eead4); padding: 20px; text-align: center;">
@@ -225,7 +234,7 @@ async function sendAccountLockoutNotification(email: string, name: string) {
 
   return sendEmail({
     to: email,
-    subject: "Cuenta bloqueada temporalmente - LUZIMARKET",
+    subject: t("accountLockedEmailSubject"),
     html,
   });
 }
