@@ -2,11 +2,17 @@ import { db } from "@/db";
 import { emailTemplates } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
 
 export async function GET(
   request: Request,
   props: { params: Promise<{ id: string }> }
 ) {
+  const session = await auth();
+  if (!session || session.user?.role !== "admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const params = await props.params;
   try {
     const template = await db
@@ -35,6 +41,11 @@ export async function PUT(
   request: Request,
   props: { params: Promise<{ id: string }> }
 ) {
+  const session = await auth();
+  if (!session || session.user?.role !== "admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const params = await props.params;
   try {
     const body = await request.json();

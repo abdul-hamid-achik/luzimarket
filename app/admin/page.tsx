@@ -147,9 +147,9 @@ export default async function AdminDashboard() {
     <div className="space-y-8">
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-univers text-gray-900">Dashboard</h1>
+        <h1 className="text-2xl font-univers text-gray-900">{t("dashboard")}</h1>
         <p className="text-sm text-gray-600 font-univers mt-1">
-          Resumen de la actividad de tu plataforma
+          {t("dashboardSubtitle")}
         </p>
       </div>
 

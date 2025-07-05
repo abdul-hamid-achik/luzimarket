@@ -71,7 +71,7 @@ export default function OrderTrackingView({
   locale,
   isGuest = false,
 }: OrderTrackingViewProps) {
-  const t = useTranslations("orders");
+  const t = useTranslations("Orders");
   const dateLocale = locale === "es" ? es : enUS;
   const [currentLocation, setCurrentLocation] = useState<[number, number] | null>(null);
 

@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "@/i18n/navigation";
 import { useCart } from "@/contexts/cart-context";
-import { CheckCircle, Loader2, XCircle, UserPlus, Shield, Package } from "lucide-react";
+import { CheckCircle, Loader2, XCircle, UserPlus, Shield, Package, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 
 export default function SuccessPage() {
   const searchParams = useSearchParams();
@@ -20,6 +21,11 @@ export default function SuccessPage() {
   const [isGuest, setIsGuest] = useState(false);
 
   const sessionId = searchParams.get("session_id");
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Número de orden copiado al portapapeles");
+  };
 
   useEffect(() => {
     if (!sessionId) {
@@ -103,10 +109,43 @@ export default function SuccessPage() {
               <div className="bg-gray-100 rounded-lg p-6 mb-8 text-left">
                 <h2 className="font-times-now text-lg mb-4">Detalles de la orden</h2>
                 <div className="space-y-2 font-univers text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Número de orden:</span>
-                    <span className="font-medium">{sessionId?.slice(-8).toUpperCase()}</span>
-                  </div>
+                  {orderDetails.orderNumbers && orderDetails.orderNumbers.length > 1 ? (
+                    <div>
+                      <span className="text-gray-600">Números de orden:</span>
+                      <div className="mt-1 space-y-1">
+                        {orderDetails.orderNumbers.map((orderNum: string, index: number) => (
+                          <div key={index} className="flex items-center justify-between gap-2">
+                            <span className="font-medium text-sm">{orderNum}</span>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-6 px-2"
+                              onClick={() => copyToClipboard(orderNum)}
+                            >
+                              <Copy className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Número de orden:</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{orderDetails.orderNumber || sessionId?.slice(-8).toUpperCase()}</span>
+                        {orderDetails.orderNumber && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 px-2"
+                            onClick={() => copyToClipboard(orderDetails.orderNumber)}
+                          >
+                            <Copy className="h-3 w-3" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  )}
                   {orderDetails.customerEmail && (
                     <div className="flex justify-between">
                       <span className="text-gray-600">Email:</span>
@@ -128,6 +167,12 @@ export default function SuccessPage() {
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
               <p className="text-sm font-univers text-blue-800">
                 Recibirás un correo de confirmación con los detalles de tu pedido y el seguimiento del envío.
+                {orderDetails?.orderNumbers?.length > 1 && (
+                  <span className="block mt-2">
+                    Nota: Como tu pedido incluye productos de múltiples vendedores, recibirás un número de orden por cada vendedor.
+                    Puedes usar cualquiera de estos números para rastrear tu pedido completo.
+                  </span>
+                )}
               </p>
             </div>
 

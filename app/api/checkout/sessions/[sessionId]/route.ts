@@ -35,20 +35,25 @@ export async function GET(
 
     // Get order details if available
     let orderInfo = null;
+    let allOrderNumbers = [];
     if (session.metadata?.orderIds) {
       const orderIds = session.metadata.orderIds.split(',');
-      if (orderIds.length > 0) {
-        const order = await db.query.orders.findFirst({
-          where: eq(orders.id, orderIds[0]),
-        });
+      
+      // Fetch all orders
+      const ordersData = await db.query.orders.findMany({
+        where: (orders, { inArray }) => inArray(orders.id, orderIds),
+      });
+      
+      if (ordersData.length > 0) {
+        // Get all order numbers
+        allOrderNumbers = ordersData.map(o => o.orderNumber);
         
-        if (order) {
-          orderInfo = {
-            orderNumber: order.orderNumber,
-            guestEmail: order.guestEmail,
-            guestName: order.guestName,
-          };
-        }
+        // Use first order for guest info
+        orderInfo = {
+          orderNumber: ordersData[0].orderNumber,
+          guestEmail: ordersData[0].guestEmail,
+          guestName: ordersData[0].guestName,
+        };
       }
     }
 
@@ -63,6 +68,7 @@ export async function GET(
       paymentStatus: session.payment_status,
       isGuest,
       orderNumber: orderInfo?.orderNumber,
+      orderNumbers: allOrderNumbers, // All order numbers for multi-vendor orders
       metadata: session.metadata,
       lineItems: session.line_items?.data.map((item) => ({
         name: item.description,
