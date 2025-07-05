@@ -368,7 +368,19 @@
       "testEmail": "Enviar correo de prueba",
       "testEmailAddress": "Correo de prueba",
       "sendTest": "Enviar prueba",
-      "backToTemplates": "Volver a plantillas"
+      "backToTemplates": "Volver a plantillas",
+      "loading": "Cargando...",
+      "notFound": "Plantilla no encontrada",
+      "editTitle": "Editar plantilla",
+      "emailSubject": "Asunto del correo",
+      "subjectPlaceholder": "Ingresa el asunto del correo...",
+      "emailContent": "Contenido del correo (HTML)",
+      "contentPlaceholder": "Ingresa el contenido del correo...",
+      "availableVariables": "Variables disponibles",
+      "saving": "Guardando...",
+      "loadError": "Error al cargar la plantilla",
+      "saveSuccess": "Plantilla guardada exitosamente",
+      "saveError": "Error al guardar la plantilla"
     },
     "vendorsPage": {
       "title": "Vendedores",

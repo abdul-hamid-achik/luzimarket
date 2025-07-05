@@ -3,8 +3,15 @@ import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { products, categories, vendors } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
-import ProductCard from "@/components/products/product-card";
-import { Breadcrumbs } from "@/components/ui/breadcrumbs";
+import { ProductCard } from "@/components/products/product-card";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 export default async function CategoryVendorPage({
   params,
@@ -53,14 +60,24 @@ export default async function CategoryVendorPage({
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Breadcrumbs */}
-      <Breadcrumbs
-        items={[
-          { label: t("home"), href: `/${locale}` },
-          { label: categoryData.name, href: `/${locale}/category/${categorySlug}` },
-          { label: vendorData.businessName },
-        ]}
-      />
+      {/* Breadcrumb navigation */}
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href={`/${locale}`}>{t("home")}</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href={`/${locale}/category/${categorySlug}`}>
+              {categoryData.name}
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{vendorData.businessName}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
       {/* Header */}
       <div className="text-center mb-12">
@@ -84,9 +101,14 @@ export default async function CategoryVendorPage({
           {categoryProducts.map((product) => (
             <ProductCard
               key={product.id}
-              product={product}
-              vendor={vendorData}
-              locale={locale}
+              product={{
+                ...product,
+                images: product.images || [],
+                vendor: {
+                  id: vendorData.id,
+                  businessName: vendorData.businessName
+                }
+              }}
             />
           ))}
         </div>

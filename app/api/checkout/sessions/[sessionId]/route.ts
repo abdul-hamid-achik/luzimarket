@@ -35,7 +35,7 @@ export async function GET(
 
     // Get order details if available
     let orderInfo = null;
-    let allOrderNumbers = [];
+    let allOrderNumbers: string[] = [];
     if (session.metadata?.orderIds) {
       const orderIds = session.metadata.orderIds.split(',');
       

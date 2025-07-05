@@ -51,7 +51,7 @@ export default async function CategoriesPage() {
                   <TableCell>
                     <div className="relative w-12 h-12 bg-gray-100 rounded overflow-hidden">
                       <Image
-                        src={category.image}
+                        src={category.imageUrl || "/placeholder.jpg"}
                         alt={category.name}
                         fill
                         className="object-cover"

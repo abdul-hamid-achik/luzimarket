@@ -25,7 +25,7 @@ export default async function EmailTemplatePreviewPage({
     notFound();
   }
 
-  const { name, subject, content, type } = template[0];
+  const { name, subject, htmlTemplate } = template[0];
 
   // Replace variables with sample data for preview
   const sampleData: Record<string, any> = {
@@ -41,7 +41,7 @@ export default async function EmailTemplatePreviewPage({
     userEmail: "juan@example.com",
   };
 
-  let previewContent = content || "";
+  let previewContent = htmlTemplate || "";
   let previewSubject = subject || "";
 
   // Replace variables in content and subject
@@ -60,7 +60,7 @@ export default async function EmailTemplatePreviewPage({
             {t("previewTemplate")}
           </h1>
           <p className="text-sm text-gray-600 font-univers mt-1">
-            {name} - {t(`templateTypes.${type}`)}
+            {name}
           </p>
         </div>
         <Link href="/admin/email-templates">

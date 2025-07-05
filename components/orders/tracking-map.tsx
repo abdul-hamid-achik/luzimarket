@@ -89,8 +89,22 @@ export default function TrackingMap({
   const center = allCoordinates.length > 0 ? allCoordinates[0] : defaultCenter;
 
   useEffect(() => {
-    if (mapRef.current && allCoordinates.length > 1) {
-      const bounds = L.latLngBounds(allCoordinates);
+    // Get all coordinates
+    const trackingCoords = trackingHistory
+      .filter((h) => h.coordinates)
+      .map((h) => [h.coordinates!.lat, h.coordinates!.lng] as [number, number]);
+
+    // Calculate center and bounds
+    const allCoords: [number, number][] = [...trackingCoords];
+    if (vendorLocation) {
+      allCoords.push([vendorLocation.lat, vendorLocation.lng]);
+    }
+    if (deliveryLocation) {
+      allCoords.push([deliveryLocation.lat, deliveryLocation.lng]);
+    }
+
+    if (mapRef.current && allCoords.length > 1) {
+      const bounds = L.latLngBounds(allCoords);
       mapRef.current.fitBounds(bounds, { padding: [50, 50] });
     }
   }, [trackingHistory, vendorLocation, deliveryLocation]);

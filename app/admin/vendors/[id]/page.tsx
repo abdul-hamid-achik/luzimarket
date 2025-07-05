@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Globe, Instagram, Facebook, Twitter } from "lucide-react";
 import { revalidatePath } from "next/cache";
 
@@ -98,7 +99,7 @@ export default async function AdminVendorDetailPage({
               {vendorData.isActive ? t("vendorStatus.active") : t("vendorStatus.inactive")}
             </span>
           </div>
-          <form action={toggleVendorStatus.bind(null, vendorData.id, vendorData.isActive)}>
+          <form action={toggleVendorStatus.bind(null, vendorData.id, vendorData.isActive || false)}>
             <Button
               type="submit"
               variant={vendorData.isActive ? "destructive" : "default"}
@@ -159,26 +160,29 @@ export default async function AdminVendorDetailPage({
       </div>
 
       {/* Address */}
-      {vendorData.address && (
+      {(vendorData.street || vendorData.city || vendorData.state) && (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-lg font-medium text-gray-900 mb-4">{t("address")}</h2>
           <div className="text-sm text-gray-600">
-            <p>{(vendorData.address as any).street}</p>
-            <p>
-              {(vendorData.address as any).city}, {(vendorData.address as any).state} {(vendorData.address as any).postalCode}
-            </p>
+            {vendorData.street && <p>{vendorData.street}</p>}
+            {(vendorData.city || vendorData.state || vendorData.postalCode) && (
+              <p>
+                {[vendorData.city, vendorData.state, vendorData.postalCode].filter(Boolean).join(", ")}
+              </p>
+            )}
+            {vendorData.country && <p>{vendorData.country}</p>}
           </div>
         </div>
       )}
 
       {/* Social Media */}
-      {vendorData.socialMedia && (
+      {(vendorData.instagramUrl || vendorData.facebookUrl || vendorData.twitterUrl || vendorData.tiktokUrl) && (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-lg font-medium text-gray-900 mb-4">{t("socialMedia")}</h2>
           <div className="flex space-x-4">
-            {(vendorData.socialMedia as any).instagram && (
+            {vendorData.instagramUrl && (
               <a 
-                href={`https://instagram.com/${(vendorData.socialMedia as any).instagram}`}
+                href={vendorData.instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-gray-500"
@@ -186,9 +190,9 @@ export default async function AdminVendorDetailPage({
                 <Instagram className="h-6 w-6" />
               </a>
             )}
-            {(vendorData.socialMedia as any).facebook && (
+            {vendorData.facebookUrl && (
               <a 
-                href={`https://facebook.com/${(vendorData.socialMedia as any).facebook}`}
+                href={vendorData.facebookUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-gray-500"
@@ -196,14 +200,26 @@ export default async function AdminVendorDetailPage({
                 <Facebook className="h-6 w-6" />
               </a>
             )}
-            {(vendorData.socialMedia as any).twitter && (
+            {vendorData.twitterUrl && (
               <a 
-                href={`https://twitter.com/${(vendorData.socialMedia as any).twitter}`}
+                href={vendorData.twitterUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-gray-500"
               >
                 <Twitter className="h-6 w-6" />
+              </a>
+            )}
+            {vendorData.tiktokUrl && (
+              <a 
+                href={vendorData.tiktokUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-gray-500"
+              >
+                <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                </svg>
               </a>
             )}
           </div>
@@ -239,11 +255,14 @@ export default async function AdminVendorDetailPage({
             {recentProducts.map((product) => (
               <div key={product.id} className="space-y-2">
                 {product.images?.[0] && (
-                  <img
-                    src={product.images[0]}
-                    alt={product.name}
-                    className="w-full h-32 object-cover rounded-lg"
-                  />
+                  <div className="relative w-full h-32">
+                    <Image
+                      src={product.images[0]}
+                      alt={product.name}
+                      fill
+                      className="object-cover rounded-lg"
+                    />
+                  </div>
                 )}
                 <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
                 <p className="text-sm text-gray-500">

@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import { OrderStatusSelect } from "@/components/admin/order-status-select";
 import { revalidatePath } from "next/cache";
@@ -203,11 +204,14 @@ export default async function AdminOrderDetailPage({
                   <td className="px-6 py-4">
                     <div className="flex items-center">
                       {product?.images?.[0] && (
-                        <img
-                          src={product.images[0]}
-                          alt={product.name}
-                          className="h-10 w-10 rounded-lg object-cover mr-3"
-                        />
+                        <div className="relative h-10 w-10 mr-3">
+                          <Image
+                            src={product.images[0]}
+                            alt={product.name}
+                            fill
+                            className="rounded-lg object-cover"
+                          />
+                        </div>
                       )}
                       <div>
                         <p className="text-sm font-medium text-gray-900">

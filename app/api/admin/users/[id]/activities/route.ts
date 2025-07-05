@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 
 export async function GET(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await auth();
@@ -12,7 +12,7 @@ export async function GET(
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const userId = params.id;
+        const { id: userId } = await params;
 
         // Mock activity data for now since we don't have an activities table
         // In a real implementation, you would fetch from an activities/audit_log table

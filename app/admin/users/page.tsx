@@ -22,32 +22,32 @@ export default function AdminUsersPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch('/api/admin/users');
+        const data = await response.json();
+        setUserList(data);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     fetchUsers();
   }, []);
 
   useEffect(() => {
+    const filterUsers = () => {
+      if (activeFilter === "all") {
+        setFilteredUsers(userList);
+      } else {
+        setFilteredUsers(userList.filter(user => user.userType === activeFilter));
+      }
+    };
+
     filterUsers();
   }, [userList, activeFilter]);
-
-  const fetchUsers = async () => {
-    try {
-      const response = await fetch('/api/admin/users');
-      const data = await response.json();
-      setUserList(data);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const filterUsers = () => {
-    if (activeFilter === "all") {
-      setFilteredUsers(userList);
-    } else {
-      setFilteredUsers(userList.filter(user => user.userType === activeFilter));
-    }
-  };
 
   const filterTabs = [
     { id: "all", label: "Todos", count: userList.length },

@@ -55,7 +55,7 @@ export default function SuccessPage() {
     };
 
     verifySession();
-  }, [sessionId, clearCart]);
+  }, [sessionId, clearCart, session?.user]);
 
   if (status === "loading") {
     return (

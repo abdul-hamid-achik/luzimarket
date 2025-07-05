@@ -28,7 +28,12 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(template[0]);
+    // Transform htmlTemplate to content for frontend compatibility
+    const { htmlTemplate, ...rest } = template[0];
+    return NextResponse.json({
+      ...rest,
+      content: htmlTemplate
+    });
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to fetch template" },
@@ -55,7 +60,7 @@ export async function PUT(
       .update(emailTemplates)
       .set({
         subject,
-        content,
+        htmlTemplate: content,
         updatedAt: new Date(),
       })
       .where(eq(emailTemplates.id, parseInt(params.id)));

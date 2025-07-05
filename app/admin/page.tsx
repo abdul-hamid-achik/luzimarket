@@ -13,6 +13,7 @@ import {
   ArrowDownRight,
   Lock
 } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 async function getStats() {
@@ -102,6 +103,7 @@ async function getStats() {
 }
 
 export default async function AdminDashboard() {
+  const t = await getTranslations("Admin");
   const stats = await getStats();
 
   const statsCards = [

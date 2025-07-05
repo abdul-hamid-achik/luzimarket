@@ -27,12 +27,12 @@ async function getVendors() {
 
 async function approveVendor(vendorId: string) {
   "use server";
-  return approveVendorAction(vendorId);
+  await approveVendorAction(vendorId);
 }
 
 async function rejectVendor(vendorId: string) {
   "use server";
-  return rejectVendorAction(vendorId);
+  await rejectVendorAction(vendorId);
 }
 
 export default async function AdminVendorsPage() {

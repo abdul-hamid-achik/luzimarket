@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { format } from "date-fns";
 import { es, enUS } from "date-fns/locale";
@@ -285,11 +286,14 @@ export default function OrderTrackingView({
                 {items.map((item, index) => (
                   <div key={index} className="flex items-center gap-3">
                     {item.product?.images?.[0] && (
-                      <img
-                        src={item.product.images[0]}
-                        alt={item.product.name}
-                        className="w-12 h-12 rounded object-cover"
-                      />
+                      <div className="relative w-12 h-12">
+                        <Image
+                          src={item.product.images[0]}
+                          alt={item.product.name}
+                          fill
+                          className="rounded object-cover"
+                        />
+                      </div>
                     )}
                     <div className="flex-1">
                       <p className="font-medium">{item.product?.name}</p>

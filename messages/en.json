@@ -368,7 +368,19 @@
       "testEmail": "Send Test Email",
       "testEmailAddress": "Test Email Address",
       "sendTest": "Send Test",
-      "backToTemplates": "Back to templates"
+      "backToTemplates": "Back to templates",
+      "loading": "Loading...",
+      "notFound": "Template not found",
+      "editTitle": "Edit Template",
+      "emailSubject": "Email Subject",
+      "subjectPlaceholder": "Enter email subject...",
+      "emailContent": "Email Content (HTML)",
+      "contentPlaceholder": "Enter email content...",
+      "availableVariables": "Available Variables",
+      "saving": "Saving...",
+      "loadError": "Failed to load template",
+      "saveSuccess": "Template saved successfully",
+      "saveError": "Failed to save template"
     },
     "vendorsPage": {
       "title": "Vendors",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
@@ -130,12 +131,13 @@ export function OrderStatusUpdater({ order, onStatusUpdate }: OrderStatusUpdater
           <div className="space-y-2">
             {order.items.map((item) => (
               <div key={item.id} className="flex items-center gap-3 p-2 bg-gray-50 rounded">
-                <div className="w-12 h-12 bg-gray-200 rounded overflow-hidden">
+                <div className="relative w-12 h-12 bg-gray-200 rounded overflow-hidden">
                   {item.product.images[0] && (
-                    <img
+                    <Image
                       src={item.product.images[0]}
                       alt={item.product.name}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
                     />
                   )}
                 </div>

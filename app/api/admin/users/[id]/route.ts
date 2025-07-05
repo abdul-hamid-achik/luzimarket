@@ -6,7 +6,7 @@ import { eq, sql } from "drizzle-orm";
 
 export async function GET(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await auth();
@@ -15,7 +15,7 @@ export async function GET(
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const userId = params.id;
+        const { id: userId } = await params;
 
         // Try to find the user in the regular users table first
         const customerUser = await db

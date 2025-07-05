@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -56,65 +56,65 @@ export default function VendorShippingSettingsPage() {
   const [rates, setRates] = useState<ShippingRate[]>([]);
   
   // Weight ranges
-  const weightRanges = [
+  const weightRanges = useMemo(() => [
     { min: 0, max: 1000, label: "0-1 kg" },
     { min: 1001, max: 5000, label: "1-5 kg" },
     { min: 5001, max: 10000, label: "5-10 kg" },
     { min: 10001, max: 20000, label: "10-20 kg" },
     { min: 20001, max: 999999, label: "20+ kg" },
-  ];
+  ], []);
 
   useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [zonesResult, methodsResult] = await Promise.all([
+          getShippingZones(),
+          getShippingMethods(),
+        ]);
+        
+        if (zonesResult.success && zonesResult.zones) {
+          setZones(zonesResult.zones);
+        }
+        
+        if (methodsResult.success && methodsResult.methods) {
+          setMethods(methodsResult.methods);
+        }
+        
+        // Initialize default rates for all combinations
+        const defaultRates: ShippingRate[] = [];
+        if (methodsResult.success && methodsResult.methods && zonesResult.success && zonesResult.zones) {
+          methodsResult.methods.forEach(method => {
+              zonesResult.zones.forEach(zone => {
+                weightRanges.forEach(range => {
+                  defaultRates.push({
+                    methodId: method.id,
+                    zoneId: zone.id,
+                    minWeight: range.min,
+                    maxWeight: range.max,
+                    baseRate: "0",
+                    perKgRate: "0",
+                  });
+                });
+              });
+            });
+          }
+        
+        setRates(defaultRates);
+      } catch (error) {
+        console.error("Error loading shipping data:", error);
+        toast.error("No se pudieron cargar los datos de envío");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (!session?.user?.vendor) {
       router.push("/vendor/login");
       return;
     }
     
     loadData();
-  }, [session, router]);
-
-  const loadData = async () => {
-    try {
-      const [zonesResult, methodsResult] = await Promise.all([
-        getShippingZones(),
-        getShippingMethods(),
-      ]);
-      
-      if (zonesResult.success && zonesResult.zones) {
-        setZones(zonesResult.zones);
-      }
-      
-      if (methodsResult.success && methodsResult.methods) {
-        setMethods(methodsResult.methods);
-      }
-      
-      // Initialize default rates for all combinations
-      const defaultRates: ShippingRate[] = [];
-      if (methodsResult.success && methodsResult.methods && zonesResult.success && zonesResult.zones) {
-        methodsResult.methods.forEach(method => {
-            zonesResult.zones.forEach(zone => {
-              weightRanges.forEach(range => {
-                defaultRates.push({
-                  methodId: method.id,
-                  zoneId: zone.id,
-                  minWeight: range.min,
-                  maxWeight: range.max,
-                  baseRate: "0",
-                  perKgRate: "0",
-                });
-              });
-            });
-          });
-        }
-      
-      setRates(defaultRates);
-    } catch (error) {
-      console.error("Error loading shipping data:", error);
-      toast.error("No se pudieron cargar los datos de envío");
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [session, router, weightRanges]);
 
   const handleRateChange = (methodId: number, zoneId: number, minWeight: number, field: 'baseRate' | 'perKgRate', value: string) => {
     setRates(prev => prev.map(rate => {

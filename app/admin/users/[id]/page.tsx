@@ -49,39 +49,39 @@ export default function UserDetailPage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await fetch(`/api/admin/users/${userId}`);
+                if (!response.ok) {
+                    throw new Error('User not found');
+                }
+                const data = await response.json();
+                setUser(data);
+            } catch (error) {
+                console.error('Error fetching user:', error);
+                setError('Error loading user data');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        const fetchUserActivities = async () => {
+            try {
+                const response = await fetch(`/api/admin/users/${userId}/activities`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setActivities(data);
+                }
+            } catch (error) {
+                console.error('Error fetching activities:', error);
+            }
+        };
+
         if (userId) {
             fetchUserData();
             fetchUserActivities();
         }
     }, [userId]);
-
-    const fetchUserData = async () => {
-        try {
-            const response = await fetch(`/api/admin/users/${userId}`);
-            if (!response.ok) {
-                throw new Error('User not found');
-            }
-            const data = await response.json();
-            setUser(data);
-        } catch (error) {
-            console.error('Error fetching user:', error);
-            setError('Error loading user data');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const fetchUserActivities = async () => {
-        try {
-            const response = await fetch(`/api/admin/users/${userId}/activities`);
-            if (response.ok) {
-                const data = await response.json();
-                setActivities(data);
-            }
-        } catch (error) {
-            console.error('Error fetching activities:', error);
-        }
-    };
 
     if (isLoading) {
         return (
