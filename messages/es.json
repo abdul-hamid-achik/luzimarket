@@ -1117,5 +1117,53 @@
         "compliance": "Operamos en cumplimiento con todas las leyes mexicanas de comercio electrónico y protección al consumidor."
       }
     }
+  },
+  "Contact": {
+    "metaTitle": "Contacto - Luzimarket",
+    "metaDescription": "Contáctanos para cualquier pregunta sobre tus pedidos, productos o servicios. Estamos aquí para ayudarte.",
+    "title": "Contáctanos",
+    "subtitle": "Estamos aquí para ayudarte. Envíanos un mensaje y te responderemos lo antes posible.",
+    "contactInfo": {
+      "title": "Información de Contacto",
+      "description": "Puedes contactarnos a través de los siguientes medios",
+      "email": "Correo Electrónico",
+      "phone": "Teléfono",
+      "address": "Dirección",
+      "addressLine1": "MOMENTO ESPECIAL SAPI DE CV",
+      "addressLine2": "Ciudad de México, CDMX",
+      "addressLine3": "México",
+      "hours": "Horario de Atención",
+      "hoursWeekdays": "Lunes a Viernes: 9:00 AM - 6:00 PM",
+      "hoursWeekends": "Sábados: 10:00 AM - 2:00 PM"
+    },
+    "quickLinks": {
+      "title": "Enlaces Rápidos",
+      "faq": "Preguntas Frecuentes",
+      "trackOrder": "Rastrear Pedido",
+      "returns": "Devoluciones",
+      "shipping": "Información de Envío"
+    },
+    "form": {
+      "title": "Envíanos un Mensaje",
+      "description": "Completa el formulario y nos pondremos en contacto contigo pronto",
+      "name": "Nombre Completo",
+      "namePlaceholder": "Tu nombre",
+      "email": "Correo Electrónico",
+      "emailPlaceholder": "tu@email.com",
+      "subject": "Asunto",
+      "subjectPlaceholder": "¿En qué podemos ayudarte?",
+      "message": "Mensaje",
+      "messagePlaceholder": "Escribe tu mensaje aquí...",
+      "submit": "Enviar Mensaje",
+      "sending": "Enviando..."
+    },
+    "successMessage": "¡Mensaje enviado exitosamente! Te responderemos pronto.",
+    "errorMessage": "Error al enviar el mensaje. Por favor, intenta de nuevo.",
+    "additionalInfo": {
+      "title": "¿Necesitas más información?",
+      "description": "Si eres un vendedor interesado en unirte a nuestra plataforma o quieres conocer más sobre Luzimarket, visita las siguientes secciones.",
+      "becomeVendor": "Conviértete en Vendedor",
+      "aboutUs": "Acerca de Nosotros"
+    }
   }
 }
