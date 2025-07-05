@@ -97,15 +97,15 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
         
         {/* Quick actions on hover */}
         <div className={cn(
-          "absolute bottom-0 left-0 right-0 p-3 transition-all duration-300",
-          "opacity-0 group-hover:opacity-100 translate-y-full group-hover:translate-y-0"
+          "absolute bottom-0 left-0 right-0 p-3 transition-all duration-300 pointer-events-none",
+          "opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0"
         )}>
-          <div className="flex gap-2">
+          <div className="flex gap-2 pointer-events-auto">
             {onQuickView && (
               <Button
                 variant="secondary"
                 size="sm"
-                className="flex-1 bg-white/90 hover:bg-white"
+                className="flex-1 bg-white/95 hover:bg-white backdrop-blur-sm"
                 onClick={(e) => {
                   e.preventDefault();
                   onQuickView(product);

@@ -174,7 +174,7 @@
       "limitedStock": "⚠️ Stock limitado",
       "limitedStockDescriptionSingle": "Solo queda 1 unidad de {productName}. ¡Apresúrate!",
       "limitedStockDescriptionMultiple": "Solo quedan {count} unidades de {productName}. ¡Apresúrate!",
-      "addedSuccess": "🛒 ¡Agregado al carrito!",
+      "addedSuccess": "¡Agregado al carrito!",
       "addedSuccessDescription": "{productName} se agregó exitosamente. ¡Excelente elección!",
       "addedSuccessDescriptionMultiple": "{count} unidades de {productName} se agregaron exitosamente. ¡Excelente elección!",
       "addError": "❌ Error al agregar",
@@ -404,6 +404,7 @@
     "loadMore": "Cargar más resultados"
   },
   "Products": {
+    "home": "Inicio",
     "title": "Todos los Productos",
     "subtitle": "Descubre nuestra selección completa de regalos extraordinarios",
     "productsFound": "productos encontrados",
@@ -547,7 +548,7 @@
     "newsletterPlaceholder": "Tu correo electrónico",
     "subscribe": "Suscribirse",
     "followUs": "Síguenos",
-    "copyright": "© 2024 MOMENTO ESPECIAL SAPI DE CV",
+    "copyright": "© {year} MOMENTO ESPECIAL SAPI DE CV",
     "allRightsReserved": "Todos los derechos reservados"
   }
 }

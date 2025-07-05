@@ -470,7 +470,7 @@ export default function VendorRegisterPage() {
         </Form>
 
         <p className="text-center text-sm font-univers text-gray-500 mt-12">
-          © 2024 LUZIMARKET. Built by <a href="https://abdulachik.dev" target="_blank" rel="noopener noreferrer" className="underline">Abdul-Hamid Achik</a>.
+          © {new Date().getFullYear()} LUZIMARKET. Built by <a href="https://abdulachik.dev" target="_blank" rel="noopener noreferrer" className="underline">Abdul-Hamid Achik</a>.
         </p>
       </div>
     </div>

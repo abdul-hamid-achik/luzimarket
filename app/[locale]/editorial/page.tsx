@@ -7,26 +7,28 @@ interface EditorialPageProps {
   params: Promise<{ locale: string }>;
 }
 
+const currentYear = new Date().getFullYear();
+
 const articles = [
   {
     id: 'guia-regalos-navidad',
-    title: 'Guía de Regalos de Navidad 2024',
+    title: `Guía de Regalos de Navidad ${currentYear}`,
     excerpt: 'Descubre los mejores regalos artesanales para esta temporada navideña',
-    date: '15 de Diciembre, 2024',
+    date: `15 de Diciembre, ${currentYear}`,
     image: null,
   },
   {
     id: 'artesanos-mexicanos',
     title: 'Conoce a Nuestros Artesanos',
     excerpt: 'Historias de los talentosos creadores detrás de cada producto único',
-    date: '10 de Diciembre, 2024',
+    date: `10 de Diciembre, ${currentYear}`,
     image: null,
   },
   {
     id: 'tendencias-regalos',
-    title: 'Tendencias en Regalos 2024',
+    title: `Tendencias en Regalos ${currentYear}`,
     excerpt: 'Las últimas tendencias en regalos personalizados y hechos a mano',
-    date: '5 de Diciembre, 2024',
+    date: `5 de Diciembre, ${currentYear}`,
     image: null,
   },
 ];

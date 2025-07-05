@@ -1,8 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Newsletter } from "./newsletter";
+import { useTranslations } from 'next-intl';
 
 export function Footer() {
+  const t = useTranslations('Footer');
+  const currentYear = new Date().getFullYear();
   const socialLinks = [
     { name: "Instagram", href: "#", icon: "/images/socials/Instagram.png" },
     { name: "Facebook", href: "#", icon: "/images/socials/Facebook.png" },
@@ -90,7 +93,7 @@ export function Footer() {
 
         {/* Copyright */}
         <div className="text-center">
-          <p className="text-xs font-univers">LUZIMARKET © 2024 / TODOS LOS DERECHOS RESERVADOS</p>
+          <p className="text-xs font-univers">{t('copyright', { year: currentYear })} / {t('allRightsReserved')}</p>
         </div>
       </div>
     </footer>
