@@ -511,7 +511,7 @@ export default function CheckoutPage() {
 
             {/* Order Summary */}
             <div className="lg:sticky lg:top-8 lg:h-fit">
-              <Card>
+              <Card data-testid="order-summary">
                 <CardHeader>
                   <CardTitle className="font-times-now">Resumen del pedido</CardTitle>
                 </CardHeader>
@@ -560,7 +560,7 @@ export default function CheckoutPage() {
                       <span>Subtotal</span>
                       <span>${subtotal.toLocaleString('es-MX')}</span>
                     </div>
-                    <div className="flex justify-between font-univers">
+                    <div className="flex justify-between font-univers" data-testid="shipping-line">
                       <span>Envío</span>
                       <span>
                         {shippingCost === 0 && selectedShipping ? (
@@ -570,7 +570,7 @@ export default function CheckoutPage() {
                         )}
                       </span>
                     </div>
-                    <div className="flex justify-between font-univers">
+                    <div className="flex justify-between font-univers" data-testid="tax-line">
                       <span>IVA (16%)</span>
                       <span>${tax.toLocaleString('es-MX')}</span>
                     </div>

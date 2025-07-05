@@ -1,36 +1,76 @@
-import { db } from "@/db";
-import { users, orders } from "@/db/schema";
-import { eq, desc, sql } from "drizzle-orm";
+"use client";
+
+import { useState, useEffect } from "react";
 import { User, Mail, Calendar, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-async function getUsers() {
-  const userList = await db
-    .select({
-      id: users.id,
-      name: users.name,
-      email: users.email,
-      createdAt: users.createdAt,
-      orderCount: sql<number>`(
-        SELECT COUNT(*) FROM ${orders}
-        WHERE ${orders.userId} = ${users.id}
-      )`,
-      totalSpent: sql<number>`(
-        SELECT COALESCE(SUM(${orders.total}::numeric), 0) FROM ${orders}
-        WHERE ${orders.userId} = ${users.id}
-        AND ${orders.paymentStatus} = 'succeeded'
-      )`,
-    })
-    .from(users)
-    .orderBy(desc(users.createdAt));
+type UserData = {
+  id: string;
+  name: string | null;
+  email: string;
+  createdAt: Date | null;
+  orderCount: number;
+  totalSpent: number;
+  userType: string;
+};
 
-  return userList;
-}
+export default function AdminUsersPage() {
+  const [userList, setUserList] = useState<UserData[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<UserData[]>([]);
+  const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [isLoading, setIsLoading] = useState(true);
 
-export default async function AdminUsersPage() {
-  const userList = await getUsers();
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
+  useEffect(() => {
+    filterUsers();
+  }, [userList, activeFilter]);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch('/api/admin/users');
+      const data = await response.json();
+      setUserList(data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const filterUsers = () => {
+    if (activeFilter === "all") {
+      setFilteredUsers(userList);
+    } else {
+      setFilteredUsers(userList.filter(user => user.userType === activeFilter));
+    }
+  };
+
+  const filterTabs = [
+    { id: "all", label: "Todos", count: userList.length },
+    { id: "customer", label: "Cliente", count: userList.filter(u => u.userType === "customer").length },
+    { id: "vendor", label: "Vendedor", count: userList.filter(u => u.userType === "vendor").length },
+    { id: "admin", label: "Admin", count: userList.filter(u => u.userType === "admin").length },
+  ];
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-2xl font-univers text-gray-900">Usuarios</h1>
+          <p className="text-sm text-gray-600 font-univers mt-1">
+            Administra todos los usuarios de la plataforma
+          </p>
+        </div>
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -42,22 +82,41 @@ export default async function AdminUsersPage() {
         </p>
       </div>
 
+      {/* User type filters */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="flex flex-wrap gap-2 mb-4">
+          {filterTabs.map((tab) => (
+            <button
+              key={tab.id}
+              role="tab"
+              onClick={() => setActiveFilter(tab.id)}
+              className={`px-4 py-2 rounded-lg text-sm font-univers transition-colors ${activeFilter === tab.id
+                  ? "bg-blue-100 text-blue-700 border border-blue-200"
+                  : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                }`}
+            >
+              {tab.label} ({tab.count})
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <p className="text-sm font-univers text-gray-600">Total usuarios</p>
-          <p className="text-2xl font-univers font-semibold text-gray-900">{userList.length}</p>
+          <p className="text-2xl font-univers font-semibold text-gray-900">{filteredUsers.length}</p>
         </div>
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <p className="text-sm font-univers text-gray-600">Usuarios activos</p>
           <p className="text-2xl font-univers font-semibold text-green-600">
-            {userList.filter(u => u.orderCount > 0).length}
+            {filteredUsers.filter(u => u.orderCount > 0).length}
           </p>
         </div>
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <p className="text-sm font-univers text-gray-600">Nuevos este mes</p>
           <p className="text-2xl font-univers font-semibold text-blue-600">
-            {userList.filter(u => u.createdAt && new Date(u.createdAt).getMonth() === new Date().getMonth()).length}
+            {filteredUsers.filter(u => u.createdAt && new Date(u.createdAt).getMonth() === new Date().getMonth()).length}
           </p>
         </div>
       </div>
@@ -75,6 +134,9 @@ export default async function AdminUsersPage() {
                   Email
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
+                  Tipo
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
                   Órdenes
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
@@ -89,7 +151,7 @@ export default async function AdminUsersPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {userList.map((user) => (
+              {filteredUsers.map((user) => (
                 <tr key={user.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -112,6 +174,16 @@ export default async function AdminUsersPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-univers ${user.userType === 'admin' ? 'bg-red-100 text-red-800' :
+                        user.userType === 'vendor' ? 'bg-purple-100 text-purple-800' :
+                          'bg-blue-100 text-blue-800'
+                      }`}>
+                      {user.userType === 'admin' ? 'Admin' :
+                        user.userType === 'vendor' ? 'Vendedor' :
+                          'Cliente'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center text-sm text-gray-900 font-univers">
                       <ShoppingCart className="h-4 w-4 mr-2 text-gray-400" />
                       {user.orderCount}
@@ -125,7 +197,7 @@ export default async function AdminUsersPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center text-sm text-gray-900 font-univers">
                       <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                      {new Date(user.createdAt!).toLocaleDateString('es-MX')}
+                      {user.createdAt ? new Date(user.createdAt).toLocaleDateString('es-MX') : 'N/A'}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

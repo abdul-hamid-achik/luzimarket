@@ -42,7 +42,6 @@
     "user": "Usuario",
     "clearSearch": "Limpiar búsqueda"
   },
-  
   "Navigation": {
     "home": "Inicio",
     "bestSellers": "Más vendidos",
@@ -59,7 +58,6 @@
     "tiktok": "TikTok",
     "whatsapp": "WhatsApp"
   },
-  
   "HomePage": {
     "title": "Regalos extraordinarios curados",
     "subtitle": "Encuentra el regalo perfecto de vendedores seleccionados en México",
@@ -69,7 +67,6 @@
     "trendingNow": "Tendencias",
     "newArrivals": "Nuevos productos"
   },
-  
   "HandpickedPage": {
     "title": "Selección Especial",
     "subtitle": "Regalos cuidadosamente seleccionados por nuestros expertos",
@@ -88,7 +85,6 @@
     "noProducts": "No se encontraron productos",
     "tryAdjustingFilters": "Intenta ajustar los filtros para ver más resultados"
   },
-  
   "ComingSoon": {
     "title": "Handpicked extraordinary gifts",
     "description": "LUZIMARKET® es una nueva plataforma online que ofrece curaduría, venta y envío a domicilio de regalos excepcionales para momentos especiales, con un catálogo de marcas y tiendas seleccionadas en todo México.",
@@ -98,7 +94,6 @@
     "comingSoonFr": "BIENTÔT",
     "comingSoonKr": "곧 출시"
   },
-  
   "Products": {
     "addToCart": "Agregar al carrito",
     "added": "Agregado",
@@ -138,7 +133,6 @@
     "addedToWishlist": "Agregado a favoritos",
     "removedFromWishlist": "Eliminado de favoritos"
   },
-  
   "Cart": {
     "title": "Carrito ({count})",
     "empty": "Tu carrito está vacío",
@@ -169,7 +163,6 @@
       "addErrorDescription": "No pudimos agregar el producto al carrito. Por favor, intenta de nuevo o contacta a soporte."
     }
   },
-  
   "Checkout": {
     "title": "Finalizar compra",
     "shippingAddress": "Dirección de envío",
@@ -205,7 +198,6 @@
       "paymentDescription": "🇲🇽 Compra de productos únicos mexicanos - Luzimarket"
     }
   },
-  
   "VendorRegistration": {
     "title": "Registro de vendedor",
     "subtitle": "Únete a nuestra plataforma de vendedores seleccionados",
@@ -237,7 +229,6 @@
     "successMessage": "Hemos recibido tu solicitud de registro. Nuestro equipo la revisará y te contactaremos pronto.",
     "backToHome": "Volver al inicio"
   },
-  
   "Admin": {
     "dashboard": "Panel de control",
     "orders": "Órdenes",
@@ -265,7 +256,6 @@
       "cancelled": "Cancelado"
     }
   },
-  
   "Vendor": {
     "dashboard": "Panel de vendedor",
     "myProducts": "Mis productos",
@@ -308,7 +298,6 @@
       }
     }
   },
-  
   "Errors": {
     "404": "Página no encontrada",
     "500": "Error del servidor",
@@ -321,7 +310,6 @@
     "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
     "passwordsDontMatch": "Las contraseñas no coinciden"
   },
-  
   "Emails": {
     "vendor": {
       "newOrderSubject": "Nueva orden #{orderNumber} - Luzimarket",
@@ -371,7 +359,32 @@
       "connectingMessage": "Luzimarket - Conectando México con el mundo"
     }
   },
-  
+  "Search": {
+    "title": "Resultados de búsqueda",
+    "resultsFor": "Resultados para",
+    "noResults": "No se encontraron resultados",
+    "searchPlaceholder": "Buscar productos, categorías o tiendas...",
+    "filters": "Filtros",
+    "sortBy": "Ordenar por",
+    "relevance": "Relevancia",
+    "priceAsc": "Precio: Menor a Mayor",
+    "priceDesc": "Precio: Mayor a Menor",
+    "newest": "Más reciente",
+    "suggestions": "Sugerencias",
+    "checkSpelling": "Verifica la ortografía",
+    "useGeneral": "Usa términos más generales",
+    "trySynonyms": "Prueba con sinónimos",
+    "searchByCategory": "Busca por categoría o marca",
+    "popularSearches": "Búsquedas populares",
+    "whatAreYouLookingFor": "¿Qué estás buscando?",
+    "useSearchBar": "Utiliza la barra de búsqueda para encontrar productos, marcas o categorías",
+    "noResultsFound": "No se encontraron resultados",
+    "couldNotFind": "No pudimos encontrar productos que coincidan con tu búsqueda. Intenta con diferentes términos o explora nuestras categorías.",
+    "viewAllProducts": "Ver todos los productos",
+    "exploreCategories": "Explorar categorías",
+    "productsFound": "{count} {count, plural, =0 {productos} =1 {producto} other {productos}} encontrados",
+    "loadMore": "Cargar más resultados"
+  },
   "Security": {
     "rateLimitAuth": "Demasiados intentos de autenticación. Intenta de nuevo en 15 minutos.",
     "rateLimitCheckout": "Demasiados intentos de compra. Intenta de nuevo en un minuto.",
@@ -380,7 +393,6 @@
     "rateLimitVendor": "Demasiadas solicitudes de vendedor. Intenta de nuevo en un minuto.",
     "rateLimitGeneral": "Demasiadas solicitudes. Intenta de nuevo en un minuto."
   },
-
   "Orders": {
     "title": "Mis pedidos",
     "noOrders": "No tienes pedidos todavía",
@@ -462,7 +474,6 @@
       "searchOrders": "Buscar pedidos..."
     }
   },
-
   "Footer": {
     "aboutUs": "Acerca de nosotros",
     "help": "Ayuda",

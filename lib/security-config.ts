@@ -3,7 +3,7 @@
 // Allowed origins for CORS
 export const getAllowedOrigins = (): string[] => {
   const origins: string[] = []
-  
+
   // Always allow localhost in development
   if (process.env.NODE_ENV === 'development') {
     origins.push(
@@ -12,24 +12,24 @@ export const getAllowedOrigins = (): string[] => {
       'http://127.0.0.1:3000'
     )
   }
-  
+
   // Production origins
   if (process.env.NEXT_PUBLIC_APP_URL) {
     origins.push(process.env.NEXT_PUBLIC_APP_URL)
   }
-  
+
   // Vercel preview URLs
   if (process.env.VERCEL_URL) {
     origins.push(`https://${process.env.VERCEL_URL}`)
   }
-  
+
   // Add your production domains
   origins.push(
     'https://luzimarket.shop',
     'https://www.luzimarket.shop',
     'https://luzimarket.vercel.app'
   )
-  
+
   // Remove duplicates
   return [...new Set(origins)]
 }
@@ -41,31 +41,31 @@ export const rateLimitConfigs = {
     windowMs: 60 * 1000, // 1 minute
     max: 60, // 60 requests per minute
   },
-  
-  // Authentication endpoints - stricter limits
+
+  // Authentication endpoints - reasonable limits for auth flows
   '/api/auth/': {
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // 5 attempts per 15 minutes
+    windowMs: 5 * 60 * 1000, // 5 minutes
+    max: 20, // 20 requests per 5 minutes (allows for normal auth flows)
   },
-  
+
   // Search endpoint - higher limit for autocomplete
   '/api/search': {
     windowMs: 60 * 1000, // 1 minute
     max: 120, // 120 requests per minute
   },
-  
+
   // Vendor registration - prevent spam
   '/api/vendor/register': {
     windowMs: 60 * 60 * 1000, // 1 hour
     max: 3, // 3 attempts per hour
   },
-  
+
   // Stripe webhooks - higher limit
   '/api/webhooks/stripe': {
     windowMs: 60 * 1000, // 1 minute
     max: 200, // 200 requests per minute
   },
-  
+
   // Review submission - prevent review spam
   '/api/reviews': {
     windowMs: 60 * 60 * 1000, // 1 hour
@@ -77,7 +77,7 @@ export const rateLimitConfigs = {
 export const csrfExcludePaths = [
   '/api/webhooks/', // Webhooks can't send CSRF tokens
   '/api/health', // Health check endpoint
-  '/api/auth/session', // NextAuth session endpoint
+  '/api/auth/', // All NextAuth endpoints need to skip CSRF protection
 ]
 
 // Security headers to add to responses
@@ -105,6 +105,6 @@ export const getContentSecurityPolicy = (): string => {
     "frame-ancestors 'none'",
     "upgrade-insecure-requests",
   ]
-  
+
   return directives.join('; ')
 }

@@ -13,6 +13,9 @@ config({ path: ".env.local" });
 
 import { db } from "./index";
 
+// Set a fixed seed for consistent data generation
+faker.seed(12345);
+
 
 // Fixed data
 const CATEGORIES = [
@@ -265,7 +268,7 @@ async function main() {
   const shouldReset = !process.argv.includes('--no-reset');
   const shouldGenerateImages = !process.argv.includes('--no-images') && !!process.env.OPENAI_SECRET_KEY;
   const forceRegenerateImages = process.argv.includes('--force-images'); // Force regenerate existing images
-  const imageBatchSize = process.argv.includes('--fast') ? 10 : 500; // Limit images in fast mode
+  const imageBatchSize = process.argv.includes('--fast') ? 10 : 100; // Limit images in fast mode
 
   try {
     // Reset database if needed
@@ -417,7 +420,7 @@ async function main() {
       const businessName = `${prefix} ${suffix}`;
       vendorData.push({
         businessName,
-        slug: slugify(businessName + "-" + faker.string.alphanumeric(6), { lower: true, strict: true }),
+        slug: slugify(businessName + "-" + i, { lower: true, strict: true }), // Use index instead of random string
         contactName: faker.person.fullName(),
         email: faker.internet.email(),
         passwordHash: defaultPasswordHash, // All test vendors use password123
@@ -490,14 +493,24 @@ async function main() {
       "gourmet-delicatessen": PRODUCT_NAMES.slice(105, 120)
     };
 
-    for (let i = 0; i < 500; i++) {
-      const category = faker.helpers.arrayElement(categories);
+    for (let i = 0; i < 100; i++) {
+      // Use modulo to cycle through categories deterministically
+      const categoryIndex = i % categories.length;
+      const category = categories[categoryIndex];
+      
       const categoryProducts = CATEGORY_PRODUCT_NAMES[category.slug] || PRODUCT_NAMES;
-      const baseName = faker.helpers.arrayElement(categoryProducts);
-      const adjective = faker.helpers.arrayElement([
+      // Use modulo to cycle through product names
+      const productNameIndex = Math.floor(i / categories.length) % categoryProducts.length;
+      const baseName = categoryProducts[productNameIndex];
+      
+      const adjectives = [
         "Premium", "Deluxe", "Exclusivo", "Artesanal", "Elegante",
         "Clásico", "Moderno", "Vintage", "Lujoso", "Especial"
-      ]);
+      ];
+      // Use modulo to cycle through adjectives
+      const adjectiveIndex = i % adjectives.length;
+      const adjective = adjectives[adjectiveIndex];
+      
       const name = `${baseName} ${adjective}`;
       const priceRange = CATEGORY_PRICE_RANGES[category.slug] || { min: 299, max: 1999 };
       const price = faker.number.int({ min: priceRange.min, max: priceRange.max });
@@ -514,12 +527,18 @@ async function main() {
         description = faker.lorem.sentences(2) + ` ${faker.helpers.arrayElement(["Hecho a mano con amor.", "Producto exclusivo de temporada.", "Edición limitada.", "Diseño único."])}`;
       }
 
+      // Assign vendors deterministically by cycling through them
+      const vendorIndex = i % vendors.length;
+      const vendor = vendors[vendorIndex];
+      // Create deterministic slug based on product index only (since everything else is now deterministic)
+      const deterministicSlug = slugify(`${baseName}-${adjective}-${i}`, { lower: true, strict: true });
+      
       productData.push({
         name,
-        slug: slugify(name + "-" + faker.string.alphanumeric(6), { lower: true, strict: true }),
+        slug: deterministicSlug,
         description,
         categoryId: category.id,
-        vendorId: faker.helpers.arrayElement(vendors).id,
+        vendorId: vendor.id,
         price: String(Math.round(price / 50) * 50), // Round to nearest 50
         images: null, // Will be generated with AI
         tags: faker.helpers.arrayElements(["nuevo", "popular", "oferta", "exclusivo", "limitado", "artesanal", "eco-friendly", "premium"], { min: 1, max: 4 }),
@@ -648,7 +667,7 @@ async function main() {
 
     // Create variants for products that have variant configurations
     let variantCounter = 0;
-    for (const product of products.slice(0, 200)) { // Add variants to first 200 products
+    for (const product of products.slice(0, 50)) { // Add variants to first 50 products
       const category = categories.find(c => c.id === product.categoryId);
       if (!category) continue;
 
@@ -683,7 +702,26 @@ async function main() {
     console.log("👥 Creating users...");
     const userPassword = await bcrypt.hash("password123", 10);
     const userData = [];
-    for (let i = 0; i < 50; i++) {
+    
+    // Add specific test users first
+    userData.push({
+      email: "customer1@example.com",
+      name: "Test Customer",
+      passwordHash: userPassword,
+      stripeCustomerId: `cus_test_customer1`,
+      isActive: true
+    });
+    
+    userData.push({
+      email: "customer2@example.com",
+      name: "Test Customer 2",
+      passwordHash: userPassword,
+      stripeCustomerId: `cus_test_customer2`,
+      isActive: true
+    });
+    
+    // Add random users
+    for (let i = 0; i < 48; i++) {
       userData.push({
         email: faker.internet.email(),
         name: faker.person.fullName(),

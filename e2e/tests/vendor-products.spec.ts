@@ -9,7 +9,7 @@ test.describe('Vendor Product Management', () => {
     const vendorTab = page.locator('button[role="tab"]').filter({ hasText: /Vendedor|Vendor/ });
     await vendorTab.click();
     await page.fill('input[type="email"]', 'vendor@luzimarket.shop');
-    await page.fill('input[type="password"]', 'vendor123');
+    await page.fill('input[type="password"]', 'password123');
     const submitButton = page.locator('button[type="submit"]').filter({ hasText: /Iniciar sesión|Sign in/ });
     await submitButton.click();
     await page.waitForURL(/\/vendor/, { timeout: 10000 });

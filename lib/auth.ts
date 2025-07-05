@@ -41,35 +41,9 @@ export const authOptions = {
             throw new InvalidLoginError();
           }
 
-          // Handle different credential formats in NextAuth
-          let parsedCredentials = credentials;
-
-          // If credentials is a string, it's likely form-encoded data
-          if (typeof credentials === 'string') {
-            console.log("Credentials is a string, parsing form data");
-            try {
-              // Parse form-encoded data
-              const params = new URLSearchParams(credentials);
-              parsedCredentials = {
-                email: params.get('email') || '',
-                password: params.get('password') || '',
-                userType: params.get('userType') || 'customer'
-              };
-              console.log("Parsed credentials:", parsedCredentials);
-            } catch (error) {
-              console.error("Failed to parse form data:", error);
-              throw new InvalidLoginError();
-            }
-          }
-
-          // Ensure we have an object with the expected fields
-          if (!parsedCredentials || typeof parsedCredentials !== 'object') {
-            console.error("Invalid credentials format");
-            throw new InvalidLoginError();
-          }
-
+          // NextAuth always passes credentials as an object, not a string
           // Validate credentials with Zod schema
-          const validationResult = loginSchema.safeParse(parsedCredentials);
+          const validationResult = loginSchema.safeParse(credentials);
           if (!validationResult.success) {
             console.error("Credential validation failed:", validationResult.error);
             throw new InvalidLoginError();

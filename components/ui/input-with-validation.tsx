@@ -24,6 +24,7 @@ const InputWithValidation = React.forwardRef<HTMLInputElement, InputWithValidati
             className
           )}
           ref={ref}
+          aria-label={props['aria-label'] || props.placeholder}
           {...props}
         />
         {showValidation && (

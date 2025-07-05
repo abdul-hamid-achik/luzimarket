@@ -25,10 +25,11 @@ export function SearchBox() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [showSearchInput, setShowSearchInput] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const t = useTranslations('Common');
-  
+
   const debouncedQuery = useDebounce(query, 300);
 
   // Fetch search results
@@ -87,32 +88,55 @@ export function SearchBox() {
     inputRef.current?.focus();
   };
 
+  const handleSearchButtonClick = () => {
+    setShowSearchInput(!showSearchInput);
+    if (!showSearchInput) {
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  };
+
   return (
-    <div ref={searchRef} className="relative flex-1">
-      <form onSubmit={handleSubmit}>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <Input
-            ref={inputRef}
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => query.length >= 2 && results.length > 0 && setIsOpen(true)}
-            placeholder={t('searchPlaceholder')}
-            className="pl-10 pr-10 w-full border-gray-300 rounded-none font-univers"
-          />
-          {query && (
-            <button
-              type="button"
-              onClick={clearSearch}
-              aria-label={t('clearSearch')}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-      </form>
+    <div ref={searchRef} className="relative flex-1" data-testid="search-box">
+      {/* Search Button for mobile/tests */}
+      <div className="md:hidden">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleSearchButtonClick}
+          aria-label={t('search')}
+          className="h-10 w-10"
+        >
+          <Search className="h-5 w-5" />
+        </Button>
+      </div>
+
+      {/* Search Input - Always visible on desktop, toggleable on mobile */}
+      <div className={`${showSearchInput ? 'block' : 'hidden'} md:block`}>
+        <form onSubmit={handleSubmit}>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              ref={inputRef}
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onFocus={() => query.length >= 2 && results.length > 0 && setIsOpen(true)}
+              placeholder={t('searchPlaceholder')}
+              className="pl-10 pr-10 w-full border-gray-300 rounded-none font-univers"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={clearSearch}
+                aria-label={t('clearSearch')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+        </form>
+      </div>
 
       {/* Search Results Dropdown */}
       {isOpen && (

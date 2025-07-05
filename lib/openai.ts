@@ -65,9 +65,9 @@ export async function generateAndUploadImage(
           return blobs.blobs[0].url;
         }
       } else {
-        // Local development URL
+        // Local development URL - need to include the full path structure
         console.log(`♻️  Using existing image for ${filename}`);
-        return `/uploads/${filename}`;
+        return `/uploads/${pathname}`;
       }
     }
     

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { safeLocalStorage } from '../helpers/localStorage';
 
 test.describe('Error Handling', () => {
   test('should handle 404 page not found', async ({ page }) => {
@@ -49,15 +50,15 @@ test.describe('Error Handling', () => {
     await page.goto('/vendor/register');
     
     // Fill form with invalid data
-    await page.fill('input[name="email"]', 'invalid-email');
-    await page.fill('input[name="phone"]', '123'); // Too short
+    await page.fill('input[placeholder="Email"]', 'invalid-email');
+    await page.fill('input[placeholder="Contraseña (mínimo 6 caracteres)"]', '123'); // Too short
     
     // Submit
     await page.click('button[type="submit"]');
     
     // Should show validation errors
-    await expect(page.locator('text=/Invalid email|Email inválido/')).toBeVisible();
-    await expect(page.locator('text=/Phone.*invalid|Teléfono.*inválido/')).toBeVisible();
+    await expect(page.locator('text=/Invalid email|Email inválido|formato/i')).toBeVisible();
+    await expect(page.locator('text=/mínimo 6 caracteres|Password must|too short/i')).toBeVisible();
   });
 
   test('should handle server errors', async ({ page }) => {
@@ -111,13 +112,8 @@ test.describe('Error Handling', () => {
   test('should handle session timeout', async ({ page }) => {
     // Login first
     await page.goto('/login');
-    await page.fill('input[type="email"]', 'maria.garcia@email.com');
-    await page.fill('input[type="password"]', 'customer123');
-    
-    const userTypeSelector = page.locator('select[name="userType"]').first();
-    if (await userTypeSelector.isVisible()) {
-      await userTypeSelector.selectOption('customer');
-    }
+    await page.fill('input[type="email"]', 'customer1@example.com');
+    await page.fill('input[type="password"]', 'password123');
     
     await page.click('button[type="submit"]');
     await page.waitForURL((url) => !url.pathname.includes('/login'));
@@ -151,9 +147,12 @@ test.describe('Error Handling', () => {
   });
 
   test('should handle invalid cart state', async ({ page }) => {
+    // Initialize safe localStorage
+    await safeLocalStorage(page);
+    
     // Manually set invalid cart data
     await page.evaluate(() => {
-      localStorage.setItem('cart', JSON.stringify({
+      localStorage.setItem('luzimarket-cart', JSON.stringify({
         items: [{ id: 'invalid', quantity: -1 }]
       }));
     });

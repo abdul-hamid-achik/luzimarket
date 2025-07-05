@@ -42,7 +42,6 @@
     "user": "User",
     "clearSearch": "Clear search"
   },
-  
   "Navigation": {
     "home": "Home",
     "bestSellers": "Best Sellers",
@@ -59,7 +58,6 @@
     "tiktok": "TikTok",
     "whatsapp": "WhatsApp"
   },
-  
   "HomePage": {
     "title": "Handpicked extraordinary gifts",
     "subtitle": "Find the perfect gift from curated vendors across Mexico",
@@ -69,7 +67,6 @@
     "trendingNow": "Trending Now",
     "newArrivals": "New Arrivals"
   },
-  
   "HandpickedPage": {
     "title": "Handpicked Selection",
     "subtitle": "Gifts carefully selected by our experts",
@@ -88,7 +85,6 @@
     "noProducts": "No products found",
     "tryAdjustingFilters": "Try adjusting filters to see more results"
   },
-  
   "ComingSoon": {
     "title": "Handpicked extraordinary gifts",
     "description": "LUZIMARKET® is a new online platform offering curation, sales, and home delivery of exceptional gifts for special moments, with a catalog of selected brands and stores throughout Mexico.",
@@ -98,7 +94,6 @@
     "comingSoonFr": "BIENTÔT",
     "comingSoonKr": "곧 출시"
   },
-  
   "Products": {
     "addToCart": "Add to cart",
     "added": "Added",
@@ -138,7 +133,6 @@
     "addedToWishlist": "Added to wishlist",
     "removedFromWishlist": "Removed from wishlist"
   },
-  
   "Cart": {
     "title": "Cart ({count})",
     "empty": "Your cart is empty",
@@ -169,7 +163,6 @@
       "addErrorDescription": "We couldn't add the product to your cart. Please try again or contact support."
     }
   },
-  
   "Checkout": {
     "title": "Checkout",
     "shippingAddress": "Shipping address",
@@ -205,7 +198,6 @@
       "paymentDescription": "🇲🇽 Unique Mexican products purchase - Luzimarket"
     }
   },
-  
   "VendorRegistration": {
     "title": "Vendor Registration",
     "subtitle": "Join our curated vendor platform",
@@ -237,7 +229,6 @@
     "successMessage": "We've received your vendor registration. Our team will review it and contact you soon.",
     "backToHome": "Back to home"
   },
-  
   "Admin": {
     "dashboard": "Dashboard",
     "orders": "Orders",
@@ -265,7 +256,6 @@
       "cancelled": "Cancelled"
     }
   },
-  
   "Vendor": {
     "dashboard": "Vendor Dashboard",
     "myProducts": "My Products",
@@ -308,7 +298,6 @@
       }
     }
   },
-  
   "Errors": {
     "404": "Page not found",
     "500": "Server error",
@@ -321,7 +310,6 @@
     "passwordTooShort": "Password must be at least 8 characters",
     "passwordsDontMatch": "Passwords don't match"
   },
-
   "Emails": {
     "vendor": {
       "newOrderSubject": "New order #{orderNumber} - Luzimarket",
@@ -371,7 +359,32 @@
       "connectingMessage": "Luzimarket - Connecting Mexico with the world"
     }
   },
-
+  "Search": {
+    "title": "Search Results",
+    "resultsFor": "Results for",
+    "noResults": "No results found",
+    "searchPlaceholder": "Search products, categories or stores...",
+    "filters": "Filters",
+    "sortBy": "Sort by",
+    "relevance": "Relevance",
+    "priceAsc": "Price: Low to High",
+    "priceDesc": "Price: High to Low",
+    "newest": "Newest",
+    "suggestions": "Suggestions",
+    "checkSpelling": "Check spelling",
+    "useGeneral": "Use more general terms",
+    "trySynonyms": "Try synonyms",
+    "searchByCategory": "Search by category or brand",
+    "popularSearches": "Popular searches",
+    "whatAreYouLookingFor": "What are you looking for?",
+    "useSearchBar": "Use the search bar to find products, brands or categories",
+    "noResultsFound": "No results found",
+    "couldNotFind": "We couldn't find products matching your search. Try different terms or explore our categories.",
+    "viewAllProducts": "View all products",
+    "exploreCategories": "Explore categories",
+    "productsFound": "{count} {count, plural, =0 {products} =1 {product} other {products}} found",
+    "loadMore": "Load more results"
+  },
   "Security": {
     "rateLimitAuth": "Too many authentication attempts. Try again in 15 minutes.",
     "rateLimitCheckout": "Too many checkout attempts. Try again in a minute.",
@@ -380,7 +393,6 @@
     "rateLimitVendor": "Too many vendor requests. Try again in a minute.",
     "rateLimitGeneral": "Too many requests. Try again in a minute."
   },
-
   "Orders": {
     "title": "My Orders",
     "noOrders": "You don't have any orders yet",
@@ -462,7 +474,6 @@
       "searchOrders": "Search orders..."
     }
   },
-  
   "Footer": {
     "aboutUs": "About Us",
     "help": "Help",

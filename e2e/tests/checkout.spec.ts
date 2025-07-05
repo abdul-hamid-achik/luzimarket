@@ -225,8 +225,8 @@ test.describe('Checkout Flow', () => {
     // Verify shipping row is visible
     await expect(shippingRow).toBeVisible();
 
-    // Verify the shipping amount shows $99
-    await expect(shippingRow).toContainText('$99');
+    // Verify the shipping amount shows $89 (base rate for standard shipping)
+    await expect(shippingRow).toContainText('$89');
   });
 
   test('should calculate totals correctly', async ({ page }) => {

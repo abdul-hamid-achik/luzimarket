@@ -66,6 +66,13 @@ function applySecurityHeaders(response: NextResponse): NextResponse {
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
+  // Handle admin and vendor routes - skip internationalization
+  if (pathname.startsWith('/admin') || pathname.startsWith('/vendor')) {
+    const response = NextResponse.next()
+    applySecurityHeaders(response)
+    return response
+  }
+
   // Handle API routes
   if (pathname.startsWith('/api/')) {
     const response = NextResponse.next()
@@ -173,9 +180,12 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Skip all internal paths (_next, assets, etc)
-    '/((?!_next|_vercel|.*\\..*|api/health).*)',
+    // Skip all internal paths (_next, assets, etc) and admin/vendor routes
+    '/((?!_next|_vercel|.*\\..*|api/health|admin|vendor).*)',
     // Include API routes for security handling
-    '/api/:path*'
+    '/api/:path*',
+    // Include admin and vendor routes for security headers only
+    '/admin/:path*',
+    '/vendor/:path*'
   ]
 }

@@ -4,7 +4,7 @@ import { Link } from '@/i18n/navigation';
 import NextLink from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Heart, ShoppingBag, User, Menu, LogOut } from "lucide-react";
+import { Heart, ShoppingBag, User, Menu, LogOut, Search } from "lucide-react";
 import { SearchBox } from "./search-box";
 import { useState } from "react";
 import { useCart } from "@/contexts/cart-context";
@@ -148,6 +148,28 @@ export function Header() {
             <Button variant="ghost" size="sm" className="font-univers text-xs tracking-wider hidden md:inline-flex">
               FAMILY
             </Button>
+
+            {/* Search Button - Mobile only */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="md:hidden"
+              aria-label={t('search')}
+              onClick={() => {
+                // Toggle search input visibility
+                const searchBox = document.querySelector('[data-testid="search-box"]');
+                if (searchBox) {
+                  const input = searchBox.querySelector('input');
+                  if (input) {
+                    input.focus();
+                  }
+                }
+              }}
+            >
+              <Search className="h-4 w-4 mr-1" />
+              Buscar
+            </Button>
+
             <Link
               href="/wishlist"
               aria-label={getWishlistItems() > 0 ? t('wishlistWithItems', { count: getWishlistItems() }) : t('wishlist')}

@@ -29,7 +29,7 @@ export default function CartSheet() {
             ) : (
               <div className="space-y-4">
                 {state.items.map((item) => (
-                  <div key={item.id} className="flex gap-4 p-4 bg-gray-50 rounded-lg" data-testid={`cart-item-${item.id}`}>
+                  <div key={item.id} className="flex gap-4 p-4 bg-gray-50 rounded-lg" data-testid="cart-item">
                     {/* Product Image */}
                     <div className="relative w-20 h-20 flex-shrink-0 bg-gray-200 rounded overflow-hidden">
                       <Image

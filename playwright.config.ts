@@ -39,6 +39,14 @@ export default defineConfig({
     /* Increase timeouts for slower operations */
     navigationTimeout: 60000,
     actionTimeout: 30000,
+    
+    /* Browser context options */
+    contextOptions: {
+      // Grant permissions that tests might need
+      permissions: ['clipboard-read', 'clipboard-write'],
+      // Bypass CSP for tests
+      bypassCSP: true,
+    },
   },
 
   /* Global timeout for tests */
@@ -56,25 +64,28 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
 
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
+    // Additional browsers only in CI for faster local development
+    ...(process.env.CI ? [
+      {
+        name: 'firefox',
+        use: { ...devices['Desktop Firefox'] },
+      },
 
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
+      {
+        name: 'webkit',
+        use: { ...devices['Desktop Safari'] },
+      },
 
-    /* Test against mobile viewports. */
-    {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
-    },
-    {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
-    },
+      /* Test against mobile viewports. */
+      {
+        name: 'Mobile Chrome',
+        use: { ...devices['Pixel 5'] },
+      },
+      {
+        name: 'Mobile Safari',
+        use: { ...devices['iPhone 12'] },
+      },
+    ] : []),
 
     /* Test against branded browsers. */
     // {
@@ -93,7 +104,7 @@ export default defineConfig({
    * Then run tests:
    * npm test
    */
-  
+
   webServer: {
     command: 'npm run dev',
     url: 'http://localhost:3000',

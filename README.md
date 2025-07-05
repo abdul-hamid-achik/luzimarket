@@ -276,21 +276,60 @@ OPENAI_SECRET_KEY=sk-...
 
 ## Testing
 
+### E2E Test Suite Status (2025-07-05)
+
+**Current Status**: 299 tests total
+- ✅ Passed: 99 tests (33.11%)
+- ❌ Failed: 192 tests (64.21%)
+- ⏭️ Skipped: 8 tests (2.68%)
+
+#### Recent Test Infrastructure Improvements
+
+Fixed multiple test infrastructure issues to improve reliability:
+
+1. **Authentication & User Management**
+   - Fixed incorrect passwords in tests (now using `password123` for all seeded users)
+   - Added specific test users (`customer1@example.com`, `customer2@example.com`)
+   - Fixed vendor login redirects to use non-internationalized routes
+
+2. **Component Selectors & Accessibility**
+   - Added `data-testid` attributes to key components (product cards, cart items, order summary)
+   - Fixed localStorage security errors with safe wrapper for test environments
+   - Added `aria-label` attributes to form inputs for accessibility
+
+3. **Missing Pages & Features**
+   - Created 404 not-found page with proper navigation links
+   - Added admin categories page (`/admin/categories`)
+   - Added missing text content for email templates page
+
+4. **Test Expectations**
+   - Updated shipping price expectations ($89 instead of $99)
+   - Fixed form field selectors in vendor registration tests
+   - Updated error message expectations to match actual implementations
+
+#### Why Tests Still Fail
+
+The majority of remaining failures are due to:
+- **Missing Features**: Tests expect multi-vendor functionality, vendor orders pages, and other features not yet implemented
+- **Timeout Issues**: 70 failures are timeout errors when clicking elements, suggesting timing or visibility issues
+- **Data Mismatches**: Test expectations don't always match the seeded data structure
+
+### Running Tests
+
 ```bash
-# Start dev server (required for tests)
-npm run dev
+# Kill any existing processes first
+pkill -f playwright
+pkill -f "next dev"
 
-# In another terminal, run tests
-npm test
-
-# Run with UI for debugging
-npm run test:ui
+# Run tests with different reporters
+npm test                    # Standard Playwright output
+npm run test:json          # JSON output for parsing
+npm run test:llm           # LLM-friendly output (JSON + JUnit XML)
 
 # Debug specific tests
-npm run test:debug
-
-# View test results
-npm run test:report
+npm run test:ui            # Run with Playwright UI
+npm run test:debug         # Debug mode
+npm run test:headed        # See browser during tests
 ```
 
 ## Deployment

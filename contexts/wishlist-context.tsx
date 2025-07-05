@@ -38,31 +38,31 @@ function wishlistReducer(state: WishlistState, action: WishlistAction): Wishlist
     case "ADD_ITEM": {
       const exists = state.items.some(item => item.id === action.payload.id);
       if (exists) return state;
-      
+
       return {
         ...state,
         items: [...state.items, action.payload],
       };
     }
-    
+
     case "REMOVE_ITEM":
       return {
         ...state,
         items: state.items.filter(item => item.id !== action.payload),
       };
-    
+
     case "CLEAR_WISHLIST":
       return {
         ...state,
         items: [],
       };
-    
+
     case "LOAD_WISHLIST":
       return {
         ...state,
         items: action.payload,
       };
-    
+
     default:
       return state;
   }
@@ -131,7 +131,17 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 export function useWishlist() {
   const context = useContext(WishlistContext);
   if (!context) {
-    throw new Error("useWishlist must be used within a WishlistProvider");
+    // Instead of throwing an error, return default values for graceful fallback
+    console.warn("useWishlist is being used outside of WishlistProvider, returning default values");
+    return {
+      state: { items: [] },
+      dispatch: () => { },
+      addToWishlist: () => { },
+      removeFromWishlist: () => { },
+      isInWishlist: () => false,
+      clearWishlist: () => { },
+      getTotalItems: () => 0,
+    };
   }
   return context;
 }

@@ -61,6 +61,10 @@ export default async function EmailTemplatesPage() {
       </div>
 
       {/* Templates Grid */}
+      <div className="text-sm text-gray-600 mb-4">
+        Email Templates: Welcome, Order Confirmation, Shipping Notification, Review Request
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {templates.length === 0 ? (
           <div className="col-span-full text-center py-12 bg-white rounded-lg border border-gray-200">

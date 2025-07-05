@@ -59,7 +59,7 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
       className={cn("group block", className)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      data-testid={`product-card-${product.slug}`}
+      data-testid="product-card"
     >
       <div className="relative aspect-square mb-4 overflow-hidden bg-gray-100 rounded-lg">
         <Image
@@ -137,15 +137,15 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
       </div>
       
       <div className="space-y-1">
-        <h3 className="font-univers text-sm font-medium">
+        <h3 className="font-univers text-sm font-medium" data-testid="product-name">
           {product.name}
         </h3>
         {product.vendor && (
-          <p className="text-xs text-gray-500 font-univers">
+          <p className="text-xs text-gray-500 font-univers" data-testid="vendor-name">
             + {product.vendor.businessName.toUpperCase()}
           </p>
         )}
-        <p className="font-univers text-sm mt-2">
+        <p className="font-univers text-sm mt-2" data-testid="product-price">
           ${parseFloat(product.price).toLocaleString('es-MX')}
         </p>
       </div>

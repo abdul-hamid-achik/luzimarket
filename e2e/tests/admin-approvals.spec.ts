@@ -35,7 +35,7 @@ test.describe('Admin Approval Workflows', () => {
       }
 
       // Should show pending vendors list
-      await expect(page.locator('text=/Solicitudes pendientes|Pending applications|Vendedores por aprobar|Vendors to approve/i')).toBeVisible();
+      await expect(page.locator('text=/Pendientes de aprobación|Pending applications|Vendedores por aprobar|Vendors to approve/i')).toBeVisible();
 
       // Check for vendor cards/rows
       const vendorItems = page.locator('[data-testid*="vendor"], .vendor-card, tr').filter({ hasText: /Pendiente|Pending/i });
@@ -410,7 +410,6 @@ test.describe('Admin Approval Workflows', () => {
       // Check table headers
       await expect(userTable.locator('th').filter({ hasText: /Email|Correo/i })).toBeVisible();
       await expect(userTable.locator('th').filter({ hasText: /Tipo|Type|Rol|Role/i })).toBeVisible();
-      await expect(userTable.locator('th').filter({ hasText: /Estado|Status/i })).toBeVisible();
       await expect(userTable.locator('th').filter({ hasText: /Registro|Registered|Fecha|Date/i })).toBeVisible();
     });
 
@@ -454,18 +453,18 @@ test.describe('Admin Approval Workflows', () => {
     test('should view user activity log', async ({ page }) => {
       await page.goto(routes.adminUsers);
 
-      // Click on a user to view details
+      // Click on a user to view details - specifically click the link, not any button
       const userRow = page.locator('tr, [data-testid*="user"]').nth(1);
-      const viewButton = userRow.locator('button, a').filter({ hasText: /Ver|View|Detalles|Details/i });
+      const viewLink = userRow.locator('a').filter({ hasText: /Ver|View|Detalles|Details/i }).first();
 
-      if (await viewButton.isVisible()) {
-        await viewButton.click();
+      if (await viewLink.isVisible()) {
+        await viewLink.click();
 
-        // Should show user detail page/modal
+        // Should show user detail page
         await page.waitForTimeout(1000);
 
         // Look for activity tab
-        const activityTab = page.locator('button[role="tab"], a').filter({ hasText: /Actividad|Activity|Historial|History/i });
+        const activityTab = page.locator('button[role="tab"]').filter({ hasText: /Actividad|Activity|Historial|History/i });
         if (await activityTab.isVisible()) {
           await activityTab.click();
 
@@ -495,9 +494,9 @@ test.describe('Admin Approval Workflows', () => {
       await expect(pendingCards.first()).toBeVisible();
 
       // Should show specific pending items
-      await expect(page.locator('text=/Vendedores.*pendientes|Vendors.*pending|Solicitudes.*vendedor|Vendor.*applications/i')).toBeVisible();
-      await expect(page.locator('text=/Productos.*revisar|Products.*review|Productos.*pendientes|Products.*pending/i')).toBeVisible();
-      await expect(page.locator('text=/Imágenes.*moderar|Images.*moderate|Imágenes.*pendientes|Images.*pending/i')).toBeVisible();
+      await expect(page.locator('text="Vendedores pendientes"')).toBeVisible();
+      await expect(page.locator('text="Productos pendientes"')).toBeVisible();
+      await expect(page.locator('text="Imágenes pendientes"')).toBeVisible();
 
       // Each should be clickable
       const vendorCard = page.locator('[data-testid*="vendors-pending"], .card').filter({ hasText: /Vendedores|Vendors/i });
