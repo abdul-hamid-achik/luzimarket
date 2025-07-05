@@ -5,13 +5,7 @@ import { products, vendors, categories } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { ProductsGrid } from "@/components/products/products-grid";
 import { FilterSidebar } from "@/components/products/filter-sidebar";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SortDropdown } from "@/components/products/sort-dropdown";
 
 interface ProductsPageProps {
   params: Promise<{ locale: string }>;
@@ -79,9 +73,9 @@ export default async function ProductsPage({ params, searchParams }: ProductsPag
           <div className="relative bg-gradient-to-br from-pink-300 via-yellow-200 to-orange-300">
             <div className="absolute inset-0 flex items-center justify-center p-12">
               <div className="max-w-md">
-                <h1 className="text-4xl font-times-now mb-4">Todos los Productos</h1>
+                <h1 className="text-4xl font-times-now mb-4">{t('title')}</h1>
                 <p className="text-base font-univers leading-relaxed">
-                  Descubre nuestra selección completa de regalos extraordinarios
+                  {t('subtitle')}
                 </p>
               </div>
             </div>
@@ -110,25 +104,12 @@ export default async function ProductsPage({ params, searchParams }: ProductsPag
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <p className="text-sm text-gray-600 font-univers">
-                    {productList.length} productos encontrados
+                    {productList.length} {t('productsFound')}
                   </p>
                 </div>
                 
                 {/* Sort Dropdown */}
-                <div className="flex items-center gap-4">
-                  <span className="text-sm font-univers text-gray-600">Ordenar por</span>
-                  <Select defaultValue={filters.sort || "featured"}>
-                    <SelectTrigger className="w-48">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="featured">Nuestra selección</SelectItem>
-                      <SelectItem value="newest">Más reciente</SelectItem>
-                      <SelectItem value="price-asc">Precio más bajo a más alto</SelectItem>
-                      <SelectItem value="price-desc">Precio más alto a más bajo</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <SortDropdown />
               </div>
               
               <ProductsGrid products={productList} />
