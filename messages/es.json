@@ -284,8 +284,13 @@
         "vendorNewOrder": "Nueva orden (vendedor)",
         "accountLocked": "Cuenta bloqueada",
         "passwordReset": "Restablecer contraseña",
-        "welcome": "Bienvenida"
+        "welcome": "Bienvenida",
+        "reviewRequest": "Solicitud de reseña",
+        "promotional": "Promocional",
+        "abandonedCart": "Carrito abandonado"
       },
+      "active": "Activa",
+      "inactive": "Inactiva",
       "editTemplate": "Editar plantilla",
       "previewTemplate": "Vista previa de plantilla",
       "templateName": "Nombre de la plantilla",

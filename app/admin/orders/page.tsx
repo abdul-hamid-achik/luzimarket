@@ -6,6 +6,7 @@ import { Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { OrderStatusSelect } from "@/components/admin/order-status-select";
+import { getTranslations } from "next-intl/server";
 
 async function getOrders() {
   const orderList = await db
@@ -43,6 +44,8 @@ async function updateOrderStatus(orderId: string, status: string) {
 }
 
 export default async function AdminOrdersPage() {
+  const t = await getTranslations("Admin.ordersPage");
+  const tStatus = await getTranslations("Admin.orderStatus");
   const orderList = await getOrders();
 
   const statusColors: Record<string, string> = {

@@ -5,8 +5,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus, Mail, Edit, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { getTranslations } from "next-intl/server";
 
 export default async function EmailTemplatesPage() {
+  const t = await getTranslations("Admin.emailTemplates");
   const templates = await db
     .select()
     .from(emailTemplates)
@@ -30,16 +32,19 @@ export default async function EmailTemplatesPage() {
   };
 
   const getTemplateLabel = (type: string) => {
-    const labels: Record<string, string> = {
-      order_confirmation: "Confirmación de Orden",
-      welcome: "Bienvenida",
-      password_reset: "Restablecer Contraseña",
-      shipping_notification: "Notificación de Envío",
-      review_request: "Solicitud de Reseña",
-      promotional: "Promocional",
-      abandoned_cart: "Carrito Abandonado",
+    const typeMap: Record<string, string> = {
+      order_confirmation: "orderConfirmation",
+      welcome: "welcome",
+      password_reset: "passwordReset",
+      shipping_notification: "orderShipped",
+      review_request: "reviewRequest",
+      promotional: "promotional",
+      abandoned_cart: "abandonedCart",
+      vendor_new_order: "vendorNewOrder",
+      account_locked: "accountLocked"
     };
-    return labels[type] || type;
+    const key = typeMap[type];
+    return key ? t(`templateTypes.${key}`) : type;
   };
 
   return (
@@ -47,15 +52,15 @@ export default async function EmailTemplatesPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-univers text-gray-900">Plantillas de Email</h1>
+          <h1 className="text-2xl font-univers text-gray-900">{t("title")}</h1>
           <p className="text-sm text-gray-600 font-univers mt-1">
-            Administra las plantillas de correo electrónico del sistema
+            {t("subtitle")}
           </p>
         </div>
         <Link href="/admin/email-templates/new">
           <Button className="bg-black text-white hover:bg-gray-800">
             <Plus className="h-4 w-4 mr-2" />
-            Nueva Plantilla
+            {t("createNew")}
           </Button>
         </Link>
       </div>
@@ -75,7 +80,7 @@ export default async function EmailTemplatesPage() {
             <Link href="/admin/email-templates/new">
               <Button variant="outline">
                 <Plus className="h-4 w-4 mr-2" />
-                Crear primera plantilla
+                {t("createNew")}
               </Button>
             </Link>
           </div>
@@ -102,18 +107,18 @@ export default async function EmailTemplatesPage() {
                   variant={template.isActive ? "default" : "secondary"}
                   className={template.isActive ? "bg-green-100 text-green-800" : ""}
                 >
-                  {template.isActive ? "Activa" : "Inactiva"}
+                  {template.isActive ? t("active") : t("inactive")}
                 </Badge>
               </div>
 
               {/* Template Info */}
               <div className="space-y-2 mb-4">
                 <p className="text-sm font-univers text-gray-600">
-                  <span className="font-medium">Asunto:</span> {template.subject}
+                  <span className="font-medium">{t("subject")}:</span> {template.subject}
                 </p>
                 {template.variables && template.variables.length > 0 && (
                   <p className="text-sm font-univers text-gray-500">
-                    <span className="font-medium">Variables:</span> {(template.variables as string[]).join(", ")}
+                    <span className="font-medium">{t("variables")}:</span> {(template.variables as string[]).join(", ")}
                   </p>
                 )}
               </div>
@@ -124,7 +129,7 @@ export default async function EmailTemplatesPage() {
                   <span>Creado {new Date(template.createdAt).toLocaleDateString('es-MX')}</span>
                 )}
                 {template.updatedAt && (
-                  <span>• Actualizado {new Date(template.updatedAt).toLocaleDateString('es-MX')}</span>
+                  <span>• {t("lastModified")} {new Date(template.updatedAt).toLocaleDateString('es-MX')}</span>
                 )}
               </div>
 
@@ -133,13 +138,13 @@ export default async function EmailTemplatesPage() {
                 <Link href={`/admin/email-templates/${template.id}/edit`} className="flex-1">
                   <Button variant="outline" size="sm" className="w-full">
                     <Edit className="h-4 w-4 mr-1" />
-                    Editar
+                    {t("edit")}
                   </Button>
                 </Link>
                 <Link href={`/admin/email-templates/${template.id}/preview`} className="flex-1">
                   <Button variant="outline" size="sm" className="w-full">
                     <Eye className="h-4 w-4 mr-1" />
-                    Vista previa
+                    {t("preview")}
                   </Button>
                 </Link>
               </div>

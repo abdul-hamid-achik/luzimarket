@@ -284,8 +284,13 @@
         "vendorNewOrder": "New Order (Vendor)",
         "accountLocked": "Account Locked",
         "passwordReset": "Password Reset",
-        "welcome": "Welcome"
+        "welcome": "Welcome",
+        "reviewRequest": "Review Request",
+        "promotional": "Promotional",
+        "abandonedCart": "Abandoned Cart"
       },
+      "active": "Active",
+      "inactive": "Inactive",
       "editTemplate": "Edit Template",
       "previewTemplate": "Preview Template",
       "templateName": "Template Name",

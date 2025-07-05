@@ -13,34 +13,36 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, Plus } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 export default async function CategoriesPage() {
+  const t = await getTranslations("Admin.categories");
   const allCategories = await db.select().from(categories).orderBy(categories.name);
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-times-now">Categorías</h1>
+        <h1 className="text-2xl font-times-now">{t("title")}</h1>
         <Button className="bg-black text-white hover:bg-gray-800">
           <Plus className="h-4 w-4 mr-2" />
-          Nueva Categoría
+          {t("createNew")}
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Todas las Categorías</CardTitle>
+          <CardTitle>{t("title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Imagen</TableHead>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Slug</TableHead>
-                <TableHead>Productos</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead className="text-right">Acciones</TableHead>
+                <TableHead>{t("categoryName")}</TableHead>
+                <TableHead>{t("slug")}</TableHead>
+                <TableHead>{t("products")}</TableHead>
+                <TableHead>{t("status")}</TableHead>
+                <TableHead className="text-right">{t("actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -61,7 +63,7 @@ export default async function CategoriesPage() {
                   <TableCell>0</TableCell>
                   <TableCell>
                     <Badge variant="outline" className="bg-green-50 text-green-700">
-                      Activa
+                      {t("active")}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
