@@ -16,7 +16,7 @@ interface AuthResult {
     id: string;
     email: string;
     name: string;
-    role: string;
+    role: "customer" | "vendor" | "admin";
   };
   error?: string;
   isLocked?: boolean;
@@ -82,7 +82,7 @@ export async function authenticateUser(
       // Handle failed login attempt
       await handleFailedLoginAttempt(email, userType, user);
       
-      const remainingAttempts = Math.max(0, LOCKOUT_THRESHOLD - (user.failedLoginAttempts + 1));
+      const remainingAttempts = Math.max(0, LOCKOUT_THRESHOLD - ((user.failedLoginAttempts || 0) + 1));
       
       if (remainingAttempts === 0) {
         return {
@@ -114,8 +114,8 @@ export async function authenticateUser(
       user: {
         id: user.id,
         email: user.email,
-        name: user.name || user.contactName || user.email,
-        role: userType,
+        name: (user as any).name || (user as any).contactName || user.email,
+        role: userType as "customer" | "vendor" | "admin",
       },
     };
   } catch (error) {

@@ -1,17 +1,17 @@
-import { test as base, expect } from '@playwright/test';
+import { test as base, expect, Browser, Page } from '@playwright/test';
 import { testUsers, loginAs, logout } from './users';
 
 /**
  * Extended test fixtures with pre-authenticated pages for each user role
  */
 export const test = base.extend<{
-  adminPage: any;
-  vendorPage: any;
-  customerPage: any;
-  guestPage: any;
+  adminPage: Page;
+  vendorPage: Page;
+  customerPage: Page;
+  guestPage: Page;
 }>({
   // Admin authenticated page
-  adminPage: async ({ browser }, use) => {
+  adminPage: async ({ browser }: { browser: Browser }, use) => {
     const context = await browser.newContext();
     const page = await context.newPage();
     
@@ -26,7 +26,7 @@ export const test = base.extend<{
   },
   
   // Vendor authenticated page
-  vendorPage: async ({ browser }, use) => {
+  vendorPage: async ({ browser }: { browser: Browser }, use) => {
     const context = await browser.newContext();
     const page = await context.newPage();
     
@@ -41,7 +41,7 @@ export const test = base.extend<{
   },
   
   // Customer authenticated page
-  customerPage: async ({ browser }, use) => {
+  customerPage: async ({ browser }: { browser: Browser }, use) => {
     const context = await browser.newContext();
     const page = await context.newPage();
     
@@ -56,7 +56,7 @@ export const test = base.extend<{
   },
   
   // Guest (unauthenticated) page
-  guestPage: async ({ browser }, use) => {
+  guestPage: async ({ browser }: { browser: Browser }, use) => {
     const context = await browser.newContext();
     const page = await context.newPage();
     

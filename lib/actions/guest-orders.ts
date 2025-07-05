@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { orders } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, isNull } from "drizzle-orm";
 import { z } from "zod";
 
 const convertGuestOrdersSchema = z.object({
@@ -18,7 +18,7 @@ export async function convertGuestOrdersToUser(data: z.infer<typeof convertGuest
     const guestOrders = await db.query.orders.findMany({
       where: and(
         eq(orders.guestEmail, validatedData.email),
-        eq(orders.userId, null)
+        isNull(orders.userId)
       ),
     });
 
@@ -42,7 +42,7 @@ export async function convertGuestOrdersToUser(data: z.infer<typeof convertGuest
       .where(
         and(
           eq(orders.guestEmail, validatedData.email),
-          eq(orders.userId, null)
+          isNull(orders.userId)
         )
       );
 

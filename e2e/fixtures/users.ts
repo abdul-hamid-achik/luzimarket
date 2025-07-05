@@ -1,3 +1,5 @@
+import { Page, Route } from '@playwright/test';
+
 /**
  * Test user credentials and helpers for e2e tests
  * These users should be created by the seed script
@@ -37,7 +39,7 @@ export const testUsers = {
 /**
  * Helper to login as a specific user type
  */
-export async function loginAs(page: any, userType: keyof typeof testUsers) {
+export async function loginAs(page: Page, userType: keyof typeof testUsers) {
   const user = testUsers[userType];
   
   // Navigate to login page
@@ -71,7 +73,7 @@ export async function loginAs(page: any, userType: keyof typeof testUsers) {
 /**
  * Create a test user via API (for tests that need fresh users)
  */
-export async function createTestUser(page: any, options: {
+export async function createTestUser(page: Page, options: {
   email: string;
   password: string;
   role?: 'customer' | 'vendor';
@@ -80,7 +82,7 @@ export async function createTestUser(page: any, options: {
   const { email, password, role = 'customer', verified = true } = options;
   
   // Mock user creation API
-  await page.route('**/api/test/create-user', async route => {
+  await page.route('**/api/test/create-user', async (route: Route) => {
     await route.fulfill({
       json: {
         success: true,
@@ -103,7 +105,7 @@ export async function createTestUser(page: any, options: {
     await page.fill('input[name="confirmPassword"]', password);
     await page.locator('label[for="acceptTerms"]').click();
     
-    await page.route('**/api/auth/register', async route => {
+    await page.route('**/api/auth/register', async (route: Route) => {
       await route.fulfill({
         json: { success: true, requiresVerification: !verified }
       });
@@ -120,7 +122,7 @@ export async function createTestUser(page: any, options: {
     await page.fill('input[name="confirmPassword"]', password);
     // Fill other required fields...
     
-    await page.route('**/api/vendor/register', async route => {
+    await page.route('**/api/vendor/register', async (route: Route) => {
       await route.fulfill({
         json: { success: true }
       });
@@ -133,7 +135,7 @@ export async function createTestUser(page: any, options: {
 /**
  * Logout helper
  */
-export async function logout(page: any) {
+export async function logout(page: Page) {
   await page.getByTestId('user-menu').click();
   await page.getByRole('button', { name: /cerrar sesión|logout/i }).click();
   await page.waitForURL('**/');
