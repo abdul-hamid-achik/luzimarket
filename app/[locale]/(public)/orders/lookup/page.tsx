@@ -50,7 +50,7 @@ export default function OrderLookupPage() {
 
       if (response.ok && result.orderId) {
         // Redirect to order details page
-        router.push(`/orders/${result.orderId}`);
+        router.push(`/orders/${result.orderId}` as any);
       } else {
         setError(result.error || "No se encontró la orden con los datos proporcionados");
       }
