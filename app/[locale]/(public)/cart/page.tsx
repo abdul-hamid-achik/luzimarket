@@ -12,12 +12,17 @@ import { getStateFromPostalCode } from "@/lib/utils/shipping-zones";
 
 export default function CartPage() {
   const { state, removeFromCart, updateQuantity, getTotalPrice } = useCart();
+  const [postalCode, setPostalCode] = useState("");
+  const [estimatedShipping, setEstimatedShipping] = useState<number | null>(null);
 
   const cartSteps = [
     { id: "cart", title: "Carrito", description: "Revisa tus productos" },
     { id: "info", title: "Información", description: "Datos de contacto y envío" },
     { id: "payment", title: "Pago", description: "Método de pago" },
   ];
+
+  const subtotal = getTotalPrice();
+  const tax = subtotal * 0.16; // 16% IVA
 
   if (state.items.length === 0) {
     return (
@@ -36,11 +41,6 @@ export default function CartPage() {
       </div>
     );
   }
-
-  const [postalCode, setPostalCode] = useState("");
-  const subtotal = getTotalPrice();
-  const tax = subtotal * 0.16; // 16% IVA
-  const [estimatedShipping, setEstimatedShipping] = useState<number | null>(null);
   
   // Basic shipping estimate based on subtotal
   const getShippingEstimate = () => {
