@@ -74,8 +74,8 @@ test.describe('Authentication', () => {
     
     // Customer tab is selected by default
     // Fill credentials
-    await page.fill('#customer-email', 'maria.garcia@email.com');
-    await page.fill('#customer-password', 'customer123');
+    await page.fill('#customer-email', 'customer1@example.com');
+    await page.fill('#customer-password', 'password123');
     
     // Submit
     const submitButton = page.locator('button[type="submit"]:has-text("Iniciar sesión")').first();
@@ -109,8 +109,8 @@ test.describe('Authentication', () => {
   test.skip('should logout', async ({ page }) => {
     // First login
     await page.goto(routes.login);
-    await page.fill('#customer-email', 'maria.garcia@email.com');
-    await page.fill('#customer-password', 'customer123');
+    await page.fill('#customer-email', 'customer1@example.com');
+    await page.fill('#customer-password', 'password123');
     
     const submitButton = page.locator('button[type="submit"]:has-text("Iniciar sesión")').first();
     await submitButton.click();

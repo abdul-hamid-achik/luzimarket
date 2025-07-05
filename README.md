@@ -116,13 +116,14 @@ Visit http://localhost:3000 to see the application.
 ### Deployment
 - `npm run vercel:link` - Link project to Vercel
 - `npm run vercel:env:pull` - Pull environment variables from Vercel
-- `npm run vercel:deploy` - Deploy to preview
-- `npm run vercel:deploy:prod` - Deploy to production
+- `npm run vercel:deploy` - Deploy to Vercel
 
 ### Testing
-- `npm run test:e2e` - Run end-to-end tests with Playwright
-- `npm run test:e2e:ui` - Run tests with Playwright UI
-- `npm run test:e2e:debug` - Debug tests with Playwright
+- `npm test` - Run all tests with Playwright
+- `npm run test:ui` - Run tests with Playwright UI
+- `npm run test:debug` - Debug tests with Playwright
+- `npm run test:headed` - Run tests in headed mode (see browser)
+- `npm run test:report` - View test results report
 
 ## Features
 
@@ -276,14 +277,20 @@ OPENAI_SECRET_KEY=sk-...
 ## Testing
 
 ```bash
-# Run all tests
-npm run test:e2e
+# Start dev server (required for tests)
+npm run dev
 
-# Run with UI
-npm run test:e2e:ui
+# In another terminal, run tests
+npm test
 
-# Debug tests
-npm run test:e2e:debug
+# Run with UI for debugging
+npm run test:ui
+
+# Debug specific tests
+npm run test:debug
+
+# View test results
+npm run test:report
 ```
 
 ## Deployment

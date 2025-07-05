@@ -5,7 +5,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Important Notes
 
 - **DO NOT REMOVE DEPENDENCIES** - Never remove or replace existing npm packages like drizzle-seed, even if they have compatibility issues. Find workarounds instead.
-- **NO scripts folder** - All commands are defined in package.json
+- **NO scripts folder** - All commands MUST be defined in package.json. Never create a scripts/ folder or standalone script files.
+- **MINIMAL SCRIPTS** - Be very careful not to create many scripts that aren't necessary or provide poor DX. Keep package.json scripts minimal and essential. For example, use a single `npm test` command instead of multiple test variations.
 - **NO Docker** - Using Vercel managed services (Neon DB, Blob Storage)
 - **Single seed script** - One db/seed.ts file that handles everything: reset, seeding, and AI image generation
 - **Database reset integrated** - The seed script uses drizzle-seed's reset functionality (can be skipped with --no-reset)
@@ -103,15 +104,16 @@ npm run build              # Build for production
 npm run start              # Start production server
 npm run lint               # Run ESLint
 npm run vercel:deploy      # Deploy to Vercel preview
-npm run vercel:deploy:prod # Deploy to Vercel production
+vercel --prod              # Deploy to Vercel production
 ```
 
 #### Testing
 ```bash
-npm run test:e2e           # Run end-to-end tests with Playwright
-npm run test:e2e:ui        # Run tests with Playwright UI
-npm run test:e2e:debug     # Debug tests with Playwright
-npm run test:e2e:headed    # Run tests in headed mode
+npm test                   # Run all tests with Playwright
+npm run test:ui            # Run tests with Playwright UI
+npm run test:debug         # Debug tests with Playwright
+npm run test:headed        # Run tests in headed mode
+npm run test:report        # View test results report
 ```
 
 ### Environment Variables

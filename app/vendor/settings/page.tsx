@@ -53,7 +53,7 @@ export default function VendorSettingsPage() {
   const { data: session } = useSession();
   const router = useRouter();
 
-  if (!(session?.user as any)?.vendor) {
+  if (!session?.user?.vendor) {
     router.push("/vendor/login");
     return null;
   }
@@ -99,11 +99,11 @@ export default function VendorSettingsPage() {
           <dl className="space-y-2">
             <div className="flex justify-between">
               <dt className="text-sm font-univers text-gray-600">Nombre del negocio:</dt>
-              <dd className="text-sm font-medium">{session.user.vendor.businessName || 'No configurado'}</dd>
+              <dd className="text-sm font-medium">{session?.user?.vendor?.businessName || 'No configurado'}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-sm font-univers text-gray-600">Email:</dt>
-              <dd className="text-sm font-medium">{session.user.email}</dd>
+              <dd className="text-sm font-medium">{session?.user?.email}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-sm font-univers text-gray-600">Estado de la cuenta:</dt>

@@ -52,17 +52,40 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }: any) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
       }
       return token;
     },
-    async session({ session, token }: any) {
+    async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
+        session.user.id = token.id;
+        session.user.role = token.role;
+        
+        // If user is a vendor, fetch vendor details
+        if (token.role === "vendor" && process.env.DATABASE_URL) {
+          try {
+            const [vendor] = await db
+              .select()
+              .from(vendors)
+              .where(eq(vendors.id, token.id))
+              .limit(1);
+            
+            if (vendor) {
+              session.user.vendor = {
+                id: vendor.id,
+                businessName: vendor.businessName,
+                contactName: vendor.contactName,
+                email: vendor.email,
+                isActive: vendor.isActive,
+              };
+            }
+          } catch (error) {
+            console.error("Error fetching vendor details:", error);
+          }
+        }
       }
       return session;
     },

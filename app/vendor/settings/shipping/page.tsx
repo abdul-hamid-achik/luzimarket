@@ -19,7 +19,7 @@ interface ShippingZone {
   id: number;
   name: string;
   code: string;
-  description: string;
+  description: string | null;
 }
 
 interface ShippingMethod {
@@ -75,39 +75,42 @@ export default function VendorShippingSettingsPage() {
 
   const loadData = async () => {
     try {
-      const [zonesData, methodsData] = await Promise.all([
+      const [zonesResult, methodsResult] = await Promise.all([
         getShippingZones(),
         getShippingMethods(),
       ]);
       
-      setZones(zonesData);
-      setMethods(methodsData);
+      if (zonesResult.success && zonesResult.zones) {
+        setZones(zonesResult.zones);
+      }
+      
+      if (methodsResult.success && methodsResult.methods) {
+        setMethods(methodsResult.methods);
+      }
       
       // Initialize default rates for all combinations
       const defaultRates: ShippingRate[] = [];
-      methodsData.forEach(method => {
-        zonesData.forEach(zone => {
-          weightRanges.forEach(range => {
-            defaultRates.push({
-              methodId: method.id,
-              zoneId: zone.id,
-              minWeight: range.min,
-              maxWeight: range.max,
-              baseRate: "0",
-              perKgRate: "0",
+      if (methodsResult.success && methodsResult.methods && zonesResult.success && zonesResult.zones) {
+        methodsResult.methods.forEach(method => {
+            zonesResult.zones.forEach(zone => {
+              weightRanges.forEach(range => {
+                defaultRates.push({
+                  methodId: method.id,
+                  zoneId: zone.id,
+                  minWeight: range.min,
+                  maxWeight: range.max,
+                  baseRate: "0",
+                  perKgRate: "0",
+                });
+              });
             });
           });
-        });
-      });
+        }
       
       setRates(defaultRates);
     } catch (error) {
       console.error("Error loading shipping data:", error);
-      toast({
-        title: "Error",
-        description: "No se pudieron cargar los datos de envío",
-        variant: "destructive",
-      });
+      toast.error("No se pudieron cargar los datos de envío");
     } finally {
       setLoading(false);
     }
@@ -148,17 +151,10 @@ export default function VendorShippingSettingsPage() {
         perKgRate: rate.perKgRate,
       })));
       
-      toast({
-        title: "Configuración guardada",
-        description: "Tu configuración de envíos ha sido actualizada",
-      });
+      toast.success("Tu configuración de envíos ha sido actualizada");
     } catch (error) {
       console.error("Error saving shipping settings:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo guardar la configuración",
-        variant: "destructive",
-      });
+      toast.error("No se pudo guardar la configuración");
     } finally {
       setSaving(false);
     }
