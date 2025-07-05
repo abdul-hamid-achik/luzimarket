@@ -203,9 +203,6 @@ export async function POST(request: NextRequest) {
         },
       ],
       billing_address_collection: 'auto',
-      shipping_address_collection: {
-        allowed_countries: ['MX'],
-      },
       // Pre-fill customer information
       customer_creation: 'if_required',
       payment_intent_data: {

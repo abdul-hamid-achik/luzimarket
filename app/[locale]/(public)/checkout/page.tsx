@@ -416,10 +416,6 @@ export default function CheckoutPage() {
                       if (option) {
                         setShippingCost(option.cost);
                         setSelectedShipping(option);
-                        // Update postal code in form if changed in calculator
-                        if (postalCode && postalCode !== form.getValues("postalCode")) {
-                          form.setValue("postalCode", postalCode);
-                        }
                       } else {
                         setShippingCost(0);
                         setSelectedShipping(null);

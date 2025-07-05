@@ -33,6 +33,13 @@ export function ShippingCalculator({
   const [shippingData, setShippingData] = useState<any>(null);
   const [selectedOption, setSelectedOption] = useState<string>('');
 
+  // Update postal code when initialPostalCode changes (but prevent loops)
+  useEffect(() => {
+    if (initialPostalCode && initialPostalCode !== postalCode) {
+      setPostalCode(initialPostalCode);
+    }
+  }, [initialPostalCode]);
+
   // Debounce postal code changes
   useEffect(() => {
     if (!postalCode || postalCode.length !== 5) {
