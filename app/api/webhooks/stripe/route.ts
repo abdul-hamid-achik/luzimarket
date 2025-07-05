@@ -6,6 +6,7 @@ import { orders, orderItems, users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import Stripe from "stripe";
 import { reduceStock, restoreStock } from "@/lib/actions/inventory";
+import { sendOrderConfirmation, sendVendorNotification } from "@/lib/email";
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -37,6 +38,21 @@ export async function POST(req: NextRequest) {
         if (orderIds.length > 0) {
           // Update all orders to processing status
           for (const orderId of orderIds) {
+            // Fetch order details
+            const order = await db.query.orders.findFirst({
+              where: eq(orders.id, orderId),
+              with: {
+                items: {
+                  with: {
+                    product: true,
+                  },
+                },
+                vendor: true,
+              },
+            });
+
+            if (!order) continue;
+
             await db
               .update(orders)
               .set({
@@ -55,10 +71,50 @@ export async function POST(req: NextRequest) {
               // For now, we'll log the error but continue processing
             }
 
+            // Send confirmation emails
+            try {
+              const customerEmail = order.guestEmail || session.customer_details?.email;
+              const customerName = order.guestName || session.customer_details?.name || 'Cliente';
+              
+              if (customerEmail) {
+                // Send customer confirmation
+                await sendOrderConfirmation({
+                  orderNumber: order.orderNumber,
+                  customerEmail,
+                  customerName,
+                  items: order.items.map(item => ({
+                    name: item.product?.name || 'Producto',
+                    quantity: item.quantity,
+                    price: parseFloat(item.price),
+                  })),
+                  total: parseFloat(order.total),
+                  vendorName: order.vendor?.businessName || 'Vendedor',
+                });
+
+                // Send vendor notification
+                if (order.vendor?.email) {
+                  await sendVendorNotification({
+                    vendorEmail: order.vendor.email,
+                    vendorName: order.vendor.businessName || 'Vendedor',
+                    orderNumber: order.orderNumber,
+                    customerName,
+                    items: order.items.map(item => ({
+                      name: item.product?.name || 'Producto',
+                      quantity: item.quantity,
+                      price: parseFloat(item.price),
+                    })),
+                    total: parseFloat(order.total),
+                    shippingAddress: order.shippingAddress as any,
+                  });
+                }
+              }
+            } catch (emailError) {
+              console.error(`Failed to send confirmation emails for order ${orderId}:`, emailError);
+            }
+
             console.log(`Order ${orderId} processed successfully`);
           }
 
-          // TODO: Send order confirmation email
           console.log("Orders paid:", orderIds.join(', '));
         }
 

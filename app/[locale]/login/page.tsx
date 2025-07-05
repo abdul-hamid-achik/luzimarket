@@ -1,17 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { signIn } from "next-auth/react";
 import { useRouter } from "@/i18n/navigation";
 import { useRouter as useNextRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2 } from "lucide-react";
+import { Loader2, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
 const loginSchema = z.object({
@@ -24,8 +25,27 @@ type LoginForm = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const router = useRouter();
   const nextRouter = useNextRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Check for verification success
+    if (searchParams.get("verified") === "true") {
+      setSuccessMessage("\u00a1Tu correo electr\u00f3nico ha sido verificado exitosamente! Ahora puedes iniciar sesi\u00f3n.");
+    }
+    
+    // Check for error messages
+    const errorParam = searchParams.get("error");
+    if (errorParam === "invalid-token") {
+      setError("El enlace de verificaci\u00f3n es inv\u00e1lido.");
+    } else if (errorParam === "expired-token") {
+      setError("El enlace de verificaci\u00f3n ha expirado. Por favor reg\u00edstrate nuevamente.");
+    } else if (errorParam === "verification-failed") {
+      setError("Error al verificar tu correo electr\u00f3nico. Por favor int\u00e9ntalo de nuevo.");
+    }
+  }, [searchParams]);
 
   const customerForm = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -44,6 +64,22 @@ export default function LoginPage() {
     setError(null);
 
     try {
+      // First, try to authenticate to get detailed error info
+      const { authenticateUser } = await import("@/lib/actions/auth");
+      const authResult = await authenticateUser(data.email, data.password, userType);
+
+      if (!authResult.success) {
+        if (authResult.isLocked) {
+          setError(authResult.error || "Cuenta bloqueada temporalmente");
+        } else if (authResult.remainingAttempts !== undefined && authResult.remainingAttempts < 3) {
+          setError(`Credenciales inválidas. ${authResult.remainingAttempts} intentos restantes antes del bloqueo.`);
+        } else {
+          setError(authResult.error || "Credenciales inválidas");
+        }
+        return;
+      }
+
+      // If authentication succeeded, proceed with NextAuth signIn
       const result = await signIn("credentials", {
         email: data.email,
         password: data.password,
@@ -52,7 +88,7 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        setError("Credenciales inválidas");
+        setError("Error al iniciar sesión");
       } else {
         // Redirect based on user type
         switch (userType) {
@@ -82,6 +118,15 @@ export default function LoginPage() {
             Inicia sesión en tu cuenta
           </p>
         </div>
+
+        {successMessage && (
+          <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-4">
+            <div className="flex items-start">
+              <CheckCircle className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-green-800 font-univers">{successMessage}</p>
+            </div>
+          </div>
+        )}
 
         <Tabs defaultValue="customer" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
@@ -120,7 +165,20 @@ export default function LoginPage() {
               </div>
 
               {error && (
-                <p className="text-sm text-red-500">{error}</p>
+                <div className={`p-3 rounded-md text-sm ${
+                  error.includes("bloqueada") || error.includes("intentos restantes")
+                    ? "bg-red-50 border border-red-200 text-red-700"
+                    : "text-red-500"
+                }`}>
+                  {error}
+                  {error.includes("verifica tu correo electrónico") && (
+                    <div className="mt-2">
+                      <Link href="/resend-verification" className="text-sm text-blue-600 hover:text-blue-800 underline">
+                        ¿No recibiste el correo? Reenviar enlace de verificación
+                      </Link>
+                    </div>
+                  )}
+                </div>
               )}
 
               <Button
@@ -179,7 +237,13 @@ export default function LoginPage() {
               </div>
 
               {error && (
-                <p className="text-sm text-red-500">{error}</p>
+                <div className={`p-3 rounded-md text-sm ${
+                  error.includes("bloqueada") || error.includes("intentos restantes")
+                    ? "bg-red-50 border border-red-200 text-red-700"
+                    : "text-red-500"
+                }`}>
+                  {error}
+                </div>
               )}
 
               <Button
@@ -238,7 +302,13 @@ export default function LoginPage() {
               </div>
 
               {error && (
-                <p className="text-sm text-red-500">{error}</p>
+                <div className={`p-3 rounded-md text-sm ${
+                  error.includes("bloqueada") || error.includes("intentos restantes")
+                    ? "bg-red-50 border border-red-200 text-red-700"
+                    : "text-red-500"
+                }`}>
+                  {error}
+                </div>
               )}
 
               <Button

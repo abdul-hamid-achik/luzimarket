@@ -1,6 +1,6 @@
 import { db } from "@/db";
-import { orders, products, vendors, users } from "@/db/schema";
-import { sql } from "drizzle-orm";
+import { orders, products, vendors, users, adminUsers } from "@/db/schema";
+import { sql, and, gt } from "drizzle-orm";
 import { 
   TrendingUp, 
   Package, 
@@ -10,17 +10,24 @@ import {
   ShoppingCart,
   Calendar,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  Lock
 } from "lucide-react";
+import Link from "next/link";
 
 async function getStats() {
+  const now = new Date();
+  
   const [
     totalRevenue,
     totalOrders,
     totalProducts,
     totalVendors,
     totalUsers,
-    recentOrders
+    recentOrders,
+    lockedUsersCount,
+    lockedVendorsCount,
+    lockedAdminsCount
   ] = await Promise.all([
     // Total revenue
     db.select({ 
@@ -49,8 +56,29 @@ async function getStats() {
     })
     .from(orders)
     .orderBy(sql`${orders.createdAt} DESC`)
-    .limit(5)
+    .limit(5),
+    
+    // Locked accounts
+    db.select({ count: sql<number>`count(*)` }).from(users)
+      .where(and(
+        gt(users.lockedUntil, now),
+        gt(users.failedLoginAttempts, 0)
+      )),
+    db.select({ count: sql<number>`count(*)` }).from(vendors)
+      .where(and(
+        gt(vendors.lockedUntil, now),
+        gt(vendors.failedLoginAttempts, 0)
+      )),
+    db.select({ count: sql<number>`count(*)` }).from(adminUsers)
+      .where(and(
+        gt(adminUsers.lockedUntil, now),
+        gt(adminUsers.failedLoginAttempts, 0)
+      ))
   ]);
+
+  const totalLockedAccounts = (lockedUsersCount[0]?.count || 0) + 
+                             (lockedVendorsCount[0]?.count || 0) + 
+                             (lockedAdminsCount[0]?.count || 0);
 
   return {
     totalRevenue: totalRevenue[0]?.total || 0,
@@ -58,6 +86,7 @@ async function getStats() {
     totalProducts: totalProducts[0]?.count || 0,
     totalVendors: totalVendors[0]?.count || 0,
     totalUsers: totalUsers[0]?.count || 0,
+    totalLockedAccounts,
     recentOrders
   };
 }
@@ -222,6 +251,17 @@ export default async function AdminDashboard() {
                 3.2%
               </span>
             </div>
+            <Link href="/admin/locked-accounts" className="flex items-center justify-between py-3 hover:bg-gray-50 -mx-2 px-2 rounded transition-colors">
+              <div className="flex items-center gap-3">
+                <Lock className="h-5 w-5 text-gray-400" />
+                <span className="text-sm font-univers text-gray-600">Cuentas Bloqueadas</span>
+              </div>
+              <span className={`text-sm font-univers font-medium ${
+                stats.totalLockedAccounts > 0 ? 'text-red-600' : 'text-gray-900'
+              }`}>
+                {stats.totalLockedAccounts}
+              </span>
+            </Link>
           </div>
         </div>
       </div>

@@ -27,6 +27,19 @@ export const vendors = pgTable("vendors", {
   tiktokUrl: text("tiktok_url"),
   twitterUrl: text("twitter_url"),
   isActive: boolean("is_active").default(false),
+  // Shipping fields
+  shippingOriginState: text("shipping_origin_state"),
+  freeShippingThreshold: decimal("free_shipping_threshold", { precision: 10, scale: 2 }),
+  defaultShippingMethodId: integer("default_shipping_method_id").references(() => shippingMethods.id),
+  shippingSettings: json("shipping_settings").$type<{
+    enabledMethods?: string[];
+    packagingFee?: number;
+    handlingTime?: number;
+  }>().default({}),
+  // Account lockout fields
+  failedLoginAttempts: integer("failed_login_attempts").default(0),
+  lastFailedLoginAt: timestamp("last_failed_login_at"),
+  lockedUntil: timestamp("locked_until"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => {
@@ -66,6 +79,12 @@ export const products = pgTable("products", {
   tags: json("tags").$type<string[]>().default([]),
   isActive: boolean("is_active").default(true),
   stock: integer("stock").default(0),
+  // Shipping fields
+  weight: integer("weight").default(0), // in grams
+  length: integer("length").default(0), // in cm
+  width: integer("width").default(0), // in cm
+  height: integer("height").default(0), // in cm
+  shippingClass: text("shipping_class").default("standard"), // standard, fragile, oversize, dangerous
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => {
@@ -97,6 +116,13 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash"),
   stripeCustomerId: text("stripe_customer_id"),
   isActive: boolean("is_active").default(true),
+  // Email verification fields
+  emailVerified: boolean("email_verified").default(false),
+  emailVerifiedAt: timestamp("email_verified_at"),
+  // Account lockout fields
+  failedLoginAttempts: integer("failed_login_attempts").default(0),
+  lastFailedLoginAt: timestamp("last_failed_login_at"),
+  lockedUntil: timestamp("locked_until"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => ({
@@ -109,6 +135,10 @@ export const orders = pgTable("orders", {
   orderNumber: text("order_number").notNull().unique(),
   userId: uuid("user_id").references(() => users.id),
   vendorId: uuid("vendor_id").notNull().references(() => vendors.id),
+  // Guest order fields
+  guestEmail: text("guest_email"),
+  guestName: text("guest_name"),
+  guestPhone: text("guest_phone"),
   status: text("status").notNull().default("pending"), // pending, paid, shipped, delivered, cancelled
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
   tax: decimal("tax", { precision: 10, scale: 2 }).notNull().default("0"),
@@ -132,6 +162,18 @@ export const orders = pgTable("orders", {
     country: string;
   }>(),
   notes: text("notes"),
+  // Tracking information
+  trackingNumber: text("tracking_number"),
+  carrier: text("carrier"), // e.g., "fedex", "ups", "dhl", "estafeta"
+  estimatedDeliveryDate: timestamp("estimated_delivery_date"),
+  actualDeliveryDate: timestamp("actual_delivery_date"),
+  trackingHistory: json("tracking_history").$type<Array<{
+    status: string;
+    location: string;
+    timestamp: Date;
+    description: string;
+    coordinates?: { lat: number; lng: number };
+  }>>().default([]),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => ({
@@ -139,6 +181,7 @@ export const orders = pgTable("orders", {
   userIdx: index("orders_user_idx").on(table.userId),
   vendorIdx: index("orders_vendor_idx").on(table.vendorId),
   statusIdx: index("orders_status_idx").on(table.status),
+  guestEmailIdx: index("orders_guest_email_idx").on(table.guestEmail),
 }));
 
 // Order items table
@@ -163,6 +206,10 @@ export const adminUsers = pgTable("admin_users", {
   passwordHash: text("password_hash").notNull(),
   role: text("role").notNull().default("admin"), // admin, super_admin
   isActive: boolean("is_active").default(true),
+  // Account lockout fields
+  failedLoginAttempts: integer("failed_login_attempts").default(0),
+  lastFailedLoginAt: timestamp("last_failed_login_at"),
+  lockedUntil: timestamp("locked_until"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => ({
@@ -182,10 +229,60 @@ export const emailTemplates = pgTable("email_templates", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Shipping zones table
+export const shippingZones = pgTable("shipping_zones", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  name: text("name").notNull(),
+  code: text("code").notNull().unique(),
+  description: text("description"),
+  states: json("states").$type<string[]>().notNull(),
+  baseRateMultiplier: decimal("base_rate_multiplier", { precision: 10, scale: 2 }).notNull().default("1.0"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Shipping methods table
+export const shippingMethods = pgTable("shipping_methods", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  carrier: text("carrier").notNull(),
+  serviceType: text("service_type").notNull(),
+  name: text("name").notNull(),
+  code: text("code").notNull().unique(),
+  description: text("description"),
+  minDeliveryDays: integer("min_delivery_days").notNull(),
+  maxDeliveryDays: integer("max_delivery_days").notNull(),
+  trackingUrlPattern: text("tracking_url_pattern"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Vendor shipping rates table
+export const vendorShippingRates = pgTable("vendor_shipping_rates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  vendorId: uuid("vendor_id").notNull().references(() => vendors.id, { onDelete: "cascade" }),
+  shippingMethodId: integer("shipping_method_id").notNull().references(() => shippingMethods.id),
+  zoneId: integer("zone_id").notNull().references(() => shippingZones.id),
+  minWeight: integer("min_weight").notNull(), // in grams
+  maxWeight: integer("max_weight").notNull(), // in grams
+  baseRate: decimal("base_rate", { precision: 10, scale: 2 }).notNull(),
+  perKgRate: decimal("per_kg_rate", { precision: 10, scale: 2 }).notNull().default("0"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  vendorIdx: index("vendor_shipping_rates_vendor_idx").on(table.vendorId),
+  methodIdx: index("vendor_shipping_rates_method_idx").on(table.shippingMethodId),
+  zoneIdx: index("vendor_shipping_rates_zone_idx").on(table.zoneId),
+}));
+
 // Relations
-export const vendorsRelations = relations(vendors, ({ many }) => ({
+export const vendorsRelations = relations(vendors, ({ many, one }) => ({
   products: many(products),
   orders: many(orders),
+  shippingRates: many(vendorShippingRates),
+  defaultShippingMethod: one(shippingMethods, {
+    fields: [vendors.defaultShippingMethodId],
+    references: [shippingMethods.id],
+  }),
 }));
 
 export const categoriesRelations = relations(categories, ({ many }) => ({
@@ -291,6 +388,54 @@ export const passwordResetTokenRelations = relations(passwordResetTokens, ({ one
   user: one(users, {
     fields: [passwordResetTokens.userId],
     references: [users.id],
+  }),
+}));
+
+// Email Verification Tokens table
+export const emailVerificationTokens = pgTable("email_verification_tokens", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  usedAt: timestamp("used_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => {
+  return {
+    tokenIdx: index("email_verification_tokens_token_idx").on(table.token),
+    userIdx: index("email_verification_tokens_user_idx").on(table.userId),
+    expiresIdx: index("email_verification_tokens_expires_idx").on(table.expiresAt),
+  }
+});
+
+export const emailVerificationTokenRelations = relations(emailVerificationTokens, ({ one }) => ({
+  user: one(users, {
+    fields: [emailVerificationTokens.userId],
+    references: [users.id],
+  }),
+}));
+
+// Shipping relations
+export const shippingZoneRelations = relations(shippingZones, ({ many }) => ({
+  vendorRates: many(vendorShippingRates),
+}));
+
+export const shippingMethodRelations = relations(shippingMethods, ({ many }) => ({
+  vendorRates: many(vendorShippingRates),
+  vendors: many(vendors),
+}));
+
+export const vendorShippingRateRelations = relations(vendorShippingRates, ({ one }) => ({
+  vendor: one(vendors, {
+    fields: [vendorShippingRates.vendorId],
+    references: [vendors.id],
+  }),
+  shippingMethod: one(shippingMethods, {
+    fields: [vendorShippingRates.shippingMethodId],
+    references: [shippingMethods.id],
+  }),
+  zone: one(shippingZones, {
+    fields: [vendorShippingRates.zoneId],
+    references: [shippingZones.id],
   }),
 }));
 

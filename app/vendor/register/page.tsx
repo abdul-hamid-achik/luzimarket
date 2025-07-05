@@ -89,7 +89,7 @@ export default function VendorRegisterPage() {
           </p>
 
           <p className="text-sm font-univers text-gray-500 mt-12">
-            MOMENTO ESPECIAL SAPI DE CV © 2022 / TODOS LOS DERECHOS RESERVADOS
+            © 2024 LUZIMARKET. Built by <a href="https://abdulachik.dev" target="_blank" rel="noopener noreferrer" className="underline">Abdul-Hamid Achik</a>.
           </p>
         </div>
       </div>
@@ -470,7 +470,7 @@ export default function VendorRegisterPage() {
         </Form>
 
         <p className="text-center text-sm font-univers text-gray-500 mt-12">
-          MOMENTO ESPECIAL SAPI DE CV © 2022 / TODOS LOS DERECHOS RESERVADOS
+          © 2024 LUZIMARKET. Built by <a href="https://abdulachik.dev" target="_blank" rel="noopener noreferrer" className="underline">Abdul-Hamid Achik</a>.
         </p>
       </div>
     </div>

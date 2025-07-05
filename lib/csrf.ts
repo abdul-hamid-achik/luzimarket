@@ -1,5 +1,4 @@
 import { NextRequest } from 'next/server'
-import crypto from 'crypto'
 
 // CSRF token configuration
 const CSRF_TOKEN_LENGTH = 32
@@ -12,7 +11,10 @@ const PROTECTED_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE']
 
 // Generate a cryptographically secure random token
 export function generateCsrfToken(): string {
-  return crypto.randomBytes(CSRF_TOKEN_LENGTH).toString('hex')
+  // Use Web Crypto API for edge runtime compatibility
+  const bytes = new Uint8Array(CSRF_TOKEN_LENGTH)
+  crypto.getRandomValues(bytes)
+  return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('')
 }
 
 // Extract CSRF token from request
@@ -41,10 +43,12 @@ export function verifyCsrfToken(token: string | null, cookieToken: string | null
   // Use timing-safe comparison to prevent timing attacks
   if (token.length !== cookieToken.length) return false
   
-  return crypto.timingSafeEqual(
-    Buffer.from(token),
-    Buffer.from(cookieToken)
-  )
+  // Manual timing-safe comparison for edge runtime
+  let result = 0
+  for (let i = 0; i < token.length; i++) {
+    result |= token.charCodeAt(i) ^ cookieToken.charCodeAt(i)
+  }
+  return result === 0
 }
 
 // Check if request should be protected by CSRF

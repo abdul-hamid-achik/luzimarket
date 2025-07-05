@@ -4,11 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Important Notes
 
+- **DO NOT REMOVE DEPENDENCIES** - Never remove or replace existing npm packages like drizzle-seed, even if they have compatibility issues. Find workarounds instead.
 - **NO scripts folder** - All commands are defined in package.json
 - **NO Docker** - Using Vercel managed services (Neon DB, Blob Storage)
 - **Single seed script** - One db/seed.ts file that handles everything: reset, seeding, and AI image generation
 - **Database reset integrated** - The seed script uses drizzle-seed's reset functionality (can be skipped with --no-reset)
+  - Note: The seed script temporarily creates a node-postgres connection for drizzle-seed compatibility, then continues with the regular postgres-js driver
 - **AI image generation** - Images are generated directly in seed.ts if OPENAI_SECRET_KEY is present
+  - Note: Some product names like "Kit de Coctelería" may trigger OpenAI content policy errors
 - **Realistic data** - Uses faker.js with Spanish (Mexico) locale for authentic vendor and product names
 - **Category-aware pricing** - Products have realistic prices based on their category
 - **Keep it simple** - Avoid creating duplicate scripts or complex variations
@@ -85,7 +88,13 @@ npm run db:setup           # Run db:push + db:seed (initial setup)
 # Seed options:
 # - Default: Resets database and seeds with fresh data
 # - With --no-reset flag: Seeds without resetting (appends data)
-# Example: npm run db:seed -- --no-reset
+# - With --no-images flag: Skips AI image generation
+# - With --fast flag: Generates images for only 10 products (for testing)
+# Examples: 
+#   npm run db:seed -- --no-reset
+#   npm run db:seed -- --no-images
+#   npm run db:seed -- --fast
+#   npm run db:seed -- --no-images --no-reset
 ```
 
 #### Build & Deployment

@@ -4,17 +4,20 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "@/i18n/navigation";
 import { useCart } from "@/contexts/cart-context";
-import { CheckCircle, Loader2, XCircle } from "lucide-react";
+import { CheckCircle, Loader2, XCircle, UserPlus, Shield, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 export default function SuccessPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { clearCart } = useCart();
+  const { data: session } = useSession();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [orderDetails, setOrderDetails] = useState<any>(null);
+  const [isGuest, setIsGuest] = useState(false);
 
   const sessionId = searchParams.get("session_id");
 
@@ -33,6 +36,7 @@ export default function SuccessPage() {
         if (response.ok && data.success) {
           setStatus("success");
           setOrderDetails(data);
+          setIsGuest(data.isGuest || !session?.user);
           // Clear the cart after successful payment
           clearCart();
         } else {
@@ -128,13 +132,57 @@ export default function SuccessPage() {
             </div>
 
             <div className="space-y-3">
-              <Link href="/orders">
-                <Button className="w-full">Ver mis órdenes</Button>
-              </Link>
+              {isGuest ? (
+                <Link href="/orders/lookup">
+                  <Button className="w-full">Buscar mi pedido</Button>
+                </Link>
+              ) : (
+                <Link href="/orders">
+                  <Button className="w-full">Ver mis órdenes</Button>
+                </Link>
+              )}
               <Link href="/">
                 <Button variant="outline" className="w-full">Continuar comprando</Button>
               </Link>
             </div>
+
+            {/* Guest Account Creation Offer */}
+            {isGuest && (
+              <Card className="mt-8 border-green-200 bg-green-50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 font-times-now text-lg">
+                    <UserPlus className="h-5 w-5" />
+                    Crea tu cuenta y ahorra tiempo
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <p className="text-sm font-univers text-gray-700">
+                      Convierte tu compra como invitado en una cuenta para disfrutar de estos beneficios:
+                    </p>
+                    <ul className="space-y-2 text-sm font-univers">
+                      <li className="flex items-start gap-2">
+                        <Package className="h-4 w-4 text-green-700 mt-0.5 flex-shrink-0" />
+                        <span>Rastrea todos tus pedidos en un solo lugar</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Shield className="h-4 w-4 text-green-700 mt-0.5 flex-shrink-0" />
+                        <span>Guarda tus direcciones para compras más rápidas</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <UserPlus className="h-4 w-4 text-green-700 mt-0.5 flex-shrink-0" />
+                        <span>Recibe ofertas exclusivas y descuentos especiales</span>
+                      </li>
+                    </ul>
+                    <Link href={`/register?email=${orderDetails?.customerEmail || ''}`}>
+                      <Button className="w-full bg-black text-white hover:bg-gray-800">
+                        Crear cuenta gratis
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </CardContent>
       </Card>

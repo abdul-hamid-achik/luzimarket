@@ -18,6 +18,11 @@ const nextConfig: NextConfig = {
         hostname: 'luzimarket.shop',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: '*.public.blob.vercel-storage.com',
+        pathname: '/**',
+      },
     ],
   },
   experimental: {

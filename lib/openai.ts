@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { uploadBlob } from './blob';
+import { uploadBlob, blobExists, listBlobs } from './blob';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -51,6 +51,26 @@ export async function generateAndUploadImage(
   options?: Omit<GenerateImageOptions, 'prompt'>
 ): Promise<string> {
   try {
+    const pathname = `ai-generated/${filename}`;
+    
+    // Check if image already exists in blob storage
+    const exists = await blobExists(pathname);
+    if (exists) {
+      // If in production, construct the Vercel Blob URL
+      if (process.env.BLOB_READ_WRITE_TOKEN) {
+        // Find the existing blob URL
+        const blobs = await listBlobs({ prefix: pathname, limit: 1 });
+        if (blobs.blobs.length > 0) {
+          console.log(`♻️  Using existing image for ${filename}`);
+          return blobs.blobs[0].url;
+        }
+      } else {
+        // Local development URL
+        console.log(`♻️  Using existing image for ${filename}`);
+        return `/uploads/${filename}`;
+      }
+    }
+    
     // Generate image
     const imageUrl = await generateImage({ prompt, ...options });
     
@@ -64,7 +84,7 @@ export async function generateAndUploadImage(
     
     // Upload to blob storage
     const blob = await uploadBlob(
-      `ai-generated/${filename}`,
+      pathname,
       imageBuffer,
       { contentType: 'image/png' }
     );
@@ -85,7 +105,13 @@ export function generateProductImagePrompt(product: {
   category?: string;
   tags?: string[];
 }): string {
-  const basePrompt = `A professional product photograph of ${product.name}`;
+  // Replace potentially problematic terms
+  let safeName = product.name
+    .replace(/Kit de Coctelería/gi, 'Kit de Preparación de Bebidas')
+    .replace(/coctel/gi, 'bebida')
+    .replace(/alcohol/gi, 'bebida');
+  
+  const basePrompt = `A professional product photograph of ${safeName}`;
   
   const details = [];
   
@@ -94,7 +120,11 @@ export function generateProductImagePrompt(product: {
   }
   
   if (product.description) {
-    details.push(product.description);
+    // Also clean the description
+    const safeDescription = product.description
+      .replace(/coctel/gi, 'bebida')
+      .replace(/alcohol/gi, 'bebida');
+    details.push(safeDescription);
   }
   
   if (product.tags && product.tags.length > 0) {
@@ -106,6 +136,7 @@ export function generateProductImagePrompt(product: {
   details.push('with soft studio lighting');
   details.push('high quality e-commerce photography');
   details.push('elegant and minimalist style');
+  details.push('suitable for all audiences');
   
   return `${basePrompt}, ${details.join(', ')}`;
 }

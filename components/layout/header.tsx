@@ -121,7 +121,14 @@ export function Header() {
 
           {/* Logo */}
           <Link href="/" className="flex-shrink-0" data-testid="logo-link">
-            <span className="text-xl md:text-2xl font-times-now tracking-wider">LUZIMARKET</span>
+            <Image 
+              src="/images/logos/logo-full.png" 
+              alt="Luzimarket" 
+              width={160} 
+              height={40}
+              className="h-8 md:h-10 w-auto"
+              priority
+            />
           </Link>
 
           {/* Search - Desktop */}

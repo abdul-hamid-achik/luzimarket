@@ -76,6 +76,10 @@
     "description": "Discover our exclusive collection of artisanal and unique products, specially chosen for unforgettable moments.",
     "filterBy": "Filter by",
     "sortBy": "Sort by",
+    "newest": "Newest",
+    "priceAsc": "Price: Low to High",
+    "priceDesc": "Price: High to Low",
+    "name": "Name",
     "occasion": "Occasion",
     "priceRange": "Price range",
     "vendor": "Vendor",
@@ -113,6 +117,11 @@
     "securePayment": "Secure payment",
     "specialPackaging": "Special packaging available",
     "relatedProducts": "Related products",
+    "home": "Home",
+    "categories": "Categories",
+    "specificationContent": "Product technical specifications.",
+    "shippingContent": "Shipping information and delivery times.",
+    "returnsContent": "Returns and exchange policy.",
     "filters": "Filters",
     "sortBy": "Sort by",
     "priceRange": "Price range",
@@ -182,7 +191,19 @@
     "cardNumber": "Card number",
     "expiryDate": "Expiry date",
     "cvv": "CVV",
-    "saveInfo": "Save information for future purchases"
+    "saveInfo": "Save information for future purchases",
+    "stockErrors": {
+      "title": "🚫 We can't process your purchase",
+      "message": "Some products in your cart don't have enough stock available.",
+      "suggestion": "Please adjust quantities in your cart or remove out-of-stock items.",
+      "requestedSingle": "you requested 1 unit",
+      "requestedMultiple": "you requested {count} units",
+      "availableNone": "out of stock",
+      "availableSingle": "only 1 left",
+      "availableMultiple": "only {count} left",
+      "shippingStandard": "📦 Standard shipping in Mexico",
+      "paymentDescription": "🇲🇽 Unique Mexican products purchase - Luzimarket"
+    }
   },
   
   "VendorRegistration": {
@@ -259,7 +280,33 @@
     "customerInfo": "Customer information",
     "shippingAddress": "Shipping address",
     "productsSold": "Products sold",
-    "viewFullOrder": "View full order"
+    "viewFullOrder": "View full order",
+    "orderManagement": {
+      "updateStatus": "Update Status",
+      "orderNumber": "Order #",
+      "total": "Total",
+      "date": "Date",
+      "customer": "Customer",
+      "products": "Products",
+      "quantity": "Quantity",
+      "newStatus": "New Status",
+      "trackingNumber": "Tracking Number (Optional)",
+      "trackingPlaceholder": "Enter tracking number",
+      "additionalNotes": "Additional Notes (Optional)",
+      "notesPlaceholder": "Add notes about this update...",
+      "updateButton": "Update Status",
+      "updating": "Updating...",
+      "noChanges": "No changes to update",
+      "updateSuccess": "✅ Status updated successfully",
+      "updateSuccessDescription": "Order #{orderNumber} has been updated. The customer will be notified automatically.",
+      "updateError": "Error updating status",
+      "statusOptions": {
+        "processing": "📦 Processing order",
+        "shipped": "🚚 Shipped",
+        "delivered": "✅ Delivered",
+        "cancelled": "❌ Cancelled"
+      }
+    }
   },
   
   "Errors": {
@@ -273,6 +320,147 @@
     "invalidPhone": "Invalid phone number",
     "passwordTooShort": "Password must be at least 8 characters",
     "passwordsDontMatch": "Passwords don't match"
+  },
+
+  "Emails": {
+    "vendor": {
+      "newOrderSubject": "New order #{orderNumber} - Luzimarket",
+      "newOrderTitle": "🎉 New order received at Luzimarket!",
+      "newOrderGreeting": "Dear {businessName},",
+      "newOrderMessage": "You've received a new order in your Luzimarket store:",
+      "orderDetailsTitle": "📋 Order details:",
+      "orderNumber": "🔢 Order number:",
+      "orderTotal": "💰 Total:",
+      "orderDate": "📅 Date:",
+      "productsTitle": "🛍️ Ordered products:",
+      "shippingTitle": "📍 Shipping address:",
+      "actionRequired": "⏰ Action required:",
+      "actionMessage": "Please process this order within the next 24 hours to maintain an excellent customer experience.",
+      "viewOrderButton": "📦 View full order",
+      "emailFooter": "This email was sent automatically by Luzimarket. If you have any questions, contact our support team."
+    },
+    "customer": {
+      "confirmationSubject": "Order confirmation #{orderNumber} - Luzimarket",
+      "confirmationTitle": "🎉 Thank you for your purchase at Luzimarket!",
+      "confirmationGreeting": "Dear {customerName},",
+      "confirmationMessage": "Your order has been successfully confirmed and is being processed by our vendor. We're excited that you've chosen unique Mexican products!",
+      "orderSummaryTitle": "📋 Order summary:",
+      "vendor": "🏪 Vendor:",
+      "subtotal": "💵 Subtotal:",
+      "tax": "🧾 Tax (16%):",
+      "shipping": "📦 Shipping:",
+      "total": "💰 Total:",
+      "whatNext": "📱 What's next?",
+      "whatNextMessage": "We'll notify you by email when your order is shipped. This typically happens within 1-2 business days.",
+      "trackOrderButton": "📱 Track my order",
+      "supportButton": "💬 Contact support",
+      "thankYouMessage": "Thank you for supporting Mexican artisans and entrepreneurs! 🇲🇽",
+      "brandMessage": "This email was sent automatically by Luzimarket.",
+      "shippingSubject": "Your order #{orderNumber} has been shipped - Luzimarket",
+      "shippingTitle": "📦 Your order is on its way!",
+      "shippingMessage": "Great news! Your order #{orderNumber} has been shipped by {vendorName} and is on its way to you.",
+      "shippingInfoTitle": "🚚 Shipping information:",
+      "trackingNumber": "Tracking number:",
+      "estimatedDelivery": "⏰ Estimated delivery time:",
+      "estimatedDeliveryTime": "3-5 business days",
+      "destination": "📍 Destination:",
+      "stayInformed": "📱 Stay informed:",
+      "stayInformedMessage": "We'll notify you as soon as your package is delivered. Meanwhile, you can track your order in real time.",
+      "needHelpButton": "💬 Need help?",
+      "mexicanProducts": "Thank you for choosing unique Mexican products! 🇲🇽",
+      "connectingMessage": "Luzimarket - Connecting Mexico with the world"
+    }
+  },
+
+  "Security": {
+    "rateLimitAuth": "Too many authentication attempts. Try again in 15 minutes.",
+    "rateLimitCheckout": "Too many checkout attempts. Try again in a minute.",
+    "rateLimitNewsletter": "Too many newsletter subscriptions. Try again in a minute.",
+    "rateLimitReviews": "Too many reviews. Try again in a minute.",
+    "rateLimitVendor": "Too many vendor requests. Try again in a minute.",
+    "rateLimitGeneral": "Too many requests. Try again in a minute."
+  },
+
+  "Orders": {
+    "title": "My Orders",
+    "noOrders": "You don't have any orders yet",
+    "startShopping": "Start shopping",
+    "orderNumber": "Order #{number}",
+    "orderDate": "Order date",
+    "orderTotal": "Total",
+    "orderStatus": "Status",
+    "viewDetails": "View details",
+    "trackOrder": "Track order",
+    "status": {
+      "pending": "Pending",
+      "processing": "Processing",
+      "paid": "Paid",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "tracking": {
+      "title": "Track Order",
+      "subtitle": "Follow your order's progress",
+      "trackingNumber": "Tracking number",
+      "carrier": "Carrier",
+      "estimatedDelivery": "Estimated delivery",
+      "currentStatus": "Current status",
+      "timeline": "Order timeline",
+      "orderPlaced": "Order placed",
+      "orderConfirmed": "Order confirmed",
+      "orderProcessing": "Processing order",
+      "orderShipped": "Order shipped",
+      "outForDelivery": "Out for delivery",
+      "orderDelivered": "Order delivered",
+      "noTrackingInfo": "Tracking information is not available yet",
+      "contactSupport": "Contact support",
+      "copyTrackingNumber": "Copy tracking number",
+      "trackingCopied": "Tracking number copied"
+    },
+    "trackingTitle": "Order #{orderNumber} Tracking",
+    "trackingMap": "Shipment Location",
+    "trackingTimeline": "Shipping Timeline",
+    "mapLabels": {
+      "vendorLocation": "Vendor Location",
+      "deliveryAddress": "Delivery Address",
+      "loadingMap": "Loading map..."
+    },
+    "deliveryInformation": "Delivery Information",
+    "deliveryAddress": "Delivery Address",
+    "orderItems": "Order Items",
+    "vendorInformation": "Vendor Information",
+    "orderDate": "Order placed on {date}",
+    "quantity": "Quantity",
+    "total": "Total",
+    "details": {
+      "title": "Order Details",
+      "orderSummary": "Order summary",
+      "shippingAddress": "Shipping address",
+      "billingAddress": "Billing address",
+      "paymentMethod": "Payment method",
+      "items": "Items",
+      "quantity": "Quantity",
+      "price": "Price",
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "tax": "Tax (16%)",
+      "total": "Total",
+      "vendorInfo": "Vendor information",
+      "downloadInvoice": "Download invoice",
+      "reorder": "Reorder",
+      "reportIssue": "Report an issue"
+    },
+    "filters": {
+      "all": "All",
+      "lastMonth": "Last month",
+      "last3Months": "Last 3 months",
+      "last6Months": "Last 6 months",
+      "lastYear": "Last year",
+      "filterByStatus": "Filter by status",
+      "filterByDate": "Filter by date",
+      "searchOrders": "Search orders..."
+    }
   },
   
   "Footer": {

@@ -115,7 +115,7 @@ export async function sendOrderConfirmation(orderDetails: {
       </div>
       
       <div style="background: linear-gradient(to right, #86efac, #fde047, #5eead4); padding: 20px; text-align: center;">
-        <p style="margin: 0; font-size: 12px;">© 2024 MOMENTO ESPECIAL SAPI DE CV</p>
+        <p style="margin: 0; font-size: 12px;">© 2024 LUZIMARKET</p>
       </div>
     </div>
   `;
@@ -212,7 +212,7 @@ export async function sendVendorNotification(vendorDetails: {
       </div>
       
       <div style="background: linear-gradient(to right, #86efac, #fde047, #5eead4); padding: 20px; text-align: center;">
-        <p style="margin: 0; font-size: 12px;">© 2024 MOMENTO ESPECIAL SAPI DE CV</p>
+        <p style="margin: 0; font-size: 12px;">© 2024 LUZIMARKET</p>
       </div>
     </div>
   `;

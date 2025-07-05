@@ -86,9 +86,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
         {/* Breadcrumb */}
         <nav className="text-sm font-univers mb-8">
           <ol className="flex items-center gap-2 text-gray-600">
-            <li><a href={`/${locale}`} className="hover:text-black">{locale === 'es' ? 'Inicio' : 'Home'}</a></li>
+            <li><a href={`/${locale}`} className="hover:text-black">{t('home')}</a></li>
             <li>/</li>
-            <li><a href={`/${locale}/categories`} className="hover:text-black">{locale === 'es' ? 'Categorías' : 'Categories'}</a></li>
+            <li><a href={`/${locale}/categories`} className="hover:text-black">{t('categories')}</a></li>
             <li>/</li>
             <li><a href={`/${locale}/category/${product.category?.slug}`} className="hover:text-black">{product.category?.name}</a></li>
             <li>/</li>
@@ -159,7 +159,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   image: images[0] || '',
                   vendorId: product.vendorId,
                   vendorName: product.vendor?.businessName || '',
-                  stock: product.stock,
+                  stock: product.stock || 0,
                 }}
               />
               
@@ -229,19 +229,19 @@ export default async function ProductPage({ params }: ProductPageProps) {
           
           <TabsContent value="specifications" className="mt-6">
             <div className="prose prose-sm font-univers max-w-none">
-              <p>{locale === 'es' ? 'Especificaciones técnicas del producto.' : 'Product technical specifications.'}</p>
+              <p>{t('specificationContent')}</p>
             </div>
           </TabsContent>
           
           <TabsContent value="shipping" className="mt-6">
             <div className="prose prose-sm font-univers max-w-none">
-              <p>{locale === 'es' ? 'Información sobre envío y tiempos de entrega.' : 'Shipping information and delivery times.'}</p>
+              <p>{t('shippingContent')}</p>
             </div>
           </TabsContent>
           
           <TabsContent value="returns" className="mt-6">
             <div className="prose prose-sm font-univers max-w-none">
-              <p>{locale === 'es' ? 'Política de devoluciones y cambios.' : 'Returns and exchange policy.'}</p>
+              <p>{t('returnsContent')}</p>
             </div>
           </TabsContent>
         </Tabs>

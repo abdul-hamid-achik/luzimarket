@@ -65,9 +65,6 @@ export default function RegisterPage() {
 
       if (response.ok) {
         setSuccess(true);
-        setTimeout(() => {
-          router.push("/login");
-        }, 2000);
       } else {
         setError(result.error || "Error al crear la cuenta");
       }
@@ -84,15 +81,21 @@ export default function RegisterPage() {
         <div className="max-w-md w-full space-y-8 text-center">
           <div className="bg-white p-8 rounded-lg shadow-sm border">
             <div className="mb-6">
-              <div className="mx-auto h-16 w-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
+              <div className="mx-auto h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                <Mail className="h-8 w-8 text-blue-600" />
               </div>
-              <h2 className="text-2xl font-times-now text-gray-900">¡Cuenta creada exitosamente!</h2>
-              <p className="text-sm text-gray-600 font-univers mt-2">
-                Te redirigiremos a la página de inicio de sesión en unos segundos...
+              <h2 className="text-2xl font-times-now text-gray-900">¡Verifica tu correo electrónico!</h2>
+              <p className="text-sm text-gray-600 font-univers mt-4">
+                Hemos enviado un enlace de verificación a tu correo electrónico.
               </p>
+              <p className="text-sm text-gray-600 font-univers mt-2">
+                Por favor revisa tu bandeja de entrada y haz clic en el enlace para activar tu cuenta.
+              </p>
+              <div className="mt-6">
+                <Link href="/login" className="text-sm text-black hover:underline font-univers">
+                  Volver al inicio de sesión
+                </Link>
+              </div>
             </div>
           </div>
         </div>

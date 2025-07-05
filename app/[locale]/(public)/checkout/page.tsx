@@ -14,10 +14,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, CreditCard, MapPin, User, Phone, Mail, Truck, Shield, Package } from "lucide-react";
+import { Loader2, CreditCard, MapPin, User, Phone, Mail, Truck, Shield, Package, UserCheck, UserX } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useSession } from "next-auth/react";
+import { ShippingCalculator } from "@/components/checkout/shipping-calculator";
 
 const checkoutSchema = z.object({
   // Personal Information
@@ -55,6 +58,8 @@ export default function CheckoutPage() {
   const items = state.items;
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [checkoutMode, setCheckoutMode] = useState<"guest" | "login">("guest");
+  const { data: session } = useSession();
 
   const form = useForm<CheckoutForm>({
     resolver: zodResolver(checkoutSchema),
@@ -67,9 +72,10 @@ export default function CheckoutPage() {
   });
 
   const subtotal = getTotalPrice();
-  const shipping = 99; // Fixed shipping cost
+  const [shippingCost, setShippingCost] = useState(0);
+  const [selectedShipping, setSelectedShipping] = useState<any>(null);
   const tax = subtotal * 0.16; // 16% IVA
-  const total = subtotal + shipping + tax;
+  const total = subtotal + shippingCost + tax;
 
   if (items.length === 0) {
     return (
@@ -100,6 +106,7 @@ export default function CheckoutPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           items: items,
+          isGuest: !session?.user,
           shippingAddress: {
             firstName: data.firstName,
             lastName: data.lastName,
@@ -113,6 +120,7 @@ export default function CheckoutPage() {
             country: data.country,
             instructions: data.instructions,
           },
+          selectedShipping: selectedShipping,
         }),
       });
 
@@ -171,6 +179,62 @@ export default function CheckoutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Checkout Form */}
             <div className="space-y-8">
+              {/* Checkout Mode Selection */}
+              {!session?.user && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 font-times-now">
+                      <User className="h-5 w-5" />
+                      Opciones de Compra
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <RadioGroup value={checkoutMode} onValueChange={(value) => setCheckoutMode(value as "guest" | "login")}>
+                      <div className="space-y-4">
+                        <div className="flex items-start space-x-3 border rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
+                          <RadioGroupItem value="guest" id="guest" className="mt-1" />
+                          <Label htmlFor="guest" className="flex-1 cursor-pointer">
+                            <div className="flex items-center gap-2 mb-1">
+                              <UserX className="h-4 w-4" />
+                              <span className="font-medium">Continuar como invitado</span>
+                            </div>
+                            <p className="text-sm text-gray-600 font-univers">
+                              Completa tu compra sin crear una cuenta. Recibirás el seguimiento de tu pedido por correo.
+                            </p>
+                          </Label>
+                        </div>
+                        <div className="flex items-start space-x-3 border rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
+                          <RadioGroupItem value="login" id="login" className="mt-1" />
+                          <Label htmlFor="login" className="flex-1 cursor-pointer">
+                            <div className="flex items-center gap-2 mb-1">
+                              <UserCheck className="h-4 w-4" />
+                              <span className="font-medium">Iniciar sesión o crear cuenta</span>
+                            </div>
+                            <p className="text-sm text-gray-600 font-univers">
+                              Accede a tu historial de pedidos, direcciones guardadas y ofertas exclusivas.
+                            </p>
+                          </Label>
+                        </div>
+                      </div>
+                    </RadioGroup>
+                    {checkoutMode === "login" && (
+                      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <p className="text-sm font-univers mb-3">
+                          Serás redirigido a la página de inicio de sesión
+                        </p>
+                        <Link href="/login?redirect=/checkout">
+                          <Button className="w-full bg-black text-white hover:bg-gray-800">
+                            Ir a iniciar sesión
+                          </Button>
+                        </Link>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Checkout Form */}
+              {(checkoutMode === "guest" || session?.user) && (
               <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
                 {/* Contact Information */}
                 <Card>
@@ -339,6 +403,31 @@ export default function CheckoutPage() {
                   </CardContent>
                 </Card>
 
+                {/* Shipping Options */}
+                {items.length > 0 && (
+                  <ShippingCalculator
+                    items={items.map(item => ({
+                      productId: item.id,
+                      quantity: item.quantity
+                    }))}
+                    vendorId={items[0]?.vendorId || ''}
+                    initialPostalCode={form.watch("postalCode") || ''}
+                    onShippingChange={(option, postalCode) => {
+                      if (option) {
+                        setShippingCost(option.cost);
+                        setSelectedShipping(option);
+                        // Update postal code in form if changed in calculator
+                        if (postalCode && postalCode !== form.getValues("postalCode")) {
+                          form.setValue("postalCode", postalCode);
+                        }
+                      } else {
+                        setShippingCost(0);
+                        setSelectedShipping(null);
+                      }
+                    }}
+                  />
+                )}
+
                 {/* Payment Info */}
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <div className="flex items-start gap-3">
@@ -417,6 +506,7 @@ export default function CheckoutPage() {
                   </Button>
                 </div>
               </form>
+              )}
             </div>
 
             {/* Order Summary */}
@@ -472,7 +562,13 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex justify-between font-univers">
                       <span>Envío</span>
-                      <span>${shipping.toLocaleString('es-MX')}</span>
+                      <span>
+                        {shippingCost === 0 && selectedShipping ? (
+                          <span className="text-green-600">GRATIS</span>
+                        ) : (
+                          `$${shippingCost.toLocaleString('es-MX')}`
+                        )}
+                      </span>
                     </div>
                     <div className="flex justify-between font-univers">
                       <span>IVA (16%)</span>

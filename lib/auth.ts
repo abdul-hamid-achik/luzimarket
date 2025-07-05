@@ -4,7 +4,6 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db, getDbInstance } from "@/db";
 import { users, vendors, adminUsers } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import bcrypt from "bcryptjs";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -32,62 +31,19 @@ export const authOptions = {
       async authorize(credentials) {
         try {
           const { email, password, userType } = loginSchema.parse(credentials);
-
-          let user;
-          let hashedPassword;
-
-          switch (userType) {
-            case "customer":
-              const customer = await db
-                .select()
-                .from(users)
-                .where(eq(users.email, email))
-                .limit(1);
-              
-              if (customer.length === 0) return null;
-              user = customer[0];
-              hashedPassword = user.passwordHash;
-              break;
-
-            case "vendor":
-              const vendor = await db
-                .select()
-                .from(vendors)
-                .where(eq(vendors.email, email))
-                .limit(1);
-              
-              if (vendor.length === 0) return null;
-              user = vendor[0];
-              hashedPassword = user.passwordHash;
-              break;
-
-            case "admin":
-              const admin = await db
-                .select()
-                .from(adminUsers)
-                .where(eq(adminUsers.email, email))
-                .limit(1);
-              
-              if (admin.length === 0) return null;
-              user = admin[0];
-              hashedPassword = user.passwordHash;
-              break;
-
-            default:
-              return null;
+          
+          // Import the authenticateUser function dynamically to avoid circular dependencies
+          const { authenticateUser } = await import("@/lib/actions/auth");
+          
+          const result = await authenticateUser(email, password, userType);
+          
+          if (!result.success) {
+            // NextAuth expects null for failed authentication
+            // The error message will be handled by the login page
+            return null;
           }
-
-          if (!hashedPassword || !user.isActive) return null;
-
-          const isValid = await bcrypt.compare(password, hashedPassword);
-          if (!isValid) return null;
-
-          return {
-            id: user.id,
-            email: user.email,
-            name: user.name || user.email,
-            role: userType,
-          };
+          
+          return result.user || null;
         } catch (error) {
           console.error("Auth error:", error);
           return null;

@@ -50,6 +50,7 @@ export function Footer() {
               <li><Link href="/vendor/register" className="hover:underline">Vende con nosotros</Link></li>
               <li><Link href="/contact" className="hover:underline">Contacto</Link></li>
               <li><Link href="/editorial" className="hover:underline">Editorial</Link></li>
+              <li><Link href="/orders/lookup" className="hover:underline">Buscar mi pedido</Link></li>
             </ul>
           </div>
 
@@ -89,7 +90,7 @@ export function Footer() {
 
         {/* Copyright */}
         <div className="text-center">
-          <p className="text-xs font-univers">MOMENTO ESPECIAL SAPI DE CV © 2024 / TODOS LOS DERECHOS RESERVADOS</p>
+          <p className="text-xs font-univers">LUZIMARKET © 2024 / TODOS LOS DERECHOS RESERVADOS</p>
         </div>
       </div>
     </footer>

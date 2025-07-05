@@ -8,7 +8,7 @@ export const routing = defineRouting({
   defaultLocale: 'es',
   
   // Locale prefix configuration
-  localePrefix: 'as-needed', // Spanish URLs won't have /es prefix
+  localePrefix: 'always', // Always show locale in URL
   
   // Define localized pathnames
   pathnames: {
@@ -81,6 +81,30 @@ export const routing = defineRouting({
     '/login': {
       es: '/iniciar-sesion',
       en: '/login'
+    },
+    '/register': {
+      es: '/registrarse',
+      en: '/register'
+    },
+    '/forgot-password': {
+      es: '/olvide-contrasena',
+      en: '/forgot-password'
+    },
+    '/reset-password': {
+      es: '/restablecer-contrasena',
+      en: '/reset-password'
+    },
+    '/resend-verification': {
+      es: '/reenviar-verificacion',
+      en: '/resend-verification'
+    },
+    '/orders': {
+      es: '/pedidos',
+      en: '/orders'
+    },
+    '/orders/[id]': {
+      es: '/pedidos/[id]',
+      en: '/orders/[id]'
     }
   }
 });

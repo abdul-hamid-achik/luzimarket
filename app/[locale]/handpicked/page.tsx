@@ -115,9 +115,9 @@ export default async function HandpickedPage({ params, searchParams }: Handpicke
                   className="border border-gray-300 rounded px-3 py-1 text-sm"
                 >
                   <option value="newest">{t('newest')}</option>
-                  <option value="price-asc">Precio: Menor a Mayor</option>
-                  <option value="price-desc">Precio: Mayor a Menor</option>
-                  <option value="name">Nombre</option>
+                  <option value="price-asc">{t('priceAsc')}</option>
+                  <option value="price-desc">{t('priceDesc')}</option>
+                  <option value="name">{t('name')}</option>
                 </select>
               </div>
             </div>

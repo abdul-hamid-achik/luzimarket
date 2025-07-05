@@ -6,6 +6,7 @@ import { generateAndUploadImage, generateProductImagePrompt, generateCategoryIma
 import { eq, sql } from "drizzle-orm";
 import slugify from "slugify";
 import bcrypt from "bcryptjs";
+import { initializeShippingData } from "../lib/actions/shipping";
 
 // Load environment variables before importing db
 config({ path: ".env.local" });
@@ -97,7 +98,7 @@ const PRODUCT_NAMES = [
   "Ramo de Lavanda",
   "Arreglo de Suculentas",
   "Bouquet de Flores Mixtas",
-  
+
   // Chocolates y Dulces
   "Caja de Chocolates Artesanales",
   "Trufas de Chocolate Belga",
@@ -114,7 +115,7 @@ const PRODUCT_NAMES = [
   "Barras de Chocolate Gourmet",
   "Pretzels Cubiertos",
   "Chocolates Sin Azúcar",
-  
+
   // Velas y Aromas
   "Vela Aromática de Lavanda",
   "Set de Velas Aromáticas",
@@ -131,7 +132,7 @@ const PRODUCT_NAMES = [
   "Sales de Baño Aromáticas",
   "Potpurrí Natural",
   "Velas Decorativas",
-  
+
   // Regalos Personalizados
   "Album Fotográfico Personalizado",
   "Taza Personalizada",
@@ -148,7 +149,7 @@ const PRODUCT_NAMES = [
   "Funda de Celular Personalizada",
   "Puzzle Personalizado",
   "Manta Personalizada",
-  
+
   // Cajas de Regalo
   "Caja Regalo Spa",
   "Caja Desayuno Sorpresa",
@@ -165,7 +166,7 @@ const PRODUCT_NAMES = [
   "Box de Productos Mexicanos",
   "Caja de Bienestar",
   "Kit de Arte y Manualidades",
-  
+
   // Decoración y Hogar
   "Jarrón de Talavera",
   "Espejo Decorativo",
@@ -182,7 +183,7 @@ const PRODUCT_NAMES = [
   "Adorno de Mesa",
   "Móvil Decorativo",
   "Escultura Artesanal",
-  
+
   // Joyería y Accesorios
   "Collar de Plata",
   "Pulsera de Oro",
@@ -199,7 +200,7 @@ const PRODUCT_NAMES = [
   "Piercing de Oro",
   "Set de Joyería",
   "Collar de Piedras Preciosas",
-  
+
   // Gourmet y Delicatessen
   "Canasta Gourmet Premium",
   "Tabla de Quesos Gourmet",
@@ -242,7 +243,7 @@ const CITIES = ["Ciudad de México", "Guadalajara", "Monterrey", "Puebla", "Quer
 const STATES = ["CDMX", "Jalisco", "Nuevo León", "Puebla", "Querétaro"];
 
 const VENDOR_PREFIXES = [
-  "Boutique", "Casa", "Tienda", "Atelier", "Estudio", "Galería", "Rincón", 
+  "Boutique", "Casa", "Tienda", "Atelier", "Estudio", "Galería", "Rincón",
   "Jardín", "Tesoro", "Arte", "Dulce", "Bella", "Luna", "Sol", "Magia"
 ];
 
@@ -254,15 +255,41 @@ const VENDOR_SUFFIXES = [
 async function main() {
   console.log("🌱 Starting seed...");
 
-  // Check if --no-reset flag is passed
+  // Check command line flags
   const shouldReset = !process.argv.includes('--no-reset');
+  const shouldGenerateImages = !process.argv.includes('--no-images') && !!process.env.OPENAI_SECRET_KEY;
+  const imageBatchSize = process.argv.includes('--fast') ? 10 : 500; // Limit images in fast mode
 
   try {
     // Reset database if needed
     if (shouldReset) {
       console.log("🧹 Resetting database...");
-      await reset(db, schema);
-      console.log("✅ Database reset complete");
+
+      // Use drizzle-seed reset with node-postgres driver for compatibility
+      try {
+        // Import node-postgres driver only when needed
+        const { drizzle } = await import('drizzle-orm/node-postgres');
+        const { Client } = await import('pg');
+        
+        // Create a temporary connection with node-postgres for reset
+        const client = new Client({
+          connectionString: process.env.DATABASE_URL,
+        });
+        
+        await client.connect();
+        const pgDb = drizzle(client, { schema });
+        
+        // Reset using the pg driver connection
+        await reset(pgDb, schema);
+        
+        // Close the temporary connection
+        await client.end();
+        
+        console.log("✅ Database reset complete");
+      } catch (resetError: any) {
+        console.error("❌ Failed to reset database:", resetError);
+        throw resetError;
+      }
     } else {
       console.log("⚡ Skipping database reset (--no-reset flag detected)");
     }
@@ -345,14 +372,14 @@ async function main() {
     const vendorData = [];
     // Add a default password hash for all test vendors
     const defaultPasswordHash = await bcrypt.hash("password123", 10);
-    
+
     for (let i = 0; i < 20; i++) {
       const prefix = faker.helpers.arrayElement(VENDOR_PREFIXES);
       const suffix = faker.helpers.arrayElement(VENDOR_SUFFIXES);
       const businessName = `${prefix} ${suffix}`;
       vendorData.push({
         businessName,
-        slug: slugify(businessName, { lower: true, strict: true }),
+        slug: slugify(businessName + "-" + faker.string.alphanumeric(6), { lower: true, strict: true }),
         contactName: faker.person.fullName(),
         email: faker.internet.email(),
         passwordHash: defaultPasswordHash, // All test vendors use password123
@@ -372,10 +399,12 @@ async function main() {
         instagramUrl: faker.datatype.boolean(0.6) ? `@${faker.internet.username()}` : "",
         facebookUrl: faker.datatype.boolean(0.6) ? faker.internet.username() : "",
         tiktokUrl: faker.datatype.boolean(0.4) ? `@${faker.internet.username()}` : "",
-        isActive: faker.datatype.boolean(0.9)
+        isActive: faker.datatype.boolean(0.9),
+        shippingOriginState: faker.helpers.arrayElement(STATES),
+        freeShippingThreshold: faker.helpers.arrayElement([null, "500", "1000", "1500", "2000"])
       });
     }
-    
+
     // Add a specific test vendor for e2e tests
     vendorData.push({
       businessName: "Test Vendor Shop",
@@ -399,16 +428,18 @@ async function main() {
       instagramUrl: "@testvendor",
       facebookUrl: "testvendor",
       tiktokUrl: "@testvendor",
-      isActive: true
+      isActive: true,
+      shippingOriginState: "Ciudad de México",
+      freeShippingThreshold: "1000"
     });
-    
+
     const vendors = await db.insert(schema.vendors).values(vendorData).returning();
     console.log(`✅ Created ${vendors.length} vendors`);
 
     // 5. Seed Products
     console.log("📦 Creating products...");
     const productData = [];
-    
+
     // Group product names by category
     const CATEGORY_PRODUCT_NAMES: Record<string, string[]> = {
       "flores-arreglos": PRODUCT_NAMES.slice(0, 15),
@@ -420,19 +451,19 @@ async function main() {
       "joyeria-accesorios": PRODUCT_NAMES.slice(90, 105),
       "gourmet-delicatessen": PRODUCT_NAMES.slice(105, 120)
     };
-    
+
     for (let i = 0; i < 500; i++) {
       const category = faker.helpers.arrayElement(categories);
       const categoryProducts = CATEGORY_PRODUCT_NAMES[category.slug] || PRODUCT_NAMES;
       const baseName = faker.helpers.arrayElement(categoryProducts);
       const adjective = faker.helpers.arrayElement([
-        "Premium", "Deluxe", "Exclusivo", "Artesanal", "Elegante", 
+        "Premium", "Deluxe", "Exclusivo", "Artesanal", "Elegante",
         "Clásico", "Moderno", "Vintage", "Lujoso", "Especial"
       ]);
       const name = `${baseName} ${adjective}`;
       const priceRange = CATEGORY_PRICE_RANGES[category.slug] || { min: 299, max: 1999 };
       const price = faker.number.int({ min: priceRange.min, max: priceRange.max });
-      
+
       // Generate more realistic descriptions based on category
       let description = "";
       if (category.slug === "flores-arreglos") {
@@ -444,7 +475,7 @@ async function main() {
       } else {
         description = faker.lorem.sentences(2) + ` ${faker.helpers.arrayElement(["Hecho a mano con amor.", "Producto exclusivo de temporada.", "Edición limitada.", "Diseño único."])}`;
       }
-      
+
       productData.push({
         name,
         slug: slugify(name + "-" + faker.string.alphanumeric(6), { lower: true, strict: true }),
@@ -460,8 +491,20 @@ async function main() {
           { value: faker.number.int({ min: 51, max: 100 }), weight: 3 }, // High stock
           { value: 0, weight: 1 } // Out of stock
         ]),
-        sku: `${category.slug.substring(0, 3).toUpperCase()}-${faker.string.alphanumeric(5).toUpperCase()}`,
-        isActive: faker.datatype.boolean(0.95)
+        isActive: faker.datatype.boolean(0.95),
+        // Shipping fields based on category
+        weight: (() => {
+          if (category.slug === "flores-arreglos") return faker.number.int({ min: 500, max: 3000 }); // 0.5-3kg
+          if (category.slug === "chocolates-dulces") return faker.number.int({ min: 100, max: 1000 }); // 0.1-1kg
+          if (category.slug === "velas-aromas") return faker.number.int({ min: 200, max: 800 }); // 0.2-0.8kg
+          if (category.slug === "joyeria-accesorios") return faker.number.int({ min: 50, max: 300 }); // 0.05-0.3kg
+          if (category.slug === "gourmet-delicatessen") return faker.number.int({ min: 300, max: 2000 }); // 0.3-2kg
+          return faker.number.int({ min: 200, max: 1500 }); // Default 0.2-1.5kg
+        })(),
+        length: faker.number.int({ min: 10, max: 50 }), // 10-50cm
+        width: faker.number.int({ min: 10, max: 40 }), // 10-40cm
+        height: faker.number.int({ min: 5, max: 30 }), // 5-30cm
+        shippingClass: faker.helpers.arrayElement(["standard", "fragile", "oversize"])
       });
     }
     const products = await db.insert(schema.products).values(productData).returning();
@@ -470,7 +513,7 @@ async function main() {
     // 5.5 Seed Product Variants
     console.log("🎨 Creating product variants...");
     const variantData = [];
-    
+
     // Define variant configurations by category
     const CATEGORY_VARIANTS: Record<string, { types: string[], values: Record<string, any[]> }> = {
       "flores-arreglos": {
@@ -566,10 +609,11 @@ async function main() {
     };
 
     // Create variants for products that have variant configurations
+    let variantCounter = 0;
     for (const product of products.slice(0, 200)) { // Add variants to first 200 products
       const category = categories.find(c => c.id === product.categoryId);
       if (!category) continue;
-      
+
       const variantConfig = CATEGORY_VARIANTS[category.slug];
       if (!variantConfig) continue;
 
@@ -577,11 +621,12 @@ async function main() {
         const values = variantConfig.values[variantType];
         for (const value of values) {
           const stock = faker.number.int({ min: 0, max: 50 });
+          variantCounter++;
           variantData.push({
             productId: product.id,
             name: value.name,
             variantType,
-            sku: `${product.sku}-${variantType.charAt(0).toUpperCase()}-${value.name.substring(0, 3).toUpperCase()}`,
+            sku: `${product.id.substring(0, 8)}-${variantType.charAt(0).toUpperCase()}-${variantCounter.toString().padStart(4, '0')}`,
             price: value.price ? String(Number(product.price) + value.price) : null,
             stock,
             attributes: value.attributes || {},
@@ -627,22 +672,130 @@ async function main() {
     // 8. Seed Orders
     console.log("🛒 Creating orders...");
     const orderData = [];
+    const carriers = ["fedex", "ups", "dhl", "estafeta", "correos-de-mexico"];
+    
     for (let i = 0; i < 150; i++) {
       const subtotal = faker.number.int({ min: 199, max: 9999 });
       const tax = Math.round(subtotal * 0.16);
       const shipping = faker.helpers.arrayElement([0, 99, 149, 199]);
       const total = subtotal + tax + shipping;
+      
+      const status = faker.helpers.weightedArrayElement([
+        { value: "delivered", weight: 4 },
+        { value: "shipped", weight: 3 },
+        { value: "processing", weight: 2 },
+        { value: "pending", weight: 1 }
+      ]);
+      
+      const orderCreatedAt = faker.date.recent({ days: 90 });
+      
+      // Prepare tracking information for shipped and delivered orders
+      let trackingData: any = {};
+      
+      if (status === "shipped" || status === "delivered") {
+        const carrier = faker.helpers.arrayElement(carriers);
+        const trackingNumber = `${carrier.toUpperCase().substring(0, 3)}${faker.string.numeric(12)}`;
+        const shippedDate = faker.date.between({ from: orderCreatedAt, to: new Date() });
+        const estimatedDelivery = new Date(shippedDate);
+        estimatedDelivery.setDate(estimatedDelivery.getDate() + faker.number.int({ min: 1, max: 5 }));
+        
+        // Build tracking history
+        const trackingHistory = [];
+        
+        // Order picked up
+        trackingHistory.push({
+          status: "picked_up",
+          location: faker.helpers.arrayElement(CITIES),
+          timestamp: shippedDate,
+          description: "Paquete recogido por el transportista",
+          coordinates: {
+            lat: Number(faker.location.latitude({ min: 14, max: 33 })),
+            lng: Number(faker.location.longitude({ min: -117, max: -86 }))
+          }
+        });
+        
+        // In transit events
+        const transitEvents = faker.number.int({ min: 1, max: 3 });
+        for (let j = 0; j < transitEvents; j++) {
+          const transitDate = faker.date.between({ from: shippedDate, to: estimatedDelivery });
+          trackingHistory.push({
+            status: "in_transit",
+            location: faker.helpers.arrayElement(CITIES),
+            timestamp: transitDate,
+            description: faker.helpers.arrayElement([
+              "En tránsito hacia el destino",
+              "Paquete en centro de distribución",
+              "Procesando en instalación"
+            ]),
+            coordinates: {
+              lat: Number(faker.location.latitude({ min: 14, max: 33 })),
+              lng: Number(faker.location.longitude({ min: -117, max: -86 }))
+            }
+          });
+        }
+        
+        // Out for delivery (for both shipped and delivered)
+        const outForDeliveryDate = new Date(estimatedDelivery);
+        outForDeliveryDate.setHours(outForDeliveryDate.getHours() - faker.number.int({ min: 2, max: 8 }));
+        trackingHistory.push({
+          status: "out_for_delivery",
+          location: faker.helpers.arrayElement(CITIES),
+          timestamp: outForDeliveryDate,
+          description: "En ruta de entrega",
+          coordinates: {
+            lat: Number(faker.location.latitude({ min: 14, max: 33 })),
+            lng: Number(faker.location.longitude({ min: -117, max: -86 }))
+          }
+        });
+        
+        // Delivered event (only for delivered orders)
+        if (status === "delivered") {
+          // Ensure the delivery date is not in the future
+          const maxDeliveryDate = new Date();
+          const minDeliveryDate = new Date(outForDeliveryDate);
+          
+          // If outForDeliveryDate is in the future, set actual delivery to a reasonable time after it
+          if (minDeliveryDate > maxDeliveryDate) {
+            // Add 1-4 hours to outForDeliveryDate for actual delivery
+            const hoursAfterOutForDelivery = faker.number.int({ min: 1, max: 4 });
+            minDeliveryDate.setHours(minDeliveryDate.getHours() + hoursAfterOutForDelivery);
+            var actualDeliveryDate = minDeliveryDate;
+          } else {
+            // Normal case: delivery happened between out for delivery and now
+            var actualDeliveryDate = faker.date.between({ from: outForDeliveryDate, to: maxDeliveryDate });
+          }
+          
+          trackingHistory.push({
+            status: "delivered",
+            location: faker.helpers.arrayElement(CITIES),
+            timestamp: actualDeliveryDate,
+            description: "Entregado exitosamente",
+            coordinates: {
+              lat: Number(faker.location.latitude({ min: 14, max: 33 })),
+              lng: Number(faker.location.longitude({ min: -117, max: -86 }))
+            }
+          });
+          
+          trackingData.actualDeliveryDate = actualDeliveryDate;
+        }
+        
+        // Sort tracking history by timestamp
+        trackingHistory.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+        
+        trackingData = {
+          trackingNumber,
+          carrier,
+          estimatedDeliveryDate: estimatedDelivery,
+          trackingHistory,
+          ...trackingData
+        };
+      }
 
       orderData.push({
         userId: faker.helpers.arrayElement(users).id,
         vendorId: faker.helpers.arrayElement(vendors).id,
         orderNumber: `ORD-${faker.string.numeric(8)}`,
-        status: faker.helpers.weightedArrayElement([
-          { value: "delivered", weight: 4 },
-          { value: "shipped", weight: 3 },
-          { value: "processing", weight: 2 },
-          { value: "pending", weight: 1 }
-        ]),
+        status,
         subtotal: String(subtotal),
         tax: String(tax),
         shipping: String(shipping),
@@ -661,7 +814,9 @@ async function main() {
           postalCode: faker.location.zipCode("#####"),
           country: "México"
         },
-        notes: faker.datatype.boolean(0.3) ? faker.lorem.sentence() : null
+        notes: faker.datatype.boolean(0.3) ? faker.lorem.sentence() : null,
+        createdAt: orderCreatedAt,
+        ...trackingData
       });
     }
     const orders = await db.insert(schema.orders).values(orderData).returning();
@@ -732,9 +887,19 @@ async function main() {
     await db.insert(schema.reviews).values(reviewData);
     console.log(`✅ Created ${reviewData.length} reviews`);
 
-    // Generate AI images if OpenAI key is available
-    if (process.env.OPENAI_SECRET_KEY) {
+    // 11. Initialize shipping data
+    console.log("🚚 Initializing shipping zones and methods...");
+    const shippingResult = await initializeShippingData();
+    if (shippingResult.success) {
+      console.log(`✅ ${shippingResult.message}`);
+    } else {
+      console.log(`⚠️  Shipping data initialization failed: ${shippingResult.error}`);
+    }
+
+    // Generate AI images if enabled
+    if (shouldGenerateImages) {
       console.log("\n🎨 Generating AI images for products and categories...");
+      console.log(`📊 Will generate images for ${Math.min(products.length, imageBatchSize)} products`);
 
       // Create uploads directory for local development
       if (process.env.NODE_ENV === 'development' && !process.env.BLOB_READ_WRITE_TOKEN) {
@@ -779,10 +944,9 @@ async function main() {
         }
       }
 
-      // Generate product images (limit to 20 for cost control)
-      // Increase the limit or remove .slice() to generate images for all products
+      // Generate product images
       console.log('\n🖼️  Generating product images...');
-      const productsToImage = products; // Generate images for all products
+      const productsToImage = products.slice(0, imageBatchSize); // Limit based on batch size
       for (const product of productsToImage) {
         try {
           console.log(`🖼️  Generating image for product: ${product.name}`);
@@ -820,7 +984,11 @@ async function main() {
 
       console.log('\n✨ AI image generation completed!');
     } else {
-      console.log("\n⚠️  Skipping AI image generation (OPENAI_SECRET_KEY not found)");
+      if (process.argv.includes('--no-images')) {
+        console.log("\n⏭️  Skipping AI image generation (--no-images flag)");
+      } else {
+        console.log("\n⚠️  Skipping AI image generation (OPENAI_SECRET_KEY not found)");
+      }
     }
 
     // Print summary

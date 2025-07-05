@@ -233,10 +233,12 @@ export default async function OrdersPage({ params }: OrdersPageProps) {
                     )}
 
                     {order.status === 'shipped' && (
-                      <Button variant="outline" size="sm">
-                        <Truck className="h-4 w-4 mr-2" />
-                        Rastrear envío
-                      </Button>
+                      <Link href={`/${locale}/orders/${order.id}`}>
+                        <Button variant="outline" size="sm">
+                          <Truck className="h-4 w-4 mr-2" />
+                          Rastrear envío
+                        </Button>
+                      </Link>
                     )}
                   </div>
                 </CardContent>

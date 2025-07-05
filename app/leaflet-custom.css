@@ -1,0 +1,120 @@
+/* Custom Leaflet styles to match Tailwind theme */
+
+/* Map container styling */
+.leaflet-container {
+  font-family: 'Univers', sans-serif;
+  background-color: #f8fafc;
+}
+
+/* Popup styling */
+.leaflet-popup-content-wrapper {
+  background-color: white;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.leaflet-popup-content {
+  margin: 0.75rem !important;
+  font-size: 0.875rem;
+  color: #374151;
+  min-width: 160px;
+}
+
+.leaflet-popup-content p {
+  margin: 0 !important;
+  line-height: 1.5;
+}
+
+.leaflet-popup-tip {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-top: none;
+  border-right: none;
+}
+
+/* Zoom controls styling */
+.leaflet-control-zoom {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 0.375rem !important;
+  overflow: hidden;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+}
+
+.leaflet-control-zoom a {
+  background-color: white !important;
+  color: #374151 !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  width: 32px !important;
+  height: 32px !important;
+  line-height: 32px !important;
+  font-size: 18px !important;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.leaflet-control-zoom a:hover {
+  background-color: #f9fafb !important;
+  color: #111827 !important;
+}
+
+.leaflet-control-zoom a:last-child {
+  border-bottom: none !important;
+}
+
+/* Attribution styling */
+.leaflet-control-attribution {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  padding: 2px 8px !important;
+  font-size: 11px !important;
+  border-radius: 0 0.375rem 0 0 !important;
+  border: 1px solid #e5e7eb !important;
+  border-bottom: none !important;
+  border-left: none !important;
+}
+
+/* Custom marker icons */
+.custom-div-icon {
+  background: transparent;
+  border: none;
+}
+
+/* Make map tiles slightly desaturated for better contrast */
+.leaflet-tile-container img {
+  filter: saturate(0.7) brightness(1.05);
+}
+
+/* Animate marker appearance */
+.leaflet-marker-icon {
+  animation: dropIn 0.3s ease-out;
+}
+
+@keyframes dropIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Polyline shadow effect */
+.leaflet-interactive {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Loading state */
+.leaflet-tile-loaded {
+  animation: tileLoad 0.2s ease-out;
+}
+
+@keyframes tileLoad {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

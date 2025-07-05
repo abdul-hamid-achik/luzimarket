@@ -4,8 +4,11 @@ import { useCart } from "@/contexts/cart-context";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-import { Trash2, Plus, Minus } from "lucide-react";
+import { Trash2, Plus, Minus, MapPin } from "lucide-react";
 import { ProgressSteps, MobileProgressSteps } from "@/components/ui/progress-steps";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { getStateFromPostalCode } from "@/lib/utils/shipping-zones";
 
 export default function CartPage() {
   const { state, removeFromCart, updateQuantity, getTotalPrice } = useCart();
@@ -34,9 +37,25 @@ export default function CartPage() {
     );
   }
 
+  const [postalCode, setPostalCode] = useState("");
   const subtotal = getTotalPrice();
   const tax = subtotal * 0.16; // 16% IVA
-  const shipping = subtotal > 1000 ? 0 : 99; // Free shipping over $1000
+  const [estimatedShipping, setEstimatedShipping] = useState<number | null>(null);
+  
+  // Basic shipping estimate based on subtotal
+  const getShippingEstimate = () => {
+    if (subtotal > 1000) return 0;
+    if (!postalCode || postalCode.length !== 5) return 99;
+    
+    const state = getStateFromPostalCode(postalCode);
+    if (!state) return 99;
+    
+    // Basic estimate based on zone
+    const zone = state === 'Ciudad de México' || state === 'Estado de México' ? 'central' : 'other';
+    return zone === 'central' ? 99 : 149;
+  };
+  
+  const shipping = estimatedShipping !== null ? estimatedShipping : getShippingEstimate();
   const total = subtotal + tax + shipping;
 
   return (
@@ -145,6 +164,42 @@ export default function CartPage() {
                     )}
                   </span>
                 </div>
+              </div>
+
+              {/* Postal Code for Shipping Estimate */}
+              <div className="mb-4 space-y-2">
+                <label className="text-sm font-univers text-gray-600 flex items-center gap-1">
+                  <MapPin className="h-4 w-4" />
+                  Calcula tu envío
+                </label>
+                <div className="flex gap-2">
+                  <Input
+                    type="text"
+                    placeholder="Código postal"
+                    value={postalCode}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '').slice(0, 5);
+                      setPostalCode(value);
+                      if (value.length === 5) {
+                        setEstimatedShipping(getShippingEstimate());
+                      }
+                    }}
+                    className="flex-1"
+                    maxLength={5}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setEstimatedShipping(getShippingEstimate())}
+                    disabled={postalCode.length !== 5}
+                  >
+                    Calcular
+                  </Button>
+                </div>
+                {postalCode.length === 5 && !getStateFromPostalCode(postalCode) && (
+                  <p className="text-xs text-red-600">Código postal inválido</p>
+                )}
               </div>
 
               <div className="border-t pt-4 mb-6">

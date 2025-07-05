@@ -3,7 +3,7 @@
 import { db } from "@/db";
 import { products, stockReservations } from "@/db/schema";
 import { eq, and, gte, lte, isNull, sql } from "drizzle-orm";
-import { auth } from "@/auth";
+import { auth } from "@/lib/auth";
 
 const CART_RESERVATION_DURATION = 15 * 60 * 1000; // 15 minutes
 const CHECKOUT_RESERVATION_DURATION = 10 * 60 * 1000; // 10 minutes

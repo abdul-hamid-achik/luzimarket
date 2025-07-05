@@ -1,0 +1,54 @@
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/db";
+import { orders } from "@/db/schema";
+import { and, eq } from "drizzle-orm";
+import { z } from "zod";
+
+const lookupSchema = z.object({
+  email: z.string().email(),
+  orderNumber: z.string().min(1),
+});
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    
+    // Validate input
+    const validationResult = lookupSchema.safeParse(body);
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: "Datos inválidos" },
+        { status: 400 }
+      );
+    }
+
+    const { email, orderNumber } = validationResult.data;
+
+    // Look up order by email and order number
+    const order = await db.query.orders.findFirst({
+      where: and(
+        eq(orders.orderNumber, orderNumber),
+        eq(orders.guestEmail, email)
+      ),
+    });
+
+    if (!order) {
+      return NextResponse.json(
+        { error: "No se encontró la orden con los datos proporcionados" },
+        { status: 404 }
+      );
+    }
+
+    // Return order ID for redirect
+    return NextResponse.json({
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+    });
+  } catch (error) {
+    console.error("Order lookup error:", error);
+    return NextResponse.json(
+      { error: "Error al buscar la orden" },
+      { status: 500 }
+    );
+  }
+}

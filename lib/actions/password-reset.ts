@@ -6,8 +6,7 @@ import { users, passwordResetTokens } from '@/db/schema'
 import { eq, and, gt } from 'drizzle-orm'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
-import { resend } from '@/lib/resend'
-import { PasswordResetEmail } from '@/emails/password-reset'
+import { sendEmail } from '@/lib/email'
 
 // Schema for requesting password reset
 const requestResetSchema = z.object({
@@ -78,17 +77,53 @@ export async function requestPasswordReset(formData: FormData) {
     })
     
     // Send reset email
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`
+    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password?token=${token}`
     
     try {
-      await resend.emails.send({
-        from: process.env.EMAIL_FROM!,
+      await sendEmail({
         to: foundUser.email,
         subject: 'Restablecer tu contraseña - LUZIMARKET',
-        react: PasswordResetEmail({
-          name: foundUser.name,
-          resetUrl,
-        }),
+        html: `
+          <div style="font-family: 'Univers', Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background-color: #000; color: #fff; padding: 20px; text-align: center;">
+              <h1 style="margin: 0; font-size: 28px; letter-spacing: 2px;">LUZIMARKET</h1>
+            </div>
+            
+            <div style="padding: 40px 20px;">
+              <h2 style="font-size: 24px; margin-bottom: 20px;">Restablecer tu contraseña</h2>
+              
+              <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                Hola ${foundUser.name},
+              </p>
+              
+              <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                Recibimos una solicitud para restablecer tu contraseña. Si no fuiste tú quien realizó esta solicitud, puedes ignorar este correo.
+              </p>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${resetUrl}" 
+                   style="display: inline-block; background-color: #000; color: #fff; padding: 14px 30px; text-decoration: none; font-weight: bold; border-radius: 4px;">
+                  Restablecer contraseña
+                </a>
+              </div>
+              
+              <p style="font-size: 14px; color: #666; line-height: 1.6; margin-top: 30px;">
+                Si no puedes hacer clic en el botón, copia y pega el siguiente enlace en tu navegador:
+              </p>
+              <p style="font-size: 14px; color: #666; word-break: break-all;">
+                ${resetUrl}
+              </p>
+              
+              <p style="font-size: 14px; color: #666; line-height: 1.6; margin-top: 30px;">
+                Este enlace expirará en 1 hora por razones de seguridad.
+              </p>
+            </div>
+            
+            <div style="background: linear-gradient(to right, #86efac, #fde047, #5eead4); padding: 20px; text-align: center;">
+              <p style="margin: 0; font-size: 12px;">© 2024 LUZIMARKET</p>
+            </div>
+          </div>
+        `,
       })
     } catch (emailError) {
       console.error('Error sending reset email:', emailError)

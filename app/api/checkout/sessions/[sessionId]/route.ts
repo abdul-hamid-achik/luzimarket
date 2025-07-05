@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
+import { db } from "@/db";
+import { orders } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 export async function GET(
   request: NextRequest,
@@ -27,23 +30,39 @@ export async function GET(
       );
     }
 
-    // Check if payment was successful
-    if (session.payment_status !== "paid") {
-      return NextResponse.json(
-        { error: "Payment not completed" },
-        { status: 400 }
-      );
+    // Check if this was a guest checkout
+    const isGuest = session.metadata?.isGuest === 'true';
+
+    // Get order details if available
+    let orderInfo = null;
+    if (session.metadata?.orderIds) {
+      const orderIds = session.metadata.orderIds.split(',');
+      if (orderIds.length > 0) {
+        const order = await db.query.orders.findFirst({
+          where: eq(orders.id, orderIds[0]),
+        });
+        
+        if (order) {
+          orderInfo = {
+            orderNumber: order.orderNumber,
+            guestEmail: order.guestEmail,
+            guestName: order.guestName,
+          };
+        }
+      }
     }
 
     // Return relevant order details
     return NextResponse.json({
       success: true,
       sessionId: session.id,
-      customerEmail: session.customer_email,
-      customerName: session.customer_details?.name,
+      customerEmail: session.customer_details?.email || session.customer_email || orderInfo?.guestEmail,
+      customerName: session.customer_details?.name || orderInfo?.guestName,
       amount: session.amount_total,
       currency: session.currency,
       paymentStatus: session.payment_status,
+      isGuest,
+      orderNumber: orderInfo?.orderNumber,
       metadata: session.metadata,
       lineItems: session.line_items?.data.map((item) => ({
         name: item.description,
@@ -54,7 +73,7 @@ export async function GET(
   } catch (error) {
     console.error("Error retrieving checkout session:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve session" },
+      { error: "Failed to retrieve session details" },
       { status: 500 }
     );
   }

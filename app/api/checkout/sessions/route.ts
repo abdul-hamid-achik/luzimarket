@@ -7,7 +7,7 @@ import { orders, orderItems } from "@/db/schema";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { items, shippingAddress, billingAddress } = body;
+    const { items, shippingAddress, billingAddress, isGuest, selectedShipping } = body;
 
     // Validate required fields
     if (!items || !Array.isArray(items) || items.length === 0) {
@@ -53,7 +53,22 @@ export async function POST(request: NextRequest) {
     // Calculate totals
     const subtotal = items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
     const tax = subtotal * 0.16; // 16% IVA
-    const shipping = subtotal > 1000 ? 0 : 99;
+    
+    // Use selected shipping or default
+    let shipping = 99; // Default fallback
+    let shippingDescription = '📦 Envío estándar en México';
+    let shippingDays = { min: 3, max: 5 };
+    
+    if (selectedShipping && selectedShipping.total !== undefined) {
+      shipping = selectedShipping.total;
+      // Get the first shipping option details for display
+      if (selectedShipping.options && selectedShipping.options.length > 0) {
+        const firstOption = selectedShipping.options[0].option;
+        shippingDescription = firstOption.name || shippingDescription;
+        shippingDays = firstOption.estimatedDays || shippingDays;
+      }
+    }
+    
     const total = subtotal + tax + shipping;
 
     // Create line items for Stripe
@@ -121,6 +136,12 @@ export async function POST(request: NextRequest) {
         shipping: vendorShipping.toString(),
         total: vendorTotal.toString(),
         currency: "MXN",
+        // Guest order fields
+        ...(isGuest ? {
+          guestEmail: shippingAddress.email,
+          guestName: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
+          guestPhone: shippingAddress.phone,
+        } : {}),
         shippingAddress: {
           street: `${shippingAddress.address} ${shippingAddress.apartment || ''}`.trim(),
           city: shippingAddress.city,
@@ -167,15 +188,15 @@ export async function POST(request: NextRequest) {
               amount: shipping * 100, // Convert to cents
               currency: 'mxn',
             },
-            display_name: '📦 Envío estándar en México',
+            display_name: shippingDescription,
             delivery_estimate: {
               minimum: {
                 unit: 'business_day',
-                value: 3,
+                value: shippingDays.min,
               },
               maximum: {
                 unit: 'business_day',
-                value: 5,
+                value: shippingDays.max,
               },
             },
           },
@@ -208,6 +229,8 @@ export async function POST(request: NextRequest) {
         shippingAddress: shippingAddress ? JSON.stringify(shippingAddress) : '',
         billingAddress: billingAddress ? JSON.stringify(billingAddress) : '',
         orderIds: orderIds.join(','),
+        isGuest: isGuest ? 'true' : 'false',
+        selectedShipping: selectedShipping ? JSON.stringify(selectedShipping) : '',
       },
       // OXXO specific settings
       payment_method_options: {

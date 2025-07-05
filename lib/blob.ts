@@ -56,7 +56,7 @@ export async function uploadBlob(
   // Production: Use Vercel Blob
   const blob = await put(pathname, file, {
     access: 'public',
-    addRandomSuffix: true,
+    addRandomSuffix: false, // Use predictable paths for caching
     cacheControlMaxAge: options?.cacheControlMaxAge,
   });
   
@@ -147,4 +147,31 @@ export async function getBlobMetadata(url: string) {
   }
   
   return await head(url);
+}
+
+/**
+ * Check if a blob exists by pathname
+ */
+export async function blobExists(pathname: string): Promise<boolean> {
+  if (isLocal) {
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    
+    const filename = pathname.split('/').pop() || 'file';
+    const filePath = path.join(process.cwd(), 'public', 'uploads', filename);
+    
+    try {
+      await fs.access(filePath);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  
+  try {
+    const blobs = await list({ prefix: pathname, limit: 1 });
+    return blobs.blobs.some(blob => blob.pathname === pathname);
+  } catch {
+    return false;
+  }
 }
