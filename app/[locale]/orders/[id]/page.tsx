@@ -13,7 +13,7 @@ export default async function OrderTrackingPage({
 }) {
   const { id, locale } = await params;
   const session = await auth();
-  const t = await getTranslations("orders");
+  const t = await getTranslations("Orders");
 
   // Fetch order with items and vendor info
   const order = await db

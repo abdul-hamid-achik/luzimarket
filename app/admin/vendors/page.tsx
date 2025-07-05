@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { Check, X, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 async function getVendors() {
   const vendorList = await db
@@ -48,6 +49,7 @@ async function rejectVendor(vendorId: string) {
 }
 
 export default async function AdminVendorsPage() {
+  const t = await getTranslations("Admin.vendorsPage");
   const vendorList = await getVendors();
   const pendingVendors = vendorList.filter(v => !v.isActive);
   const activeVendors = vendorList.filter(v => v.isActive);
@@ -56,9 +58,9 @@ export default async function AdminVendorsPage() {
     <div className="space-y-8">
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-univers text-gray-900">Vendedores</h1>
+        <h1 className="text-2xl font-univers text-gray-900">{t("title")}</h1>
         <p className="text-sm text-gray-600 font-univers mt-1">
-          Administra y aprueba vendedores de la plataforma
+          {t("subtitle")}
         </p>
       </div>
 
@@ -66,7 +68,7 @@ export default async function AdminVendorsPage() {
       {pendingVendors.length > 0 && (
         <div>
           <h2 className="text-lg font-univers text-gray-900 mb-4">
-            Pendientes de aprobación ({pendingVendors.length})
+            {t("vendorStatus.pending")} ({pendingVendors.length})
           </h2>
           <div className="bg-white rounded-lg border border-gray-200">
             <div className="overflow-x-auto">
@@ -74,19 +76,19 @@ export default async function AdminVendorsPage() {
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
-                      Negocio
+                      {t("businessName")}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
-                      Contacto
+                      {t("contactName")}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
-                      Email
+                      {t("email")}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
-                      Fecha
+                      {t("joined")}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
-                      Acciones
+                      {t("actions")}
                     </th>
                   </tr>
                 </thead>
@@ -122,7 +124,7 @@ export default async function AdminVendorsPage() {
                               className="bg-green-600 hover:bg-green-700 text-white"
                             >
                               <Check className="h-4 w-4 mr-1" />
-                              Aprobar
+                              {t("activate")}
                             </Button>
                           </form>
                           <form action={rejectVendor.bind(null, vendor.id)}>
@@ -133,7 +135,7 @@ export default async function AdminVendorsPage() {
                               className="border-red-300 text-red-600 hover:bg-red-50"
                             >
                               <X className="h-4 w-4 mr-1" />
-                              Rechazar
+                              {t("deactivate")}
                             </Button>
                           </form>
                           <Link href={`/admin/vendors/${vendor.id}`}>
@@ -155,7 +157,7 @@ export default async function AdminVendorsPage() {
       {/* Active vendors */}
       <div>
         <h2 className="text-lg font-univers text-gray-900 mb-4">
-          Vendedores activos ({activeVendors.length})
+          {t("vendorStatus.active")} ({activeVendors.length})
         </h2>
         <div className="bg-white rounded-lg border border-gray-200">
           <div className="overflow-x-auto">
@@ -172,10 +174,10 @@ export default async function AdminVendorsPage() {
                     Email
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
-                    Teléfono
+                    {t("phone")}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
-                    Estado
+                    {t("status")}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
                     Acciones
@@ -208,7 +210,7 @@ export default async function AdminVendorsPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-univers bg-green-100 text-green-800">
                         <span className="mr-1.5 h-2 w-2 rounded-full bg-green-400" />
-                        Activo
+                        {t("vendorStatus.active")}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

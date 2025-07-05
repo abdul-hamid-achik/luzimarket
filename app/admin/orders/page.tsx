@@ -158,9 +158,9 @@ export default async function AdminOrdersPage() {
                         order.paymentStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                         'bg-red-100 text-red-800'
                       }`}>
-                        {order.paymentStatus === 'succeeded' ? 'Completado' :
-                         order.paymentStatus === 'pending' ? 'Pendiente' :
-                         'Fallido'}
+                        {order.paymentStatus === 'succeeded' ? t('paymentStatus.succeeded') :
+                         order.paymentStatus === 'pending' ? t('paymentStatus.pending') :
+                         t('paymentStatus.failed')}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
