@@ -8,7 +8,7 @@ import { Page, Route } from '@playwright/test';
 export const testUsers = {
   admin: {
     email: 'admin@luzimarket.shop',
-    password: 'Admin123!@#',
+    password: 'admin123',
     role: 'admin' as const
   },
   vendor: {
@@ -18,7 +18,7 @@ export const testUsers = {
   },
   customer: {
     email: 'customer1@example.com',
-    password: 'password123', 
+    password: 'password123',
     role: 'customer' as const
   },
   // Additional test users for specific scenarios
@@ -41,10 +41,10 @@ export const testUsers = {
  */
 export async function loginAs(page: Page, userType: keyof typeof testUsers) {
   const user = testUsers[userType];
-  
+
   // Navigate to login page
   await page.goto('/iniciar-sesion');
-  
+
   // Click the appropriate tab for user type
   if (user.role === 'vendor') {
     await page.getByRole('tab', { name: 'Vendedor' }).click();
@@ -52,14 +52,14 @@ export async function loginAs(page: Page, userType: keyof typeof testUsers) {
     await page.getByRole('tab', { name: 'Admin' }).click();
   }
   // Customer tab is selected by default
-  
+
   // Fill credentials
   await page.fill('input[name="email"]', user.email);
   await page.fill('input[name="password"]', user.password);
-  
+
   // Submit login
   await page.getByRole('button', { name: /iniciar sesión/i }).click();
-  
+
   // Wait for navigation
   if (user.role === 'admin') {
     await page.waitForURL('**/admin**');
@@ -80,7 +80,7 @@ export async function createTestUser(page: Page, options: {
   verified?: boolean;
 }) {
   const { email, password, role = 'customer', verified = true } = options;
-  
+
   // Mock user creation API
   await page.route('**/api/test/create-user', async (route: Route) => {
     await route.fulfill({
@@ -94,7 +94,7 @@ export async function createTestUser(page: Page, options: {
       }
     });
   });
-  
+
   // In real implementation, this would call your API
   // For now, we'll use registration flow
   if (role === 'customer') {
@@ -104,13 +104,13 @@ export async function createTestUser(page: Page, options: {
     await page.fill('input[name="password"]', password);
     await page.fill('input[name="confirmPassword"]', password);
     await page.locator('label[for="acceptTerms"]').click();
-    
+
     await page.route('**/api/auth/register', async (route: Route) => {
       await route.fulfill({
         json: { success: true, requiresVerification: !verified }
       });
     });
-    
+
     await page.getByRole('button', { name: /registrarse/i }).click();
   } else if (role === 'vendor') {
     await page.goto('/vendor/register');
@@ -121,13 +121,13 @@ export async function createTestUser(page: Page, options: {
     await page.fill('input[name="password"]', password);
     await page.fill('input[name="confirmPassword"]', password);
     // Fill other required fields...
-    
+
     await page.route('**/api/vendor/register', async (route: Route) => {
       await route.fulfill({
         json: { success: true }
       });
     });
-    
+
     await page.getByRole('button', { name: /registrar negocio/i }).click();
   }
 }

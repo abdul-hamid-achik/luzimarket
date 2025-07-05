@@ -13,17 +13,17 @@ export default async function LocaleLayout({
   params
 }: {
   children: React.ReactNode;
-  params: Promise<{locale: string}>;
+  params: Promise<{ locale: string }>;
 }) {
   // Ensure that the incoming `locale` is valid
-  const {locale} = await params;
+  const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
 
   // Enable static rendering
   setRequestLocale(locale);
-  
+
   // Providing all messages to the client
   // side is the easiest way to get started
   const messages = await getMessages();
@@ -34,7 +34,9 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <Providers>
             <Header />
-            {children}
+            <main id="main">
+              {children}
+            </main>
             <Footer />
             <CartSheet />
             <Toaster />

@@ -35,7 +35,7 @@ export default function LoginPage() {
     if (searchParams.get("verified") === "true") {
       setSuccessMessage("\u00a1Tu correo electr\u00f3nico ha sido verificado exitosamente! Ahora puedes iniciar sesi\u00f3n.");
     }
-    
+
     // Check for error messages
     const errorParam = searchParams.get("error");
     if (errorParam === "invalid-token") {
@@ -147,7 +147,7 @@ export default function LoginPage() {
                   disabled={isLoading}
                 />
                 {customerForm.formState.errors.email && (
-                  <p className="text-sm text-red-500 mt-1">{customerForm.formState.errors.email.message}</p>
+                  <p className="text-sm text-red-500 mt-1" role="alert">{customerForm.formState.errors.email.message}</p>
                 )}
               </div>
 
@@ -160,16 +160,15 @@ export default function LoginPage() {
                   disabled={isLoading}
                 />
                 {customerForm.formState.errors.password && (
-                  <p className="text-sm text-red-500 mt-1">{customerForm.formState.errors.password.message}</p>
+                  <p className="text-sm text-red-500 mt-1" role="alert">{customerForm.formState.errors.password.message}</p>
                 )}
               </div>
 
               {error && (
-                <div className={`p-3 rounded-md text-sm ${
-                  error.includes("bloqueada") || error.includes("intentos restantes")
-                    ? "bg-red-50 border border-red-200 text-red-700"
-                    : "text-red-500"
-                }`}>
+                <div className={`p-3 rounded-md text-sm ${error.includes("bloqueada") || error.includes("intentos restantes")
+                  ? "bg-red-50 border border-red-200 text-red-700"
+                  : "text-red-500"
+                  }`} role="alert">
                   {error}
                   {error.includes("verifica tu correo electrónico") && (
                     <div className="mt-2">
@@ -219,7 +218,7 @@ export default function LoginPage() {
                   disabled={isLoading}
                 />
                 {vendorForm.formState.errors.email && (
-                  <p className="text-sm text-red-500 mt-1">{vendorForm.formState.errors.email.message}</p>
+                  <p className="text-sm text-red-500 mt-1" role="alert">{vendorForm.formState.errors.email.message}</p>
                 )}
               </div>
 
@@ -232,16 +231,15 @@ export default function LoginPage() {
                   disabled={isLoading}
                 />
                 {vendorForm.formState.errors.password && (
-                  <p className="text-sm text-red-500 mt-1">{vendorForm.formState.errors.password.message}</p>
+                  <p className="text-sm text-red-500 mt-1" role="alert">{vendorForm.formState.errors.password.message}</p>
                 )}
               </div>
 
               {error && (
-                <div className={`p-3 rounded-md text-sm ${
-                  error.includes("bloqueada") || error.includes("intentos restantes")
-                    ? "bg-red-50 border border-red-200 text-red-700"
-                    : "text-red-500"
-                }`}>
+                <div className={`p-3 rounded-md text-sm ${error.includes("bloqueada") || error.includes("intentos restantes")
+                  ? "bg-red-50 border border-red-200 text-red-700"
+                  : "text-red-500"
+                  }`} role="alert">
                   {error}
                 </div>
               )}
@@ -284,7 +282,7 @@ export default function LoginPage() {
                   disabled={isLoading}
                 />
                 {adminForm.formState.errors.email && (
-                  <p className="text-sm text-red-500 mt-1">{adminForm.formState.errors.email.message}</p>
+                  <p className="text-sm text-red-500 mt-1" role="alert">{adminForm.formState.errors.email.message}</p>
                 )}
               </div>
 
@@ -297,16 +295,15 @@ export default function LoginPage() {
                   disabled={isLoading}
                 />
                 {adminForm.formState.errors.password && (
-                  <p className="text-sm text-red-500 mt-1">{adminForm.formState.errors.password.message}</p>
+                  <p className="text-sm text-red-500 mt-1" role="alert">{adminForm.formState.errors.password.message}</p>
                 )}
               </div>
 
               {error && (
-                <div className={`p-3 rounded-md text-sm ${
-                  error.includes("bloqueada") || error.includes("intentos restantes")
-                    ? "bg-red-50 border border-red-200 text-red-700"
-                    : "text-red-500"
-                }`}>
+                <div className={`p-3 rounded-md text-sm ${error.includes("bloqueada") || error.includes("intentos restantes")
+                  ? "bg-red-50 border border-red-200 text-red-700"
+                  : "text-red-500"
+                  }`} role="alert">
                   {error}
                 </div>
               )}

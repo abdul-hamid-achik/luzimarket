@@ -255,9 +255,16 @@ const VENDOR_SUFFIXES = [
 async function main() {
   console.log("🌱 Starting seed...");
 
+  // Available command line flags:
+  // --no-reset: Skip database reset
+  // --no-images: Skip AI image generation
+  // --force-images: Force regenerate existing images
+  // --fast: Limit image generation to 10 items for testing
+
   // Check command line flags
   const shouldReset = !process.argv.includes('--no-reset');
   const shouldGenerateImages = !process.argv.includes('--no-images') && !!process.env.OPENAI_SECRET_KEY;
+  const forceRegenerateImages = process.argv.includes('--force-images'); // Force regenerate existing images
   const imageBatchSize = process.argv.includes('--fast') ? 10 : 500; // Limit images in fast mode
 
   try {
@@ -270,21 +277,21 @@ async function main() {
         // Import node-postgres driver only when needed
         const { drizzle } = await import('drizzle-orm/node-postgres');
         const { Client } = await import('pg');
-        
+
         // Create a temporary connection with node-postgres for reset
         const client = new Client({
           connectionString: process.env.DATABASE_URL,
         });
-        
+
         await client.connect();
         const pgDb = drizzle(client, { schema });
-        
+
         // Reset using the pg driver connection
         await reset(pgDb, schema);
-        
+
         // Close the temporary connection
         await client.end();
-        
+
         console.log("✅ Database reset complete");
       } catch (resetError: any) {
         console.error("❌ Failed to reset database:", resetError);
@@ -304,30 +311,61 @@ async function main() {
     // 2. Seed Admin Users
     console.log("👤 Creating admin users...");
     const hashedPassword = await bcrypt.hash("admin123", 10);
-    const adminUsers = await db.insert(schema.adminUsers).values([
+
+    // Ensure admin user exists (upsert approach)
+    const adminUsersData = [
       {
         email: "admin@luzimarket.shop",
         name: "Administrador Principal",
         passwordHash: hashedPassword,
-        role: "super_admin",
+        role: "super_admin" as const,
         isActive: true
       },
       {
         email: "support@luzimarket.shop",
         name: "Soporte Técnico",
         passwordHash: hashedPassword,
-        role: "admin",
+        role: "admin" as const,
         isActive: true
       },
       {
         email: "manager@luzimarket.shop",
         name: "Gerente de Ventas",
         passwordHash: hashedPassword,
-        role: "admin",
+        role: "admin" as const,
         isActive: true
       }
-    ]).returning();
-    console.log(`✅ Created ${adminUsers.length} admin users`);
+    ];
+
+    const adminUsers = [];
+    for (const userData of adminUsersData) {
+      try {
+        // Try to insert, if it fails due to unique constraint, update instead
+        const [user] = await db.insert(schema.adminUsers).values(userData).returning();
+        adminUsers.push(user);
+        console.log(`✅ Created admin user: ${userData.email}`);
+      } catch (error: any) {
+        if (error.code === '23505' || error.message?.includes('duplicate key')) {
+          // User exists, update password and ensure it's active
+          console.log(`👤 Admin user ${userData.email} already exists, updating...`);
+          const [user] = await db.update(schema.adminUsers)
+            .set({
+              passwordHash: hashedPassword,
+              isActive: true,
+              name: userData.name,
+              role: userData.role
+            })
+            .where(eq(schema.adminUsers.email, userData.email))
+            .returning();
+          adminUsers.push(user);
+          console.log(`✅ Updated admin user: ${userData.email}`);
+        } else {
+          console.error(`❌ Error creating admin user ${userData.email}:`, error);
+          throw error;
+        }
+      }
+    }
+    console.log(`✅ Ensured ${adminUsers.length} admin users exist`);
 
     // 3. Seed Email Templates
     console.log("📧 Creating email templates...");
@@ -673,35 +711,35 @@ async function main() {
     console.log("🛒 Creating orders...");
     const orderData = [];
     const carriers = ["fedex", "ups", "dhl", "estafeta", "correos-de-mexico"];
-    
+
     for (let i = 0; i < 150; i++) {
       const subtotal = faker.number.int({ min: 199, max: 9999 });
       const tax = Math.round(subtotal * 0.16);
       const shipping = faker.helpers.arrayElement([0, 99, 149, 199]);
       const total = subtotal + tax + shipping;
-      
+
       const status = faker.helpers.weightedArrayElement([
         { value: "delivered", weight: 4 },
         { value: "shipped", weight: 3 },
         { value: "processing", weight: 2 },
         { value: "pending", weight: 1 }
       ]);
-      
+
       const orderCreatedAt = faker.date.recent({ days: 90 });
-      
+
       // Prepare tracking information for shipped and delivered orders
       let trackingData: any = {};
-      
+
       if (status === "shipped" || status === "delivered") {
         const carrier = faker.helpers.arrayElement(carriers);
         const trackingNumber = `${carrier.toUpperCase().substring(0, 3)}${faker.string.numeric(12)}`;
         const shippedDate = faker.date.between({ from: orderCreatedAt, to: new Date() });
         const estimatedDelivery = new Date(shippedDate);
         estimatedDelivery.setDate(estimatedDelivery.getDate() + faker.number.int({ min: 1, max: 5 }));
-        
+
         // Build tracking history
         const trackingHistory = [];
-        
+
         // Order picked up
         trackingHistory.push({
           status: "picked_up",
@@ -713,7 +751,7 @@ async function main() {
             lng: Number(faker.location.longitude({ min: -117, max: -86 }))
           }
         });
-        
+
         // In transit events
         const transitEvents = faker.number.int({ min: 1, max: 3 });
         for (let j = 0; j < transitEvents; j++) {
@@ -733,7 +771,7 @@ async function main() {
             }
           });
         }
-        
+
         // Out for delivery (for both shipped and delivered)
         const outForDeliveryDate = new Date(estimatedDelivery);
         outForDeliveryDate.setHours(outForDeliveryDate.getHours() - faker.number.int({ min: 2, max: 8 }));
@@ -747,13 +785,13 @@ async function main() {
             lng: Number(faker.location.longitude({ min: -117, max: -86 }))
           }
         });
-        
+
         // Delivered event (only for delivered orders)
         if (status === "delivered") {
           // Ensure the delivery date is not in the future
           const maxDeliveryDate = new Date();
           const minDeliveryDate = new Date(outForDeliveryDate);
-          
+
           // If outForDeliveryDate is in the future, set actual delivery to a reasonable time after it
           if (minDeliveryDate > maxDeliveryDate) {
             // Add 1-4 hours to outForDeliveryDate for actual delivery
@@ -764,7 +802,7 @@ async function main() {
             // Normal case: delivery happened between out for delivery and now
             var actualDeliveryDate = faker.date.between({ from: outForDeliveryDate, to: maxDeliveryDate });
           }
-          
+
           trackingHistory.push({
             status: "delivered",
             location: faker.helpers.arrayElement(CITIES),
@@ -775,13 +813,13 @@ async function main() {
               lng: Number(faker.location.longitude({ min: -117, max: -86 }))
             }
           });
-          
+
           trackingData.actualDeliveryDate = actualDeliveryDate;
         }
-        
+
         // Sort tracking history by timestamp
         trackingHistory.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
-        
+
         trackingData = {
           trackingNumber,
           carrier,
@@ -899,7 +937,6 @@ async function main() {
     // Generate AI images if enabled
     if (shouldGenerateImages) {
       console.log("\n🎨 Generating AI images for products and categories...");
-      console.log(`📊 Will generate images for ${Math.min(products.length, imageBatchSize)} products`);
 
       // Create uploads directory for local development
       if (process.env.NODE_ENV === 'development' && !process.env.BLOB_READ_WRITE_TOKEN) {
@@ -910,9 +947,12 @@ async function main() {
         console.log('📁 Created local uploads directory\n');
       }
 
-      // Generate category images
+      // Generate category images (only for categories without images, unless forced)
       console.log('🖼️  Generating category images...');
-      for (const category of categories) {
+      const categoriesToImage = forceRegenerateImages ? categories : categories.filter(c => !c.imageUrl);
+      console.log(`📊 Found ${categoriesToImage.length} categories ${forceRegenerateImages ? '(forced regeneration)' : 'without images'}`);
+
+      for (const category of categoriesToImage) {
         try {
           console.log(`🖼️  Generating image for category: ${category.name}`);
 
@@ -944,9 +984,12 @@ async function main() {
         }
       }
 
-      // Generate product images
+      // Generate product images (only for products without images, unless forced)
       console.log('\n🖼️  Generating product images...');
-      const productsToImage = products.slice(0, imageBatchSize); // Limit based on batch size
+      const productsNeedingImages = forceRegenerateImages ? products : products.filter(p => !p.images || (Array.isArray(p.images) && p.images.length === 0));
+      const productsToImage = productsNeedingImages.slice(0, imageBatchSize);
+      console.log(`📊 Found ${productsNeedingImages.length} products ${forceRegenerateImages ? '(forced regeneration)' : 'without images'}, generating for ${productsToImage.length}`);
+
       for (const product of productsToImage) {
         try {
           console.log(`🖼️  Generating image for product: ${product.name}`);

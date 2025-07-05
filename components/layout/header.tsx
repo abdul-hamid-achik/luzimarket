@@ -40,6 +40,13 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b" data-testid="header">
+      {/* Skip navigation link */}
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:bg-black focus:text-white focus:p-2 focus:rounded-br-md"
+      >
+        Skip to main content
+      </a>
       <div>
         {/* Top bar - Desktop only */}
         <div className="hidden md:flex items-center justify-between py-2 text-xs border-b px-8">
@@ -63,53 +70,53 @@ export function Header() {
             <SheetContent side="left" className="w-[300px]">
               <SheetHeader>
                 <SheetTitle>
-                  <Image 
-                    src="/images/logos/logo-simple.png" 
-                    alt="Luzi" 
-                    width={80} 
+                  <Image
+                    src="/images/logos/logo-simple.png"
+                    alt="Luzi"
+                    width={80}
                     height={30}
                     className="h-6 w-auto"
                   />
                 </SheetTitle>
               </SheetHeader>
               <nav className="mt-8 space-y-4">
-                <Link 
-                  href="/best-sellers" 
+                <Link
+                  href="/best-sellers"
                   className="block py-2 text-sm font-univers"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {tNav('bestSellers')}
                 </Link>
-                <Link 
-                  href="/handpicked" 
+                <Link
+                  href="/handpicked"
                   className="block py-2 text-sm font-univers"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {tNav('handpicked')}
                 </Link>
-                <Link 
-                  href="/brands" 
+                <Link
+                  href="/brands"
                   className="block py-2 text-sm font-univers"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {tNav('brandsAndStores')}
                 </Link>
-                <Link 
-                  href="/categories" 
+                <Link
+                  href="/categories"
                   className="block py-2 text-sm font-univers"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {tNav('categories')}
                 </Link>
-                <Link 
-                  href="/occasions" 
+                <Link
+                  href="/occasions"
                   className="block py-2 text-sm font-univers"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {tNav('occasions')}
                 </Link>
-                <Link 
-                  href="/editorial" 
+                <Link
+                  href="/editorial"
                   className="block py-2 text-sm font-univers"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -121,10 +128,10 @@ export function Header() {
 
           {/* Logo */}
           <Link href="/" className="flex-shrink-0" data-testid="logo-link">
-            <Image 
-              src="/images/logos/logo-full.png" 
-              alt="Luzimarket" 
-              width={160} 
+            <Image
+              src="/images/logos/logo-full.png"
+              alt="Luzimarket"
+              width={160}
               height={40}
               className="h-8 md:h-10 w-auto"
               priority
@@ -141,10 +148,13 @@ export function Header() {
             <Button variant="ghost" size="sm" className="font-univers text-xs tracking-wider hidden md:inline-flex">
               FAMILY
             </Button>
-            <Link href="/wishlist">
-              <Button 
-                variant="ghost" 
-                size="icon" 
+            <Link
+              href="/wishlist"
+              aria-label={getWishlistItems() > 0 ? t('wishlistWithItems', { count: getWishlistItems() }) : t('wishlist')}
+            >
+              <Button
+                variant="ghost"
+                size="icon"
                 className="hidden md:inline-flex relative"
                 aria-label={getWishlistItems() > 0 ? t('wishlistWithItems', { count: getWishlistItems() }) : t('wishlist')}
               >
@@ -197,10 +207,10 @@ export function Header() {
                 </Button>
               </Link>
             )}
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={toggleCart} 
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleCart}
               className="relative"
               aria-label={getTotalItems() > 0 ? t('shoppingCartWithItems', { count: getTotalItems() }) : t('shoppingCart')}
               data-testid="cart-button"
