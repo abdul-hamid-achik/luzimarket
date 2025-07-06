@@ -1165,5 +1165,54 @@
       "becomeVendor": "Conviértete en Vendedor",
       "aboutUs": "Acerca de Nosotros"
     }
+  },
+  "Success": {
+    "title": "¡Gracias por tu pedido!",
+    "subtitle": "Tu pago ha sido procesado exitosamente",
+    "orderConfirmation": "Hemos recibido tu pedido y lo estamos preparando para envío.",
+    "sessionId": "ID de sesión",
+    "emailSent": "Se ha enviado un correo de confirmación a tu dirección de email registrada.",
+    "whatNext": {
+      "title": "¿Qué sigue?",
+      "email": {
+        "title": "Confirmación del Pedido",
+        "description": "Recibirás un correo con los detalles de tu pedido e información de rastreo."
+      },
+      "shipping": {
+        "title": "Envío",
+        "description": "Tu pedido será enviado dentro de 1-3 días hábiles."
+      },
+      "support": {
+        "title": "¿Necesitas Ayuda?",
+        "description": "Contacta a nuestro equipo de soporte si tienes preguntas sobre tu pedido."
+      }
+    },
+    "viewOrders": "Ver Mis Pedidos",
+    "continueShopping": "Continuar Comprando"
+  },
+  "CheckoutCancel": {
+    "title": "Checkout Cancelado",
+    "subtitle": "Tu pago fue cancelado",
+    "message": "No se ha realizado ningún cargo a tu cuenta.",
+    "cartSaved": "Tu carrito ha sido guardado y puedes completar tu compra en cualquier momento.",
+    "help": {
+      "title": "¿Tienes problemas con el checkout?",
+      "cart": {
+        "title": "Tu Carrito está Seguro",
+        "description": "Todos los artículos permanecen en tu carrito y puedes regresar al checkout cuando estés listo."
+      },
+      "payment": {
+        "title": "Métodos de Pago",
+        "description": "Aceptamos tarjetas de crédito, débito y pagos en OXXO."
+      },
+      "oxxo": {
+        "title": "Pagos en OXXO",
+        "description": "Para pagos en OXXO, recibirás un voucher para pagar en cualquier tienda OXXO dentro de 3 días."
+      }
+    },
+    "returnToCart": "Regresar al Carrito",
+    "continueShopping": "Continuar Comprando",
+    "needHelp": "¿Necesitas ayuda?",
+    "contactSupport": "Contactar Soporte"
   }
 }

@@ -71,6 +71,20 @@ export async function POST(request: NextRequest) {
     
     const total = subtotal + tax + shipping;
 
+    // Determine base URL for images (same logic as checkout URLs)
+    let appUrlForImages: string;
+    
+    if (process.env.NEXT_PUBLIC_APP_URL) {
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+      appUrlForImages = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
+    } else if (process.env.VERCEL_URL) {
+      appUrlForImages = `https://${process.env.VERCEL_URL}`;
+    } else if (process.env.NODE_ENV === 'production') {
+      appUrlForImages = 'https://luzimarket.shop';
+    } else {
+      appUrlForImages = 'http://localhost:3000';
+    }
+    
     // Create line items for Stripe
     const lineItems = [
       ...items.map((item: any) => ({
@@ -79,7 +93,7 @@ export async function POST(request: NextRequest) {
           product_data: {
             name: item.name,
             images: item.image && item.image.startsWith('/') 
-              ? [`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}${item.image}`]
+              ? [`${appUrlForImages}${item.image}`]
               : item.image ? [item.image] : [],
             metadata: {
               vendorId: item.vendorId,
@@ -173,12 +187,41 @@ export async function POST(request: NextRequest) {
 
     // Create Stripe checkout session
     try {
+      // Determine the base URL based on environment
+      let appUrl: string;
+      
+      if (process.env.NEXT_PUBLIC_APP_URL) {
+        // Use environment variable if set
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+        appUrl = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
+      } else if (process.env.VERCEL_URL) {
+        // Use Vercel URL in production
+        appUrl = `https://${process.env.VERCEL_URL}`;
+      } else if (process.env.NODE_ENV === 'production') {
+        // Fallback for production
+        appUrl = 'https://luzimarket.shop';
+      } else {
+        // Local development
+        appUrl = 'http://localhost:3000';
+      }
+      
+      console.log('Checkout URLs:', {
+        env: {
+          NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+          VERCEL_URL: process.env.VERCEL_URL,
+          NODE_ENV: process.env.NODE_ENV,
+        },
+        appUrl,
+        success_url: `${appUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${appUrl}/checkout/cancel`,
+      });
+      
       const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card', 'oxxo'], // Support OXXO for Mexico
       line_items: lineItems,
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/cancel`,
+      success_url: `${appUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${appUrl}/checkout/cancel`,
       customer_email: shippingAddress.email,
       // Pre-fill shipping information
       shipping_options: [

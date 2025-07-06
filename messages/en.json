@@ -1202,6 +1202,55 @@
       "link": "Visit FAQ"
     }
   },
+  "Success": {
+    "title": "Thank you for your order!",
+    "subtitle": "Your payment has been processed successfully",
+    "orderConfirmation": "We've received your order and are preparing it for shipment.",
+    "sessionId": "Session ID",
+    "emailSent": "A confirmation email has been sent to your registered email address.",
+    "whatNext": {
+      "title": "What happens next?",
+      "email": {
+        "title": "Order Confirmation",
+        "description": "You'll receive an email with your order details and tracking information."
+      },
+      "shipping": {
+        "title": "Shipping",
+        "description": "Your order will be shipped within 1-3 business days."
+      },
+      "support": {
+        "title": "Need Help?",
+        "description": "Contact our support team if you have any questions about your order."
+      }
+    },
+    "viewOrders": "View My Orders",
+    "continueShopping": "Continue Shopping"
+  },
+  "CheckoutCancel": {
+    "title": "Checkout Cancelled",
+    "subtitle": "Your payment was cancelled",
+    "message": "No charges have been made to your account.",
+    "cartSaved": "Your cart has been saved and you can complete your purchase anytime.",
+    "help": {
+      "title": "Having trouble with checkout?",
+      "cart": {
+        "title": "Your Cart is Safe",
+        "description": "All items remain in your cart and you can return to checkout when ready."
+      },
+      "payment": {
+        "title": "Payment Methods",
+        "description": "We accept credit cards, debit cards, and OXXO payments."
+      },
+      "oxxo": {
+        "title": "OXXO Payments",
+        "description": "For OXXO payments, you'll receive a voucher to pay at any OXXO store within 3 days."
+      }
+    },
+    "returnToCart": "Return to Cart",
+    "continueShopping": "Continue Shopping",
+    "needHelp": "Need help?",
+    "contactSupport": "Contact Support"
+  },
   "Privacy": {
     "title": "Privacy Policy",
     "lastUpdated": "Last updated: January 2025",
