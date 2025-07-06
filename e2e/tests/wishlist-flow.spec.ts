@@ -24,7 +24,11 @@ test.describe('Wishlist Complete Flow', () => {
       });
     });
     
-    await page.getByRole('button', { name: /registrarse/i }).click();
+    // Wait for form to be fully loaded and stable
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(500);
+    
+    await page.getByRole('button', { name: /crear cuenta/i }).click();
   });
 
   test('should redirect guest to login when trying to add to wishlist', async ({ page }) => {
@@ -36,8 +40,8 @@ test.describe('Wishlist Complete Flow', () => {
     await page.getByTestId('product-card').first().click();
     await page.waitForLoadState('networkidle');
     
-    // Try to add to wishlist
-    await page.getByRole('button', { name: /agregar a favoritos|add to wishlist/i }).click();
+    // Try to add to wishlist from product detail page
+    await page.getByTestId('wishlist-button').click();
     
     // Should redirect to login
     await page.waitForURL('**/iniciar-sesion**');

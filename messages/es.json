@@ -1214,5 +1214,66 @@
     "continueShopping": "Continuar Comprando",
     "needHelp": "¿Necesitas ayuda?",
     "contactSupport": "Contactar Soporte"
+  },
+  "Terms": {
+    "title": "Términos y Condiciones",
+    "lastUpdated": "Última actualización: {date}",
+    "intro": "Bienvenido a LuziMarket. Al usar nuestra plataforma, aceptas estos términos y condiciones. Por favor, léelos cuidadosamente antes de utilizar nuestros servicios.",
+    "acceptance": {
+      "title": "1. Aceptación de Términos",
+      "description": "Al acceder y utilizar LuziMarket, aceptas cumplir con estos términos y condiciones, todas las leyes y regulaciones aplicables, y aceptas que eres responsable del cumplimiento de las leyes locales aplicables."
+    },
+    "platformUse": {
+      "title": "2. Uso de la Plataforma",
+      "description": "LuziMarket es un marketplace que conecta vendedores y compradores. Las siguientes reglas aplican:",
+      "eligibility": "Debes tener al menos 18 años para usar esta plataforma",
+      "account": "Eres responsable de mantener la confidencialidad de tu cuenta",
+      "prohibited": "Está prohibido usar la plataforma para actividades ilegales o fraudulentas"
+    },
+    "purchases": {
+      "title": "3. Compras y Pagos",
+      "description": "Todas las compras están sujetas a las siguientes condiciones:",
+      "pricing": "Los precios están en pesos mexicanos e incluyen IVA",
+      "payment": "Aceptamos tarjetas de crédito, débito y pagos en OXXO",
+      "oxxo": "Los pagos en OXXO deben completarse dentro de 3 días",
+      "confirmation": "Recibirás un correo de confirmación con los detalles de tu pedido"
+    },
+    "shipping": {
+      "title": "4. Envío y Entrega",
+      "description": "Los tiempos y costos de envío varían según el vendedor y la ubicación:",
+      "zones": "Envíos disponibles a toda la República Mexicana",
+      "times": "Los tiempos de entrega son estimados y pueden variar",
+      "costs": "Los costos de envío se calculan según el peso y destino"
+    },
+    "returns": {
+      "title": "5. Devoluciones y Reembolsos",
+      "description": "Nuestra política de devoluciones garantiza tu satisfacción:",
+      "period": "Tienes 30 días para solicitar una devolución",
+      "conditions": "Los productos deben estar en su condición original",
+      "process": "Las devoluciones se procesan dentro de 5-7 días hábiles",
+      "refunds": "Los reembolsos se realizan al método de pago original"
+    },
+    "intellectual": {
+      "title": "6. Propiedad Intelectual",
+      "description": "Todo el contenido en LuziMarket, incluyendo logos, textos e imágenes, está protegido por derechos de autor y otras leyes de propiedad intelectual."
+    },
+    "liability": {
+      "title": "7. Limitación de Responsabilidad",
+      "description": "LuziMarket actúa como intermediario entre vendedores y compradores. No somos responsables por la calidad, seguridad o legalidad de los productos listados."
+    },
+    "profeco": {
+      "title": "8. Protección al Consumidor",
+      "description": "Como consumidor en México, tienes derechos protegidos por la ley. Para cualquier queja o aclaración, también puedes contactar a:",
+      "info": "Procuraduría Federal del Consumidor (PROFECO)",
+      "phone": "Teléfono: 55 5568 8722",
+      "website": "www.gob.mx/profeco"
+    },
+    "contact": {
+      "title": "9. Contacto",
+      "description": "Si tienes preguntas sobre estos términos, contáctanos:",
+      "company": "LuziMarket S.A. de C.V.",
+      "email": "legal@luzimarket.shop",
+      "address": "Ciudad de México, México"
+    }
   }
 }

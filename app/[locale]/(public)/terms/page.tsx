@@ -9,7 +9,7 @@ export default async function TermsPage() {
       
       <div className="prose prose-gray max-w-none space-y-8">
         <section>
-          <p className="text-lg text-gray-600">{t("lastUpdated")}</p>
+          <p className="text-lg text-gray-600">{t("lastUpdated", { date: "1 de Enero, 2024" })}</p>
           <p className="mt-4">{t("intro")}</p>
         </section>
 

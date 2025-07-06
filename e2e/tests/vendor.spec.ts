@@ -8,7 +8,7 @@ test.describe('Vendor Registration', () => {
 
   test('should display vendor registration form', async ({ page }) => {
     // Check page title
-    await expect(page.locator('h1')).toContainText(/Vendor|Vendedor|Tienda/);
+    await expect(page.locator('h2')).toContainText(/Bienvenidx.*Family/);
     
     // Check form fields
     await expect(page.locator('input[name="businessName"]')).toBeVisible();
@@ -19,7 +19,7 @@ test.describe('Vendor Registration', () => {
 
   test('should validate required fields', async ({ page }) => {
     // Try to submit empty form
-    const submitButton = page.locator('button[type="submit"]');
+    const submitButton = page.getByRole('button', { name: '¡Listo!' });
     await submitButton.click();
     
     // Should show validation errors

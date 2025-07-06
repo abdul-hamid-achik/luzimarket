@@ -6,7 +6,7 @@
 export const routes = {
   home: '/es',
   login: '/es/iniciar-sesion',
-  register: '/es/register',
+  register: '/es/registrarse',
   products: '/es/productos',
   cart: '/es/carrito',
   checkout: '/es/pagar',

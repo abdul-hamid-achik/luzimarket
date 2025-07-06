@@ -14,7 +14,7 @@ test.describe('Vendor Dashboard', () => {
     await page.waitForTimeout(500);
     
     // Fill in vendor credentials using name attributes based on the tab panel
-    await page.locator('input[type="email"]').fill(email);
+    await page.locator('#vendor-email').fill(email);
     await page.locator('input[type="password"]').fill(password);
     
     // Submit login form
