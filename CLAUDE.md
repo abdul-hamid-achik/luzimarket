@@ -125,6 +125,8 @@ npm run test:failed:json   # Re-run failed tests with JSON output
 - Run the complete test suite ONCE and wait for completion before analyzing
 - Use `--reporter=list` or `--reporter=json` for readable output
 - Don't spawn multiple test instances - be patient and let tests finish
+- **NEVER use --headed or --debug mode** - These modes halt execution and prevent the agent from continuing. They are exclusively for interactive use with the user
+- If the user specifically requests headed/debug mode, they must provide clear instructions on what to look for or what actions to take in the browser
 
 **LLM-FRIENDLY TESTING:**
 - Use `npm run test:llm` for comprehensive LLM analysis (creates JSON + JUnit XML)
