@@ -5,9 +5,10 @@ import { CheckCircle } from "lucide-react";
 export default async function SuccessPage({
   searchParams,
 }: {
-  searchParams: { session_id?: string };
+  searchParams: Promise<{ session_id?: string }>;
 }) {
   const t = await getTranslations("Success");
+  const params = await searchParams;
 
   return (
     <div className="container mx-auto px-4 py-16 text-center max-w-2xl">
@@ -20,9 +21,9 @@ export default async function SuccessPage({
       
       <div className="bg-gray-50 p-8 rounded-lg mb-8">
         <p className="text-lg mb-4">{t("orderConfirmation")}</p>
-        {searchParams.session_id && (
+        {params.session_id && (
           <p className="text-sm text-gray-500 mb-4">
-            {t("sessionId")}: {searchParams.session_id}
+            {t("sessionId")}: {params.session_id}
           </p>
         )}
         <p className="text-gray-600">{t("emailSent")}</p>

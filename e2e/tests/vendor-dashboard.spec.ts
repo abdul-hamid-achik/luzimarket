@@ -8,20 +8,20 @@ test.describe('Vendor Dashboard', () => {
     await page.goto(routes.login);
     
     // Click on vendor tab
-    await page.click(`button:has-text("${uiText.es.vendorTab}")`);
+    await page.getByRole('tab', { name: uiText.es.vendorTab }).click();
     
     // Wait for vendor form to be visible
     await page.waitForTimeout(500);
     
-    // Fill in vendor credentials
-    await page.fill('#vendor-email', email);
-    await page.fill('#vendor-password', password);
+    // Fill in vendor credentials using name attributes based on the tab panel
+    await page.locator('input[type="email"]').fill(email);
+    await page.locator('input[type="password"]').fill(password);
     
     // Submit login form
     await page.locator(`button[type="submit"]:has-text("${uiText.es.login}")`).click();
     
-    // Wait for redirect to vendor dashboard
-    await page.waitForURL('**/vendor/dashboard', { timeout: 10000 });
+    // Wait for redirect to vendor dashboard (localized path)
+    await page.waitForURL('**/vendedor/panel', { timeout: 10000 });
   }
 
   test.beforeEach(async ({ page }) => {

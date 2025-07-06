@@ -12,7 +12,7 @@ test.describe('Vendor Product Management', () => {
     await page.fill('input[type="password"]', 'password123');
     const submitButton = page.locator('button[type="submit"]').filter({ hasText: /Iniciar sesión|Sign in/ });
     await submitButton.click();
-    await page.waitForURL(/\/vendor/, { timeout: 10000 });
+    await page.waitForURL(/\/vendedor\//, { timeout: 10000 });
   }
 
   test.beforeEach(async ({ page }) => {

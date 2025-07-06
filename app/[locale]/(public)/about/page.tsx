@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import Image from "next/image";
+import Link from "next/link";
 
 export default async function AboutPage() {
   const t = await getTranslations("About");
@@ -62,12 +63,12 @@ export default async function AboutPage() {
           <h2 className="text-2xl font-times-now mb-4 text-center">{t("join.title")}</h2>
           <p className="text-center mb-6">{t("join.description")}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/vendor/register" className="bg-black text-white px-6 py-3 text-center hover:bg-gray-800 transition">
+            <Link href="/vendor/register" className="bg-black text-white px-6 py-3 text-center hover:bg-gray-800 transition">
               {t("join.vendorButton")}
-            </a>
-            <a href="/products" className="border border-black px-6 py-3 text-center hover:bg-gray-100 transition">
+            </Link>
+            <Link href="/products" className="border border-black px-6 py-3 text-center hover:bg-gray-100 transition">
               {t("join.shopButton")}
-            </a>
+            </Link>
           </div>
         </section>
 

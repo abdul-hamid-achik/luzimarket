@@ -11,9 +11,9 @@ export const routes = {
   cart: '/es/carrito',
   checkout: '/es/pagar',
   categories: '/es/categorias',
-  vendorRegister: '/vendor/register', // Vendor routes are not internationalized
-  vendorDashboard: '/vendor/dashboard',
-  vendorProducts: '/vendor/products',
+  vendorRegister: '/es/vendedor/registro', // Uses localized pathname from routing.ts
+  vendorDashboard: '/es/vendedor/panel', // Uses localized pathname from routing.ts
+  vendorProducts: '/es/vendedor/productos', // Uses localized pathname from routing.ts
   admin: '/admin', // Admin routes are not internationalized
   adminOrders: '/admin/orders',
   adminVendors: '/admin/vendors',
@@ -37,9 +37,9 @@ export const enRoutes = {
   cart: '/en/cart',
   checkout: '/en/checkout',
   categories: '/en/categories',
-  vendorRegister: '/vendor/register', // Vendor routes are not internationalized
-  vendorDashboard: '/vendor/dashboard',
-  vendorProducts: '/vendor/products',
+  vendorRegister: '/en/vendor/register', // Uses English pathname from routing.ts
+  vendorDashboard: '/en/vendor/dashboard', // Uses English pathname from routing.ts
+  vendorProducts: '/en/vendor/products', // Uses English pathname from routing.ts
   admin: '/admin', // Admin routes are not internationalized
   adminOrders: '/admin/orders',
   adminVendors: '/admin/vendors',

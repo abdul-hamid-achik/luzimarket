@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import Image from "next/image";
+import { routing } from "@/i18n/routing";
 import { 
   LayoutDashboard, 
   Package, 
@@ -25,7 +26,8 @@ export default async function AdminLayout({
   const t = await getTranslations("Admin");
   
   if (!session || session.user?.role !== "admin") {
-    redirect("/login");
+    // Redirect to Spanish login by default (as es is the default locale)
+    redirect(`/${routing.defaultLocale}/iniciar-sesion`);
   }
 
   return (

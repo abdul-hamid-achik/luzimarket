@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth, signOut } from "@/lib/auth";
+import { routing } from "@/i18n/routing";
 import { 
   LayoutDashboard, 
   Package, 
@@ -18,8 +19,10 @@ export default async function VendorLayout({
 }) {
   const session = await auth();
   
+  // Skip auth check for registration page - will be handled by parallel route
   if (!session || !session.user || session.user.role !== "vendor") {
-    redirect("/login");
+    // Redirect to Spanish login by default (as es is the default locale)
+    redirect(`/${routing.defaultLocale}/iniciar-sesion`);
   }
 
   return (
