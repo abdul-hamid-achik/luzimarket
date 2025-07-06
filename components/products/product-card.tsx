@@ -114,7 +114,7 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
                 data-testid={`quick-view-${product.slug}`}
               >
                 <Eye className="h-4 w-4 mr-1" />
-                {t('quickView')}
+                <span>{t('quickView')}</span>
               </Button>
             )}
             <AddToCartButton
