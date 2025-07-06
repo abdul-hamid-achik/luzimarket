@@ -8,11 +8,11 @@ test.describe('Vendor Product Management', () => {
     await page.goto(routes.login);
     const vendorTab = page.locator('button[role="tab"]').filter({ hasText: /Vendedor|Vendor/ });
     await vendorTab.click();
-    await page.fill('input[type="email"]', 'vendor@luzimarket.shop');
-    await page.fill('input[type="password"]', 'password123');
+    await page.fill('#vendor-email', 'vendor@luzimarket.shop');
+    await page.fill('#vendor-password', 'password123');
     const submitButton = page.locator('button[type="submit"]').filter({ hasText: /Iniciar sesión|Sign in/ });
     await submitButton.click();
-    await page.waitForURL(/\/vendedor\//, { timeout: 10000 });
+    await page.waitForURL(/\/vendedor/, { timeout: 10000 });
   }
 
   test.beforeEach(async ({ page }) => {
@@ -22,17 +22,20 @@ test.describe('Vendor Product Management', () => {
   test.describe('Product Creation', () => {
     test('should create new product with all required fields', async ({ page }) => {
       // Navigate to add product
-      await page.goto('/vendor/products/new');
+      await page.goto('/es/vendor/products/new');
+      await page.waitForLoadState('networkidle');
       
       // Fill basic information
-      await page.fill('input[name="name"], input[placeholder*="nombre"]', 'Ramo de Rosas Rojas');
-      await page.fill('textarea[name="description"], textarea[placeholder*="descripción"]', 'Hermoso ramo de 12 rosas rojas frescas, perfectas para ocasiones especiales. Incluye papel decorativo y tarjeta personalizada.');
-      await page.fill('input[name="price"], input[type="number"][placeholder*="precio"]', '599');
-      await page.fill('input[name="stock"], input[type="number"][placeholder*="stock"]', '25');
+      await page.fill('input[name="name"]', 'Ramo de Rosas Rojas');
+      await page.fill('textarea[name="description"]', 'Hermoso ramo de 12 rosas rojas frescas, perfectas para ocasiones especiales. Incluye papel decorativo y tarjeta personalizada.');
+      await page.fill('input[name="price"]', '599');
+      await page.fill('input[name="stock"]', '25');
       
-      // Select category
-      const categorySelect = page.locator('select[name="category"], [role="combobox"]').first();
-      await categorySelect.selectOption({ index: 1 }); // Select first category
+      // Select category - handle shadcn/ui Select component
+      await page.getByRole('combobox').first().click();
+      await page.waitForTimeout(300);
+      // Select "Flores & Amores" category
+      await page.getByRole('option', { name: 'Flores & Amores' }).click();
       
       // Add product specifications
       const addSpecButton = page.locator('button').filter({ hasText: /Agregar especificación|Add specification|Característica|Feature/i });
@@ -71,8 +74,10 @@ test.describe('Vendor Product Management', () => {
       const submitButton = page.locator('button[type="submit"]').filter({ hasText: /Publicar|Publish|Crear|Create/i });
       await submitButton.click();
       
-      // Should show validation errors
-      await expect(page.locator('text=/requerido|required|obligatorio|mandatory/i')).toBeVisible();
+      // Should show validation errors - check for specific field errors
+      await page.waitForTimeout(500);
+      const formErrors = page.locator('[role="alert"], .text-destructive, .text-red-500');
+      await expect(formErrors.first()).toBeVisible();
       
       // Specific field errors
       const nameError = page.locator('text=/nombre.*requerido|name.*required/i');
@@ -137,7 +142,7 @@ test.describe('Vendor Product Management', () => {
       await expect(page.locator('text=/guardado.*borrador|saved.*draft/i')).toBeVisible();
       
       // Should appear in products list as draft
-      await page.goto('/vendor/products');
+      await page.goto('/es/vendor/products');
       const draftProduct = page.locator('tr, .product-card').filter({ hasText: 'Producto en Borrador' });
       await expect(draftProduct).toBeVisible();
       await expect(draftProduct.locator('text=/Borrador|Draft/i')).toBeVisible();
@@ -147,7 +152,7 @@ test.describe('Vendor Product Management', () => {
   test.describe('Product Editing', () => {
     test('should edit existing product', async ({ page }) => {
       // Go to products list
-      await page.goto('/vendor/products');
+      await page.goto('/es/vendor/products');
       
       // Find edit button for first product
       const editButton = page.locator('button, a').filter({ hasText: /Editar|Edit/i }).first();
@@ -183,7 +188,7 @@ test.describe('Vendor Product Management', () => {
     });
 
     test('should update product images', async ({ page }) => {
-      await page.goto('/vendor/products');
+      await page.goto('/es/vendor/products');
       
       const editButton = page.locator('button, a').filter({ hasText: /Editar|Edit/i }).first();
       if (await editButton.isVisible()) {
@@ -224,7 +229,7 @@ test.describe('Vendor Product Management', () => {
     });
 
     test('should manage product inventory', async ({ page }) => {
-      await page.goto('/vendor/products');
+      await page.goto('/es/vendor/products');
       
       // Look for inline inventory edit
       const stockInput = page.locator('input[type="number"][name*="stock"]').first();
@@ -258,7 +263,7 @@ test.describe('Vendor Product Management', () => {
     });
 
     test('should duplicate product', async ({ page }) => {
-      await page.goto('/vendor/products');
+      await page.goto('/es/vendor/products');
       
       // Find product actions menu
       const actionsButton = page.locator('button').filter({ 
@@ -274,7 +279,7 @@ test.describe('Vendor Product Management', () => {
           await duplicateOption.click();
           
           // Should open edit form with copied data
-          await page.waitForURL(/\/new|nuevo|duplicate/, { timeout: 5000 });
+          await page.waitForURL(/\/vendor\/products\/new/, { timeout: 5000 });
           
           // Verify fields are pre-filled
           const nameInput = page.locator('input[name="name"]');
@@ -297,7 +302,7 @@ test.describe('Vendor Product Management', () => {
 
   test.describe('Product Status Management', () => {
     test('should publish draft product', async ({ page }) => {
-      await page.goto('/vendor/products');
+      await page.goto('/es/vendor/products');
       
       // Filter by drafts
       const draftFilter = page.locator('button, option').filter({ hasText: /Borrador|Draft/i });
@@ -330,7 +335,7 @@ test.describe('Vendor Product Management', () => {
     });
 
     test('should pause/unpause product', async ({ page }) => {
-      await page.goto('/vendor/products');
+      await page.goto('/es/vendor/products');
       
       // Find active product
       const activeProduct = page.locator('tr, .product-card').filter({ hasText: /Activo|Active/i }).first();
@@ -353,7 +358,7 @@ test.describe('Vendor Product Management', () => {
     });
 
     test('should delete product', async ({ page }) => {
-      await page.goto('/vendor/products');
+      await page.goto('/es/vendor/products');
       
       // Get initial product count
       const initialProducts = await page.locator('tr:not(:first-child), .product-card').count();
@@ -390,7 +395,7 @@ test.describe('Vendor Product Management', () => {
 
   test.describe('Product Analytics', () => {
     test('should view product performance', async ({ page }) => {
-      await page.goto('/vendor/products');
+      await page.goto('/es/vendor/products');
       
       // Click on product to view details
       const productRow = page.locator('tr:not(:first-child), .product-card').first();
@@ -418,7 +423,7 @@ test.describe('Vendor Product Management', () => {
     });
 
     test('should export product data', async ({ page }) => {
-      await page.goto('/vendor/products');
+      await page.goto('/es/vendor/products');
       
       // Look for export button
       const exportButton = page.locator('button').filter({ hasText: /Exportar|Export|Descargar|Download/i });
@@ -447,12 +452,13 @@ test.describe('Vendor Product Management', () => {
 
   test.describe('Bulk Operations', () => {
     test('should bulk update product prices', async ({ page }) => {
-      await page.goto('/vendor/products');
+      await page.goto('/es/vendor/products');
       
       // Select multiple products
-      const checkboxes = page.locator('input[type="checkbox"]:not([disabled])').slice(0, 3);
+      const allCheckboxes = await page.locator('input[type="checkbox"]:not([disabled])').all();
+      const checkboxes = allCheckboxes.slice(0, 3);
       
-      for (const checkbox of await checkboxes.all()) {
+      for (const checkbox of checkboxes) {
         await checkbox.click();
       }
       
@@ -484,14 +490,15 @@ test.describe('Vendor Product Management', () => {
     });
 
     test('should bulk delete products', async ({ page }) => {
-      await page.goto('/vendor/products');
+      await page.goto('/es/vendor/products');
       
       // Get initial count
       const initialCount = await page.locator('tr:not(:first-child), .product-card').count();
       
       // Select products
-      const checkboxes = page.locator('input[type="checkbox"]:not([disabled])').slice(0, 2);
-      for (const checkbox of await checkboxes.all()) {
+      const allCheckboxes = await page.locator('input[type="checkbox"]:not([disabled])').all();
+      const checkboxes = allCheckboxes.slice(0, 2);
+      for (const checkbox of checkboxes) {
         await checkbox.click();
       }
       

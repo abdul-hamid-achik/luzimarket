@@ -53,6 +53,6 @@ test.describe('Basic App Tests', () => {
     
     // Admin might redirect to login or show admin page
     const url = page.url();
-    expect(url).toMatch(/\/(admin|login)/);
+    expect(url).toMatch(/\/(admin|iniciar-sesion)/);
   });
 });
