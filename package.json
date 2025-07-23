@@ -102,7 +102,7 @@
     "canvas": "^3.1.2",
     "cross-env": "^7.0.3",
     "dotenv-cli": "^8.0.0",
-    "drizzle-kit": "^0.31.1",
+    "drizzle-kit": "^0.18.1",
     "eslint": "^9.29.0",
     "eslint-config-next": "^15.3.3",
     "semantic-release": "^24.2.5",

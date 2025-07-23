@@ -18,6 +18,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Keep it simple** - Avoid creating duplicate scripts or complex variations
 - **Database** - Using Neon serverless PostgreSQL
 - **File Storage** - Using Vercel Blob for file storage
+- **Build Output** - Uses Next.js standalone output mode for optimized deployments
+- **Production Builds** - Automatically removes `data-testid` attributes in production via Next.js compiler
 
 ## Local Development Setup
 
@@ -105,6 +107,8 @@ npm run start              # Start production server
 npm run lint               # Run ESLint
 npm run vercel:deploy      # Deploy to Vercel preview
 vercel --prod              # Deploy to Vercel production
+npm run release            # Create semantic release (automated versioning)
+npm run release:dry        # Preview semantic release without publishing
 ```
 
 #### Testing
@@ -157,6 +161,9 @@ STRIPE_WEBHOOK_SECRET=...
 # NextAuth
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=...
+
+# Testing (automatically set by Playwright)
+PLAYWRIGHT_TEST=...  # Set to '1' when running tests
 ```
 
 #### AI Image Generation
