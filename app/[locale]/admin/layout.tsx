@@ -11,7 +11,8 @@ import {
   Mail,
   Settings,
   LogOut,
-  Lock
+  Lock,
+  DollarSign
 } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { LogoutButton } from "@/components/admin/logout-button";
@@ -87,6 +88,14 @@ export default async function AdminLayout({
             >
               <Users className="h-4 w-4" />
               {t("users")}
+            </Link>
+
+            <Link
+              href="/admin/financials"
+              className="flex items-center gap-3 px-3 py-2 text-sm font-univers text-gray-700 rounded-md hover:bg-gray-100 hover:text-black transition-colors"
+            >
+              <DollarSign className="h-4 w-4" />
+              {t("financials")}
             </Link>
 
             <Link

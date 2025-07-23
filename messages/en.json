@@ -274,6 +274,7 @@
     "products": "Products",
     "vendors": "Vendors",
     "users": "Users",
+    "financials": "Financials",
     "emails": "Emails",
     "settings": "Settings",
     "analytics": "Analytics",
@@ -573,6 +574,8 @@
       },
       "lastUpdated": "Last updated: {time}",
       "tabs": {
+        "overview": "Overview",
+        "reports": "Reports",
         "transactions": "Transactions",
         "payouts": "Payouts"
       },
@@ -994,7 +997,7 @@
     "metaDescription": "Read the terms and conditions of use for Luzimarket, the curated gift marketplace in Mexico.",
     "title": "Terms and Conditions",
     "lastUpdated": "Last updated: {date}",
-    "introduction": "Welcome to Luzimarket. By accessing and using our platform, you agree to comply with these Terms and Conditions. Please read them carefully before using our services. These terms constitute a legal agreement between you and MOMENTO ESPECIAL SAPI DE CV.",
+    "introduction": "Welcome to Luzimarket, a digital marketplace that connects buyers with independent vendors in Mexico. By accessing and using our platform, you agree to comply with these Terms and Conditions. Please read them carefully before using our services. These terms constitute a legal agreement between you and MOMENTO ESPECIAL SAPI DE CV, operator of the Luzimarket platform.",
     "sections": {
       "definitions": {
         "title": "Definitions",
@@ -1008,14 +1011,31 @@
         "descriptions": {
           "platform": "refers to the luzimarket.shop website and all its mobile applications and related services",
           "user": "any person who accesses or uses the Platform",
-          "vendor": "merchants who offer their products through our Platform",
-          "products": "items, gifts, and merchandise offered for sale on the Platform",
-          "services": "all services provided by Luzimarket, including transaction facilitation"
+          "vendor": "independent merchants who offer their products through our Platform",
+          "products": "items, gifts, and merchandise offered for sale on the Platform by third-party vendors",
+          "services": "all services provided by Luzimarket, including transaction facilitation, payment processing, and customer support",
+          "marketplace": "\"Marketplace\" - digital platform that facilitates transactions between buyers and independent vendors",
+          "platformFee": "\"Platform Fee\" - percentage charged to vendors for each successful transaction (typically 15% of sale value)"
         }
       },
       "acceptance": {
         "title": "Acceptance of Terms",
         "content": "By registering, browsing, or making purchases on Luzimarket, you confirm that you have read, understood, and accepted these Terms and Conditions, as well as our Privacy Policy. If you do not agree with these terms, you should not use our Platform."
+      },
+      "marketplaceModel": {
+        "title": "Marketplace Model",
+        "intro": "Luzimarket operates as a digital marketplace that:",
+        "roles": {
+          "facilitator": "Facilitates connections between buyers and independent vendors",
+          "paymentProcessor": "Processes payments securely through Stripe Connect",
+          "platform": "Provides technological infrastructure for transactions",
+          "curator": "Carefully selects vendors that meet our quality standards"
+        },
+        "important": "IMPORTANT: Luzimarket is not the seller of the products. Each purchase constitutes a direct contract between you and the individual vendor. Luzimarket acts solely as an intermediary to facilitate these transactions.",
+        "fees": {
+          "title": "Platform Fees",
+          "content": "Luzimarket charges vendors a commission for each successful sale (typically 15% of sale value). This commission covers platform services, payment processing, customer support, and technology maintenance. Prices shown to buyers already include all costs."
+        }
       },
       "platformUse": {
         "title": "Platform Use",
@@ -1542,7 +1562,117 @@
       "address": "Mexico City, CDMX, Mexico"
     }
   },
+  "admin": {
+    "financials": {
+      "title": "Financial Management",
+      "description": "Monitor platform finances and vendor balances",
+      "stats": {
+        "totalRevenue": "Total Revenue",
+        "totalRevenueDescription": "Platform fees collected",
+        "pendingFees": "Pending Fees",
+        "pendingFeesDescription": "To be collected",
+        "vendorBalances": "Vendor Balances",
+        "pending": "pending",
+        "activeVendors": "Active Vendors",
+        "activeVendorsDescription": "With available balance"
+      },
+      "tabs": {
+        "vendorBalances": "Vendor Balances",
+        "platformFees": "Platform Fees",
+        "payouts": "Payouts"
+      },
+      "vendors": {
+        "title": "Vendor Balances",
+        "description": "Available and pending funds by vendor",
+        "vendor": "Vendor",
+        "available": "Available",
+        "pending": "Pending",
+        "lifetime": "Lifetime Total",
+        "search": "Search vendor..."
+      },
+      "fees": {
+        "title": "Platform Fees",
+        "description": "Commission charged on each transaction",
+        "date": "Date",
+        "vendor": "Vendor",
+        "order": "Order",
+        "orderAmount": "Order Amount",
+        "rate": "Rate",
+        "platformFee": "Fee",
+        "status": "Status"
+      },
+      "payouts": {
+        "title": "Payout History",
+        "description": "Processed payouts to vendors",
+        "date": "Date",
+        "vendor": "Vendor",
+        "amount": "Amount",
+        "status": "Status",
+        "reference": "Reference"
+      },
+      "actions": {
+        "title": "Actions",
+        "viewVendor": "View vendor",
+        "viewTransactions": "View transactions",
+        "requestPayout": "Request payout",
+        "exportReport": "Export report",
+        "refresh": "Refresh"
+      },
+      "reports": {
+        "title": "Financial Reports",
+        "description": "Comprehensive analysis of platform performance",
+        "reports": "Reports",
+        "reportsDescription": "Generate detailed reports to analyze business performance",
+        "selectDateRange": "Select a date range",
+        "selectVendor": "Select vendor",
+        "allVendors": "All vendors",
+        "download": "Download",
+        "platformOverview": "Platform Overview",
+        "salesReport": "Sales Report",
+        "payoutsReport": "Payouts Report",
+        "platformRevenue": "Platform Revenue",
+        "commissionEarned": "Commission earned",
+        "totalSales": "Total Sales",
+        "orders": "orders",
+        "activeVendors": "Active Vendors",
+        "of": "of",
+        "total": "total",
+        "avgOrderValue": "Average Order Value",
+        "topVendorsByRevenue": "Top Vendors by Revenue",
+        "vendorPerformance": "Vendor Performance",
+        "vendor": "Vendor",
+        "revenue": "Revenue",
+        "avgOrder": "Avg Order",
+        "totalOrders": "Total Orders",
+        "totalRevenue": "Total Revenue",
+        "salesOverTime": "Sales Over Time",
+        "topProducts": "Top Products",
+        "soldUnits": "{count} units sold",
+        "totalPayouts": "Total Payouts",
+        "pendingPayouts": "Pending Payouts",
+        "completedPayouts": "Completed Payouts",
+        "failedPayouts": "Failed Payouts",
+        "payoutStatusBreakdown": "Payout Status Breakdown",
+        "recentPayouts": "Recent Payouts",
+        "reportError": "Error generating report",
+        "downloadSuccess": "Report downloaded successfully",
+        "downloadError": "Error downloading report"
+      }
+    }
+  },
   "vendor": {
+    "layout": {
+      "title": "LUZIMARKET",
+      "vendorPanel": "Vendor Panel",
+      "dashboard": "Dashboard",
+      "products": "My Products",
+      "orders": "Orders",
+      "analytics": "Analytics",
+      "financials": "Financials",
+      "payments": "Payments",
+      "settings": "Settings",
+      "logout": "Log out"
+    },
     "financials": {
       "title": "Financial Dashboard",
       "subtitle": "Manage your finances and payments",
@@ -1578,20 +1708,34 @@
       },
       "lastUpdated": "Last updated: {time}",
       "tabs": {
+        "overview": "Overview",
+        "reports": "Reports",
         "transactions": "Transactions",
         "payouts": "Payouts"
       },
       "transactions": {
         "title": "Transaction history",
         "description": "All sales, refunds, and account movements",
-        "empty": "No transactions yet"
+        "empty": "No transactions yet",
+        "type": "Type",
+        "description": "Description",
+        "amount": "Amount",
+        "status": "Status",
+        "date": "Date",
+        "searchPlaceholder": "Search transactions..."
       },
       "payouts": {
         "title": "Payout history",
         "description": "Payments sent to your bank account",
         "empty": "No payouts yet",
         "payoutTo": "Payout to {method}",
-        "bankAccount": "Bank account"
+        "bankAccount": "Bank account",
+        "date": "Date",
+        "amount": "Amount",
+        "method": "Method",
+        "status": "Status",
+        "arrivalDate": "Arrival date",
+        "searchPlaceholder": "Search payouts..."
       },
       "accountInfo": {
         "title": "Account information",
@@ -1603,6 +1747,56 @@
         "disabled": "Inactive",
         "manageAccount": "Manage account"
       }
+    },
+    "payouts": {
+      "requestPayout": "Request Payout",
+      "title": "Request Payout",
+      "description": "Available balance: {balance}",
+      "amount": "Amount to withdraw",
+      "minimumNote": "Minimum amount: {amount}",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "processing": "Processing...",
+      "success": "Payout request submitted successfully",
+      "errors": {
+        "invalidAmount": "Please enter a valid amount",
+        "minimumAmount": "Minimum amount is {amount}",
+        "insufficientBalance": "Insufficient balance",
+        "requestFailed": "Failed to process request. Please try again."
+      }
+    },
+    "reports": {
+      "title": "Financial Reports",
+      "description": "Analyze your business performance with detailed reports",
+      "selectDateRange": "Select a date range to generate the report",
+      "salesReport": "Sales",
+      "revenueReport": "Revenue",
+      "productsReport": "Products",
+      "download": "Download",
+      "totalOrders": "Total Orders",
+      "totalRevenue": "Total Revenue",
+      "avgOrderValue": "Average Order Value",
+      "revenueOverTime": "Revenue Over Time",
+      "topProducts": "Top Selling Products",
+      "soldUnits": "{count} units sold",
+      "revenue": "Revenue",
+      "availableBalance": "Available Balance",
+      "pendingBalance": "Pending Balance",
+      "reservedBalance": "Reserved Balance",
+      "transactionBreakdown": "Transaction Breakdown",
+      "payoutSummary": "Payout Summary",
+      "payouts": "payouts",
+      "totalProducts": "Total Products",
+      "inventoryValue": "Inventory Value",
+      "lowStock": "Low Stock",
+      "productPerformance": "Product Performance",
+      "product": "Product",
+      "sku": "SKU",
+      "stock": "Stock",
+      "sold": "Sold",
+      "reportError": "Error generating report",
+      "downloadSuccess": "Report downloaded successfully",
+      "downloadError": "Error downloading report"
     }
   }
 }

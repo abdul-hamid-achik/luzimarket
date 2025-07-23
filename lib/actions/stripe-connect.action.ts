@@ -6,6 +6,12 @@ import { eq, and, desc, gte, lte, sql } from "drizzle-orm";
 import { createConnectedAccount, createAccountLink, retrieveAccount, getBalance, createPayout, getAccountLoginLink } from "@/lib/stripe";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { 
+  stripeRequirementsSchema, 
+  stripeCapabilitiesSchema, 
+  stripeBusinessProfileSchema,
+  type ApiResponse
+} from "@/lib/types/api";
 
 // Schema for creating Stripe Connect account
 const createStripeAccountSchema = z.object({
@@ -67,6 +73,19 @@ export async function createVendorStripeAccount(input: z.infer<typeof createStri
 
     // Save Stripe account to database
     await db.transaction(async (tx) => {
+      // Parse and validate Stripe data with schemas
+      const requirements = stripeRequirementsSchema.parse(stripeAccount.requirements || {
+        currentlyDue: [],
+        eventuallyDue: [],
+        pastDue: [],
+        pendingVerification: [],
+        errors: [],
+      });
+      
+      const capabilities = stripeCapabilitiesSchema.parse(stripeAccount.capabilities || {});
+      
+      const businessProfile = stripeBusinessProfileSchema.parse(stripeAccount.business_profile || {});
+
       // Create vendor Stripe account record
       await tx.insert(vendorStripeAccounts).values({
         vendorId: validatedInput.vendorId,
@@ -76,9 +95,9 @@ export async function createVendorStripeAccount(input: z.infer<typeof createStri
         chargesEnabled: stripeAccount.charges_enabled || false,
         payoutsEnabled: stripeAccount.payouts_enabled || false,
         detailsSubmitted: stripeAccount.details_submitted || false,
-        requirements: stripeAccount.requirements as any,
-        capabilities: stripeAccount.capabilities as any,
-        businessProfile: stripeAccount.business_profile as any,
+        requirements,
+        capabilities,
+        businessProfile,
       });
 
       // Create vendor balance record
@@ -177,6 +196,19 @@ export async function updateVendorStripeAccountStatus(input: z.infer<typeof upda
     // Retrieve latest account status from Stripe
     const stripeAccount = await retrieveAccount(vendorAccount.stripeAccountId);
 
+    // Parse and validate Stripe data with schemas
+    const requirements = stripeRequirementsSchema.parse(stripeAccount.requirements || {
+      currentlyDue: [],
+      eventuallyDue: [],
+      pastDue: [],
+      pendingVerification: [],
+      errors: [],
+    });
+    
+    const capabilities = stripeCapabilitiesSchema.parse(stripeAccount.capabilities || {});
+    
+    const businessProfile = stripeBusinessProfileSchema.parse(stripeAccount.business_profile || {});
+
     // Update account status in database
     await db
       .update(vendorStripeAccounts)
@@ -184,9 +216,9 @@ export async function updateVendorStripeAccountStatus(input: z.infer<typeof upda
         chargesEnabled: stripeAccount.charges_enabled || false,
         payoutsEnabled: stripeAccount.payouts_enabled || false,
         detailsSubmitted: stripeAccount.details_submitted || false,
-        requirements: stripeAccount.requirements as any,
-        capabilities: stripeAccount.capabilities as any,
-        businessProfile: stripeAccount.business_profile as any,
+        requirements,
+        capabilities,
+        businessProfile,
         onboardingStatus: stripeAccount.details_submitted ? "completed" : "in_progress",
         updatedAt: new Date(),
       })

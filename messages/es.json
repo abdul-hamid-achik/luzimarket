@@ -274,6 +274,7 @@
     "products": "Productos",
     "vendors": "Vendedores",
     "users": "Usuarios",
+    "financials": "Finanzas",
     "emails": "Correos",
     "settings": "Configuración",
     "analytics": "Análisis",
@@ -573,6 +574,8 @@
       },
       "lastUpdated": "Última actualización: {time}",
       "tabs": {
+        "overview": "Vista General",
+        "reports": "Reportes",
         "transactions": "Transacciones",
         "payouts": "Pagos"
       },
@@ -994,7 +997,7 @@
     "metaDescription": "Lee los términos y condiciones de uso de Luzimarket, el marketplace de regalos curados en México.",
     "title": "Términos y Condiciones",
     "lastUpdated": "Última actualización: {date}",
-    "introduction": "Bienvenido a Luzimarket. Al acceder y utilizar nuestra plataforma, aceptas cumplir con estos Términos y Condiciones. Por favor, léelos cuidadosamente antes de usar nuestros servicios. Estos términos constituyen un acuerdo legal entre tú y MOMENTO ESPECIAL SAPI DE CV.",
+    "introduction": "Bienvenido a Luzimarket, un marketplace digital que conecta compradores con vendedores independientes en México. Al acceder y utilizar nuestra plataforma, aceptas cumplir con estos Términos y Condiciones. Por favor, léelos cuidadosamente antes de usar nuestros servicios. Estos términos constituyen un acuerdo legal entre tú y MOMENTO ESPECIAL SAPI DE CV, operadora de la plataforma Luzimarket.",
     "sections": {
       "definitions": {
         "title": "Definiciones",
@@ -1008,14 +1011,31 @@
         "descriptions": {
           "platform": "se refiere al sitio web luzimarket.shop y todas sus aplicaciones móviles y servicios relacionados",
           "user": "cualquier persona que acceda o utilice la Plataforma",
-          "vendor": "comerciantes que ofrecen sus productos a través de nuestra Plataforma",
-          "products": "artículos, regalos y mercancías ofrecidas para la venta en la Plataforma",
-          "services": "todos los servicios proporcionados por Luzimarket, incluyendo la facilitación de transacciones"
+          "vendor": "comerciantes independientes que ofrecen sus productos a través de nuestra Plataforma",
+          "products": "artículos, regalos y mercancías ofrecidas para la venta en la Plataforma por vendedores terceros",
+          "services": "todos los servicios proporcionados por Luzimarket, incluyendo la facilitación de transacciones, procesamiento de pagos y soporte al cliente",
+          "marketplace": "\"Marketplace\" - plataforma digital que facilita transacciones entre compradores y vendedores independientes",
+          "platformFee": "\"Comisión de Plataforma\" - porcentaje cobrado a vendedores por cada transacción exitosa (generalmente 15% del valor de venta)"
         }
       },
       "acceptance": {
         "title": "Aceptación de los Términos",
         "content": "Al registrarte, navegar o realizar compras en Luzimarket, confirmas que has leído, entendido y aceptado estos Términos y Condiciones, así como nuestra Política de Privacidad. Si no estás de acuerdo con estos términos, no debes utilizar nuestra Plataforma."
+      },
+      "marketplaceModel": {
+        "title": "Modelo de Marketplace",
+        "intro": "Luzimarket opera como un marketplace digital que:",
+        "roles": {
+          "facilitator": "Facilita la conexión entre compradores y vendedores independientes",
+          "paymentProcessor": "Procesa pagos de forma segura a través de Stripe Connect",
+          "platform": "Proporciona la infraestructura tecnológica para las transacciones",
+          "curator": "Selecciona cuidadosamente a vendedores que cumplen con nuestros estándares de calidad"
+        },
+        "important": "IMPORTANTE: Luzimarket no es el vendedor de los productos. Cada compra constituye un contrato directo entre tú y el vendedor individual. Luzimarket actúa únicamente como intermediario para facilitar estas transacciones.",
+        "fees": {
+          "title": "Comisiones de Plataforma",
+          "content": "Luzimarket cobra una comisión a los vendedores por cada venta exitosa (típicamente 15% del valor de venta). Esta comisión cubre los servicios de plataforma, procesamiento de pagos, soporte al cliente y mantenimiento tecnológico. Los precios mostrados a los compradores ya incluyen todos los costos."
+        }
       },
       "platformUse": {
         "title": "Uso de la Plataforma",
@@ -1060,7 +1080,7 @@
           "oxxo": "Pagos en efectivo en tiendas OXXO (límite de 10,000 MXN por transacción)",
           "transfer": "Transferencia bancaria (para pedidos especiales)"
         },
-        "stripe": "Todos los pagos con tarjeta son procesados de forma segura por Stripe, Inc., cumpliendo con los estándares PCI-DSS. Luzimarket no almacena información de tarjetas de crédito.",
+        "stripe": "Todos los pagos son procesados de forma segura por Stripe Connect, cumpliendo con los estándares PCI-DSS. Los fondos se distribuyen automáticamente: el monto del producto va directamente al vendedor, y la comisión de plataforma (15%) es retenida por Luzimarket. Ni Luzimarket ni los vendedores almacenan información de tarjetas de crédito.",
         "oxxoDetails": "Los pagos OXXO deben completarse dentro de 7 días después de generar la referencia. Los pagos OXXO no son reembolsables y están sujetos a las políticas de OXXO."
       },
       "shipping": {
@@ -1116,13 +1136,17 @@
       },
       "liability": {
         "title": "Limitación de Responsabilidad",
-        "intro": "Luzimarket actúa como intermediario entre compradores y vendedores. No somos responsables por:",
+        "intro": "Como marketplace digital, Luzimarket facilita transacciones entre compradores y vendedores independientes. Nuestra responsabilidad se limita a proporcionar la plataforma tecnológica y los servicios de facilitación. No somos responsables por:",
         "limitations": {
-          "quality": "La calidad, seguridad o legalidad de los productos listados",
-          "availability": "La disponibilidad continua de la Plataforma",
+          "quality": "La calidad, seguridad o legalidad de los productos vendidos por terceros",
+          "vendorActions": "Las acciones, omisiones o incumplimientos de los vendedores",
+          "shipping": "Retrasos o daños en el envío causados por vendedores o empresas de mensajería",
+          "availability": "La disponibilidad continua de productos específicos o de la Plataforma",
           "accuracy": "La exactitud de la información proporcionada por vendedores",
-          "thirdParty": "Acciones u omisiones de terceros, incluyendo vendedores y servicios de envío"
-        }
+          "disputes": "Disputas directas entre compradores y vendedores",
+          "platformFees": "Los vendedores son responsables del pago de comisiones de plataforma"
+        },
+        "maxLiability": "En cualquier caso, la responsabilidad total de Luzimarket no excederá el valor de la transacción específica en cuestión."
       },
       "indemnification": {
         "title": "Indemnización",
@@ -1402,7 +1426,117 @@
       "address": "Ciudad de México, México"
     }
   },
+  "admin": {
+    "financials": {
+      "title": "Gestión Financiera",
+      "description": "Supervisa las finanzas de la plataforma y los balances de vendedores",
+      "stats": {
+        "totalRevenue": "Ingresos Totales",
+        "totalRevenueDescription": "Comisiones cobradas",
+        "pendingFees": "Comisiones Pendientes",
+        "pendingFeesDescription": "Por cobrar",
+        "vendorBalances": "Balance de Vendedores",
+        "pending": "pendiente",
+        "activeVendors": "Vendedores Activos",
+        "activeVendorsDescription": "Con balance disponible"
+      },
+      "tabs": {
+        "vendorBalances": "Balances de Vendedores",
+        "platformFees": "Comisiones de Plataforma",
+        "payouts": "Pagos"
+      },
+      "vendors": {
+        "title": "Balances de Vendedores",
+        "description": "Fondos disponibles y pendientes por vendedor",
+        "vendor": "Vendedor",
+        "available": "Disponible",
+        "pending": "Pendiente",
+        "lifetime": "Total Histórico",
+        "search": "Buscar vendedor..."
+      },
+      "fees": {
+        "title": "Comisiones de Plataforma",
+        "description": "Comisiones cobradas en cada transacción",
+        "date": "Fecha",
+        "vendor": "Vendedor",
+        "order": "Orden",
+        "orderAmount": "Monto Orden",
+        "rate": "Tasa",
+        "platformFee": "Comisión",
+        "status": "Estado"
+      },
+      "payouts": {
+        "title": "Historial de Pagos",
+        "description": "Pagos procesados a vendedores",
+        "date": "Fecha",
+        "vendor": "Vendedor",
+        "amount": "Monto",
+        "status": "Estado",
+        "reference": "Referencia"
+      },
+      "actions": {
+        "title": "Acciones",
+        "viewVendor": "Ver vendedor",
+        "viewTransactions": "Ver transacciones",
+        "requestPayout": "Solicitar pago",
+        "exportReport": "Exportar reporte",
+        "refresh": "Actualizar"
+      },
+      "reports": {
+        "title": "Reportes Financieros",
+        "description": "Análisis completo del rendimiento de la plataforma",
+        "reports": "Reportes",
+        "reportsDescription": "Genera reportes detallados para analizar el rendimiento del negocio",
+        "selectDateRange": "Selecciona un rango de fechas",
+        "selectVendor": "Seleccionar vendedor",
+        "allVendors": "Todos los vendedores",
+        "download": "Descargar",
+        "platformOverview": "Vista General",
+        "salesReport": "Reporte de Ventas",
+        "payoutsReport": "Reporte de Pagos",
+        "platformRevenue": "Ingresos de Plataforma",
+        "commissionEarned": "Comisiones ganadas",
+        "totalSales": "Ventas Totales",
+        "orders": "órdenes",
+        "activeVendors": "Vendedores Activos",
+        "of": "de",
+        "total": "total",
+        "avgOrderValue": "Valor Promedio de Orden",
+        "topVendorsByRevenue": "Principales Vendedores por Ingresos",
+        "vendorPerformance": "Rendimiento de Vendedores",
+        "vendor": "Vendedor",
+        "revenue": "Ingresos",
+        "avgOrder": "Orden Promedio",
+        "totalOrders": "Total de Órdenes",
+        "totalRevenue": "Ingresos Totales",
+        "salesOverTime": "Ventas a lo Largo del Tiempo",
+        "topProducts": "Productos Más Vendidos",
+        "soldUnits": "{count} unidades vendidas",
+        "totalPayouts": "Total de Pagos",
+        "pendingPayouts": "Pagos Pendientes",
+        "completedPayouts": "Pagos Completados",
+        "failedPayouts": "Pagos Fallidos",
+        "payoutStatusBreakdown": "Desglose por Estado",
+        "recentPayouts": "Pagos Recientes",
+        "reportError": "Error al generar el reporte",
+        "downloadSuccess": "Reporte descargado exitosamente",
+        "downloadError": "Error al descargar el reporte"
+      }
+    }
+  },
   "vendor": {
+    "layout": {
+      "title": "LUZIMARKET",
+      "vendorPanel": "Panel de Vendedor",
+      "dashboard": "Dashboard",
+      "products": "Mis Productos",
+      "orders": "Órdenes",
+      "analytics": "Análisis",
+      "financials": "Finanzas",
+      "payments": "Pagos",
+      "settings": "Configuración",
+      "logout": "Cerrar sesión"
+    },
     "financials": {
       "title": "Panel Financiero",
       "subtitle": "Gestiona tus finanzas y pagos",
@@ -1438,20 +1572,34 @@
       },
       "lastUpdated": "Última actualización: {time}",
       "tabs": {
+        "overview": "Vista General",
+        "reports": "Reportes",
         "transactions": "Transacciones",
         "payouts": "Pagos"
       },
       "transactions": {
         "title": "Historial de transacciones",
         "description": "Todas las ventas, reembolsos y movimientos de tu cuenta",
-        "empty": "No hay transacciones aún"
+        "empty": "No hay transacciones aún",
+        "type": "Tipo",
+        "description": "Descripción",
+        "amount": "Monto",
+        "status": "Estado",
+        "date": "Fecha",
+        "searchPlaceholder": "Buscar transacciones..."
       },
       "payouts": {
         "title": "Historial de pagos",
         "description": "Pagos enviados a tu cuenta bancaria",
         "empty": "No hay pagos aún",
         "payoutTo": "Pago a {method}",
-        "bankAccount": "Cuenta bancaria"
+        "bankAccount": "Cuenta bancaria",
+        "date": "Fecha",
+        "amount": "Monto",
+        "method": "Método",
+        "status": "Estado",
+        "arrivalDate": "Fecha de llegada",
+        "searchPlaceholder": "Buscar pagos..."
       },
       "accountInfo": {
         "title": "Información de la cuenta",
@@ -1463,6 +1611,56 @@
         "disabled": "Inactivo",
         "manageAccount": "Gestionar cuenta"
       }
+    },
+    "payouts": {
+      "requestPayout": "Solicitar Pago",
+      "title": "Solicitar Pago",
+      "description": "Balance disponible: {balance}",
+      "amount": "Monto a retirar",
+      "minimumNote": "Monto mínimo: {amount}",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar",
+      "processing": "Procesando...",
+      "success": "Solicitud de pago enviada exitosamente",
+      "errors": {
+        "invalidAmount": "Por favor ingresa un monto válido",
+        "minimumAmount": "El monto mínimo es {amount}",
+        "insufficientBalance": "Balance insuficiente",
+        "requestFailed": "Error al procesar la solicitud. Por favor intenta de nuevo."
+      }
+    },
+    "reports": {
+      "title": "Reportes Financieros",
+      "description": "Analiza el rendimiento de tu negocio con reportes detallados",
+      "selectDateRange": "Selecciona un rango de fechas para generar el reporte",
+      "salesReport": "Ventas",
+      "revenueReport": "Ingresos",
+      "productsReport": "Productos",
+      "download": "Descargar",
+      "totalOrders": "Total de Órdenes",
+      "totalRevenue": "Ingresos Totales",
+      "avgOrderValue": "Valor Promedio de Orden",
+      "revenueOverTime": "Ingresos a lo Largo del Tiempo",
+      "topProducts": "Productos Más Vendidos",
+      "soldUnits": "{count} unidades vendidas",
+      "revenue": "Ingresos",
+      "availableBalance": "Balance Disponible",
+      "pendingBalance": "Balance Pendiente",
+      "reservedBalance": "Balance Reservado",
+      "transactionBreakdown": "Desglose de Transacciones",
+      "payoutSummary": "Resumen de Pagos",
+      "payouts": "pagos",
+      "totalProducts": "Total de Productos",
+      "inventoryValue": "Valor del Inventario",
+      "lowStock": "Stock Bajo",
+      "productPerformance": "Rendimiento de Productos",
+      "product": "Producto",
+      "sku": "SKU",
+      "stock": "Stock",
+      "sold": "Vendidos",
+      "reportError": "Error al generar el reporte",
+      "downloadSuccess": "Reporte descargado exitosamente",
+      "downloadError": "Error al descargar el reporte"
     }
   }
 }

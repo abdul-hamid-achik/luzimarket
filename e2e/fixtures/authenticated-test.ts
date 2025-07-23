@@ -82,6 +82,20 @@ export async function switchUser(currentPage: any, newUserType: keyof typeof tes
 }
 
 /**
+ * Helper function for vendor-authenticated tests
+ */
+export async function authenticatedTestVendor(page: Page, testFunction: () => Promise<void>) {
+  // Login as vendor
+  await loginAs(page, 'vendor');
+  
+  // Run the test function
+  await testFunction();
+  
+  // Logout after test
+  await logout(page);
+}
+
+/**
  * Example usage:
  * 
  * test('admin can approve vendors', async ({ adminPage }) => {

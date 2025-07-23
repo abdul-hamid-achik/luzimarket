@@ -9,13 +9,29 @@ export default async function TermsPage() {
       
       <div className="prose prose-gray max-w-none space-y-8">
         <section>
-          <p className="text-lg text-gray-600">{t("lastUpdated", { date: "1 de Enero, 2024" })}</p>
-          <p className="mt-4">{t("intro")}</p>
+          <p className="text-lg text-gray-600">{t("lastUpdated", { date: "1 de Enero, 2025" })}</p>
+          <p className="mt-4">{t("introduction")}</p>
         </section>
 
         <section>
-          <h2 className="text-2xl font-times-now mb-4">{t("acceptance.title")}</h2>
-          <p>{t("acceptance.description")}</p>
+          <h2 className="text-2xl font-times-now mb-4">{t("sections.acceptance.title")}</h2>
+          <p>{t("sections.acceptance.content")}</p>
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-times-now mb-4">{t("sections.marketplaceModel.title")}</h2>
+          <p className="mb-4">{t("sections.marketplaceModel.intro")}</p>
+          <ul className="list-disc pl-6 space-y-2 mb-4">
+            <li>{t("sections.marketplaceModel.roles.facilitator")}</li>
+            <li>{t("sections.marketplaceModel.roles.paymentProcessor")}</li>
+            <li>{t("sections.marketplaceModel.roles.platform")}</li>
+            <li>{t("sections.marketplaceModel.roles.curator")}</li>
+          </ul>
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+            <p className="font-medium">{t("sections.marketplaceModel.important")}</p>
+          </div>
+          <h3 className="text-xl font-times-now mb-2">{t("sections.marketplaceModel.fees.title")}</h3>
+          <p>{t("sections.marketplaceModel.fees.content")}</p>
         </section>
 
         <section>
