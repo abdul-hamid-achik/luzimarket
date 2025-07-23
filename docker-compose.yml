@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  db:
+    image: neondatabase/neon_local:latest
+    container_name: luzimarket-db
+    ports:
+      - "5432:5432"
+    environment:
+      NEON_API_KEY: ${NEON_API_KEY}
+      NEON_PROJECT_ID: ${NEON_PROJECT_ID}
+      DRIVER: serverless
+      BRANCH_ID: ${NEON_BRANCH_ID}
+    # Optional: Add volumes only if you want to persist data between restarts
+    # volumes:
+    #   - ./.neon_local/:/tmp/.neon_local
+    #   - ./.git/HEAD:/tmp/.git/HEAD:ro,consistent

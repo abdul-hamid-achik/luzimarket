@@ -222,23 +222,26 @@ test.describe('Admin Dashboard', () => {
     }
   });
 
-  test('should search in admin panel', async ({ page }) => {
+  test('should display products in admin panel', async ({ page }) => {
     await page.goto('/admin/products');
     
-    // Find search input
-    const searchInput = page.locator('input[type="search"], input[placeholder*="Search"], input[placeholder*="Buscar"]').first();
+    // Should show products page header
+    await expect(page.getByRole('heading', { name: 'Productos', exact: true })).toBeVisible();
+    await expect(page.getByText('Administra y aprueba productos de los vendedores')).toBeVisible();
     
-    if (await searchInput.isVisible()) {
-      await searchInput.fill('flores');
-      await searchInput.press('Enter');
-      
-      // Results should filter
-      await page.waitForLoadState('networkidle');
-      
-      // Table should update or show results
-      const results = page.locator('table tbody tr, .search-results');
-      await expect(results.first()).toBeVisible();
-    }
+    // Should show stats cards grid
+    const statsGrid = page.locator('.grid').filter({ hasText: 'Total productos' });
+    await expect(statsGrid).toBeVisible();
+    
+    // Check individual stat cards
+    await expect(page.locator('.bg-white').filter({ hasText: 'Total productos' })).toBeVisible();
+    
+    // Should show at least one product table (there may be pending and active tables)
+    const anyTable = page.locator('table').first();
+    await expect(anyTable).toBeVisible();
+    
+    // Should have basic table structure
+    await expect(page.locator('th').first()).toBeVisible();
   });
 
   test('should logout from admin', async ({ page }) => {

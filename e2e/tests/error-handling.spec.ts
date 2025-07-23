@@ -6,16 +6,18 @@ test.describe('Error Handling', () => {
     // Navigate to non-existent page
     await page.goto('/this-page-does-not-exist-123456');
     
-    // Should show 404 page
-    await expect(page.locator('text=/404|Not Found|No encontrado/i')).toBeVisible();
+    // Should show 404 page with the correct elements
+    await expect(page.locator('h1').filter({ hasText: '404' })).toBeVisible();
+    await expect(page.locator('h2').filter({ hasText: 'Not Found' })).toBeVisible();
     
-    // Should have link to home
-    const homeLink = page.locator('a').filter({ hasText: /Home|Inicio|Back/ }).first();
+    // Should have link to home with correct Spanish text
+    const homeLink = page.locator('a').filter({ hasText: /Volver al Inicio|Home/i }).first();
     await expect(homeLink).toBeVisible();
     
     // Click home link
     await homeLink.click();
-    await expect(page).toHaveURL('/');
+    // Account for internationalization - could be / or /en or /es
+    await expect(page).toHaveURL(/^https?:\/\/[^/]+\/(en|es)?\/?$/);
   });
 
   test('should handle product not found', async ({ page }) => {

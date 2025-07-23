@@ -296,6 +296,18 @@ This is a Next.js 15 e-commerce platform using App Router with the following key
    - Integrated into seed script - runs automatically if `OPENAI_SECRET_KEY` is present
    - Generates contextually appropriate e-commerce photography
 
+10. **Security Features**:
+    - Comprehensive security middleware with CORS, CSRF protection, rate limiting, and security headers
+    - Account lockout system: 5 failed attempts triggers 30-minute lockout
+    - Secure password hashing with bcryptjs
+    - Email verification required for new accounts
+
+11. **Advanced E-commerce Features**:
+    - Stock reservation system with automatic expiration (30 minutes)
+    - Zone-based shipping calculations for Mexico
+    - Dynamic email templates with full CRUD admin interface
+    - Multi-step checkout process with cart persistence
+
 ### Project Structure
 
 - `/app/[locale]/` - Internationalized routes
