@@ -19,7 +19,7 @@ export async function GET(request: Request) {
         name: products.name,
         slug: products.slug,
         price: products.price,
-        image: sql<string>`${products.images}[1]`,
+        image: sql<string>`${products.images}->0`,
         type: sql<string>`'product'`,
       })
       .from(products)

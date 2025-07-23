@@ -162,7 +162,7 @@ test.describe('User Account', () => {
       await expect(removeButton).toBeVisible();
       
       // Should have add to cart button
-      const addToCartButton = wishlistItems.first().locator('button').filter({ hasText: /Add to Cart|Agregar/ });
+      const addToCartButton = wishlistItems.first().locator('button').filter({ hasText: /Add to Cart|Agregar al carrito/i });
       await expect(addToCartButton).toBeVisible();
     } else {
       // Empty wishlist

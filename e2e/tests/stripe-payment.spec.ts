@@ -9,7 +9,7 @@ test.describe('Stripe Payment Flow', () => {
     const firstProduct = page.locator('main').locator('a[href*="/products/"]').first();
     await firstProduct.hover();
     
-    const addToCartButton = firstProduct.locator('button:has-text("Add to cart"), button:has-text("Agregar al carrito")').first();
+    const addToCartButton = firstProduct.locator('button').filter({ hasText: /add to cart|agregar al carrito/i }).first();
     await addToCartButton.click();
     await page.waitForTimeout(1000);
   }

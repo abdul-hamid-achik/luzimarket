@@ -38,7 +38,6 @@ export async function POST(req: NextRequest) {
 
     // Create the product
     const [newProduct] = await db.insert(products).values({
-      id: nanoid(),
       vendorId: session.user.id,
       name: validatedData.name,
       slug,

@@ -2,7 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
 import { db } from "@/db";
 import { products, vendors, categories } from "@/db/schema";
-import { eq, ilike, or, and } from "drizzle-orm";
+import { ilike, or, and, eq, gte, lte, sql, inArray } from "drizzle-orm";
 import { ProductsGrid } from "@/components/products/products-grid";
 import { FilterSidebar } from "@/components/products/filter-sidebar";
 import { Search, X } from "lucide-react";
@@ -24,6 +24,48 @@ interface SearchPageProps {
 async function searchProducts(query: string, filters: any) {
   if (!query) {
     return [];
+  }
+
+  // Build where conditions
+  const whereConditions = [
+    eq(products.isActive, true),
+    or(
+      ilike(products.name, `%${query}%`),
+      ilike(products.description, `%${query}%`),
+      ilike(vendors.businessName, `%${query}%`),
+      ilike(categories.name, `%${query}%`)
+    )
+  ];
+
+  // Add price filtering if specified
+  if (filters.minPrice) {
+    const minPrice = parseFloat(filters.minPrice);
+    if (!isNaN(minPrice)) {
+      whereConditions.push(gte(sql`CAST(${products.price} AS DECIMAL)`, minPrice));
+    }
+  }
+  
+  if (filters.maxPrice) {
+    const maxPrice = parseFloat(filters.maxPrice);
+    if (!isNaN(maxPrice)) {
+      whereConditions.push(lte(sql`CAST(${products.price} AS DECIMAL)`, maxPrice));
+    }
+  }
+
+  // Add category filtering if specified
+  if (filters.categories) {
+    const categoryIds = filters.categories.split(',').filter(Boolean);
+    if (categoryIds.length > 0) {
+      whereConditions.push(inArray(products.categoryId, categoryIds));
+    }
+  }
+
+  // Add vendor filtering if specified
+  if (filters.vendors) {
+    const vendorIds = filters.vendors.split(',').filter(Boolean);
+    if (vendorIds.length > 0) {
+      whereConditions.push(inArray(products.vendorId, vendorIds));
+    }
   }
 
   const searchResults = await db
@@ -48,17 +90,7 @@ async function searchProducts(query: string, filters: any) {
     .from(products)
     .leftJoin(vendors, eq(products.vendorId, vendors.id))
     .leftJoin(categories, eq(products.categoryId, categories.id))
-    .where(
-      and(
-        eq(products.isActive, true),
-        or(
-          ilike(products.name, `%${query}%`),
-          ilike(products.description, `%${query}%`),
-          ilike(vendors.businessName, `%${query}%`),
-          ilike(categories.name, `%${query}%`)
-        )
-      )
-    );
+    .where(and(...whereConditions));
 
   // Apply sorting
   if (filters.sort === 'price-asc') {
@@ -77,6 +109,27 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
   
   const t = await getTranslations('Search');
   const searchResults = query ? await searchProducts(query, filters) : [];
+  
+  // Fetch filter data for sidebar
+  const [categoriesData, vendorsData] = await Promise.all([
+    db.select({ id: categories.id, name: categories.name }).from(categories).limit(20),
+    db.select({ id: vendors.id, businessName: vendors.businessName }).from(vendors).limit(20)
+  ]);
+  
+  // Transform data for FilterSidebar
+  const filterCategories = categoriesData.map(cat => ({
+    id: cat.id.toString(),
+    name: cat.name,
+    count: 0 // Could be calculated with a more complex query
+  }));
+  
+  const filterVendors = vendorsData.map(vendor => ({
+    id: vendor.id.toString(),
+    name: vendor.businessName || 'Vendor',
+    count: 0 // Could be calculated with a more complex query
+  }));
+  
+  const priceRange = { min: 0, max: 10000 };
 
   return (
     <main className="min-h-screen bg-white">
@@ -180,7 +233,11 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
             <div className="flex gap-8">
               {/* Filters Sidebar */}
               <aside className="w-64 hidden lg:block">
-                <FilterSidebar />
+                <FilterSidebar 
+                  categories={filterCategories}
+                  vendors={filterVendors}
+                  priceRange={priceRange}
+                />
               </aside>
 
               {/* Products Grid */}

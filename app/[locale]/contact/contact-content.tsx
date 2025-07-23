@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { toast } from 'sonner'
 import { Mail, Phone, MapPin, Clock, MessageSquare, Send } from 'lucide-react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -146,29 +146,23 @@ export function ContactContent() {
                   <h3 className="font-medium">{t('quickLinks.title')}</h3>
                   <div className="space-y-2">
                     <Link
-                      href="/faq"
+                      href="/orders"
                       className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-primary"
                     >
                       <MessageSquare className="h-4 w-4" />
-                      <span>{t('quickLinks.faq')}</span>
-                    </Link>
-                    <Link
-                      href="/orders/lookup"
-                      className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-primary"
-                    >
                       <span>{t('quickLinks.trackOrder')}</span>
                     </Link>
                     <Link
-                      href="/returns"
+                      href="/products"
                       className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-primary"
                     >
-                      <span>{t('quickLinks.returns')}</span>
+                      <span>{t('quickLinks.products')}</span>
                     </Link>
                     <Link
-                      href="/shipping"
+                      href="/categories"
                       className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-primary"
                     >
-                      <span>{t('quickLinks.shipping')}</span>
+                      <span>{t('quickLinks.categories')}</span>
                     </Link>
                   </div>
                 </div>

@@ -8,11 +8,13 @@ test.describe('Image Upload and Approval Workflow', () => {
     await page.goto(routes.login);
     const vendorTab = page.locator('button[role="tab"]').filter({ hasText: /Vendedor|Vendor/ });
     await vendorTab.click();
+    await page.waitForTimeout(500); // Wait for tab transition
     await page.fill('input[type="email"]', 'vendor@luzimarket.shop');
     await page.fill('input[type="password"]', 'password123');
     const submitButton = page.locator('button[type="submit"]').filter({ hasText: /Iniciar sesión|Sign in/ });
     await submitButton.click();
-    await page.waitForURL(/\/vendor/, { timeout: 10000 });
+    // More flexible URL matching for vendor dashboard (handles localized URLs)
+    await page.waitForURL((url: URL) => url.pathname.includes('/vendor') || url.pathname.includes('/vendedor'), { timeout: 15000 });
   }
 
   // Helper to login as admin

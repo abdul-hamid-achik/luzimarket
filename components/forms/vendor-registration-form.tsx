@@ -96,6 +96,7 @@ export default function VendorRegistrationForm() {
               name="businessName"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>{t("businessNameLabel")}</FormLabel>
                   <FormControl>
                     <InputWithValidation 
                       placeholder={t("businessNamePlaceholder")} 
@@ -115,6 +116,7 @@ export default function VendorRegistrationForm() {
               name="contactName"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>{t("contactNameLabel")}</FormLabel>
                   <FormControl>
                     <InputWithValidation placeholder={t("contactNamePlaceholder")} {...field} />
                   </FormControl>
@@ -128,6 +130,7 @@ export default function VendorRegistrationForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>{t("emailLabel")}</FormLabel>
                   <FormControl>
                     <InputWithValidation type="email" placeholder={t("email")} {...field} />
                   </FormControl>
@@ -141,6 +144,7 @@ export default function VendorRegistrationForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>{t("passwordLabel")}</FormLabel>
                   <FormControl>
                     <InputWithValidation type="password" placeholder={t("passwordPlaceholder")} {...field} />
                   </FormControl>
@@ -154,6 +158,7 @@ export default function VendorRegistrationForm() {
               name="whatsapp"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>{t("whatsappLabel")}</FormLabel>
                   <FormControl>
                     <InputWithValidation placeholder={t("phonePlaceholder")} {...field} />
                   </FormControl>
@@ -167,6 +172,7 @@ export default function VendorRegistrationForm() {
               name="businessPhone"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>{t("businessPhoneLabel")}</FormLabel>
                   <FormControl>
                     <InputWithValidation placeholder={t("businessPhonePlaceholder")} {...field} />
                   </FormControl>
@@ -180,6 +186,7 @@ export default function VendorRegistrationForm() {
               name="businessHours"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>{t("businessHoursLabel")}</FormLabel>
                   <FormControl>
                     <InputWithValidation placeholder={t("businessHoursPlaceholder")} {...field} />
                   </FormControl>
@@ -193,6 +200,7 @@ export default function VendorRegistrationForm() {
               name="street"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>{t("streetLabel")}</FormLabel>
                   <FormControl>
                     <InputWithValidation placeholder={t("streetPlaceholder")} {...field} />
                   </FormControl>
@@ -207,6 +215,7 @@ export default function VendorRegistrationForm() {
                 name="city"
                 render={({ field }) => (
                   <FormItem>
+                    <FormLabel>{t("cityLabel")}</FormLabel>
                     <FormControl>
                       <InputWithValidation placeholder={t("cityPlaceholder")} {...field} />
                     </FormControl>
@@ -220,6 +229,7 @@ export default function VendorRegistrationForm() {
                 name="state"
                 render={({ field }) => (
                   <FormItem>
+                    <FormLabel>{t("stateLabel")}</FormLabel>
                     <FormControl>
                       <InputWithValidation placeholder={t("statePlaceholder")} {...field} />
                     </FormControl>
@@ -233,6 +243,7 @@ export default function VendorRegistrationForm() {
                 name="country"
                 render={({ field }) => (
                   <FormItem>
+                    <FormLabel>{t("countryLabel")}</FormLabel>
                     <FormControl>
                       <InputWithValidation placeholder={t("countryPlaceholder")} {...field} />
                     </FormControl>
@@ -248,6 +259,7 @@ export default function VendorRegistrationForm() {
             name="websiteUrl"
             render={({ field }) => (
               <FormItem>
+                <FormLabel>{t("websiteLabel")}</FormLabel>
                 <FormControl>
                   <InputWithValidation placeholder={t("websitePlaceholder")} {...field} />
                 </FormControl>
@@ -261,6 +273,7 @@ export default function VendorRegistrationForm() {
             name="description"
             render={({ field }) => (
               <FormItem>
+                <FormLabel>{t("descriptionLabel")}</FormLabel>
                 <FormControl>
                   <Textarea
                     placeholder={t("descriptionPlaceholder")}

@@ -29,16 +29,16 @@ test.describe('Vendor Dashboard', () => {
   });
 
   test('should access vendor dashboard after login', async ({ page }) => {
-    // Verify we're on the vendor dashboard
-    await expect(page).toHaveURL(/\/vendor/);
+    // Verify we're on the vendor dashboard (handle localized paths)
+    await expect(page).toHaveURL(/\/(vendor|vendedor)/);
     
     // Check for dashboard elements
     await expect(page.locator('h1, h2').filter({ hasText: /Dashboard|Panel/ })).toBeVisible();
     
     // Verify vendor-specific navigation items
-    await expect(page.locator('nav, aside').locator('text=/Productos|Products/')).toBeVisible();
-    await expect(page.locator('nav, aside').locator('text=/Pedidos|Orders/')).toBeVisible();
-    await expect(page.locator('nav, aside').locator('text=/Estadísticas|Analytics|Stats/')).toBeVisible();
+    await expect(page.locator('nav, aside').locator('text=/Mis Productos|Products/')).toBeVisible();
+    await expect(page.locator('nav, aside').locator('text=/Órdenes|Orders/')).toBeVisible();
+    await expect(page.locator('nav, aside').locator('text=/Análisis|Analytics/')).toBeVisible();
   });
 
   test('should display vendor statistics overview', async ({ page }) => {

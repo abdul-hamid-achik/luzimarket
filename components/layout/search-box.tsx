@@ -114,9 +114,13 @@ export function SearchBox() {
       <div className={`${showSearchInput ? 'block' : 'hidden'} md:block`}>
         <form onSubmit={handleSubmit}>
           <div className="relative">
+            <label htmlFor="search-input" className="sr-only">
+              {t('search')}
+            </label>
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               ref={inputRef}
+              id="search-input"
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}

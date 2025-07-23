@@ -105,6 +105,22 @@ export const routing = defineRouting({
     '/orders/[id]': {
       es: '/pedidos/[id]',
       en: '/orders/[id]'
+    },
+    '/about': {
+      es: '/acerca-de',
+      en: '/about'
+    },
+    '/contact': {
+      es: '/contacto',
+      en: '/contact'
+    },
+    '/terms': {
+      es: '/terminos',
+      en: '/terms'
+    },
+    '/privacy': {
+      es: '/privacidad',
+      en: '/privacy'
     }
   }
 });

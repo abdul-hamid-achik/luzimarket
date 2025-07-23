@@ -1,6 +1,7 @@
 'use client';
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname } from '@/i18n/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import {
   Select,
@@ -24,7 +25,8 @@ export function SortDropdown() {
     } else {
       params.set('sort', value);
     }
-    router.push(`${pathname}?${params.toString()}`);
+    const newUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+    router.push(newUrl);
   };
 
   return (

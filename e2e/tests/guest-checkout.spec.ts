@@ -15,15 +15,18 @@ test.describe('Guest Checkout Flow', () => {
     await page.getByTestId('product-card').first().click();
     await page.waitForLoadState('networkidle');
     
-    // Add to cart from product detail page
-    await page.getByRole('button', { name: /agregar al carrito/i }).click();
+    // Add to cart from product detail page - wait for page to fully load
+    await page.waitForTimeout(1000);
+    const addToCartButton = page.locator('main').getByRole('button', { name: /agregar al carrito|add to cart/i }).first();
+    await addToCartButton.click();
     
     // Wait for cart sidebar to appear
     await page.waitForSelector('[role="dialog"]');
-    await page.waitForTimeout(300); // Wait for animation
+    await page.waitForTimeout(500); // Wait for animation
 
-    // Proceed to checkout
-    await page.getByRole('button', { name: /pagar/i }).click();
+    // Proceed to checkout - button should be in the cart dialog
+    const checkoutButton = page.locator('[role="dialog"]').getByRole('button', { name: /pagar|checkout/i });
+    await checkoutButton.click();
     await page.waitForURL('**/pagar');
 
     // Fill guest checkout form
@@ -65,7 +68,8 @@ test.describe('Guest Checkout Flow', () => {
     // Add product to cart
     await page.goto(routes.products);
     await page.getByTestId('product-card').first().click();
-    await page.getByRole('button', { name: /agregar al carrito/i }).click();
+    await page.waitForTimeout(1000);
+    await page.locator('main').getByRole('button', { name: /agregar al carrito/i }).first().click();
     await page.waitForSelector('[role="dialog"]');
     await page.waitForTimeout(300);
     
@@ -91,7 +95,8 @@ test.describe('Guest Checkout Flow', () => {
     // Add product and go to checkout
     await page.goto(routes.products);
     await page.getByTestId('product-card').first().click();
-    await page.getByRole('button', { name: /agregar al carrito/i }).click();
+    await page.waitForTimeout(1000);
+    await page.locator('main').getByRole('button', { name: /agregar al carrito/i }).first().click();
     await page.waitForSelector('[role="dialog"]');
     await page.waitForTimeout(300);
     await page.getByRole('button', { name: /pagar/i }).click();
@@ -152,14 +157,15 @@ test.describe('Guest Checkout Flow', () => {
     
     // Add first product
     await page.getByTestId('product-card').first().click();
-    await page.getByRole('button', { name: /agregar al carrito/i }).click();
+    await page.waitForTimeout(1000);
+    await page.locator('main').getByRole('button', { name: /agregar al carrito/i }).first().click();
     await page.waitForTimeout(500);
     
     // Close cart and add second product
     await page.keyboard.press('Escape');
     await page.goto(routes.products);
     await page.getByTestId('product-card').nth(1).click();
-    await page.getByRole('button', { name: /agregar al carrito/i }).click();
+    await page.locator('main').getByRole('button', { name: /agregar al carrito/i }).first().click();
     await page.waitForSelector('[role="dialog"]');
 
     // Verify cart has 2 items
@@ -184,10 +190,10 @@ test.describe('Guest Checkout Flow', () => {
     await page.goto(routes.products);
     await page.getByTestId('product-card').first().click();
     
-    // Store product name
-    const productName = await page.getByTestId('product-name').textContent();
+    // Store product name - get from the detail page, not the listing
+    const productName = await page.locator('main').getByTestId('product-name').first().textContent();
     
-    await page.getByRole('button', { name: /agregar al carrito/i }).click();
+    await page.locator('main').getByRole('button', { name: /agregar al carrito/i }).first().click();
     await page.waitForSelector('[role="dialog"]');
     await page.waitForTimeout(300);
     
@@ -228,7 +234,8 @@ test.describe('Guest Checkout Flow', () => {
     // Add product to cart
     await page.goto(routes.products);
     await page.getByTestId('product-card').first().click();
-    await page.getByRole('button', { name: /agregar al carrito/i }).click();
+    await page.waitForTimeout(1000);
+    await page.locator('main').getByRole('button', { name: /agregar al carrito/i }).first().click();
     await page.waitForSelector('[role="dialog"]');
     await page.waitForTimeout(300);
     

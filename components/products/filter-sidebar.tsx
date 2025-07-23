@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -74,7 +75,7 @@ export function FilterSidebar({
     // Reset to page 1 when filters change
     params.set("page", "1");
     
-    router.push(`?${params.toString()}`);
+    router.push(`?${params.toString()}` as any);
   };
 
   // Handle category toggle

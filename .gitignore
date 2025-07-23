@@ -16,6 +16,11 @@
 /playwright-report/
 /playwright/.cache/
 
+# test artifacts
+test-results.json
+failed-results.json
+junit-results.xml
+
 # next.js
 /.next/
 /out/

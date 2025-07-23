@@ -121,7 +121,31 @@ test.describe('Accessibility Tests', () => {
     });
 
     // All form inputs should have accessible names
-    formAccessibility.forEach(input => {
+    console.log('Total inputs found:', formAccessibility.length);
+    formAccessibility.forEach((input, index) => {
+      console.log(`Field ${index}:`, {
+        type: input.type,
+        name: input.name,
+        hasLabel: input.hasLabel,
+        hasAriaLabel: input.hasAriaLabel,
+        hasAriaLabelledBy: input.hasAriaLabelledBy,
+        hasAccessibleName: input.hasAccessibleName
+      });
+      if (!input.hasAccessibleName) {
+        console.log(`❌ Field ${index} missing accessible name:`, input);
+      } else {
+        console.log(`✅ Field ${index} has accessible name`);
+      }
+    });
+    
+    // Only fail on the first missing accessible name for debugging
+    const firstMissingField = formAccessibility.find(input => !input.hasAccessibleName);
+    if (firstMissingField) {
+      const index = formAccessibility.indexOf(firstMissingField);
+      console.log(`First failing field at index ${index}:`, firstMissingField);
+    }
+    
+    formAccessibility.forEach((input, index) => {
       expect(input.hasAccessibleName).toBeTruthy();
     });
   });

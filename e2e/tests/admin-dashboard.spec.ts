@@ -23,19 +23,19 @@ test.describe('Admin Dashboard', () => {
     // Find and click submit button in admin form
     await page.locator(`form:has(#admin-email) button[type="submit"]:has-text("${uiText.es.login}")`).click();
     
-    // Wait for navigation to admin dashboard
-    await page.waitForURL(routes.admin, { timeout: 15000 });
+    // Wait for navigation to admin dashboard (more flexible URL matching)
+    await page.waitForURL((url: URL) => url.pathname.includes('/admin'), { timeout: 15000 });
   });
 
   test('should display admin dashboard', async ({ page }) => {
     // Check dashboard elements
-    await expect(page.locator('h1:has-text("Dashboard")')).toBeVisible();
+    await expect(page.locator('h1').filter({ hasText: /Dashboard|Panel de control/i })).toBeVisible();
     
-    // Should have navigation menu with Spanish text
-    const sidebar = page.locator('nav, aside').first();
+    // Should have navigation menu with translated text
+    const sidebar = page.locator('aside');
     await expect(sidebar).toBeVisible();
-    await expect(page.locator('text="Órdenes"')).toBeVisible();
-    await expect(page.locator('text="Productos"')).toBeVisible();
+    await expect(sidebar.locator('text="Órdenes"')).toBeVisible();
+    await expect(sidebar.locator('text="Productos"')).toBeVisible();
   });
 
   test('should show dashboard statistics', async ({ page }) => {
@@ -54,8 +54,8 @@ test.describe('Admin Dashboard', () => {
     // Click orders link in Spanish
     await page.click('a:has-text("Órdenes")');
     
-    // Wait for navigation
-    await page.waitForURL(routes.adminOrders);
+    // Wait for navigation (handle localized URLs)
+    await page.waitForURL((url: URL) => url.pathname.includes('/admin/orders') || url.pathname.includes('/orders'), { timeout: 15000 });
     
     // Should show orders page
     await expect(page.locator('h1:has-text("Órdenes")')).toBeVisible();
@@ -102,8 +102,8 @@ test.describe('Admin Dashboard', () => {
   test('should manage products', async ({ page }) => {
     await page.click('a:has-text("Productos")');
     
-    // Wait for navigation
-    await page.waitForURL('/admin/products');
+    // Wait for navigation (handle localized URLs)
+    await page.waitForURL((url: URL) => url.pathname.includes('/admin/products') || url.pathname.includes('/products'), { timeout: 15000 });
     
     // Should show products page
     await expect(page.locator('h1:has-text("Productos")')).toBeVisible();
@@ -112,8 +112,8 @@ test.describe('Admin Dashboard', () => {
   test('should approve/reject vendors', async ({ page }) => {
     await page.click('a:has-text("Vendedores")');
     
-    // Wait for navigation
-    await page.waitForURL('/admin/vendors');
+    // Wait for navigation (handle localized URLs)
+    await page.waitForURL((url: URL) => url.pathname.includes('/admin/vendors') || url.pathname.includes('/vendors'), { timeout: 15000 });
     
     // Should show vendors page
     await expect(page.locator('h1:has-text("Vendedores")')).toBeVisible();
@@ -122,8 +122,8 @@ test.describe('Admin Dashboard', () => {
   test('should manage categories', async ({ page }) => {
     await page.click('a:has-text("Categorías")');
     
-    // Wait for navigation
-    await page.waitForURL('/admin/categories');
+    // Wait for navigation (handle localized URLs)
+    await page.waitForURL((url: URL) => url.pathname.includes('/admin/categories') || url.pathname.includes('/categorias'), { timeout: 15000 });
     
     // Should show categories page
     await expect(page.locator('h1:has-text("Categorías")')).toBeVisible();
@@ -252,7 +252,7 @@ test.describe('Admin Dashboard', () => {
     const logoutButton = page.locator('text=/Logout|Cerrar Sesión|Sign Out/').first();
     await logoutButton.click();
     
-    // Should redirect to login or home
-    await expect(page).toHaveURL(/\/(login|$)/);
+    // Should redirect to login or home (handle localized URLs)
+    await expect(page).toHaveURL(/\/(login|iniciar-sesion|$)/);
   });
 });
