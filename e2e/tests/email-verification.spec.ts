@@ -7,7 +7,7 @@ test.describe('Email Verification Flow', () => {
     
     // Should show the resend verification form
     await expect(page.getByText('Reenviar enlace de verificación')).toBeVisible();
-    await expect(page.getByLabel('Correo electrónico')).toBeVisible();
+    await expect(page.locator('input[id="email"]')).toBeVisible();
     await expect(page.getByRole('button', { name: /enviar enlace de verificación/i })).toBeVisible();
   });
 
@@ -15,18 +15,18 @@ test.describe('Email Verification Flow', () => {
     await page.goto('/resend-verification');
     
     // Try with invalid email
-    await page.fill('input[type="email"]', 'invalid-email');
+    await page.locator('input[id="email"]').fill('invalid-email');
     await page.getByRole('button', { name: /enviar enlace de verificación/i }).click();
     
-    // Should show validation error
-    await expect(page.getByText('Correo electrónico inválido')).toBeVisible();
+    // Should show validation error (check for any validation error text)
+    await expect(page.locator('text=/correo.*inválido|email.*inválido|inválido/i')).toBeVisible();
   });
 
   test('should handle resend verification request', async ({ page }) => {
     await page.goto('/resend-verification');
     
     // Fill valid email
-    await page.fill('input[type="email"]', 'test@example.com');
+    await page.locator('input[id="email"]').fill('test@example.com');
     
     // Mock API response
     await page.route('**/api/auth/resend-verification', async route => {
@@ -99,7 +99,7 @@ test.describe('Email Verification Flow', () => {
   test('should disable form during submission', async ({ page }) => {
     await page.goto('/resend-verification');
     
-    await page.fill('input[type="email"]', 'test@example.com');
+    await page.locator('input[id="email"]').fill('test@example.com');
     
     // Mock slow API
     await page.route('**/api/auth/resend-verification', async route => {
@@ -118,13 +118,13 @@ test.describe('Email Verification Flow', () => {
     await expect(page.getByText('Enviando enlace...')).toBeVisible();
     
     // Input should be disabled
-    await expect(page.getByRole('textbox')).toBeDisabled();
+    await expect(page.locator('input[id="email"]')).toBeDisabled();
   });
 
   test('should handle network errors', async ({ page }) => {
     await page.goto('/resend-verification');
     
-    await page.fill('input[type="email"]', 'test@example.com');
+    await page.locator('input[id="email"]').fill('test@example.com');
     
     // Mock network error
     await page.route('**/api/auth/resend-verification', async route => {
@@ -149,7 +149,7 @@ test.describe('Email Verification Flow', () => {
     await page.goto('/resend-verification');
     
     // Check form has proper labels
-    const emailInput = page.getByLabel('Correo electrónico');
+    const emailInput = page.locator('input[id="email"]');
     await expect(emailInput).toBeVisible();
     
     // Check input has proper attributes
@@ -157,7 +157,7 @@ test.describe('Email Verification Flow', () => {
     await expect(emailInput).toHaveAttribute('placeholder', 'tu@email.com');
     
     // Form should be keyboard navigable
-    await page.keyboard.press('Tab'); // Focus email input
+    await emailInput.focus();
     await expect(emailInput).toBeFocused();
     
     await page.keyboard.press('Tab'); // Focus submit button

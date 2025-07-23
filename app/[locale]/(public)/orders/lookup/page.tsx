@@ -116,7 +116,7 @@ export default function OrderLookupPage() {
                   <Label htmlFor="orderNumber">Número de orden</Label>
                   <Input
                     id="orderNumber"
-                    placeholder="Ej: LM-1234567890-ABCD"
+                    placeholder="Ej: LM-2501-A7B9"
                     {...form.register("orderNumber")}
                   />
                   {form.formState.errors.orderNumber && (
@@ -125,7 +125,7 @@ export default function OrderLookupPage() {
                     </p>
                   )}
                   <p className="text-xs text-gray-500 mt-1 font-univers">
-                    Formato: LM-############-XXXX. Puedes encontrarlo en tu email de confirmación.
+                    Formato: LM-AAMM-XXXX. Puedes encontrarlo en tu email de confirmación.
                   </p>
                 </div>
 

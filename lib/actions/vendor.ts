@@ -8,6 +8,7 @@ import { sendVendorNotification } from "@/lib/email";
 import { eq } from "drizzle-orm";
 import { generateSlug } from "@/lib/utils/slug";
 import bcrypt from "bcryptjs";
+import { auth } from "@/lib/auth";
 
 export async function registerVendor(data: unknown) {
   try {
@@ -86,5 +87,30 @@ export async function registerVendor(data: unknown) {
     }
     
     return { success: false, error: "tryAgain" };
+  }
+}
+
+export async function getVendorFromSession() {
+  try {
+    const session = await auth();
+    
+    if (!session || !session.user || session.user.role !== "vendor") {
+      return { success: false, error: "Unauthorized" };
+    }
+    
+    const vendor = await db
+      .select()
+      .from(vendors)
+      .where(eq(vendors.id, session.user.id))
+      .limit(1);
+    
+    if (!vendor.length) {
+      return { success: false, error: "Vendor not found" };
+    }
+    
+    return { success: true, data: vendor[0] };
+  } catch (error) {
+    console.error("Error getting vendor from session:", error);
+    return { success: false, error: "Failed to get vendor information" };
   }
 }

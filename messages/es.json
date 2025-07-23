@@ -29,6 +29,8 @@
     "wishlist": "Lista de deseos",
     "wishlistWithItems": "Lista de deseos con {count} productos",
     "currencyLocale": "MXN",
+    "currencyMXN": "MXN",
+    "currencyUSD": "USD",
     "shippingTo": "Envío a: {location}",
     "searchPlaceholder": "Buscar productos, categorías o tiendas...",
     "searching": "Buscando...",
@@ -39,6 +41,7 @@
     "searchStores": "Tiendas",
     "myAccount": "Mi cuenta",
     "myOrders": "Mis pedidos",
+    "trackOrder": "Rastrear pedido",
     "user": "Usuario",
     "clearSearch": "Limpiar búsqueda"
   },
@@ -488,6 +491,129 @@
         "shipped": "🚚 Enviado",
         "delivered": "✅ Entregado",
         "cancelled": "❌ Cancelado"
+      }
+    },
+    "dashboard": {
+      "stripeConnect": {
+        "title": "Pagos con Stripe",
+        "description": "Configura tu cuenta para recibir pagos",
+        "active": "Activo",
+        "pending": "Pendiente",
+        "notConnected": "Necesitas configurar tu cuenta de Stripe para comenzar a recibir pagos.",
+        "incompleteSetup": "Tu cuenta de Stripe está pendiente de verificación. Completa la configuración para activar pagos.",
+        "fullyActive": "Tu cuenta de Stripe está activa. Puedes recibir pagos y gestionar tus finanzas.",
+        "setupPayments": "Configurar Pagos",
+        "managePayments": "Gestionar Pagos",
+        "completeSetup": "Completar Configuración"
+      }
+    },
+    "stripeOnboarding": {
+      "title": "Configuración de Pagos",
+      "description": "Configura tu cuenta de Stripe para recibir pagos de tus ventas",
+      "getStarted": {
+        "title": "Comienza a recibir pagos",
+        "description": "Stripe Connect te permite recibir pagos de forma segura y automática."
+      },
+      "benefits": {
+        "title": "Beneficios de Stripe Connect",
+        "instantPayments": "Recibe pagos instantáneos de tus ventas",
+        "automaticPayouts": "Depósitos automáticos a tu cuenta bancaria",
+        "financialReports": "Reportes financieros detallados",
+        "secureTransactions": "Transacciones seguras y protegidas"
+      },
+      "createAccount": "Crear Cuenta de Pagos",
+      "creating": "Creando cuenta...",
+      "accountCreated": "Cuenta creada exitosamente",
+      "accountCreationFailed": "Error al crear la cuenta",
+      "accountStatus": {
+        "title": "Estado de tu Cuenta",
+        "description": "Resumen del estado de tu cuenta de pagos"
+      },
+      "status": {
+        "active": "Activa",
+        "pending": "Pendiente",
+        "incomplete": "Incompleta"
+      },
+      "features": {
+        "acceptPayments": "Aceptar Pagos",
+        "receivePayouts": "Recibir Depósitos",
+        "detailsSubmitted": "Información Enviada"
+      },
+      "enabled": "Habilitado",
+      "disabled": "Deshabilitado",
+      "complete": "Completo",
+      "incomplete": "Incompleto",
+      "requirementsTitle": "Requisitos Pendientes",
+      "pastDue": "Vencidos",
+      "currentlyDue": "Requeridos",
+      "completeOnboarding": "Completar Configuración",
+      "updateDetails": "Actualizar Información",
+      "refreshStatus": "Actualizar Estado",
+      "loading": "Cargando...",
+      "refreshing": "Actualizando...",
+      "onboardingLinkFailed": "Error al generar enlace de configuración",
+      "statusUpdated": "Estado actualizado",
+      "statusUpdateFailed": "Error al actualizar estado",
+      "successMessage": "¡Tu cuenta está completamente configurada! Ya puedes recibir pagos de tus ventas."
+    },
+    "financials": {
+      "title": "Panel Financiero",
+      "description": "Gestiona tus finanzas y revisa tus transacciones",
+      "balance": {
+        "available": "Saldo Disponible",
+        "availableDescription": "Fondos listos para retiro",
+        "pending": "Saldo Pendiente",
+        "pendingDescription": "Fondos en proceso",
+        "lifetime": "Volumen Total",
+        "lifetimeDescription": "Total histórico de ventas"
+      },
+      "actions": {
+        "export": "Exportar",
+        "refresh": "Actualizar"
+      },
+      "lastUpdated": "Última actualización: {time}",
+      "tabs": {
+        "transactions": "Transacciones",
+        "payouts": "Pagos"
+      },
+      "transactions": {
+        "title": "Historial de Transacciones",
+        "description": "Todas tus ventas y movimientos",
+        "empty": "No hay transacciones aún"
+      },
+      "payouts": {
+        "title": "Historial de Pagos",
+        "description": "Depósitos a tu cuenta bancaria",
+        "empty": "No hay pagos registrados",
+        "payoutTo": "Pago a {method}"
+      },
+      "status": {
+        "completed": "Completado",
+        "pending": "Pendiente",
+        "failed": "Fallido",
+        "processing": "Procesando",
+        "paid": "Pagado",
+        "inTransit": "En tránsito"
+      },
+      "accountInfo": {
+        "title": "Información de Cuenta",
+        "accountId": "ID de Cuenta",
+        "commissionRate": "Comisión",
+        "payoutsEnabled": "Pagos Habilitados",
+        "chargesEnabled": "Cobros Habilitados",
+        "enabled": "Habilitado",
+        "disabled": "Deshabilitado",
+        "manageAccount": "Gestionar Cuenta"
+      },
+      "noStripeAccount": {
+        "title": "Cuenta de Stripe no configurada",
+        "description": "Necesitas configurar tu cuenta de Stripe para ver información financiera.",
+        "action": "Configurar Stripe"
+      },
+      "incompleteAccount": {
+        "title": "Configuración incompleta",
+        "description": "Completa la configuración de tu cuenta para activar pagos.",
+        "action": "Completar configuración"
       }
     }
   },
@@ -1274,6 +1400,69 @@
       "company": "LuziMarket S.A. de C.V.",
       "email": "legal@luzimarket.shop",
       "address": "Ciudad de México, México"
+    }
+  },
+  "vendor": {
+    "financials": {
+      "title": "Panel Financiero",
+      "subtitle": "Gestiona tus finanzas y pagos",
+      "noStripeAccount": {
+        "title": "Cuenta de Stripe no configurada",
+        "description": "Necesitas configurar tu cuenta de Stripe Connect para recibir pagos directamente.",
+        "action": "Configurar cuenta de Stripe"
+      },
+      "incompleteAccount": {
+        "title": "Configuración incompleta",
+        "description": "Tu cuenta de Stripe Connect necesita información adicional antes de poder procesar pagos.",
+        "action": "Completar configuración"
+      },
+      "balance": {
+        "available": "Balance disponible",
+        "availableDescription": "Fondos listos para retirar",
+        "pending": "Balance pendiente",
+        "pendingDescription": "Fondos en proceso",
+        "lifetime": "Ventas totales",
+        "lifetimeDescription": "Total histórico de ventas"
+      },
+      "status": {
+        "completed": "Completado",
+        "pending": "Pendiente",
+        "failed": "Fallido",
+        "processing": "Procesando",
+        "paid": "Pagado",
+        "inTransit": "En tránsito"
+      },
+      "actions": {
+        "export": "Exportar",
+        "refresh": "Actualizar"
+      },
+      "lastUpdated": "Última actualización: {time}",
+      "tabs": {
+        "transactions": "Transacciones",
+        "payouts": "Pagos"
+      },
+      "transactions": {
+        "title": "Historial de transacciones",
+        "description": "Todas las ventas, reembolsos y movimientos de tu cuenta",
+        "empty": "No hay transacciones aún"
+      },
+      "payouts": {
+        "title": "Historial de pagos",
+        "description": "Pagos enviados a tu cuenta bancaria",
+        "empty": "No hay pagos aún",
+        "payoutTo": "Pago a {method}",
+        "bankAccount": "Cuenta bancaria"
+      },
+      "accountInfo": {
+        "title": "Información de la cuenta",
+        "accountId": "ID de cuenta",
+        "commissionRate": "Comisión de plataforma",
+        "payoutsEnabled": "Pagos habilitados",
+        "chargesEnabled": "Cobros habilitados",
+        "enabled": "Activo",
+        "disabled": "Inactivo",
+        "manageAccount": "Gestionar cuenta"
+      }
     }
   }
 }

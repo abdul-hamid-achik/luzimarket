@@ -39,8 +39,14 @@ test.describe('Image Upload and Approval Workflow', () => {
       await page.goto('/vendor/products/new');
       
       // Check for image upload area
-      const uploadArea = page.locator('[data-testid*="upload"], .dropzone, input[type="file"], text=/Subir imagen|Upload image|Arrastrar|Drag/i').first();
-      await expect(uploadArea).toBeVisible();
+      const uploadArea = page.locator('[data-testid*="upload"], .dropzone, input[type="file"]').first();
+      const uploadText = page.getByText(/Subir imagen|Upload image|Arrastrar|Drag/i);
+      
+      // Check if either upload area or upload text is visible
+      const uploadAreaVisible = await uploadArea.isVisible({ timeout: 2000 }).catch(() => false);
+      const uploadTextVisible = await uploadText.isVisible({ timeout: 2000 }).catch(() => false);
+      
+      expect(uploadAreaVisible || uploadTextVisible).toBeTruthy();
       
       // Check for upload instructions
       await expect(page.locator('text=/Arrastrar.*soltar|Drag.*drop|Seleccionar|Choose|Browse/i')).toBeVisible();

@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { auth } from "@/lib/auth";
+import { createVendorStripeAccount } from "@/lib/actions/stripe-connect.action";
 
 export async function approveVendor(vendorId: string) {
   const session = await auth();
@@ -53,6 +54,21 @@ export async function approveVendor(vendorId: string) {
         emailVerified: true,
         emailVerifiedAt: new Date(),
       });
+    }
+
+    // Create Stripe Connect account for the vendor
+    try {
+      await createVendorStripeAccount({
+        vendorId: vendorId,
+        email: vendorData.email,
+        businessName: vendorData.businessName,
+        country: "MX",
+        type: "express",
+      });
+      console.log("Stripe Connect account created for vendor:", vendorId);
+    } catch (stripeError) {
+      // Log the error but don't fail the approval
+      console.error("Error creating Stripe account for vendor:", stripeError);
     }
 
     // Send approval email

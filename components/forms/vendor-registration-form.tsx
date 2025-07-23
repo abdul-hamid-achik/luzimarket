@@ -308,6 +308,9 @@ export default function VendorRegistrationForm() {
                           type="button"
                           onClick={() => field.onChange(true)}
                           className="relative"
+                          role="checkbox"
+                          aria-checked={field.value === true}
+                          aria-label={`${t("deliveryQuestion")} - ${t("yes")}`}
                         >
                           {field.value ? (
                             <CheckCircle2 className="h-5 w-5 text-green-600" />
@@ -323,6 +326,9 @@ export default function VendorRegistrationForm() {
                           type="button"
                           onClick={() => field.onChange(false)}
                           className="relative"
+                          role="checkbox"
+                          aria-checked={field.value === false}
+                          aria-label={`${t("deliveryQuestion")} - ${t("no")}`}
                         >
                           {!field.value ? (
                             <CheckCircle2 className="h-5 w-5 text-red-600" />

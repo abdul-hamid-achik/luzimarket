@@ -41,7 +41,7 @@ test.describe('Multi-Vendor Orders', () => {
       hasText: vendor1Products[0].vendor 
     }).first();
     await vendor1Card.click();
-    await page.getByRole('button', { name: /agregar al carrito/i }).click();
+    await page.getByRole('button', { name: /agregar al carrito/i }).first().click();
     await page.waitForTimeout(500);
     
     // Close cart and add product from vendor 2
@@ -52,7 +52,7 @@ test.describe('Multi-Vendor Orders', () => {
       hasText: vendor2Products[0].vendor 
     }).first();
     await vendor2Card.click();
-    await page.getByRole('button', { name: /agregar al carrito/i }).click();
+    await page.getByRole('button', { name: /agregar al carrito/i }).first().click();
     await page.waitForSelector('[role="dialog"]');
     
     // Verify cart has products from both vendors
@@ -114,7 +114,7 @@ test.describe('Multi-Vendor Orders', () => {
       hasText: vendor1Products[0].vendor 
     }).first();
     await vendor1Card.click();
-    await page.getByRole('button', { name: /agregar al carrito/i }).click();
+    await page.getByRole('button', { name: /agregar al carrito/i }).first().click();
     await page.keyboard.press('Escape');
     
     // Add from vendor 2
@@ -123,7 +123,7 @@ test.describe('Multi-Vendor Orders', () => {
       hasText: vendor2Products[0].vendor 
     }).first();
     await vendor2Card.click();
-    await page.getByRole('button', { name: /agregar al carrito/i }).click();
+    await page.getByRole('button', { name: /agregar al carrito/i }).first().click();
     
     // Checkout
     await page.getByRole('button', { name: /pagar/i }).click();
@@ -173,7 +173,7 @@ test.describe('Multi-Vendor Orders', () => {
       hasText: vendor1Products[0].vendor 
     }).first();
     await vendor1Card.click();
-    await page.getByRole('button', { name: /agregar al carrito/i }).click();
+    await page.getByRole('button', { name: /agregar al carrito/i }).first().click();
     await page.keyboard.press('Escape');
     
     await page.goto(routes.products);
@@ -181,7 +181,7 @@ test.describe('Multi-Vendor Orders', () => {
       hasText: vendor2Products[0].vendor 
     }).first();
     await vendor2Card.click();
-    await page.getByRole('button', { name: /agregar al carrito/i }).click();
+    await page.getByRole('button', { name: /agregar al carrito/i }).first().click();
     
     // Quick checkout
     await page.getByRole('button', { name: /pagar/i }).click();
@@ -248,7 +248,7 @@ test.describe('Multi-Vendor Orders', () => {
       hasText: vendor1Products[0].vendor 
     }).first();
     await vendor1Card.click();
-    await page.getByRole('button', { name: /agregar al carrito/i }).click();
+    await page.getByRole('button', { name: /agregar al carrito/i }).first().click();
     await page.keyboard.press('Escape');
     
     await page.goto(routes.products);
@@ -256,7 +256,7 @@ test.describe('Multi-Vendor Orders', () => {
       hasText: vendor2Products[0].vendor 
     }).first();
     await vendor2Card.click();
-    await page.getByRole('button', { name: /agregar al carrito/i }).click();
+    await page.getByRole('button', { name: /agregar al carrito/i }).first().click();
     
     // Checkout
     const cancelOrderId1 = `ORD-CANCEL-V1-${Date.now()}`;
@@ -363,7 +363,7 @@ test.describe('Multi-Vendor Orders', () => {
         hasText: vendor1Products[0].vendor 
       }).first();
       await vendor1Card.click();
-      await page.getByRole('button', { name: /agregar al carrito/i }).click();
+      await page.getByRole('button', { name: /agregar al carrito/i }).first().click();
       await page.keyboard.press('Escape');
       await page.goto(routes.products);
     }
@@ -372,7 +372,7 @@ test.describe('Multi-Vendor Orders', () => {
       hasText: vendor2Products[0].vendor 
     }).first();
     await vendor2Card.click();
-    await page.getByRole('button', { name: /agregar al carrito/i }).click();
+    await page.getByRole('button', { name: /agregar al carrito/i }).first().click();
     
     // Go to checkout
     await page.getByRole('button', { name: /pagar/i }).click();

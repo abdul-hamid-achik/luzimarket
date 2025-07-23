@@ -9,7 +9,9 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  Store
+  Store,
+  CreditCard,
+  DollarSign
 } from "lucide-react";
 
 export default async function VendorLayout({
@@ -80,6 +82,22 @@ export default async function VendorLayout({
             >
               <BarChart3 className="h-4 w-4" />
               Análisis
+            </Link>
+
+            <Link
+              href="/vendor/financials"
+              className="flex items-center gap-3 px-3 py-2 text-sm font-univers text-gray-700 rounded-md hover:bg-gray-100 hover:text-black transition-colors"
+            >
+              <DollarSign className="h-4 w-4" />
+              Finanzas
+            </Link>
+
+            <Link
+              href="/vendor/stripe-onboarding"
+              className="flex items-center gap-3 px-3 py-2 text-sm font-univers text-gray-700 rounded-md hover:bg-gray-100 hover:text-black transition-colors"
+            >
+              <CreditCard className="h-4 w-4" />
+              Pagos
             </Link>
 
             <Link

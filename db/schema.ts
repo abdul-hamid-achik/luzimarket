@@ -274,6 +274,169 @@ export const vendorShippingRates = pgTable("vendor_shipping_rates", {
   zoneIdx: index("vendor_shipping_rates_zone_idx").on(table.zoneId),
 }));
 
+// ============================================
+// STRIPE CONNECT TABLES
+// ============================================
+
+// Vendor Balances table
+export const vendorBalances = pgTable("vendor_balances", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  vendorId: uuid("vendor_id").notNull().references(() => vendors.id, { onDelete: "cascade" }).unique(),
+  availableBalance: decimal("available_balance", { precision: 10, scale: 2 }).notNull().default("0"),
+  pendingBalance: decimal("pending_balance", { precision: 10, scale: 2 }).notNull().default("0"),
+  reservedBalance: decimal("reserved_balance", { precision: 10, scale: 2 }).notNull().default("0"),
+  currency: text("currency").notNull().default("MXN"),
+  lifetimeVolume: decimal("lifetime_volume", { precision: 10, scale: 2 }).notNull().default("0"),
+  lastUpdated: timestamp("last_updated").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  vendorIdx: index("vendor_balances_vendor_idx").on(table.vendorId),
+}));
+
+// Transactions table
+export const transactions = pgTable("transactions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  vendorId: uuid("vendor_id").notNull().references(() => vendors.id),
+  orderId: uuid("order_id").references(() => orders.id),
+  type: text("type").notNull(), // 'sale', 'refund', 'payout', 'fee', 'adjustment', 'transfer'
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: text("currency").notNull().default("MXN"),
+  status: text("status").notNull().default("pending"), // 'pending', 'completed', 'failed', 'cancelled'
+  description: text("description"),
+  metadata: json("metadata").$type<Record<string, any>>().default({}),
+  stripeTransferId: text("stripe_transfer_id"),
+  stripeChargeId: text("stripe_charge_id"),
+  stripeRefundId: text("stripe_refund_id"),
+  balanceTransaction: json("balance_transaction").$type<{
+    before: { available: number; pending: number; reserved: number };
+    after: { available: number; pending: number; reserved: number };
+  }>(),
+  createdAt: timestamp("created_at").defaultNow(),
+  completedAt: timestamp("completed_at"),
+}, (table) => ({
+  vendorIdx: index("transactions_vendor_idx").on(table.vendorId),
+  orderIdx: index("transactions_order_idx").on(table.orderId),
+  typeIdx: index("transactions_type_idx").on(table.type),
+  statusIdx: index("transactions_status_idx").on(table.status),
+  createdIdx: index("transactions_created_idx").on(table.createdAt),
+}));
+
+// Payouts table
+export const payouts = pgTable("payouts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  vendorId: uuid("vendor_id").notNull().references(() => vendors.id),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: text("currency").notNull().default("MXN"),
+  status: text("status").notNull().default("pending"), // 'pending', 'processing', 'paid', 'failed', 'cancelled'
+  method: text("method").notNull().default("bank_transfer"), // 'bank_transfer', 'card'
+  stripePayoutId: text("stripe_payout_id").unique(),
+  bankAccountId: uuid("bank_account_id").references(() => vendorBankAccounts.id),
+  arrivalDate: timestamp("arrival_date"),
+  failureReason: text("failure_reason"),
+  metadata: json("metadata").$type<Record<string, any>>().default({}),
+  transactionIds: json("transaction_ids").$type<string[]>().default([]),
+  createdAt: timestamp("created_at").defaultNow(),
+  processedAt: timestamp("processed_at"),
+  paidAt: timestamp("paid_at"),
+}, (table) => ({
+  vendorIdx: index("payouts_vendor_idx").on(table.vendorId),
+  statusIdx: index("payouts_status_idx").on(table.status),
+  stripePayoutIdx: index("payouts_stripe_payout_idx").on(table.stripePayoutId),
+  createdIdx: index("payouts_created_idx").on(table.createdAt),
+}));
+
+// Platform Fees table
+export const platformFees = pgTable("platform_fees", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orderId: uuid("order_id").notNull().references(() => orders.id),
+  vendorId: uuid("vendor_id").notNull().references(() => vendors.id),
+  orderAmount: decimal("order_amount", { precision: 10, scale: 2 }).notNull(),
+  feePercentage: decimal("fee_percentage", { precision: 5, scale: 2 }).notNull(),
+  feeAmount: decimal("fee_amount", { precision: 10, scale: 2 }).notNull(),
+  vendorEarnings: decimal("vendor_earnings", { precision: 10, scale: 2 }).notNull(),
+  currency: text("currency").notNull().default("MXN"),
+  status: text("status").notNull().default("pending"), // 'pending', 'collected', 'transferred', 'refunded'
+  stripeApplicationFeeId: text("stripe_application_fee_id"),
+  stripeTransferId: text("stripe_transfer_id"),
+  createdAt: timestamp("created_at").defaultNow(),
+  collectedAt: timestamp("collected_at"),
+  transferredAt: timestamp("transferred_at"),
+}, (table) => ({
+  orderIdx: index("platform_fees_order_idx").on(table.orderId),
+  vendorIdx: index("platform_fees_vendor_idx").on(table.vendorId),
+  statusIdx: index("platform_fees_status_idx").on(table.status),
+}));
+
+// Vendor Bank Accounts table
+export const vendorBankAccounts = pgTable("vendor_bank_accounts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  vendorId: uuid("vendor_id").notNull().references(() => vendors.id, { onDelete: "cascade" }),
+  accountHolderName: text("account_holder_name").notNull(),
+  accountHolderType: text("account_holder_type").notNull(), // 'individual' or 'company'
+  bankName: text("bank_name").notNull(),
+  last4: text("last4").notNull(),
+  currency: text("currency").notNull().default("MXN"),
+  country: text("country").notNull().default("MX"),
+  isDefault: boolean("is_default").default(false),
+  stripeExternalAccountId: text("stripe_external_account_id"),
+  metadata: json("metadata").$type<Record<string, any>>().default({}),
+  verifiedAt: timestamp("verified_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  vendorIdx: index("vendor_bank_accounts_vendor_idx").on(table.vendorId),
+  stripeAccountIdx: index("vendor_bank_accounts_stripe_idx").on(table.stripeExternalAccountId),
+}));
+
+// Vendor Stripe Connect Configuration
+export const vendorStripeAccounts = pgTable("vendor_stripe_accounts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  vendorId: uuid("vendor_id").notNull().references(() => vendors.id, { onDelete: "cascade" }).unique(),
+  stripeAccountId: text("stripe_account_id").notNull().unique(),
+  accountType: text("account_type").notNull().default("express"), // 'express', 'standard', 'custom'
+  onboardingStatus: text("onboarding_status").notNull().default("pending"), // 'pending', 'in_progress', 'completed', 'rejected'
+  chargesEnabled: boolean("charges_enabled").default(false),
+  payoutsEnabled: boolean("payouts_enabled").default(false),
+  detailsSubmitted: boolean("details_submitted").default(false),
+  requirements: json("requirements").$type<{
+    currentlyDue: string[];
+    eventuallyDue: string[];
+    pastDue: string[];
+    pendingVerification: string[];
+    errors: Array<{ code: string; reason: string; requirement: string }>;
+  }>(),
+  capabilities: json("capabilities").$type<{
+    card_payments?: string;
+    transfers?: string;
+    tax_reporting_mx?: string;
+    [key: string]: string | undefined;
+  }>(),
+  businessProfile: json("business_profile").$type<{
+    mcc?: string;
+    name?: string;
+    url?: string;
+    supportEmail?: string;
+    supportPhone?: string;
+    [key: string]: any;
+  }>(),
+  commissionRate: decimal("commission_rate", { precision: 5, scale: 2 }).notNull().default("15"), // Platform commission percentage
+  payoutSchedule: json("payout_schedule").$type<{
+    interval: 'daily' | 'weekly' | 'monthly' | 'manual';
+    weekly_anchor?: string;
+    monthly_anchor?: number;
+    delay_days?: number;
+  }>().default({ interval: 'daily' }),
+  minimumPayoutAmount: decimal("minimum_payout_amount", { precision: 10, scale: 2 }).notNull().default("100"), // Minimum amount for automatic payouts
+  tosAcceptanceDate: timestamp("tos_acceptance_date"),
+  tosAcceptanceIp: text("tos_acceptance_ip"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  vendorIdx: index("vendor_stripe_accounts_vendor_idx").on(table.vendorId),
+  stripeAccountIdx: index("vendor_stripe_accounts_stripe_idx").on(table.stripeAccountId),
+  statusIdx: index("vendor_stripe_accounts_status_idx").on(table.onboardingStatus),
+}));
+
 // Relations
 export const vendorsRelations = relations(vendors, ({ many, one }) => ({
   products: many(products),
@@ -283,6 +446,13 @@ export const vendorsRelations = relations(vendors, ({ many, one }) => ({
     fields: [vendors.defaultShippingMethodId],
     references: [shippingMethods.id],
   }),
+  // Stripe Connect relations
+  stripeAccount: one(vendorStripeAccounts),
+  balance: one(vendorBalances),
+  transactions: many(transactions),
+  payouts: many(payouts),
+  bankAccounts: many(vendorBankAccounts),
+  platformFees: many(platformFees),
 }));
 
 export const categoriesRelations = relations(categories, ({ many }) => ({
@@ -494,3 +664,85 @@ export const productVariantRelations = relations(productVariants, ({ one }) => (
     references: [products.id],
   }),
 }));
+
+// ============================================
+// STRIPE CONNECT RELATIONS
+// ============================================
+
+export const vendorBalanceRelations = relations(vendorBalances, ({ one }) => ({
+  vendor: one(vendors, {
+    fields: [vendorBalances.vendorId],
+    references: [vendors.id],
+  }),
+}));
+
+export const transactionRelations = relations(transactions, ({ one }) => ({
+  vendor: one(vendors, {
+    fields: [transactions.vendorId],
+    references: [vendors.id],
+  }),
+  order: one(orders, {
+    fields: [transactions.orderId],
+    references: [orders.id],
+  }),
+}));
+
+export const payoutRelations = relations(payouts, ({ one }) => ({
+  vendor: one(vendors, {
+    fields: [payouts.vendorId],
+    references: [vendors.id],
+  }),
+  bankAccount: one(vendorBankAccounts, {
+    fields: [payouts.bankAccountId],
+    references: [vendorBankAccounts.id],
+  }),
+}));
+
+export const platformFeeRelations = relations(platformFees, ({ one }) => ({
+  order: one(orders, {
+    fields: [platformFees.orderId],
+    references: [orders.id],
+  }),
+  vendor: one(vendors, {
+    fields: [platformFees.vendorId],
+    references: [vendors.id],
+  }),
+}));
+
+export const vendorBankAccountRelations = relations(vendorBankAccounts, ({ one, many }) => ({
+  vendor: one(vendors, {
+    fields: [vendorBankAccounts.vendorId],
+    references: [vendors.id],
+  }),
+  payouts: many(payouts),
+}));
+
+export const vendorStripeAccountRelations = relations(vendorStripeAccounts, ({ one }) => ({
+  vendor: one(vendors, {
+    fields: [vendorStripeAccounts.vendorId],
+    references: [vendors.id],
+  }),
+}));
+
+// ============================================
+// TYPE EXPORTS
+// ============================================
+
+// Stripe Connect Types
+export type VendorBalance = typeof vendorBalances.$inferSelect;
+export type NewVendorBalance = typeof vendorBalances.$inferInsert;
+
+export type Transaction = typeof transactions.$inferSelect;
+export type NewTransaction = typeof transactions.$inferInsert;
+
+export type Payout = typeof payouts.$inferSelect;
+export type NewPayout = typeof payouts.$inferInsert;
+
+export type PlatformFee = typeof platformFees.$inferSelect;
+export type NewPlatformFee = typeof platformFees.$inferInsert;
+
+export type VendorBankAccount = typeof vendorBankAccounts.$inferSelect;
+export type NewVendorBankAccount = typeof vendorBankAccounts.$inferInsert;
+
+export type VendorStripeAccount = typeof vendorStripeAccounts.$inferSelect;
+export type NewVendorStripeAccount = typeof vendorStripeAccounts.$inferInsert;

@@ -29,6 +29,8 @@
     "wishlist": "Wishlist",
     "wishlistWithItems": "Wishlist with {count} items",
     "currencyLocale": "MXN",
+    "currencyMXN": "MXN",
+    "currencyUSD": "USD",
     "shippingTo": "Shipping to: {location}",
     "searchPlaceholder": "Search products, categories or stores...",
     "searching": "Searching...",
@@ -39,6 +41,7 @@
     "searchStores": "Stores",
     "myAccount": "My Account",
     "myOrders": "My Orders",
+    "trackOrder": "Track Order",
     "user": "User",
     "clearSearch": "Clear search"
   },
@@ -488,6 +491,129 @@
         "shipped": "🚚 Shipped",
         "delivered": "✅ Delivered",
         "cancelled": "❌ Cancelled"
+      }
+    },
+    "dashboard": {
+      "stripeConnect": {
+        "title": "Stripe Payments",
+        "description": "Set up your account to receive payments",
+        "active": "Active",
+        "pending": "Pending",
+        "notConnected": "You need to set up your Stripe account to start receiving payments.",
+        "incompleteSetup": "Your Stripe account is pending verification. Complete the setup to enable payments.",
+        "fullyActive": "Your Stripe account is active. You can receive payments and manage your finances.",
+        "setupPayments": "Set Up Payments",
+        "managePayments": "Manage Payments",
+        "completeSetup": "Complete Setup"
+      }
+    },
+    "stripeOnboarding": {
+      "title": "Payment Setup",
+      "description": "Set up your Stripe account to receive payments from your sales",
+      "getStarted": {
+        "title": "Start receiving payments",
+        "description": "Stripe Connect allows you to receive payments securely and automatically."
+      },
+      "benefits": {
+        "title": "Benefits of Stripe Connect",
+        "instantPayments": "Receive instant payments from your sales",
+        "automaticPayouts": "Automatic deposits to your bank account",
+        "financialReports": "Detailed financial reports",
+        "secureTransactions": "Secure and protected transactions"
+      },
+      "createAccount": "Create Payment Account",
+      "creating": "Creating account...",
+      "accountCreated": "Account created successfully",
+      "accountCreationFailed": "Failed to create account",
+      "accountStatus": {
+        "title": "Account Status",
+        "description": "Summary of your payment account status"
+      },
+      "status": {
+        "active": "Active",
+        "pending": "Pending",
+        "incomplete": "Incomplete"
+      },
+      "features": {
+        "acceptPayments": "Accept Payments",
+        "receivePayouts": "Receive Payouts",
+        "detailsSubmitted": "Details Submitted"
+      },
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "complete": "Complete",
+      "incomplete": "Incomplete",
+      "requirementsTitle": "Pending Requirements",
+      "pastDue": "Past Due",
+      "currentlyDue": "Currently Due",
+      "completeOnboarding": "Complete Onboarding",
+      "updateDetails": "Update Details",
+      "refreshStatus": "Refresh Status",
+      "loading": "Loading...",
+      "refreshing": "Refreshing...",
+      "onboardingLinkFailed": "Failed to generate onboarding link",
+      "statusUpdated": "Status updated",
+      "statusUpdateFailed": "Failed to update status",
+      "successMessage": "Your account is fully set up! You can now receive payments from your sales."
+    },
+    "financials": {
+      "title": "Financial Dashboard",
+      "description": "Manage your finances and review your transactions",
+      "balance": {
+        "available": "Available Balance",
+        "availableDescription": "Funds ready for withdrawal",
+        "pending": "Pending Balance",
+        "pendingDescription": "Funds being processed",
+        "lifetime": "Lifetime Volume",
+        "lifetimeDescription": "Total historical sales"
+      },
+      "actions": {
+        "export": "Export",
+        "refresh": "Refresh"
+      },
+      "lastUpdated": "Last updated: {time}",
+      "tabs": {
+        "transactions": "Transactions",
+        "payouts": "Payouts"
+      },
+      "transactions": {
+        "title": "Transaction History",
+        "description": "All your sales and movements",
+        "empty": "No transactions yet"
+      },
+      "payouts": {
+        "title": "Payout History",
+        "description": "Deposits to your bank account",
+        "empty": "No payouts recorded",
+        "payoutTo": "Payout to {method}"
+      },
+      "status": {
+        "completed": "Completed",
+        "pending": "Pending",
+        "failed": "Failed",
+        "processing": "Processing",
+        "paid": "Paid",
+        "inTransit": "In Transit"
+      },
+      "accountInfo": {
+        "title": "Account Information",
+        "accountId": "Account ID",
+        "commissionRate": "Commission Rate",
+        "payoutsEnabled": "Payouts Enabled",
+        "chargesEnabled": "Charges Enabled",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "manageAccount": "Manage Account"
+      },
+      "noStripeAccount": {
+        "title": "Stripe account not configured",
+        "description": "You need to set up your Stripe account to view financial information.",
+        "action": "Set up Stripe"
+      },
+      "incompleteAccount": {
+        "title": "Incomplete setup",
+        "description": "Complete your account setup to enable payments.",
+        "action": "Complete setup"
       }
     }
   },
@@ -1414,6 +1540,69 @@
       "company": "MOMENTO ESPECIAL SAPI DE CV",
       "rfc": "RFC: MES240315XX0",
       "address": "Mexico City, CDMX, Mexico"
+    }
+  },
+  "vendor": {
+    "financials": {
+      "title": "Financial Dashboard",
+      "subtitle": "Manage your finances and payments",
+      "noStripeAccount": {
+        "title": "Stripe account not configured",
+        "description": "You need to set up your Stripe Connect account to receive payments directly.",
+        "action": "Set up Stripe account"
+      },
+      "incompleteAccount": {
+        "title": "Incomplete setup",
+        "description": "Your Stripe Connect account needs additional information before it can process payments.",
+        "action": "Complete setup"
+      },
+      "balance": {
+        "available": "Available balance",
+        "availableDescription": "Funds ready to withdraw",
+        "pending": "Pending balance",
+        "pendingDescription": "Funds being processed",
+        "lifetime": "Total sales",
+        "lifetimeDescription": "All-time sales total"
+      },
+      "status": {
+        "completed": "Completed",
+        "pending": "Pending",
+        "failed": "Failed",
+        "processing": "Processing",
+        "paid": "Paid",
+        "inTransit": "In transit"
+      },
+      "actions": {
+        "export": "Export",
+        "refresh": "Refresh"
+      },
+      "lastUpdated": "Last updated: {time}",
+      "tabs": {
+        "transactions": "Transactions",
+        "payouts": "Payouts"
+      },
+      "transactions": {
+        "title": "Transaction history",
+        "description": "All sales, refunds, and account movements",
+        "empty": "No transactions yet"
+      },
+      "payouts": {
+        "title": "Payout history",
+        "description": "Payments sent to your bank account",
+        "empty": "No payouts yet",
+        "payoutTo": "Payout to {method}",
+        "bankAccount": "Bank account"
+      },
+      "accountInfo": {
+        "title": "Account information",
+        "accountId": "Account ID",
+        "commissionRate": "Platform commission",
+        "payoutsEnabled": "Payouts enabled",
+        "chargesEnabled": "Charges enabled",
+        "enabled": "Active",
+        "disabled": "Inactive",
+        "manageAccount": "Manage account"
+      }
     }
   }
 }

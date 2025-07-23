@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { products, orders, vendors } from "@/db/schema";
+import { products, orders, vendors, vendorStripeAccounts } from "@/db/schema";
 import { eq, sql, and } from "drizzle-orm";
 import { 
   Package, 
@@ -9,10 +9,15 @@ import {
   ShoppingCart, 
   TrendingUp,
   Plus,
-  ArrowUpRight
+  ArrowUpRight,
+  CreditCard,
+  AlertCircle
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { getTranslations } from "next-intl/server";
 
 async function getVendorStats(vendorId: string) {
   const [
@@ -75,6 +80,7 @@ async function getVendorStats(vendorId: string) {
 
 export default async function VendorDashboard() {
   const session = await auth();
+  const t = await getTranslations("Vendor");
   
   if (!session || session.user.role !== "vendor") {
     redirect("/login");
@@ -83,11 +89,17 @@ export default async function VendorDashboard() {
   const vendorId = session.user.id;
   const stats = await getVendorStats(vendorId);
 
-  // Get vendor info
+  // Get vendor info and Stripe account
   const [vendorInfo] = await db
     .select()
     .from(vendors)
     .where(eq(vendors.id, vendorId))
+    .limit(1);
+
+  const [stripeAccount] = await db
+    .select()
+    .from(vendorStripeAccounts)
+    .where(eq(vendorStripeAccounts.vendorId, vendorId))
     .limit(1);
 
   const statsCards = [
@@ -242,6 +254,61 @@ export default async function VendorDashboard() {
           <p className="text-sm text-yellow-800 font-univers">
             Tu cuenta está pendiente de aprobación. Podrás agregar productos una vez que sea aprobada.
           </p>
+        </div>
+      )}
+
+      {/* Stripe Connect status */}
+      {vendorInfo.isActive && (
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="bg-purple-50 p-3 rounded-lg">
+                <CreditCard className="h-6 w-6 text-purple-600" />
+              </div>
+              <div>
+                <h2 className="text-lg font-univers text-gray-900">{t("dashboard.stripeConnect.title")}</h2>
+                <p className="text-sm text-gray-600 font-univers">{t("dashboard.stripeConnect.description")}</p>
+              </div>
+            </div>
+            {stripeAccount && (
+              <Badge className={stripeAccount.chargesEnabled && stripeAccount.payoutsEnabled ? "bg-green-600" : "bg-yellow-600"}>
+                {stripeAccount.chargesEnabled && stripeAccount.payoutsEnabled ? t("dashboard.stripeConnect.active") : t("dashboard.stripeConnect.pending")}
+              </Badge>
+            )}
+          </div>
+
+          {!stripeAccount ? (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                {t("dashboard.stripeConnect.notConnected")}
+              </AlertDescription>
+            </Alert>
+          ) : !stripeAccount.chargesEnabled || !stripeAccount.payoutsEnabled ? (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                {t("dashboard.stripeConnect.incompleteSetup")}
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <Alert className="border-green-200 bg-green-50">
+              <AlertDescription className="text-green-800">
+                {t("dashboard.stripeConnect.fullyActive")}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <div className="mt-4">
+            <Link href="/vendor/stripe-onboarding">
+              <Button className="w-full" variant={stripeAccount?.chargesEnabled ? "outline" : "default"}>
+                <CreditCard className="h-4 w-4 mr-2" />
+                {!stripeAccount ? t("dashboard.stripeConnect.setupPayments") : 
+                 stripeAccount.chargesEnabled && stripeAccount.payoutsEnabled ? t("dashboard.stripeConnect.managePayments") : 
+                 t("dashboard.stripeConnect.completeSetup")}
+              </Button>
+            </Link>
+          </div>
         </div>
       )}
     </div>

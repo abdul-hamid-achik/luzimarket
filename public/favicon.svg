@@ -1,0 +1,23 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    @media (prefers-color-scheme: dark) {
+      .flower-path { fill: #ffffff; }
+    }
+    @media (prefers-color-scheme: light) {
+      .flower-path { fill: #000000; }
+    }
+  </style>
+  <!-- Simplified flower shape for favicon -->
+  <g class="flower-path">
+    <!-- Top petal -->
+    <ellipse cx="16" cy="8" rx="5" ry="7" />
+    <!-- Right petal -->
+    <ellipse cx="24" cy="16" rx="7" ry="5" />
+    <!-- Bottom petal -->
+    <ellipse cx="16" cy="24" rx="5" ry="7" />
+    <!-- Left petal -->
+    <ellipse cx="8" cy="16" rx="7" ry="5" />
+    <!-- Center -->
+    <circle cx="16" cy="16" r="4" />
+  </g>
+</svg>

@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { stripe } from "@/lib/stripe";
 import { db } from "@/db";
-import { orders, orderItems, users } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { orders, orderItems, users, vendorBalances, transactions, platformFees, vendorStripeAccounts } from "@/db/schema";
+import { eq, and } from "drizzle-orm";
 import Stripe from "stripe";
 import { reduceStock, restoreStock } from "@/lib/actions/inventory";
 import { sendOrderConfirmation, sendVendorNotification } from "@/lib/email";
@@ -63,6 +63,69 @@ export async function POST(req: NextRequest) {
               })
               .where(eq(orders.id, orderId));
 
+            // Update vendor balance and create transaction if using Stripe Connect
+            const platformFee = await db.query.platformFees.findFirst({
+              where: eq(platformFees.orderId, orderId),
+            });
+
+            if (platformFee) {
+              // Update vendor balance
+              const vendorBalance = await db.query.vendorBalances.findFirst({
+                where: eq(vendorBalances.vendorId, order.vendorId),
+              });
+
+              if (vendorBalance) {
+                const newAvailableBalance = parseFloat(vendorBalance.availableBalance) + parseFloat(platformFee.vendorEarnings);
+                
+                await db
+                  .update(vendorBalances)
+                  .set({
+                    availableBalance: newAvailableBalance.toString(),
+                    lastUpdated: new Date(),
+                  })
+                  .where(eq(vendorBalances.vendorId, order.vendorId));
+
+                // Create transaction record
+                await db.insert(transactions).values({
+                  vendorId: order.vendorId,
+                  orderId: orderId,
+                  type: "sale",
+                  amount: platformFee.vendorEarnings,
+                  currency: "MXN",
+                  status: "completed",
+                  description: `Venta - Orden #${order.orderNumber}`,
+                  metadata: {
+                    orderNumber: order.orderNumber,
+                    paymentIntentId: session.payment_intent,
+                  },
+                  stripeChargeId: session.payment_intent as string,
+                  balanceTransaction: {
+                    before: {
+                      available: parseFloat(vendorBalance.availableBalance),
+                      pending: parseFloat(vendorBalance.pendingBalance),
+                      reserved: parseFloat(vendorBalance.reservedBalance),
+                    },
+                    after: {
+                      available: newAvailableBalance,
+                      pending: parseFloat(vendorBalance.pendingBalance),
+                      reserved: parseFloat(vendorBalance.reservedBalance),
+                    },
+                  },
+                  completedAt: new Date(),
+                });
+
+                // Update platform fee status
+                await db
+                  .update(platformFees)
+                  .set({
+                    status: "collected",
+                    stripeApplicationFeeId: session.payment_intent as string,
+                    collectedAt: new Date(),
+                  })
+                  .where(eq(platformFees.orderId, orderId));
+              }
+            }
+
             // Reduce stock for each order
             const stockReduced = await reduceStock(orderId);
             if (!stockReduced) {
@@ -116,6 +179,53 @@ export async function POST(req: NextRequest) {
           }
 
           console.log("Orders paid:", orderIds.join(', '));
+          
+          // Handle Stripe Connect transfers for multi-vendor orders
+          if (session.metadata?.useStripeConnect === 'true' && session.metadata?.vendorSplits) {
+            try {
+              const vendorSplits = JSON.parse(session.metadata.vendorSplits);
+              const paymentIntentId = session.payment_intent as string;
+              
+              // Retrieve the payment intent to get the charge ID
+              const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+              const chargeId = paymentIntent.latest_charge as string;
+              
+              // Create transfers to each vendor
+              for (const split of vendorSplits) {
+                try {
+                  const transfer = await stripe.transfers.create({
+                    amount: Math.round(split.amount * 100), // Convert to cents
+                    currency: 'mxn',
+                    destination: split.stripeAccountId,
+                    source_transaction: chargeId,
+                    description: `Pago por orden ${split.orderId}`,
+                    metadata: {
+                      orderId: split.orderId,
+                      vendorId: split.vendorId,
+                    },
+                  });
+                  
+                  console.log(`Transfer created for vendor ${split.vendorId}: ${transfer.id}`);
+                  
+                  // Update platform fee status to transferred
+                  await db
+                    .update(platformFees)
+                    .set({
+                      status: 'transferred',
+                      stripeTransferId: transfer.id,
+                      transferredAt: new Date(),
+                    })
+                    .where(eq(platformFees.orderId, split.orderId));
+                    
+                } catch (transferError) {
+                  console.error(`Failed to create transfer for vendor ${split.vendorId}:`, transferError);
+                  // Continue with other transfers even if one fails
+                }
+              }
+            } catch (error) {
+              console.error('Error processing vendor splits:', error);
+            }
+          }
         }
 
         // Handle legacy single order metadata for backward compatibility
@@ -234,6 +344,109 @@ export async function POST(req: NextRequest) {
           console.log("Subscription invoice payment failed:", invoice.id);
           // TODO: Send payment failed email
         }
+        break;
+      }
+
+      // Stripe Connect specific events
+      case "account.updated": {
+        const account = event.data.object as Stripe.Account;
+        
+        // Update vendor Stripe account status
+        const vendorAccount = await db.query.vendorStripeAccounts.findFirst({
+          where: eq(vendorStripeAccounts.stripeAccountId, account.id),
+        });
+
+        if (vendorAccount) {
+          await db
+            .update(vendorStripeAccounts)
+            .set({
+              chargesEnabled: account.charges_enabled || false,
+              payoutsEnabled: account.payouts_enabled || false,
+              detailsSubmitted: account.details_submitted || false,
+              requirements: account.requirements as any,
+              capabilities: account.capabilities as any,
+              businessProfile: account.business_profile as any,
+              onboardingStatus: account.details_submitted ? "completed" : "in_progress",
+              updatedAt: new Date(),
+            })
+            .where(eq(vendorStripeAccounts.stripeAccountId, account.id));
+
+          console.log(`Vendor account ${account.id} updated`);
+        }
+        break;
+      }
+
+      case "application_fee.created": {
+        const fee = event.data.object as Stripe.ApplicationFee;
+        console.log("Application fee created:", fee.id, "Amount:", fee.amount);
+        break;
+      }
+
+      case "transfer.created": {
+        const transfer = event.data.object as Stripe.Transfer;
+        console.log("Transfer created:", transfer.id, "Amount:", transfer.amount);
+        
+        // Update transaction record with transfer details
+        if (transfer.metadata?.orderId && transfer.metadata?.vendorId) {
+          // Create or update transaction record for the transfer
+          await db.insert(transactions).values({
+            vendorId: transfer.metadata.vendorId,
+            orderId: transfer.metadata.orderId,
+            type: "transfer",
+            amount: (transfer.amount / 100).toString(), // Convert from cents
+            currency: transfer.currency.toUpperCase(),
+            status: "pending",
+            description: `Transferencia de Stripe - ${transfer.id}`,
+            stripeTransferId: transfer.id,
+            metadata: {
+              destination: transfer.destination,
+              sourceTransaction: transfer.source_transaction,
+            },
+          });
+        }
+        break;
+      }
+      
+      case "transfer.updated": {
+        const transfer = event.data.object as Stripe.Transfer;
+        
+        // Update transaction status based on transfer status
+        if (transfer.metadata?.orderId) {
+          const status = transfer.reversed ? "reversed" : "completed";
+          
+          await db
+            .update(transactions)
+            .set({
+              status,
+              completedAt: new Date(),
+            })
+            .where(eq(transactions.stripeTransferId, transfer.id));
+        }
+        break;
+      }
+
+      case "payout.created":
+      case "payout.updated": {
+        const payout = event.data.object as Stripe.Payout;
+        
+        // Handle payout status updates
+        console.log(`Payout ${payout.id} status: ${payout.status}`);
+        break;
+      }
+
+      case "payout.paid": {
+        const payout = event.data.object as Stripe.Payout;
+        
+        // Mark payout as completed
+        console.log(`Payout ${payout.id} paid successfully`);
+        break;
+      }
+
+      case "payout.failed": {
+        const payout = event.data.object as Stripe.Payout;
+        
+        // Handle failed payout
+        console.log(`Payout ${payout.id} failed: ${payout.failure_message}`);
         break;
       }
 

@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { validateCartStock, type CartItem } from "@/lib/actions/inventory";
 import { db } from "@/db";
-import { orders, orderItems } from "@/db/schema";
+import { orders, orderItems, vendorStripeAccounts, platformFees } from "@/db/schema";
+import { eq, inArray } from "drizzle-orm";
+import { generateOrderNumber } from "@/lib/utils/order-id";
 
 export async function POST(request: NextRequest) {
   try {
@@ -120,7 +122,7 @@ export async function POST(request: NextRequest) {
     // Shipping is now handled via shipping_options, not as a line item
 
     // Create order record first
-    const orderNumber = `LM-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+    const orderNumber = generateOrderNumber();
     
     // For multi-vendor orders, we'll create separate orders per vendor
     const vendorGroups = items.reduce((groups: any, item: any) => {
@@ -132,7 +134,30 @@ export async function POST(request: NextRequest) {
       return groups;
     }, {});
 
+    // Check if all vendors have Stripe Connect accounts
+    const vendorIds = Object.keys(vendorGroups);
+    const vendorStripeAccountsData = await db
+      .select()
+      .from(vendorStripeAccounts)
+      .where(inArray(vendorStripeAccounts.vendorId, vendorIds));
+
+    const vendorStripeMap = new Map(
+      vendorStripeAccountsData.map(acc => [acc.vendorId, acc])
+    );
+
+    // Check if all vendors have active Stripe accounts
+    let useStripeConnect = true;
+    for (const vendorId of vendorIds) {
+      const stripeAccount = vendorStripeMap.get(vendorId);
+      if (!stripeAccount || !stripeAccount.chargesEnabled || !stripeAccount.payoutsEnabled) {
+        useStripeConnect = false;
+        console.log(`Vendor ${vendorId} does not have an active Stripe Connect account`);
+        break;
+      }
+    }
+
     const orderIds: string[] = [];
+    const orderDetailsMap = new Map<string, any>();
     
     // Create orders for each vendor
     for (const [vendorId, vendorItems] of Object.entries(vendorGroups)) {
@@ -140,9 +165,14 @@ export async function POST(request: NextRequest) {
       const vendorTax = vendorSubtotal * 0.16;
       const vendorShipping = vendorSubtotal > 1000 ? 0 : 99;
       const vendorTotal = vendorSubtotal + vendorTax + vendorShipping;
+      
+      // Calculate platform fee (default 15% of subtotal)
+      const stripeAccount = vendorStripeMap.get(vendorId);
+      const commissionRate = stripeAccount?.commissionRate ? parseFloat(stripeAccount.commissionRate) : 15;
+      const platformFeeAmount = vendorSubtotal * (commissionRate / 100);
 
       const [order] = await db.insert(orders).values({
-        orderNumber: `${orderNumber}-${vendorId.slice(-4)}`,
+        orderNumber: orderNumber,
         vendorId: vendorId,
         status: "pending",
         subtotal: vendorSubtotal.toString(),
@@ -183,6 +213,30 @@ export async function POST(request: NextRequest) {
 
       await db.insert(orderItems).values(orderItemsData);
       orderIds.push(order.id);
+      
+      // Store order details for later use
+      orderDetailsMap.set(vendorId, {
+        orderId: order.id,
+        total: vendorTotal,
+        subtotal: vendorSubtotal,
+        platformFee: platformFeeAmount,
+        vendorEarnings: vendorTotal - platformFeeAmount,
+        stripeAccountId: stripeAccount?.stripeAccountId,
+      });
+      
+      // Create platform fee record if using Stripe Connect
+      if (useStripeConnect && stripeAccount) {
+        await db.insert(platformFees).values({
+          orderId: order.id,
+          vendorId: vendorId,
+          orderAmount: vendorTotal.toString(),
+          feePercentage: commissionRate.toString(),
+          feeAmount: platformFeeAmount.toString(),
+          vendorEarnings: (vendorTotal - platformFeeAmount).toString(),
+          currency: "MXN",
+          status: "pending",
+        });
+      }
     }
 
     // Create Stripe checkout session
@@ -216,76 +270,169 @@ export async function POST(request: NextRequest) {
         cancel_url: `${appUrl}/checkout/cancel`,
       });
       
-      const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card', 'oxxo'], // Support OXXO for Mexico
-      line_items: lineItems,
-      mode: 'payment',
-      success_url: `${appUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${appUrl}/checkout/cancel`,
-      customer_email: shippingAddress.email,
-      // Pre-fill shipping information
-      shipping_options: [
-        {
-          shipping_rate_data: {
-            type: 'fixed_amount',
-            fixed_amount: {
-              amount: shipping * 100, // Convert to cents
-              currency: 'mxn',
-            },
-            display_name: shippingDescription,
-            delivery_estimate: {
-              minimum: {
-                unit: 'business_day',
-                value: shippingDays.min,
-              },
-              maximum: {
-                unit: 'business_day',
-                value: shippingDays.max,
-              },
-            },
-          },
-        },
-      ],
-      billing_address_collection: 'auto',
-      // Pre-fill customer information
-      customer_creation: 'if_required',
-      payment_intent_data: {
-        description: '🇲🇽 Compra de productos únicos mexicanos - Luzimarket',
-        shipping: {
-          name: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
-          phone: shippingAddress.phone,
-          address: {
-            line1: shippingAddress.address,
-            line2: shippingAddress.apartment || undefined,
-            city: shippingAddress.city,
-            state: shippingAddress.state,
-            postal_code: shippingAddress.postalCode,
-            country: 'MX',
-          },
-        },
-      },
-      metadata: {
-        customerName: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
-        customerPhone: shippingAddress.phone || '',
-        shippingAddress: shippingAddress ? JSON.stringify(shippingAddress) : '',
-        billingAddress: billingAddress ? JSON.stringify(billingAddress) : '',
-        orderIds: orderIds.join(','),
-        isGuest: isGuest ? 'true' : 'false',
-        selectedShipping: selectedShipping ? JSON.stringify(selectedShipping) : '',
-      },
-      // OXXO specific settings
-      payment_method_options: {
-        oxxo: {
-          expires_after_days: 3, // OXXO voucher expires in 3 days
-        },
-      },
-      locale: 'es', // Spanish for Mexico
-    });
+      // If we're using Stripe Connect and all vendors have accounts, handle payment splitting
+      if (useStripeConnect) {
+        // For Stripe Connect, we'll use the platform account and create transfers after payment
+        // This works for both single and multi-vendor scenarios
+        
+        // Calculate total platform fees
+        let totalPlatformFees = 0;
+        const vendorSplits: any[] = [];
+        
+        for (const [vendorId, details] of orderDetailsMap.entries()) {
+          totalPlatformFees += details.platformFee;
+          vendorSplits.push({
+            vendorId,
+            stripeAccountId: details.stripeAccountId,
+            amount: details.vendorEarnings, // Amount to transfer to vendor
+            orderId: details.orderId,
+          });
+        }
 
-      return NextResponse.json({ 
-        sessionId: session.id,
-        url: session.url 
-      });
+        const session = await stripe.checkout.sessions.create({
+          payment_method_types: ['card', 'oxxo'],
+          line_items: lineItems,
+          mode: 'payment',
+          success_url: `${appUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${appUrl}/checkout/cancel`,
+          customer_email: shippingAddress.email,
+          shipping_options: [
+            {
+              shipping_rate_data: {
+                type: 'fixed_amount',
+                fixed_amount: {
+                  amount: shipping * 100,
+                  currency: 'mxn',
+                },
+                display_name: shippingDescription,
+                delivery_estimate: {
+                  minimum: {
+                    unit: 'business_day',
+                    value: shippingDays.min,
+                  },
+                  maximum: {
+                    unit: 'business_day',
+                    value: shippingDays.max,
+                  },
+                },
+              },
+            },
+          ],
+          billing_address_collection: 'auto',
+          customer_creation: 'if_required',
+          payment_intent_data: {
+            description: '🇲🇽 Compra de productos únicos mexicanos - Luzimarket',
+            // Platform keeps all funds initially, transfers happen in webhook
+            shipping: {
+              name: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
+              phone: shippingAddress.phone,
+              address: {
+                line1: shippingAddress.address,
+                line2: shippingAddress.apartment || undefined,
+                city: shippingAddress.city,
+                state: shippingAddress.state,
+                postal_code: shippingAddress.postalCode,
+                country: 'MX',
+              },
+            },
+          },
+          metadata: {
+            customerName: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
+            customerPhone: shippingAddress.phone || '',
+            shippingAddress: shippingAddress ? JSON.stringify(shippingAddress) : '',
+            billingAddress: billingAddress ? JSON.stringify(billingAddress) : '',
+            orderIds: orderIds.join(','),
+            isGuest: isGuest ? 'true' : 'false',
+            selectedShipping: selectedShipping ? JSON.stringify(selectedShipping) : '',
+            useStripeConnect: 'true',
+            vendorSplits: JSON.stringify(vendorSplits), // Store vendor split details
+            totalPlatformFees: totalPlatformFees.toString(),
+          },
+          payment_method_options: {
+            oxxo: {
+              expires_after_days: 3,
+            },
+          },
+          locale: 'es',
+        });
+        
+        return NextResponse.json({ 
+          sessionId: session.id,
+          url: session.url 
+        });
+      } else {
+        // For multi-vendor or vendors without Stripe Connect, use regular checkout
+        const session = await stripe.checkout.sessions.create({
+          payment_method_types: ['card', 'oxxo'], // Support OXXO for Mexico
+          line_items: lineItems,
+          mode: 'payment',
+          success_url: `${appUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${appUrl}/checkout/cancel`,
+          customer_email: shippingAddress.email,
+          // Pre-fill shipping information
+          shipping_options: [
+            {
+              shipping_rate_data: {
+                type: 'fixed_amount',
+                fixed_amount: {
+                  amount: shipping * 100, // Convert to cents
+                  currency: 'mxn',
+                },
+                display_name: shippingDescription,
+                delivery_estimate: {
+                  minimum: {
+                    unit: 'business_day',
+                    value: shippingDays.min,
+                  },
+                  maximum: {
+                    unit: 'business_day',
+                    value: shippingDays.max,
+                  },
+                },
+              },
+            },
+          ],
+          billing_address_collection: 'auto',
+          // Pre-fill customer information
+          customer_creation: 'if_required',
+          payment_intent_data: {
+            description: '🇲🇽 Compra de productos únicos mexicanos - Luzimarket',
+            shipping: {
+              name: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
+              phone: shippingAddress.phone,
+              address: {
+                line1: shippingAddress.address,
+                line2: shippingAddress.apartment || undefined,
+                city: shippingAddress.city,
+                state: shippingAddress.state,
+                postal_code: shippingAddress.postalCode,
+                country: 'MX',
+              },
+            },
+          },
+          metadata: {
+            customerName: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
+            customerPhone: shippingAddress.phone || '',
+            shippingAddress: shippingAddress ? JSON.stringify(shippingAddress) : '',
+            billingAddress: billingAddress ? JSON.stringify(billingAddress) : '',
+            orderIds: orderIds.join(','),
+            isGuest: isGuest ? 'true' : 'false',
+            selectedShipping: selectedShipping ? JSON.stringify(selectedShipping) : '',
+          },
+          // OXXO specific settings
+          payment_method_options: {
+            oxxo: {
+              expires_after_days: 3, // OXXO voucher expires in 3 days
+            },
+          },
+          locale: 'es', // Spanish for Mexico
+        });
+
+        return NextResponse.json({ 
+          sessionId: session.id,
+          url: session.url 
+        });
+      }
     } catch (stripeError: any) {
       console.error('Stripe session creation error:', {
         type: stripeError.type,

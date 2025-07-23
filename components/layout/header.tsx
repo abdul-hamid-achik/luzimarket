@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Heart, ShoppingBag, User, Menu, LogOut, Search } from "lucide-react";
 import { SearchBox } from "./search-box";
+import { CurrencySwitch } from "./currency-switch";
 import { useState } from "react";
 import { useCart } from "@/contexts/cart-context";
 import { useWishlist } from "@/contexts/wishlist-context";
@@ -51,7 +52,7 @@ export function Header() {
         {/* Top bar - Desktop only */}
         <div className="hidden md:flex items-center justify-between py-2 text-xs border-b px-8">
           <div className="flex items-center gap-4">
-            <span className="text-gray-600">{t('currencyLocale')}</span>
+            <CurrencySwitch />
           </div>
           <div className="flex items-center gap-4">
             <span className="text-gray-600">{t('shippingTo', { location: 'MONTERREY, NL' })}</span>
@@ -215,6 +216,11 @@ export function Header() {
                       {t('myOrders')}
                     </NextLink>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <NextLink href="/orders/lookup" className="cursor-pointer">
+                      {t('trackOrder')}
+                    </NextLink>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600">
                     <LogOut className="mr-2 h-4 w-4" />
@@ -223,11 +229,31 @@ export function Header() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link href="/login">
-                <Button variant="ghost" size="icon" aria-label={t('userAccount')}>
-                  <User className="h-5 w-5" />
-                </Button>
-              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" aria-label={t('userAccount')}>
+                    <User className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <NextLink href="/login" className="cursor-pointer">
+                      {t('login')}
+                    </NextLink>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <NextLink href="/register" className="cursor-pointer">
+                      {t('register')}
+                    </NextLink>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <NextLink href="/orders/lookup" className="cursor-pointer">
+                      {t('trackOrder')}
+                    </NextLink>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
             <Button
               variant="ghost"

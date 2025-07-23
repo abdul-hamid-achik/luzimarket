@@ -14,6 +14,11 @@ test.describe('Performance Tests', () => {
     
     // Check Core Web Vitals
     const metrics = await page.evaluate(() => {
+      return performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    });
+    expect((metrics as any).loadEventEnd - (metrics as any).loadEventStart).toBeLessThan(3000);
+
+    const metrics2 = await page.evaluate(() => {
       return new Promise((resolve) => {
         const observer = new PerformanceObserver((list) => {
           const entries = list.getEntries();
@@ -34,8 +39,8 @@ test.describe('Performance Tests', () => {
     });
     
     // FCP should be under 1.8s (good)
-    if (metrics.fcp) {
-      expect(metrics.fcp).toBeLessThan(1800);
+    if (metrics2.fcp) {
+      expect(metrics2.fcp).toBeLessThan(1800);
     }
   });
 
@@ -157,11 +162,10 @@ test.describe('Performance Tests', () => {
       return new Promise((resolve) => {
         let clsValue = 0;
         const observer = new PerformanceObserver((list) => {
-          for (const entry of list.getEntries()) {
-            if (!entry.hadRecentInput) {
-              clsValue += entry.value;
-            }
-          }
+          const entries = performance.getEntriesByType('layout-shift');
+          clsValue = entries.filter((entry: any) => !entry.hadRecentInput).reduce((sum: number, entry: any) => {
+            return sum + entry.value;
+          }, 0);
         });
         
         observer.observe({ type: 'layout-shift', buffered: true });
@@ -263,10 +267,9 @@ test.describe('Performance Tests', () => {
   test('should optimize search functionality', async ({ page }) => {
     await page.goto('/');
     
-    const searchButton = page.locator('[aria-label="Search"]').first();
-    await searchButton.click();
-    
-    const searchInput = page.locator('input[type="search"]').first();
+    // Use the first visible search input (desktop version)
+    const searchInput = page.locator('input[id="search-input"]').first();
+    await expect(searchInput).toBeVisible();
     
     // Type slowly to test debouncing
     const searchTerm = 'flores';
