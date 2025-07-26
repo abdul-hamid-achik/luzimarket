@@ -2,10 +2,7 @@ import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { setRequestLocale, getMessages } from 'next-intl/server';
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
 import { Providers } from "@/components/providers";
-import CartSheet from "@/components/cart/cart-sheet";
 import { Toaster } from "@/components/ui/sonner";
 
 export default async function LocaleLayout({
@@ -33,12 +30,7 @@ export default async function LocaleLayout({
       <body className="antialiased">
         <NextIntlClientProvider messages={messages}>
           <Providers>
-            <Header />
-            <main id="main">
-              {children}
-            </main>
-            <Footer />
-            <CartSheet />
+            {children}
             <Toaster />
           </Providers>
         </NextIntlClientProvider>
