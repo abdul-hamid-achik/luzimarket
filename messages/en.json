@@ -88,6 +88,73 @@
     "noProducts": "No products found",
     "tryAdjustingFilters": "Try adjusting filters to see more results"
   },
+  "account": {
+    "page": {
+      "user": "User",
+      "memberSince": "Member since",
+      "orders": "Orders",
+      "spent": "Spent",
+      "overview": "Overview",
+      "myOrders": "My Orders",
+      "wishlist": "Wishlist",
+      "profile": "Profile",
+      "quickActions": "Quick Actions",
+      "viewAllOrders": "View all orders",
+      "myWishlist": "My wishlist",
+      "editProfile": "Edit profile",
+      "security": "Security",
+      "recentOrders": "Recent Orders",
+      "noOrdersYet": "You don't have any orders yet",
+      "startShopping": "Start shopping",
+      "order": "Order",
+      "viewAllOrdersButton": "View all orders",
+      "orderHistory": "Order History",
+      "myWishlistTitle": "My Wishlist",
+      "wishlistEmpty": "Your wishlist is empty",
+      "exploreProducts": "Explore products",
+      "profileInfo": "Profile Information",
+      "delivered": "Delivered",
+      "shipped": "Shipped",
+      "paid": "Paid",
+      "pending": "Pending"
+    },
+    "security": {
+      "title": "Account Security",
+      "description": "Protect your account and control who can access it",
+      "password": {
+        "title": "Change password",
+        "description": "Use a unique password that you don't use on other sites"
+      },
+      "twoFactor": {
+        "title": "Two-factor authentication",
+        "description": "Add an extra layer of security to your account",
+        "authenticatorApp": "Authenticator app",
+        "authenticatorDescription": "Use an app like Google Authenticator",
+        "emailBackup": "Email backup",
+        "emailDescription": "Receive verification codes via email",
+        "viewBackupCodes": "View backup codes"
+      },
+      "sessions": {
+        "title": "Where you're signed in",
+        "description": "If you see a device you don't recognize, sign out and change your password"
+      },
+      "privacy": {
+        "title": "Privacy and communications",
+        "description": "Control what information you share and how we communicate with you",
+        "orderUpdates": "Order updates",
+        "orderUpdatesDescription": "Get notifications about your order status",
+        "promotionalEmails": "Promotional emails",
+        "promotionalDescription": "Special offers and recommended products",
+        "securityAlerts": "Security alerts",
+        "securityDescription": "Important notices about your account"
+      },
+      "deleteAccount": {
+        "title": "Delete account",
+        "description": "Once you delete your account, there is no going back. Please be certain.",
+        "button": "Delete my account"
+      }
+    }
+  },
   "Auth": {
     "invalidCredentials": "Invalid credentials",
     "accountLocked": "Account is locked. Please try again in {minutes} minutes.",
@@ -335,7 +402,9 @@
       "trackingNumber": "Tracking Number",
       "notes": "Notes",
       "updateStatus": "Update Status",
-      "backToOrders": "Back to orders"
+      "backToOrders": "Back to orders",
+      "exportCSV": "Export CSV",
+      "exporting": "Exporting..."
     },
     "emailTemplates": {
       "title": "Email Templates",
@@ -438,6 +507,64 @@
       "unlockSuccess": "Account unlocked successfully",
       "noLockedAccounts": "No locked accounts"
     },
+    "productDetail": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "approve": "Approve",
+      "deactivate": "Deactivate",
+      "images": "Images",
+      "description": "Description",
+      "productInfo": "Product Information",
+      "price": "Price",
+      "stock": "Stock",
+      "units": "units",
+      "category": "Category",
+      "tags": "Tags",
+      "vendorInfo": "Vendor Information",
+      "vendor": "Vendor",
+      "vendorEmail": "Vendor Email",
+      "vendorActive": "Active",
+      "vendorInactive": "Inactive",
+      "shippingInfo": "Shipping Information",
+      "weight": "Weight",
+      "dimensions": "Dimensions",
+      "shippingClass": "Shipping Class",
+      "actions": "Actions",
+      "viewPublic": "View Public Page",
+      "pendingApproval": "This product is pending approval and not visible to customers.",
+      "awaitingApproval": "This product is awaiting approval from administrators.",
+      "timestamps": "Timestamps",
+      "created": "Created",
+      "updated": "Last Updated"
+    },
+    "usersPage": {
+      "title": "Users",
+      "subtitle": "Manage all platform users",
+      "totalUsers": "Total users",
+      "activeUsers": "Active users",
+      "newThisMonth": "New this month",
+      "filterAll": "All",
+      "filterCustomer": "Customer",
+      "filterVendor": "Vendor",
+      "filterAdmin": "Admin",
+      "tableHeaders": {
+        "user": "User",
+        "email": "Email",
+        "type": "Type",
+        "orders": "Orders",
+        "totalSpent": "Total Spent",
+        "registered": "Registered",
+        "actions": "Actions"
+      },
+      "userTypes": {
+        "admin": "Admin",
+        "vendor": "Vendor",
+        "customer": "Customer"
+      },
+      "noName": "No name",
+      "viewDetails": "View details",
+      "loading": "Loading..."
+    },
     "categories": {
       "title": "Categories",
       "subtitle": "Manage product categories",
@@ -451,13 +578,202 @@
       "createNew": "Create Category",
       "active": "Active",
       "inactive": "Inactive"
+    },
+    "productsPage": {
+      "title": "Products",
+      "subtitle": "Manage all platform products",
+      "pendingApproval": "Pending approval",
+      "allProducts": "All products",
+      "bulkActions": "Bulk actions",
+      "approveSelected": "Approve selected",
+      "rejectSelected": "Reject selected",
+      "deleteSelected": "Delete selected",
+      "selected": "Selected",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "product": "Product",
+      "vendor": "Vendor",
+      "category": "Category",
+      "price": "Price",
+      "stock": "Stock",
+      "status": "Status",
+      "actions": "Actions",
+      "active": "Active",
+      "inactive": "Inactive",
+      "approve": "Approve",
+      "deactivate": "Deactivate",
+      "view": "View",
+      "noProducts": "No products",
+      "noProductsSelected": "No products selected",
+      "bulkActionSuccess": "Bulk action completed successfully",
+      "bulkActionError": "Error performing bulk action",
+      "totalProducts": "Total products",
+      "activeProducts": "Active",
+      "pendingProducts": "Pending",
+      "withStock": "With stock"
+    },
+    "security": {
+      "title": "Security",
+      "description": "Manage security and access for your admin account",
+      "password": {
+        "title": "Change password",
+        "description": "Update your password regularly to keep your account secure"
+      },
+      "twoFactor": {
+        "title": "Two-factor authentication",
+        "description": "Add an extra layer of security to your account",
+        "authenticatorApp": "Authenticator app",
+        "authenticatorDescription": "Use Google Authenticator or Authy",
+        "smsBackup": "SMS backup",
+        "smsDescription": "Receive codes via SMS as backup",
+        "viewBackupCodes": "View backup codes"
+      },
+      "sessions": {
+        "title": "Active sessions",
+        "description": "Manage devices that have access to your account"
+      },
+      "notifications": {
+        "title": "Security notifications",
+        "description": "Get alerts about important account activity",
+        "loginAlerts": "Login alerts",
+        "loginAlertsDescription": "Notify new logins from unknown devices",
+        "suspiciousActivity": "Suspicious activity",
+        "suspiciousDescription": "Alert about unauthorized access attempts",
+        "passwordChanges": "Password changes",
+        "passwordDescription": "Confirm all password changes via email"
+      }
+    },
+    "settingsPage": {
+      "title": "Settings",
+      "subtitle": "Manage general platform settings",
+      "securitySettings": "Security Settings",
+      "securityDescription": "Manage passwords, authentication and active sessions",
+      "goToSecurity": "Go to Security",
+      "generalSettings": "General Settings",
+      "siteName": "Site name",
+      "adminEmail": "Admin email",
+      "maintenanceMode": "Maintenance mode",
+      "maintenanceModeDescription": "Show maintenance page to users",
+      "paymentSettings": "Payment Settings",
+      "stripePublicKey": "Stripe Public Key",
+      "platformCommission": "Platform commission (%)",
+      "testMode": "Test mode",
+      "testModeDescription": "Use Stripe test mode",
+      "emailSettings": "Email Settings",
+      "fromEmail": "From email",
+      "fromName": "From name",
+      "orderNotifications": "Order notifications",
+      "orderNotificationsDescription": "Email admin when there are new orders",
+      "shippingSettings": "Shipping Settings",
+      "defaultShippingCost": "Default shipping cost",
+      "freeShippingThreshold": "Free shipping threshold",
+      "automaticCalculation": "Automatic calculation",
+      "automaticCalculationDescription": "Calculate shipping based on customer address",
+      "localization": "Localization",
+      "defaultLanguage": "Default language",
+      "spanish": "Spanish",
+      "english": "English",
+      "timezone": "Timezone",
+      "mexicoCity": "Mexico City (GMT-6)",
+      "monterrey": "Monterrey (GMT-6)",
+      "cancun": "Cancun (GMT-5)",
+      "currency": "Currency",
+      "mxn": "MXN - Mexican Peso",
+      "usd": "USD - US Dollar",
+      "saveChanges": "Save changes"
+    },
+    "emailTemplates": {
+      "new": {
+        "validation": {
+          "name": "Name must be at least 3 characters",
+          "type": "Please select a template type",
+          "subject": "Subject must be at least 5 characters",
+          "htmlContent": "HTML content is required"
+        },
+        "toast": {
+          "createError": "Error creating template",
+          "createSuccess": "Template created successfully"
+        },
+        "labels": {
+          "backToTemplates": "Back to templates",
+          "newTemplate": "New Email Template",
+          "createDescription": "Create a new email template",
+          "basicInfo": "Basic Information",
+          "templateName": "Template Name",
+          "templateType": "Template Type",
+          "selectType": "Select a type",
+          "emailSubject": "Email Subject",
+          "description": "Description (optional)",
+          "descriptionPlaceholder": "Describe the purpose of this template...",
+          "activeTemplate": "Active Template",
+          "inactiveTemplatesNote": "Inactive templates won't be used",
+          "availableVariables": "Available Variables",
+          "clickToInsert": "Click to insert into editor",
+          "html": "HTML",
+          "plainText": "Plain Text",
+          "preview": "Preview",
+          "desktop": "Desktop",
+          "mobile": "Mobile",
+          "plainTextVersion": "Plain text version of the email...",
+          "uploadingImages": "Uploading images...",
+          "dragImages": "Drag images here or click to select",
+          "imageFormats": "PNG, JPG up to 5MB",
+          "principal": "Main",
+          "cancel": "Cancel",
+          "save": "Save Template",
+          "saving": "Saving...",
+          "creating": "Creating..."
+        },
+        "placeholders": {
+          "templateName": "E.g: Order Confirmation",
+          "subjectWithVariables": "E.g: Your order #{{order_number}} has been confirmed",
+          "variableUsage": "You can use variables like"
+        },
+        "templateTypes": {
+          "orderConfirmation": "Order Confirmation",
+          "welcome": "Welcome",
+          "passwordReset": "Password Reset",
+          "shippingNotification": "Shipping Notification",
+          "reviewRequest": "Review Request",
+          "promotional": "Promotional",
+          "abandonedCart": "Abandoned Cart"
+        }
+      }
     }
   },
   "Vendor": {
+    "layout": {
+      "dashboard": "Dashboard",
+      "products": "Products",
+      "orders": "Orders",
+      "analytics": "Analytics",
+      "financials": "Financials",
+      "payments": "Payments",
+      "settings": "Settings",
+      "logout": "Logout"
+    },
     "dashboard": "Vendor Dashboard",
     "myProducts": "My Products",
     "addProduct": "Add Product",
-    "orders": "Orders",
+    "orders": {
+      "title": "Orders",
+      "statusUpdated": "Order status updated successfully",
+      "updateError": "Error updating order status",
+      "status": {
+        "label": "Order status",
+        "select": "Select status",
+        "pending": "Pending",
+        "processing": "Processing",
+        "shipped": "Shipped",
+        "delivered": "Delivered",
+        "cancelled": "Cancelled"
+      },
+      "trackingNumber": "Tracking number",
+      "trackingNumberPlaceholder": "Enter tracking number",
+      "notes": "Notes",
+      "notesPlaceholder": "Add notes about the status update",
+      "updateStatus": "Update status"
+    },
     "analytics": "Analytics",
     "profile": "Profile",
     "settings": "Settings",
@@ -468,6 +784,46 @@
     "shippingAddress": "Shipping address",
     "productsSold": "Products sold",
     "viewFullOrder": "View full order",
+    "orderDetails": {
+      "orderNumber": "Order",
+      "orderInvoice": "Order Invoice",
+      "date": "Date",
+      "status": "Status",
+      "customer": "Customer",
+      "guest": "Guest",
+      "shippingAddress": "Shipping address",
+      "orderItems": "Order items",
+      "product": "Product",
+      "quantity": "Quantity",
+      "price": "Price",
+      "total": "Total",
+      "subtotal": "Subtotal",
+      "tax": "Tax (16%)",
+      "shipping": "Shipping",
+      "print": "Print",
+      "downloadInvoice": "Download invoice",
+      "shippingActions": "Shipping actions",
+      "paymentInfo": "Payment information",
+      "method": "Method",
+      "paid": "Paid",
+      "pending": "Pending",
+      "transactionId": "Transaction ID",
+      "notes": "Notes",
+      "copiedToClipboard": "Copied to clipboard",
+      "orderNumberCopied": "Order number copied",
+      "status": {
+        "pending": "Pending",
+        "processing": "Processing",
+        "shipped": "Shipped",
+        "delivered": "Delivered",
+        "cancelled": "Cancelled"
+      },
+      "payment": {
+        "pending": "Pending",
+        "succeeded": "Completed",
+        "failed": "Failed"
+      }
+    },
     "orderManagement": {
       "updateStatus": "Update Status",
       "orderNumber": "Order #",
@@ -495,6 +851,28 @@
       }
     },
     "dashboard": {
+      "welcome": "Welcome, {businessName}",
+      "subtitle": "Here's your business summary",
+      "totalProducts": "Total Products",
+      "activeProducts": "Active Products",
+      "totalOrders": "Total Orders",
+      "totalRevenue": "Total Revenue",
+      "addProduct": "Add Product",
+      "quickActions": "Quick Actions",
+      "viewProducts": "View Products",
+      "viewOrders": "View Orders",
+      "analytics": "Analytics",
+      "settings": "Settings",
+      "recentOrders": "Recent Orders",
+      "viewAll": "View all",
+      "noRecentOrders": "No recent orders",
+      "orderStatus": {
+        "pending": "Pending",
+        "paid": "Paid",
+        "shipped": "Shipped",
+        "delivered": "Delivered"
+      },
+      "accountPending": "Your account is pending approval. You'll be able to add products once it's approved.",
       "stripeConnect": {
         "title": "Stripe Payments",
         "description": "Set up your account to receive payments",
@@ -608,6 +986,10 @@
         "disabled": "Disabled",
         "manageAccount": "Manage Account"
       },
+      "export": {
+        "transactions": "Export transactions",
+        "payouts": "Export payouts"
+      },
       "noStripeAccount": {
         "title": "Stripe account not configured",
         "description": "You need to set up your Stripe account to view financial information.",
@@ -618,6 +1000,101 @@
         "description": "Complete your account setup to enable payments.",
         "action": "Complete setup"
       }
+    },
+    "analytics": {
+      "title": "Analytics",
+      "description": "Track your business performance and growth",
+      "totalSales": "Total Sales",
+      "totalOrders": "Total Orders",
+      "averageOrder": "Average Order Value",
+      "conversionRate": "Conversion Rate",
+      "comingSoon": "Coming Soon",
+      "analyticsComingSoon": "Advanced analytics and reporting features are coming soon. Stay tuned for detailed insights about your business performance."
+    },
+    "security": {
+      "title": "Security",
+      "description": "Protect your vendor account",
+      "password": {
+        "title": "Change password",
+        "description": "Keep your account secure with a strong password"
+      },
+      "twoFactor": {
+        "title": "Two-factor authentication",
+        "description": "Add an extra layer of security to your account",
+        "status": "Status",
+        "notConfigured": "Not configured",
+        "active": "Active",
+        "configure": "Configure",
+        "disable": "Disable",
+        "enableApp": "Enable with app",
+        "enableSms": "Enable SMS authentication",
+        "disableSms": "Disable SMS authentication",
+        "viewBackupCodes": "View backup codes"
+      },
+      "sessions": {
+        "title": "Active devices",
+        "description": "Devices where you've recently signed in",
+        "currentSession": "Current session",
+        "lastActive": "Last active",
+        "revoke": "Revoke",
+        "revokeAll": "Revoke all",
+        "loading": "Loading sessions...",
+        "loadError": "Error loading sessions",
+        "sessionRevoked": "Session revoked successfully",
+        "revokeError": "Error revoking session",
+        "allSessionsRevoked": "All sessions have been revoked",
+        "revokeAllError": "Error revoking sessions"
+      }
+    },
+    "payouts": {
+      "requestPayout": "Request Payout",
+      "title": "Request Payout",
+      "description": "Available balance: {balance}",
+      "amount": "Amount to withdraw",
+      "minimumNote": "Minimum amount: {amount}",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "processing": "Processing...",
+      "success": "Payout request sent successfully",
+      "errors": {
+        "invalidAmount": "Please enter a valid amount",
+        "minimumAmount": "Minimum amount is {amount}",
+        "insufficientBalance": "Insufficient balance",
+        "requestFailed": "Failed to process request. Please try again."
+      }
+    },
+    "reports": {
+      "title": "Financial Reports",
+      "description": "Analyze your business performance with detailed reports",
+      "selectDateRange": "Select a date range to generate the report",
+      "salesReport": "Sales",
+      "revenueReport": "Revenue",
+      "productsReport": "Products",
+      "download": "Download",
+      "totalOrders": "Total Orders",
+      "totalRevenue": "Total Revenue",
+      "avgOrderValue": "Average Order Value",
+      "revenueOverTime": "Revenue Over Time",
+      "topProducts": "Top Products",
+      "soldUnits": "{count} units sold",
+      "revenue": "Revenue",
+      "availableBalance": "Available Balance",
+      "pendingBalance": "Pending Balance",
+      "reservedBalance": "Reserved Balance",
+      "transactionBreakdown": "Transaction Breakdown",
+      "payoutSummary": "Payout Summary",
+      "payouts": "payouts",
+      "totalProducts": "Total Products",
+      "inventoryValue": "Inventory Value",
+      "lowStock": "Low Stock",
+      "productPerformance": "Product Performance",
+      "product": "Product",
+      "sku": "SKU",
+      "stock": "Stock",
+      "sold": "Sold",
+      "reportError": "Error generating report",
+      "downloadSuccess": "Report downloaded successfully",
+      "downloadError": "Error downloading report"
     }
   },
   "Errors": {
@@ -1183,7 +1660,7 @@
     "sections": {
       "story": {
         "title": "Our Story",
-        "paragraph1": "Luzimarket was born from a passion for celebrating life's special moments and the desire to support talented Mexican artisans and entrepreneurs. Founded in 2024, our mission is to create a bridge between those seeking unique and meaningful gifts and the creators who put their heart into every piece.",
+        "paragraph1": "Luzimarket was born from a passion for celebrating life's special moments and the desire to support talented Mexican artisans and entrepreneurs. Founded recently, our mission is to create a bridge between those seeking unique and meaningful gifts and the creators who put their heart into every piece.",
         "paragraph2": "We believe that every gift tells a story. That's why we carefully select vendors who share our vision of quality, authenticity, and attention to detail. From handcrafted jewelry to gourmet products, from decorative art to memorable experiences, every product at Luzimarket has been chosen for its ability to create unforgettable moments.",
         "paragraph3": "We are more than a marketplace; we are a community that celebrates Mexican creativity, supports fair trade, and facilitates meaningful connections through the art of giving."
       },
@@ -1516,7 +1993,7 @@
     "story": {
       "title": "Our Story",
       "paragraph1": "Luzimarket was born from a simple belief: every gift should tell a story. In a world of mass-produced items, we saw an opportunity to connect thoughtful gift-givers with Mexico's talented artisans and unique vendors.",
-      "paragraph2": "Founded in 2024, we started as a small marketplace with just a handful of vendors. Today, we're proud to support hundreds of Mexican small businesses, from traditional craftspeople to innovative designers, all united by their commitment to quality and authenticity.",
+      "paragraph2": "Founded recently, we started as a small marketplace with just a handful of vendors. Today, we're proud to support hundreds of Mexican small businesses, from traditional craftspeople to innovative designers, all united by their commitment to quality and authenticity.",
       "paragraph3": "Our name, Luzimarket, combines 'luz' (light) with 'market', reflecting our mission to shine a light on Mexico's hidden gems and bring them to a wider audience."
     },
     "mission": {
@@ -1797,6 +2274,81 @@
       "reportError": "Error generating report",
       "downloadSuccess": "Report downloaded successfully",
       "downloadError": "Error downloading report"
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Manage your account and store settings",
+      "shipping": {
+        "title": "Shipping",
+        "description": "Configure your shipping methods and rates"
+      },
+      "store": {
+        "title": "Store Information",
+        "description": "Update your store details and public profile"
+      },
+      "payments": {
+        "title": "Payments",
+        "description": "Manage your payment information and preferences"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "description": "Control how and when to receive notifications"
+      },
+      "security": {
+        "title": "Security",
+        "description": "Protect your account with security settings"
+      },
+      "accountInfo": {
+        "title": "Account Information",
+        "businessName": "Business Name",
+        "email": "Email",
+        "vendorId": "Vendor ID",
+        "status": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "notConfigured": "Not configured",
+        "memberSince": "Member Since"
+      }
+    },
+    "products": {
+      "new": {
+        "title": "New Product",
+        "editTitle": "Edit Product"
+      },
+      "form": {
+        "selectCategory": "Select a category",
+        "dragDropImages": "Drag images here or click to select"
+      },
+      "validation": {
+        "stockPositive": "Stock must be a positive number",
+        "categoryRequired": "Select a category",
+        "imagesRequired": "Add at least one image"
+      },
+      "toast": {
+        "uploadError": "Error uploading images",
+        "createError": "Error creating product",
+        "createSuccess": "Product created successfully",
+        "updateError": "Error updating product",
+        "updateSuccess": "Product updated successfully",
+        "deleteError": "Error deleting product",
+        "deleteSuccess": "Product deleted successfully"
+      }
+    },
+    "shipping": {
+      "toast": {
+        "loadError": "Could not load shipping data",
+        "saveSuccess": "Your shipping configuration has been updated",
+        "saveError": "Could not save configuration"
+      },
+      "form": {
+        "selectState": "Select your state"
+      }
+    },
+    "financials": {
+      "table": {
+        "viewOrder": "View order",
+        "viewDetails": "View details"
+      }
     }
   }
 }

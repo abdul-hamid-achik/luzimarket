@@ -164,8 +164,8 @@ test.describe('Admin Dashboard', () => {
       const endDate = page.locator('input[type="date"]').last();
       
       if (await startDate.isVisible() && await endDate.isVisible()) {
-        await startDate.fill('2024-01-01');
-        await endDate.fill('2024-12-31');
+        await startDate.fill('2025-01-01');
+        await endDate.fill('2025-12-31');
         
         // Apply filter
         const applyButton = page.locator('button').filter({ hasText: /Apply|Aplicar/ }).first();

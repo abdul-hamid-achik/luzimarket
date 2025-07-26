@@ -74,13 +74,7 @@ export async function createVendorStripeAccount(input: z.infer<typeof createStri
     // Save Stripe account to database
     await db.transaction(async (tx) => {
       // Parse and validate Stripe data with schemas
-      const requirements = stripeRequirementsSchema.parse(stripeAccount.requirements || {
-        currentlyDue: [],
-        eventuallyDue: [],
-        pastDue: [],
-        pendingVerification: [],
-        errors: [],
-      });
+      const requirements = stripeRequirementsSchema.parse(stripeAccount.requirements || {});
       
       const capabilities = stripeCapabilitiesSchema.parse(stripeAccount.capabilities || {});
       
@@ -197,13 +191,7 @@ export async function updateVendorStripeAccountStatus(input: z.infer<typeof upda
     const stripeAccount = await retrieveAccount(vendorAccount.stripeAccountId);
 
     // Parse and validate Stripe data with schemas
-    const requirements = stripeRequirementsSchema.parse(stripeAccount.requirements || {
-      currentlyDue: [],
-      eventuallyDue: [],
-      pastDue: [],
-      pendingVerification: [],
-      errors: [],
-    });
+    const requirements = stripeRequirementsSchema.parse(stripeAccount.requirements || {});
     
     const capabilities = stripeCapabilitiesSchema.parse(stripeAccount.capabilities || {});
     

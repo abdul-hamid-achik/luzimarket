@@ -88,6 +88,73 @@
     "noProducts": "No se encontraron productos",
     "tryAdjustingFilters": "Intenta ajustar los filtros para ver más resultados"
   },
+  "account": {
+    "page": {
+      "user": "Usuario",
+      "memberSince": "Miembro desde",
+      "orders": "Pedidos",
+      "spent": "Gastado",
+      "overview": "Resumen",
+      "myOrders": "Mis Pedidos",
+      "wishlist": "Lista de Deseos",
+      "profile": "Perfil",
+      "quickActions": "Acciones Rápidas",
+      "viewAllOrders": "Ver todos mis pedidos",
+      "myWishlist": "Mi lista de deseos",
+      "editProfile": "Editar perfil",
+      "security": "Seguridad",
+      "recentOrders": "Pedidos Recientes",
+      "noOrdersYet": "No tienes pedidos aún",
+      "startShopping": "Comenzar a comprar",
+      "order": "Pedido",
+      "viewAllOrdersButton": "Ver todos los pedidos",
+      "orderHistory": "Historial de Pedidos",
+      "myWishlistTitle": "Mi Lista de Deseos",
+      "wishlistEmpty": "Tu lista de deseos está vacía",
+      "exploreProducts": "Explorar productos",
+      "profileInfo": "Información del Perfil",
+      "delivered": "Entregado",
+      "shipped": "Enviado",
+      "paid": "Pagado",
+      "pending": "Pendiente"
+    },
+    "security": {
+      "title": "Seguridad de la cuenta",
+      "description": "Protege tu cuenta y controla quién puede acceder a ella",
+      "password": {
+        "title": "Cambiar contraseña",
+        "description": "Usa una contraseña única que no uses en otros sitios"
+      },
+      "twoFactor": {
+        "title": "Autenticación de dos factores",
+        "description": "Añade una capa extra de seguridad a tu cuenta",
+        "authenticatorApp": "Aplicación de autenticación",
+        "authenticatorDescription": "Usa una app como Google Authenticator",
+        "emailBackup": "Email de respaldo",
+        "emailDescription": "Recibe códigos de verificación por email",
+        "viewBackupCodes": "Ver códigos de respaldo"
+      },
+      "sessions": {
+        "title": "Dispositivos donde has iniciado sesión",
+        "description": "Si ves un dispositivo que no reconoces, cierra esa sesión y cambia tu contraseña"
+      },
+      "privacy": {
+        "title": "Privacidad y comunicaciones",
+        "description": "Controla qué información compartes y cómo nos comunicamos contigo",
+        "orderUpdates": "Actualizaciones de pedidos",
+        "orderUpdatesDescription": "Recibe notificaciones sobre el estado de tus pedidos",
+        "promotionalEmails": "Correos promocionales",
+        "promotionalDescription": "Ofertas especiales y productos recomendados",
+        "securityAlerts": "Alertas de seguridad",
+        "securityDescription": "Avisos importantes sobre tu cuenta"
+      },
+      "deleteAccount": {
+        "title": "Eliminar cuenta",
+        "description": "Una vez que elimines tu cuenta, no hay vuelta atrás. Por favor, asegúrate.",
+        "button": "Eliminar mi cuenta"
+      }
+    }
+  },
   "Auth": {
     "invalidCredentials": "Credenciales inválidas",
     "accountLocked": "Cuenta bloqueada temporalmente. Intenta de nuevo en {minutes} minutos.",
@@ -335,7 +402,9 @@
       "trackingNumber": "Número de rastreo",
       "notes": "Notas",
       "updateStatus": "Actualizar estado",
-      "backToOrders": "Volver a órdenes"
+      "backToOrders": "Volver a órdenes",
+      "exportCSV": "Exportar CSV",
+      "exporting": "Exportando..."
     },
     "emailTemplates": {
       "title": "Plantillas de correo",
@@ -438,6 +507,64 @@
       "unlockSuccess": "Cuenta desbloqueada exitosamente",
       "noLockedAccounts": "No hay cuentas bloqueadas"
     },
+    "productDetail": {
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "approve": "Aprobar",
+      "deactivate": "Desactivar",
+      "images": "Imágenes",
+      "description": "Descripción",
+      "productInfo": "Información del Producto",
+      "price": "Precio",
+      "stock": "Inventario",
+      "units": "unidades",
+      "category": "Categoría",
+      "tags": "Etiquetas",
+      "vendorInfo": "Información del Vendedor",
+      "vendor": "Vendedor",
+      "vendorEmail": "Correo del Vendedor",
+      "vendorActive": "Activo",
+      "vendorInactive": "Inactivo",
+      "shippingInfo": "Información de Envío",
+      "weight": "Peso",
+      "dimensions": "Dimensiones",
+      "shippingClass": "Clase de Envío",
+      "actions": "Acciones",
+      "viewPublic": "Ver Página Pública",
+      "pendingApproval": "Este producto está pendiente de aprobación y no es visible para los clientes.",
+      "awaitingApproval": "Este producto está esperando aprobación de los administradores.",
+      "timestamps": "Marcas de Tiempo",
+      "created": "Creado",
+      "updated": "Última Actualización"
+    },
+    "usersPage": {
+      "title": "Usuarios",
+      "subtitle": "Administra todos los usuarios de la plataforma",
+      "totalUsers": "Total usuarios",
+      "activeUsers": "Usuarios activos",
+      "newThisMonth": "Nuevos este mes",
+      "filterAll": "Todos",
+      "filterCustomer": "Cliente",
+      "filterVendor": "Vendedor",
+      "filterAdmin": "Admin",
+      "tableHeaders": {
+        "user": "Usuario",
+        "email": "Email",
+        "type": "Tipo",
+        "orders": "Órdenes",
+        "totalSpent": "Total gastado",
+        "registered": "Registro",
+        "actions": "Acciones"
+      },
+      "userTypes": {
+        "admin": "Admin",
+        "vendor": "Vendedor",
+        "customer": "Cliente"
+      },
+      "noName": "Sin nombre",
+      "viewDetails": "Ver detalles",
+      "loading": "Cargando..."
+    },
     "categories": {
       "title": "Categorías",
       "subtitle": "Administra las categorías de productos",
@@ -451,13 +578,202 @@
       "createNew": "Crear categoría",
       "active": "Activa",
       "inactive": "Inactiva"
+    },
+    "productsPage": {
+      "title": "Productos",
+      "subtitle": "Administra todos los productos de la plataforma",
+      "pendingApproval": "Pendientes de aprobación",
+      "allProducts": "Todos los productos",
+      "bulkActions": "Acciones masivas",
+      "approveSelected": "Aprobar seleccionados",
+      "rejectSelected": "Rechazar seleccionados",
+      "deleteSelected": "Eliminar seleccionados",
+      "selected": "Seleccionados",
+      "selectAll": "Seleccionar todos",
+      "deselectAll": "Deseleccionar todos",
+      "product": "Producto",
+      "vendor": "Vendedor",
+      "category": "Categoría",
+      "price": "Precio",
+      "stock": "Stock",
+      "status": "Estado",
+      "actions": "Acciones",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "approve": "Aprobar",
+      "deactivate": "Desactivar",
+      "view": "Ver",
+      "noProducts": "No hay productos",
+      "noProductsSelected": "No hay productos seleccionados",
+      "bulkActionSuccess": "Acción masiva completada exitosamente",
+      "bulkActionError": "Error al realizar la acción masiva",
+      "totalProducts": "Total productos",
+      "activeProducts": "Activos",
+      "pendingProducts": "Pendientes",
+      "withStock": "Con stock"
+    },
+    "security": {
+      "title": "Seguridad",
+      "description": "Administra la seguridad y el acceso de tu cuenta de administrador",
+      "password": {
+        "title": "Cambiar contraseña",
+        "description": "Actualiza tu contraseña regularmente para mantener tu cuenta segura"
+      },
+      "twoFactor": {
+        "title": "Autenticación de dos factores",
+        "description": "Añade una capa extra de seguridad a tu cuenta",
+        "authenticatorApp": "Aplicación de autenticación",
+        "authenticatorDescription": "Usa Google Authenticator o Authy",
+        "smsBackup": "SMS de respaldo",
+        "smsDescription": "Recibe códigos por SMS como respaldo",
+        "viewBackupCodes": "Ver códigos de respaldo"
+      },
+      "sessions": {
+        "title": "Sesiones activas",
+        "description": "Gestiona los dispositivos que tienen acceso a tu cuenta"
+      },
+      "notifications": {
+        "title": "Notificaciones de seguridad",
+        "description": "Recibe alertas sobre actividad importante en tu cuenta",
+        "loginAlerts": "Alertas de inicio de sesión",
+        "loginAlertsDescription": "Notificar nuevos inicios de sesión desde dispositivos desconocidos",
+        "suspiciousActivity": "Actividad sospechosa",
+        "suspiciousDescription": "Alertar sobre intentos de acceso no autorizados",
+        "passwordChanges": "Cambios de contraseña",
+        "passwordDescription": "Confirmar todos los cambios de contraseña por email"
+      }
+    },
+    "settingsPage": {
+      "title": "Configuración",
+      "subtitle": "Administra la configuración general de la plataforma",
+      "securitySettings": "Configuración de Seguridad",
+      "securityDescription": "Administra contraseñas, autenticación y sesiones activas",
+      "goToSecurity": "Ir a Seguridad",
+      "generalSettings": "Configuración General",
+      "siteName": "Nombre del sitio",
+      "adminEmail": "Email de administrador",
+      "maintenanceMode": "Modo mantenimiento",
+      "maintenanceModeDescription": "Mostrar página de mantenimiento a los usuarios",
+      "paymentSettings": "Configuración de Pagos",
+      "stripePublicKey": "Stripe Public Key",
+      "platformCommission": "Comisión de la plataforma (%)",
+      "testMode": "Pagos en prueba",
+      "testModeDescription": "Usar modo de prueba de Stripe",
+      "emailSettings": "Configuración de Email",
+      "fromEmail": "Email remitente",
+      "fromName": "Nombre remitente",
+      "orderNotifications": "Notificaciones de pedidos",
+      "orderNotificationsDescription": "Enviar email al admin cuando hay nuevos pedidos",
+      "shippingSettings": "Configuración de Envío",
+      "defaultShippingCost": "Costo de envío predeterminado",
+      "freeShippingThreshold": "Envío gratis a partir de",
+      "automaticCalculation": "Cálculo automático",
+      "automaticCalculationDescription": "Calcular envío basado en la dirección del cliente",
+      "localization": "Localización",
+      "defaultLanguage": "Idioma predeterminado",
+      "spanish": "Español",
+      "english": "English",
+      "timezone": "Zona horaria",
+      "mexicoCity": "Ciudad de México (GMT-6)",
+      "monterrey": "Monterrey (GMT-6)",
+      "cancun": "Cancún (GMT-5)",
+      "currency": "Moneda",
+      "mxn": "MXN - Peso Mexicano",
+      "usd": "USD - Dólar Estadounidense",
+      "saveChanges": "Guardar cambios"
+    },
+    "emailTemplates": {
+      "new": {
+        "validation": {
+          "name": "El nombre debe tener al menos 3 caracteres",
+          "type": "Selecciona un tipo de plantilla",
+          "subject": "El asunto debe tener al menos 5 caracteres",
+          "htmlContent": "El contenido HTML es requerido"
+        },
+        "toast": {
+          "createError": "Error al crear la plantilla",
+          "createSuccess": "Plantilla creada exitosamente"
+        },
+        "labels": {
+          "backToTemplates": "Volver a plantillas",
+          "newTemplate": "Nueva Plantilla de Email",
+          "createDescription": "Crea una nueva plantilla de correo electrónico",
+          "basicInfo": "Información Básica",
+          "templateName": "Nombre de la Plantilla",
+          "templateType": "Tipo de Plantilla",
+          "selectType": "Selecciona un tipo",
+          "emailSubject": "Asunto del Email",
+          "description": "Descripción (opcional)",
+          "descriptionPlaceholder": "Describe el propósito de esta plantilla...",
+          "activeTemplate": "Plantilla Activa",
+          "inactiveTemplatesNote": "Las plantillas inactivas no se usarán",
+          "availableVariables": "Variables Disponibles",
+          "clickToInsert": "Haz clic para insertar en el editor",
+          "html": "HTML",
+          "plainText": "Texto Plano",
+          "preview": "Vista Previa",
+          "desktop": "Desktop",
+          "mobile": "Mobile",
+          "plainTextVersion": "Versión en texto plano del email...",
+          "uploadingImages": "Subiendo imágenes...",
+          "dragImages": "Arrastra imágenes aquí o haz clic para seleccionar",
+          "imageFormats": "PNG, JPG hasta 5MB",
+          "principal": "Principal",
+          "cancel": "Cancelar",
+          "save": "Guardar Plantilla",
+          "saving": "Guardando...",
+          "creating": "Creando..."
+        },
+        "placeholders": {
+          "templateName": "Ej: Confirmación de Orden",
+          "subjectWithVariables": "Ej: Tu orden #{{order_number}} ha sido confirmada",
+          "variableUsage": "Puedes usar variables como"
+        },
+        "templateTypes": {
+          "orderConfirmation": "Confirmación de Orden",
+          "welcome": "Bienvenida",
+          "passwordReset": "Restablecer Contraseña",
+          "shippingNotification": "Notificación de Envío",
+          "reviewRequest": "Solicitud de Reseña",
+          "promotional": "Promocional",
+          "abandonedCart": "Carrito Abandonado"
+        }
+      }
     }
   },
   "Vendor": {
+    "layout": {
+      "dashboard": "Panel",
+      "products": "Productos",
+      "orders": "Órdenes",
+      "analytics": "Análisis",
+      "financials": "Finanzas",
+      "payments": "Pagos",
+      "settings": "Configuración",
+      "logout": "Cerrar sesión"
+    },
     "dashboard": "Panel de vendedor",
     "myProducts": "Mis productos",
     "addProduct": "Agregar producto",
-    "orders": "Órdenes",
+    "orders": {
+      "title": "Órdenes",
+      "statusUpdated": "Estado de orden actualizado exitosamente",
+      "updateError": "Error al actualizar el estado de la orden",
+      "status": {
+        "label": "Estado de la orden",
+        "select": "Seleccionar estado",
+        "pending": "Pendiente",
+        "processing": "Procesando",
+        "shipped": "Enviado",
+        "delivered": "Entregado",
+        "cancelled": "Cancelado"
+      },
+      "trackingNumber": "Número de seguimiento",
+      "trackingNumberPlaceholder": "Ingrese el número de seguimiento",
+      "notes": "Notas",
+      "notesPlaceholder": "Agregue notas sobre la actualización del estado",
+      "updateStatus": "Actualizar estado"
+    },
     "analytics": "Análisis",
     "profile": "Perfil",
     "settings": "Configuración",
@@ -468,6 +784,46 @@
     "shippingAddress": "Dirección de envío",
     "productsSold": "Productos vendidos",
     "viewFullOrder": "Ver orden completa",
+    "orderDetails": {
+      "orderNumber": "Orden",
+      "orderInvoice": "Factura de Orden",
+      "date": "Fecha",
+      "status": "Estado",
+      "customer": "Cliente",
+      "guest": "Invitado",
+      "shippingAddress": "Dirección de envío",
+      "orderItems": "Artículos de la orden",
+      "product": "Producto",
+      "quantity": "Cantidad",
+      "price": "Precio",
+      "total": "Total",
+      "subtotal": "Subtotal",
+      "tax": "IVA (16%)",
+      "shipping": "Envío",
+      "print": "Imprimir",
+      "downloadInvoice": "Descargar factura",
+      "shippingActions": "Acciones de envío",
+      "paymentInfo": "Información de pago",
+      "method": "Método",
+      "paid": "Pagado",
+      "pending": "Pendiente",
+      "transactionId": "ID de transacción",
+      "notes": "Notas",
+      "copiedToClipboard": "Copiado al portapapeles",
+      "orderNumberCopied": "Número de orden copiado",
+      "status": {
+        "pending": "Pendiente",
+        "processing": "Procesando",
+        "shipped": "Enviado",
+        "delivered": "Entregado",
+        "cancelled": "Cancelado"
+      },
+      "payment": {
+        "pending": "Pendiente",
+        "succeeded": "Completado",
+        "failed": "Fallido"
+      }
+    },
     "orderManagement": {
       "updateStatus": "Actualizar Estado",
       "orderNumber": "Orden #",
@@ -495,6 +851,28 @@
       }
     },
     "dashboard": {
+      "welcome": "Bienvenido, {businessName}",
+      "subtitle": "Aquí está el resumen de tu negocio",
+      "totalProducts": "Productos Totales",
+      "activeProducts": "Productos Activos",
+      "totalOrders": "Órdenes Totales",
+      "totalRevenue": "Ingresos Totales",
+      "addProduct": "Agregar Producto",
+      "quickActions": "Acciones Rápidas",
+      "viewProducts": "Ver Productos",
+      "viewOrders": "Ver Órdenes",
+      "analytics": "Análisis",
+      "settings": "Configuración",
+      "recentOrders": "Órdenes Recientes",
+      "viewAll": "Ver todas",
+      "noRecentOrders": "No hay órdenes recientes",
+      "orderStatus": {
+        "pending": "Pendiente",
+        "paid": "Pagado",
+        "shipped": "Enviado",
+        "delivered": "Entregado"
+      },
+      "accountPending": "Tu cuenta está pendiente de aprobación. Podrás agregar productos una vez que sea aprobada.",
       "stripeConnect": {
         "title": "Pagos con Stripe",
         "description": "Configura tu cuenta para recibir pagos",
@@ -607,6 +985,10 @@
         "enabled": "Habilitado",
         "disabled": "Deshabilitado",
         "manageAccount": "Gestionar Cuenta"
+      },
+      "export": {
+        "transactions": "Exportar transacciones",
+        "payouts": "Exportar pagos"
       },
       "noStripeAccount": {
         "title": "Cuenta de Stripe no configurada",
@@ -1187,7 +1569,7 @@
     "sections": {
       "story": {
         "title": "Nuestra Historia",
-        "paragraph1": "Luzimarket nació de la pasión por celebrar los momentos especiales de la vida y el deseo de apoyar a los talentosos artesanos y emprendedores mexicanos. Fundada en 2024, nuestra misión es crear un puente entre quienes buscan regalos únicos y significativos y los creadores que ponen su corazón en cada pieza.",
+        "paragraph1": "Luzimarket nació de la pasión por celebrar los momentos especiales de la vida y el deseo de apoyar a los talentosos artesanos y emprendedores mexicanos. Fundada recientemente, nuestra misión es crear un puente entre quienes buscan regalos únicos y significativos y los creadores que ponen su corazón en cada pieza.",
         "paragraph2": "Creemos que cada regalo cuenta una historia. Por eso, cuidadosamente seleccionamos a vendedores que comparten nuestra visión de calidad, autenticidad y atención al detalle. Desde joyería artesanal hasta productos gourmet, desde arte decorativo hasta experiencias memorables, cada producto en Luzimarket ha sido elegido por su capacidad de crear momentos inolvidables.",
         "paragraph3": "Somos más que un marketplace; somos una comunidad que celebra la creatividad mexicana, apoya el comercio justo y facilita conexiones significativas a través del arte de regalar."
       },
@@ -1537,81 +1919,6 @@
       "settings": "Configuración",
       "logout": "Cerrar sesión"
     },
-    "financials": {
-      "title": "Panel Financiero",
-      "subtitle": "Gestiona tus finanzas y pagos",
-      "noStripeAccount": {
-        "title": "Cuenta de Stripe no configurada",
-        "description": "Necesitas configurar tu cuenta de Stripe Connect para recibir pagos directamente.",
-        "action": "Configurar cuenta de Stripe"
-      },
-      "incompleteAccount": {
-        "title": "Configuración incompleta",
-        "description": "Tu cuenta de Stripe Connect necesita información adicional antes de poder procesar pagos.",
-        "action": "Completar configuración"
-      },
-      "balance": {
-        "available": "Balance disponible",
-        "availableDescription": "Fondos listos para retirar",
-        "pending": "Balance pendiente",
-        "pendingDescription": "Fondos en proceso",
-        "lifetime": "Ventas totales",
-        "lifetimeDescription": "Total histórico de ventas"
-      },
-      "status": {
-        "completed": "Completado",
-        "pending": "Pendiente",
-        "failed": "Fallido",
-        "processing": "Procesando",
-        "paid": "Pagado",
-        "inTransit": "En tránsito"
-      },
-      "actions": {
-        "export": "Exportar",
-        "refresh": "Actualizar"
-      },
-      "lastUpdated": "Última actualización: {time}",
-      "tabs": {
-        "overview": "Vista General",
-        "reports": "Reportes",
-        "transactions": "Transacciones",
-        "payouts": "Pagos"
-      },
-      "transactions": {
-        "title": "Historial de transacciones",
-        "description": "Todas las ventas, reembolsos y movimientos de tu cuenta",
-        "empty": "No hay transacciones aún",
-        "type": "Tipo",
-        "description": "Descripción",
-        "amount": "Monto",
-        "status": "Estado",
-        "date": "Fecha",
-        "searchPlaceholder": "Buscar transacciones..."
-      },
-      "payouts": {
-        "title": "Historial de pagos",
-        "description": "Pagos enviados a tu cuenta bancaria",
-        "empty": "No hay pagos aún",
-        "payoutTo": "Pago a {method}",
-        "bankAccount": "Cuenta bancaria",
-        "date": "Fecha",
-        "amount": "Monto",
-        "method": "Método",
-        "status": "Estado",
-        "arrivalDate": "Fecha de llegada",
-        "searchPlaceholder": "Buscar pagos..."
-      },
-      "accountInfo": {
-        "title": "Información de la cuenta",
-        "accountId": "ID de cuenta",
-        "commissionRate": "Comisión de plataforma",
-        "payoutsEnabled": "Pagos habilitados",
-        "chargesEnabled": "Cobros habilitados",
-        "enabled": "Activo",
-        "disabled": "Inactivo",
-        "manageAccount": "Gestionar cuenta"
-      }
-    },
     "payouts": {
       "requestPayout": "Solicitar Pago",
       "title": "Solicitar Pago",
@@ -1661,6 +1968,139 @@
       "reportError": "Error al generar el reporte",
       "downloadSuccess": "Reporte descargado exitosamente",
       "downloadError": "Error al descargar el reporte"
+    },
+    "settings": {
+      "title": "Configuración",
+      "description": "Administra la configuración de tu cuenta y tienda",
+      "shipping": {
+        "title": "Envío",
+        "description": "Configura tus métodos y tarifas de envío"
+      },
+      "store": {
+        "title": "Información de la tienda",
+        "description": "Actualiza los detalles de tu tienda y perfil público"
+      },
+      "payments": {
+        "title": "Pagos",
+        "description": "Administra tu información de pago y preferencias"
+      },
+      "notifications": {
+        "title": "Notificaciones",
+        "description": "Controla cómo y cuándo recibir notificaciones"
+      },
+      "security": {
+        "title": "Seguridad",
+        "description": "Protege tu cuenta con configuraciones de seguridad"
+      },
+      "accountInfo": {
+        "title": "Información de la cuenta",
+        "businessName": "Nombre del negocio",
+        "email": "Correo electrónico",
+        "vendorId": "ID de vendedor",
+        "status": "Estado",
+        "active": "Activo",
+        "inactive": "Inactivo",
+        "notConfigured": "No configurado",
+        "memberSince": "Miembro desde"
+      }
+    },
+    "security": {
+      "title": "Seguridad",
+      "description": "Protege tu cuenta de vendedor",
+      "password": {
+        "title": "Cambiar contraseña",
+        "description": "Mantén tu cuenta segura con una contraseña fuerte"
+      },
+      "twoFactor": {
+        "title": "Autenticación de dos factores",
+        "description": "Añade una capa extra de seguridad a tu cuenta",
+        "status": "Estado",
+        "notConfigured": "No configurado",
+        "active": "Activo",
+        "configure": "Configurar",
+        "disable": "Desactivar",
+        "enableApp": "Activar con aplicación",
+        "enableSms": "Activar autenticación por SMS",
+        "disableSms": "Desactivar autenticación por SMS",
+        "viewBackupCodes": "Ver códigos de respaldo"
+      },
+      "sessions": {
+        "title": "Dispositivos activos",
+        "description": "Dispositivos donde has iniciado sesión recientemente",
+        "currentSession": "Sesión actual",
+        "lastActive": "Última actividad",
+        "revoke": "Revocar",
+        "revokeAll": "Revocar todas",
+        "loading": "Cargando sesiones...",
+        "loadError": "Error al cargar las sesiones",
+        "sessionRevoked": "Sesión revocada exitosamente",
+        "revokeError": "Error al revocar la sesión",
+        "allSessionsRevoked": "Todas las sesiones han sido revocadas",
+        "revokeAllError": "Error al revocar las sesiones"
+      }
+    },
+    "products": {
+      "new": {
+        "validation": {
+          "name": "El nombre debe tener al menos 3 caracteres",
+          "description": "La descripción debe tener al menos 10 caracteres",
+          "price": "El precio debe ser mayor a 0",
+          "stock": "El stock debe ser un número entero positivo",
+          "image": "Se requiere al menos una imagen",
+          "category": "Por favor selecciona una categoría"
+        },
+        "toast": {
+          "createSuccess": "Producto creado exitosamente",
+          "createError": "Error al crear el producto",
+          "uploadError": "Error al subir la imagen"
+        },
+        "placeholders": {
+          "name": "Nombre del producto",
+          "description": "Describe tu producto en detalle...",
+          "price": "0.00",
+          "stock": "0",
+          "sku": "SKU-001"
+        }
+      },
+      "edit": {
+        "title": "Editar Producto",
+        "validation": {
+          "name": "El nombre debe tener al menos 3 caracteres",
+          "description": "La descripción debe tener al menos 10 caracteres",
+          "price": "El precio debe ser mayor a 0",
+          "stock": "El stock debe ser un número entero positivo",
+          "category": "Por favor selecciona una categoría"
+        },
+        "toast": {
+          "updateSuccess": "Producto actualizado exitosamente",
+          "updateError": "Error al actualizar el producto",
+          "uploadError": "Error al subir la imagen",
+          "deleteImageError": "Error al eliminar la imagen"
+        },
+        "placeholders": {
+          "name": "Nombre del producto",
+          "description": "Describe tu producto en detalle...",
+          "price": "0.00",
+          "stock": "0",
+          "sku": "SKU-001"
+        }
+      }
+    },
+    "shipping": {
+      "toast": {
+        "updateSuccess": "Configuración de envío actualizada",
+        "updateError": "Error al actualizar la configuración"
+      },
+      "placeholders": {
+        "basePrice": "Precio base de envío",
+        "additionalCost": "Costo adicional por producto"
+      }
+    },
+    "financials": {
+      "table": {
+        "viewOrder": "Ver orden",
+        "viewDetails": "Ver detalles"
+      }
     }
   }
 }

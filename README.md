@@ -350,4 +350,4 @@ The app is configured for Vercel deployment with:
 
 ## License
 
-All rights reserved - LUZIMARKET © 2024
+All rights reserved - LUZIMARKET © 2025

@@ -15,25 +15,23 @@ import { ChevronLeft, Upload, X, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 const productSchema = z.object({
-  name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
-  description: z.string().min(10, "La descripción debe tener al menos 10 caracteres"),
-  price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
-    message: "El precio debe ser un número mayor a 0",
-  }),
-  stock: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
-    message: "El stock debe ser un número positivo",
-  }),
-  categoryId: z.string().min(1, "Selecciona una categoría"),
+  name: z.string().min(3),
+  description: z.string().min(10),
+  price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0),
+  stock: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0),
+  categoryId: z.string().min(1),
   tags: z.string().optional(),
-  images: z.array(z.string()).min(1, "Agrega al menos una imagen"),
+  images: z.array(z.string()).min(1),
 });
 
 type ProductForm = z.infer<typeof productSchema>;
 
 export default function NewProductPage() {
   const router = useRouter();
+  const t = useTranslations("vendor.products.new");
   const [isLoading, setIsLoading] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
@@ -70,7 +68,7 @@ export default function NewProductPage() {
       form.setValue("images", [...imageUrls, ...newImageUrls]);
       toast.success(`${files.length} imagen(es) agregadas`);
     } catch (error) {
-      toast.error("Error al subir las imágenes");
+      toast.error(t("toast.uploadError"));
     } finally {
       setUploadingImages(false);
     }
@@ -102,10 +100,10 @@ export default function NewProductPage() {
         throw new Error("Error al crear el producto");
       }
 
-      toast.success("Producto creado exitosamente");
+      toast.success(t("toast.createSuccess"));
       router.push("/vendor/products");
     } catch (error) {
-      toast.error("Error al crear el producto");
+      toast.error(t("toast.createError"));
     } finally {
       setIsLoading(false);
     }
@@ -144,7 +142,7 @@ export default function NewProductPage() {
                     <FormLabel>Nombre del Producto</FormLabel>
                     <FormControl>
                       <InputWithValidation
-                        placeholder="Ejemplo: Ramo de Rosas Rojas"
+                        placeholder={t("placeholders.name")}
                         {...field}
                         showValidation={form.formState.dirtyFields.name}
                         isValid={form.formState.dirtyFields.name && !form.formState.errors.name}
@@ -164,7 +162,7 @@ export default function NewProductPage() {
                     <FormLabel>Descripción</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Describe tu producto en detalle..."
+                        placeholder={t("placeholders.description")}
                         rows={4}
                         {...field}
                       />
@@ -236,7 +234,7 @@ export default function NewProductPage() {
                       <InputWithValidation
                         type="number"
                         step="0.01"
-                        placeholder="299.99"
+                        placeholder={t("placeholders.price")}
                         {...field}
                         showValidation={form.formState.dirtyFields.price}
                         isValid={form.formState.dirtyFields.price && !form.formState.errors.price}
@@ -257,7 +255,7 @@ export default function NewProductPage() {
                     <FormControl>
                       <InputWithValidation
                         type="number"
-                        placeholder="50"
+                        placeholder={t("placeholders.stock")}
                         {...field}
                         showValidation={form.formState.dirtyFields.stock}
                         isValid={form.formState.dirtyFields.stock && !form.formState.errors.stock}

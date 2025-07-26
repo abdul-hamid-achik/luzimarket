@@ -95,13 +95,13 @@ export default function LoginPage() {
         // Redirect based on user type
         switch (userType) {
           case "admin":
-            nextRouter.push("/admin"); // Admin routes are not internationalized
+            router.push("/admin"); // Admin dashboard
             break;
           case "vendor":
-            nextRouter.push("/vendor/dashboard"); // Vendor routes are not internationalized
+            router.push("/vendor/dashboard"); // Vendor dashboard
             break;
           default:
-            router.push("/"); // Customer routes are internationalized
+            router.push("/"); // Customer home
         }
       }
     } catch (error) {

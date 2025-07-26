@@ -20,13 +20,21 @@ import {
   Loader2,
   Download,
   BarChart3,
-  FileText
+  FileText,
+  ChevronDown
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { FinancialsDataTable } from "./financials-data-table";
 import { PayoutRequestDialog } from "@/components/vendor/payout-request-dialog";
 import { FinancialReports } from "@/components/vendor/financial-reports";
+import { exportToCSV, formatDate as formatDateExport } from "@/lib/utils/export";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface FinancialsClientProps {
   vendor: any;
@@ -50,6 +58,38 @@ export function FinancialsClient({
     setIsRefreshing(true);
     // Reload the page to fetch fresh data
     window.location.reload();
+  };
+
+  const handleExportTransactions = () => {
+    if (!transactions?.transactions?.length) return;
+    
+    const columns = [
+      { key: 'createdAt', header: 'Fecha', formatter: formatDateExport },
+      { key: 'description', header: 'Descripción' },
+      { key: 'type', header: 'Tipo' },
+      { key: 'amount', header: 'Monto', formatter: (value: string) => formatCurrency(value) },
+      { key: 'status', header: 'Estado' },
+      { key: 'orderId', header: 'ID de Orden' },
+    ];
+    
+    const filename = `transacciones_${vendor.businessName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
+    exportToCSV(transactions.transactions, columns, filename);
+  };
+
+  const handleExportPayouts = () => {
+    if (!payouts?.payouts?.length) return;
+    
+    const columns = [
+      { key: 'createdAt', header: 'Fecha', formatter: formatDateExport },
+      { key: 'amount', header: 'Monto', formatter: (value: string) => formatCurrency(value) },
+      { key: 'status', header: 'Estado' },
+      { key: 'method', header: 'Método' },
+      { key: 'arrivalDate', header: 'Fecha de llegada', formatter: formatDateExport },
+      { key: 'reference', header: 'Referencia' },
+    ];
+    
+    const filename = `pagos_${vendor.businessName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
+    exportToCSV(payouts.payouts, columns, filename);
   };
 
   const formatCurrency = (amount: string | number) => {
@@ -172,10 +212,25 @@ export function FinancialsClient({
                 onSuccess={handleRefresh}
               />
             )}
-            <Button variant="outline" size="sm" disabled>
-              <Download className="h-4 w-4 mr-2" />
-              {t("actions.export")}
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Download className="h-4 w-4 mr-2" />
+                  {t("actions.export")}
+                  <ChevronDown className="h-4 w-4 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleExportTransactions}>
+                  <FileText className="h-4 w-4 mr-2" />
+                  {t("export.transactions")}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleExportPayouts}>
+                  <CreditCard className="h-4 w-4 mr-2" />
+                  {t("export.payouts")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing}>
               {isRefreshing ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />

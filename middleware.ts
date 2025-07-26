@@ -11,6 +11,7 @@ import {
   securityHeaders,
   getContentSecurityPolicy
 } from '@/lib/security-config'
+import { updateSessionActivity } from '@/lib/actions/session'
 
 // Create the internationalization middleware
 const intlMiddleware = createMiddleware(routing)
@@ -65,6 +66,18 @@ function applySecurityHeaders(response: NextResponse): NextResponse {
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
+  
+  // Track session activity for authenticated users (non-blocking)
+  const sessionToken = request.headers.get('authorization')?.replace('Bearer ', '') || 
+                      request.cookies.get('next-auth.session-token')?.value ||
+                      request.cookies.get('__Secure-next-auth.session-token')?.value;
+                      
+  if (sessionToken && !pathname.startsWith('/_next') && !pathname.startsWith('/api/')) {
+    // Update session activity in background
+    updateSessionActivity(sessionToken).catch(() => {
+      // Silently fail - don't block the request
+    });
+  }
 
   // Handle API routes
   if (pathname.startsWith('/api/')) {

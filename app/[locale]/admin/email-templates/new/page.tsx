@@ -17,27 +17,38 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 
 // Dynamically import the editor to avoid SSR issues
 const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
-const emailTemplateSchema = z.object({
-  name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
-  type: z.string().min(1, "Selecciona un tipo de plantilla"),
-  subject: z.string().min(5, "El asunto debe tener al menos 5 caracteres"),
-  description: z.string().optional(),
-  htmlContent: z.string().min(10, "El contenido HTML es requerido"),
-  textContent: z.string().optional(),
-  variables: z.array(z.string()).optional(),
-  isActive: z.boolean(),
-});
-
-type EmailTemplateForm = z.infer<typeof emailTemplateSchema>;
+type EmailTemplateForm = {
+  name: string;
+  type: string;
+  subject: string;
+  description?: string;
+  htmlContent: string;
+  textContent?: string;
+  variables?: string[];
+  isActive: boolean;
+};
 
 export default function NewEmailTemplatePage() {
   const router = useRouter();
+  const t = useTranslations("Admin.emailTemplates.new");
   const [isLoading, setIsLoading] = useState(false);
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
+
+  const emailTemplateSchema = z.object({
+    name: z.string().min(3, t("validation.name")),
+    type: z.string().min(1, t("validation.type")),
+    subject: z.string().min(5, t("validation.subject")),
+    description: z.string().optional(),
+    htmlContent: z.string().min(10, t("validation.htmlContent")),
+    textContent: z.string().optional(),
+    variables: z.array(z.string()).optional(),
+    isActive: z.boolean(),
+  });
 
   const form = useForm<EmailTemplateForm>({
     resolver: zodResolver(emailTemplateSchema),
@@ -88,7 +99,7 @@ export default function NewEmailTemplatePage() {
     <p>Tu contenido aquí...</p>
   </div>
   <div class="footer">
-    <p>© 2024 Luzimarket. Todos los derechos reservados.</p>
+    <p>© {{current_year}} Luzimarket. Todos los derechos reservados.</p>
   </div>
 </body>
 </html>`,
@@ -99,13 +110,13 @@ export default function NewEmailTemplatePage() {
   });
 
   const templateTypes = [
-    { value: "order_confirmation", label: "Confirmación de Orden" },
-    { value: "welcome", label: "Bienvenida" },
-    { value: "password_reset", label: "Restablecer Contraseña" },
-    { value: "shipping_notification", label: "Notificación de Envío" },
-    { value: "review_request", label: "Solicitud de Reseña" },
-    { value: "promotional", label: "Promocional" },
-    { value: "abandoned_cart", label: "Carrito Abandonado" },
+    { value: "order_confirmation", label: t("templateTypes.orderConfirmation") },
+    { value: "welcome", label: t("templateTypes.welcome") },
+    { value: "password_reset", label: t("templateTypes.passwordReset") },
+    { value: "shipping_notification", label: t("templateTypes.shippingNotification") },
+    { value: "review_request", label: t("templateTypes.reviewRequest") },
+    { value: "promotional", label: t("templateTypes.promotional") },
+    { value: "abandoned_cart", label: t("templateTypes.abandonedCart") },
   ];
 
   const commonVariables = [
@@ -135,13 +146,13 @@ export default function NewEmailTemplatePage() {
       });
 
       if (!response.ok) {
-        throw new Error("Error al crear la plantilla");
+        throw new Error(t("toast.createError"));
       }
 
-      toast.success("Plantilla creada exitosamente");
+      toast.success(t("toast.createSuccess"));
       router.push("/admin/email-templates");
     } catch (error) {
-      toast.error("Error al crear la plantilla");
+      toast.error(t("toast.createError"));
     } finally {
       setIsLoading(false);
     }
@@ -156,12 +167,12 @@ export default function NewEmailTemplatePage() {
           className="inline-flex items-center text-sm font-univers text-gray-600 hover:text-gray-900 mb-4"
         >
           <ChevronLeft className="h-4 w-4 mr-1" />
-          Volver a plantillas
+          {t("labels.backToTemplates")}
         </Link>
         
-        <h1 className="text-2xl font-univers text-gray-900">Nueva Plantilla de Email</h1>
+        <h1 className="text-2xl font-univers text-gray-900">{t("labels.newTemplate")}</h1>
         <p className="text-sm text-gray-600 font-univers mt-1">
-          Crea una nueva plantilla de correo electrónico
+          {t("labels.createDescription")}
         </p>
       </div>
 
@@ -172,7 +183,7 @@ export default function NewEmailTemplatePage() {
             <div className="lg:col-span-1 space-y-6">
               {/* Basic Information */}
               <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h2 className="text-lg font-univers mb-6">Información Básica</h2>
+                <h2 className="text-lg font-univers mb-6">{t("labels.basicInfo")}</h2>
                 
                 <div className="space-y-4">
                   <FormField
@@ -180,9 +191,9 @@ export default function NewEmailTemplatePage() {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nombre de la Plantilla</FormLabel>
+                        <FormLabel>{t("labels.templateName")}</FormLabel>
                         <FormControl>
-                          <Input placeholder="Ej: Confirmación de Orden" {...field} />
+                          <Input placeholder={t("placeholders.templateName")} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -194,11 +205,11 @@ export default function NewEmailTemplatePage() {
                     name="type"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tipo de Plantilla</FormLabel>
+                        <FormLabel>{t("labels.templateType")}</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Selecciona un tipo" />
+                              <SelectValue placeholder={t("labels.selectType")} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>

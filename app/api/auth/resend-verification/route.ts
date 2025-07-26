@@ -121,7 +121,7 @@ export async function POST(request: Request) {
           </div>
           
           <div style="background: linear-gradient(to right, #86efac, #fde047, #5eead4); padding: 20px; text-align: center;">
-            <p style="margin: 0; font-size: 12px;">© 2024 LUZIMARKET</p>
+            <p style="margin: 0; font-size: 12px;">© ${new Date().getFullYear()} LUZIMARKET</p>
           </div>
         </div>
       `,

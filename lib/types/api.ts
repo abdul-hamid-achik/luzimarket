@@ -159,15 +159,15 @@ export type ReportData =
 
 // Stripe Connect data schemas
 export const stripeRequirementsSchema = z.object({
-  currentlyDue: z.array(z.string()),
-  eventuallyDue: z.array(z.string()),
-  pastDue: z.array(z.string()),
-  pendingVerification: z.array(z.string()),
+  currentlyDue: z.array(z.string()).optional().default([]),
+  eventuallyDue: z.array(z.string()).optional().default([]),
+  pastDue: z.array(z.string()).optional().default([]),
+  pendingVerification: z.array(z.string()).optional().default([]),
   errors: z.array(z.object({
     code: z.string(),
     reason: z.string(), 
     requirement: z.string(),
-  })),
+  })).optional().default([]),
 });
 
 export const stripeCapabilitiesSchema = z.record(z.string());

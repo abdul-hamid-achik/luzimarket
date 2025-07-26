@@ -1,5 +1,5 @@
 import { pgTable, text, timestamp, boolean, integer, decimal, json, uuid, varchar, index } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 
 // Vendors table
 export const vendors = pgTable("vendors", {
@@ -40,6 +40,10 @@ export const vendors = pgTable("vendors", {
   failedLoginAttempts: integer("failed_login_attempts").default(0),
   lastFailedLoginAt: timestamp("last_failed_login_at"),
   lockedUntil: timestamp("locked_until"),
+  // Two-factor authentication fields
+  twoFactorSecret: text("two_factor_secret"),
+  twoFactorEnabled: boolean("two_factor_enabled").default(false),
+  twoFactorBackupCodes: json("two_factor_backup_codes").$type<string[]>().default([]),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => {
@@ -123,6 +127,10 @@ export const users = pgTable("users", {
   failedLoginAttempts: integer("failed_login_attempts").default(0),
   lastFailedLoginAt: timestamp("last_failed_login_at"),
   lockedUntil: timestamp("locked_until"),
+  // Two-factor authentication fields
+  twoFactorSecret: text("two_factor_secret"),
+  twoFactorEnabled: boolean("two_factor_enabled").default(false),
+  twoFactorBackupCodes: json("two_factor_backup_codes").$type<string[]>().default([]),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => ({
@@ -210,6 +218,10 @@ export const adminUsers = pgTable("admin_users", {
   failedLoginAttempts: integer("failed_login_attempts").default(0),
   lastFailedLoginAt: timestamp("last_failed_login_at"),
   lockedUntil: timestamp("locked_until"),
+  // Two-factor authentication fields
+  twoFactorSecret: text("two_factor_secret"),
+  twoFactorEnabled: boolean("two_factor_enabled").default(false),
+  twoFactorBackupCodes: json("two_factor_backup_codes").$type<string[]>().default([]),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => ({
@@ -746,3 +758,22 @@ export type NewVendorBankAccount = typeof vendorBankAccounts.$inferInsert;
 
 export type VendorStripeAccount = typeof vendorStripeAccounts.$inferSelect;
 export type NewVendorStripeAccount = typeof vendorStripeAccounts.$inferInsert;
+
+// User Sessions
+export const userSessions = pgTable("user_sessions", {
+  id: text("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: text("user_id").notNull(),
+  userType: text("user_type").notNull(), // 'user' | 'vendor' | 'admin'
+  sessionToken: text("session_token").notNull().unique(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  device: text("device"),
+  browser: text("browser"),
+  location: text("location"),
+  lastActive: timestamp("last_active").notNull().defaultNow(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export type UserSession = typeof userSessions.$inferSelect;
+export type NewUserSession = typeof userSessions.$inferInsert;

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { User, Mail, Calendar, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 type UserData = {
   id: string;
@@ -16,6 +17,7 @@ type UserData = {
 };
 
 export default function AdminUsersPage() {
+  const t = useTranslations("Admin.usersPage");
   const [userList, setUserList] = useState<UserData[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserData[]>([]);
   const [activeFilter, setActiveFilter] = useState<string>("all");
@@ -50,19 +52,19 @@ export default function AdminUsersPage() {
   }, [userList, activeFilter]);
 
   const filterTabs = [
-    { id: "all", label: "Todos", count: userList.length },
-    { id: "customer", label: "Cliente", count: userList.filter(u => u.userType === "customer").length },
-    { id: "vendor", label: "Vendedor", count: userList.filter(u => u.userType === "vendor").length },
-    { id: "admin", label: "Admin", count: userList.filter(u => u.userType === "admin").length },
+    { id: "all", label: t("filterAll"), count: userList.length },
+    { id: "customer", label: t("filterCustomer"), count: userList.filter(u => u.userType === "customer").length },
+    { id: "vendor", label: t("filterVendor"), count: userList.filter(u => u.userType === "vendor").length },
+    { id: "admin", label: t("filterAdmin"), count: userList.filter(u => u.userType === "admin").length },
   ];
 
   if (isLoading) {
     return (
       <div className="space-y-8">
         <div>
-          <h1 className="text-2xl font-univers text-gray-900">Usuarios</h1>
+          <h1 className="text-2xl font-univers text-gray-900">{t("title")}</h1>
           <p className="text-sm text-gray-600 font-univers mt-1">
-            Administra todos los usuarios de la plataforma
+            {t("subtitle")}
           </p>
         </div>
         <div className="flex items-center justify-center py-8">
@@ -76,9 +78,9 @@ export default function AdminUsersPage() {
     <div className="space-y-8">
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-univers text-gray-900">Usuarios</h1>
+        <h1 className="text-2xl font-univers text-gray-900">{t("title")}</h1>
         <p className="text-sm text-gray-600 font-univers mt-1">
-          Administra todos los usuarios de la plataforma
+          {t("subtitle")}
         </p>
       </div>
 
@@ -104,17 +106,17 @@ export default function AdminUsersPage() {
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <p className="text-sm font-univers text-gray-600">Total usuarios</p>
+          <p className="text-sm font-univers text-gray-600">{t("totalUsers")}</p>
           <p className="text-2xl font-univers font-semibold text-gray-900">{filteredUsers.length}</p>
         </div>
         <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <p className="text-sm font-univers text-gray-600">Usuarios activos</p>
+          <p className="text-sm font-univers text-gray-600">{t("activeUsers")}</p>
           <p className="text-2xl font-univers font-semibold text-green-600">
             {filteredUsers.filter(u => u.orderCount > 0).length}
           </p>
         </div>
         <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <p className="text-sm font-univers text-gray-600">Nuevos este mes</p>
+          <p className="text-sm font-univers text-gray-600">{t("newThisMonth")}</p>
           <p className="text-2xl font-univers font-semibold text-blue-600">
             {filteredUsers.filter(u => u.createdAt && new Date(u.createdAt).getMonth() === new Date().getMonth()).length}
           </p>
@@ -128,25 +130,25 @@ export default function AdminUsersPage() {
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
-                  Usuario
+                  {t("tableHeaders.user")}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
-                  Email
+                  {t("tableHeaders.email")}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
-                  Tipo
+                  {t("tableHeaders.type")}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
-                  Órdenes
+                  {t("tableHeaders.orders")}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
-                  Total gastado
+                  {t("tableHeaders.totalSpent")}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
-                  Registro
+                  {t("tableHeaders.registered")}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
-                  Acciones
+                  {t("tableHeaders.actions")}
                 </th>
               </tr>
             </thead>
@@ -162,7 +164,7 @@ export default function AdminUsersPage() {
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-univers font-medium text-gray-900">
-                          {user.name || 'Sin nombre'}
+                          {user.name || t("noName")}
                         </div>
                       </div>
                     </div>
@@ -178,9 +180,9 @@ export default function AdminUsersPage() {
                         user.userType === 'vendor' ? 'bg-purple-100 text-purple-800' :
                           'bg-blue-100 text-blue-800'
                       }`}>
-                      {user.userType === 'admin' ? 'Admin' :
-                        user.userType === 'vendor' ? 'Vendedor' :
-                          'Cliente'}
+                      {user.userType === 'admin' ? t("userTypes.admin") :
+                        user.userType === 'vendor' ? t("userTypes.vendor") :
+                          t("userTypes.customer")}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -204,7 +206,7 @@ export default function AdminUsersPage() {
                     <div className="flex items-center gap-2">
                       <Link href={`/admin/users/${user.id}`}>
                         <Button size="sm" variant="outline">
-                          Ver detalles
+                          {t("viewDetails")}
                         </Button>
                       </Link>
                     </div>

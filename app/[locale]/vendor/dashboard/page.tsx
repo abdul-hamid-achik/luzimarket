@@ -80,7 +80,7 @@ async function getVendorStats(vendorId: string) {
 
 export default async function VendorDashboard() {
   const session = await auth();
-  const t = await getTranslations("Vendor");
+  const t = await getTranslations("vendor");
   
   if (!session || session.user.role !== "vendor") {
     redirect("/login");
@@ -104,28 +104,28 @@ export default async function VendorDashboard() {
 
   const statsCards = [
     {
-      title: "Productos Totales",
+      title: t("dashboard.totalProducts"),
       value: stats.totalProducts.toString(),
       icon: Package,
       color: "text-blue-600",
       bgColor: "bg-blue-50"
     },
     {
-      title: "Productos Activos",
+      title: t("dashboard.activeProducts"),
       value: stats.activeProducts.toString(),
       icon: TrendingUp,
       color: "text-green-600",
       bgColor: "bg-green-50"
     },
     {
-      title: "Órdenes Totales",
+      title: t("dashboard.totalOrders"),
       value: stats.totalOrders.toString(),
       icon: ShoppingCart,
       color: "text-purple-600",
       bgColor: "bg-purple-50"
     },
     {
-      title: "Ingresos Totales",
+      title: t("dashboard.totalRevenue"),
       value: `$${stats.totalRevenue.toLocaleString('es-MX')}`,
       icon: DollarSign,
       color: "text-orange-600",
@@ -139,16 +139,16 @@ export default async function VendorDashboard() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-univers text-gray-900">
-            Bienvenido, {vendorInfo.businessName}
+            {t("dashboard.welcome", { businessName: vendorInfo.businessName })}
           </h1>
           <p className="text-sm text-gray-600 font-univers mt-1">
-            Aquí está el resumen de tu negocio
+            {t("dashboard.subtitle")}
           </p>
         </div>
         <Link href="/vendor/products/new">
           <Button className="bg-black text-white hover:bg-gray-800">
             <Plus className="h-4 w-4 mr-2" />
-            Agregar Producto
+            {t("dashboard.addProduct")}
           </Button>
         </Link>
       </div>
@@ -175,26 +175,26 @@ export default async function VendorDashboard() {
       {/* Quick actions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h2 className="text-lg font-univers text-gray-900 mb-4">Acciones Rápidas</h2>
+          <h2 className="text-lg font-univers text-gray-900 mb-4">{t("dashboard.quickActions")}</h2>
           <div className="grid grid-cols-2 gap-4">
             <Link href="/vendor/products">
               <Button variant="outline" className="w-full">
-                Ver Productos
+                {t("dashboard.viewProducts")}
               </Button>
             </Link>
             <Link href="/vendor/orders">
               <Button variant="outline" className="w-full">
-                Ver Órdenes
+                {t("dashboard.viewOrders")}
               </Button>
             </Link>
             <Link href="/vendor/analytics">
               <Button variant="outline" className="w-full">
-                Análisis
+                {t("dashboard.analytics")}
               </Button>
             </Link>
             <Link href="/vendor/settings">
               <Button variant="outline" className="w-full">
-                Configuración
+                {t("dashboard.settings")}
               </Button>
             </Link>
           </div>
@@ -203,15 +203,15 @@ export default async function VendorDashboard() {
         {/* Recent orders */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-univers text-gray-900">Órdenes Recientes</h2>
+            <h2 className="text-lg font-univers text-gray-900">{t("dashboard.recentOrders")}</h2>
             <Link href="/vendor/orders" className="text-sm text-blue-600 hover:text-blue-800 font-univers">
-              Ver todas
+              {t("dashboard.viewAll")}
             </Link>
           </div>
           
           {stats.recentOrders.length === 0 ? (
             <p className="text-sm text-gray-500 font-univers text-center py-8">
-              No hay órdenes recientes
+              {t("dashboard.noRecentOrders")}
             </p>
           ) : (
             <div className="space-y-3">
@@ -232,10 +232,10 @@ export default async function VendorDashboard() {
                       order.status === 'paid' ? 'bg-yellow-100 text-yellow-800' :
                       'bg-gray-100 text-gray-800'
                     }`}>
-                      {order.status === 'delivered' ? 'Entregado' :
-                       order.status === 'shipped' ? 'Enviado' :
-                       order.status === 'paid' ? 'Pagado' :
-                       'Pendiente'}
+                      {order.status === 'delivered' ? t("dashboard.orderStatus.delivered") :
+                       order.status === 'shipped' ? t("dashboard.orderStatus.shipped") :
+                       order.status === 'paid' ? t("dashboard.orderStatus.paid") :
+                       t("dashboard.orderStatus.pending")}
                     </span>
                     <p className="text-sm font-univers font-medium text-gray-900">
                       ${Number(order.total).toLocaleString('es-MX')}
@@ -252,7 +252,7 @@ export default async function VendorDashboard() {
       {!vendorInfo.isActive && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <p className="text-sm text-yellow-800 font-univers">
-            Tu cuenta está pendiente de aprobación. Podrás agregar productos una vez que sea aprobada.
+            {t("dashboard.accountPending")}
           </p>
         </div>
       )}

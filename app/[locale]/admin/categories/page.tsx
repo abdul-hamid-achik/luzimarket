@@ -12,8 +12,8 @@ export default async function CategoriesPage() {
       slug: categories.slug,
       description: categories.description,
       imageUrl: categories.imageUrl,
-      isActive: categories.isActive,
-      displayOrder: categories.displayOrder,
+      isActive: sql<boolean>`COALESCE(${categories.isActive}, false)`,
+      displayOrder: sql<number>`COALESCE(${categories.displayOrder}, 0)`,
       productCount: sql<number>`count(${products.id})`,
     })
     .from(categories)

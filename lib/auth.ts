@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { users, vendors, adminUsers } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { createSession } from "@/lib/actions/session";
 
 // Custom error class for invalid credentials
 class InvalidLoginError extends CredentialsSignin {
@@ -75,10 +76,17 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }: { token: any; user: any }) {
+    async jwt({ token, user, trigger }: { token: any; user: any; trigger?: string }) {
       if (user) {
         token.id = user.id;
         token.role = user.role as "customer" | "vendor" | "admin";
+        
+        // Generate a unique session token for tracking only on sign in
+        if (trigger === "signIn" || trigger === "signUp") {
+          token.sessionToken = `${user.id}-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+          // Create a database session
+          await createSession(user.id, user.role, token.sessionToken);
+        }
       }
       return token;
     },
@@ -86,6 +94,7 @@ export const authOptions = {
       if (session.user) {
         session.user.id = token.id;
         session.user.role = token.role;
+        session.sessionToken = token.sessionToken;
 
         // If user is a vendor, fetch vendor details
         if (token.role === "vendor") {

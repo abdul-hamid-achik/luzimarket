@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { users, orders } from "@/db/schema";
 import { eq, desc, sql } from "drizzle-orm";
-import { User, Mail, Calendar, ShoppingBag, Heart, Settings, LogOut } from "lucide-react";
+import { User, Mail, Calendar, ShoppingBag, Heart, Settings, LogOut, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -60,7 +60,7 @@ export default async function AccountPage({ params }: AccountPageProps) {
     redirect("/login");
   }
 
-  const t = await getTranslations('Account');
+  const t = await getTranslations('account.page');
   const userData = await getUserData(session.user.id);
 
   return (
@@ -75,7 +75,7 @@ export default async function AccountPage({ params }: AccountPageProps) {
               </div>
               <div>
                 <h1 className="text-2xl font-times-now text-gray-900">
-                  {userData.user?.name || 'Usuario'}
+                  {userData.user?.name || t('user')}
                 </h1>
                 <div className="flex items-center gap-2 text-sm text-gray-600 font-univers">
                   <Mail className="h-4 w-4" />
@@ -83,7 +83,7 @@ export default async function AccountPage({ params }: AccountPageProps) {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-600 font-univers">
                   <Calendar className="h-4 w-4" />
-                  Miembro desde {new Date(userData.user?.createdAt!).toLocaleDateString('es-MX')}
+                  {t('memberSince')} {new Date(userData.user?.createdAt!).toLocaleDateString('es-MX')}
                 </div>
               </div>
             </div>
@@ -93,13 +93,13 @@ export default async function AccountPage({ params }: AccountPageProps) {
                   <p className="text-2xl font-times-now text-gray-900">
                     {userData.stats.totalOrders}
                   </p>
-                  <p className="text-xs text-gray-600 font-univers">Pedidos</p>
+                  <p className="text-xs text-gray-600 font-univers">{t('orders')}</p>
                 </div>
                 <div className="text-center">
                   <p className="text-2xl font-times-now text-gray-900">
                     ${Number(userData.stats.totalSpent).toLocaleString('es-MX')}
                   </p>
-                  <p className="text-xs text-gray-600 font-univers">Gastado</p>
+                  <p className="text-xs text-gray-600 font-univers">{t('spent')}</p>
                 </div>
               </div>
             </div>
@@ -110,16 +110,16 @@ export default async function AccountPage({ params }: AccountPageProps) {
         <Tabs defaultValue="overview" className="space-y-8">
           <TabsList className="bg-white border border-gray-200 p-1">
             <TabsTrigger value="overview" className="font-univers">
-              Resumen
+              {t('overview')}
             </TabsTrigger>
             <TabsTrigger value="orders" className="font-univers">
-              Mis Pedidos
+              {t('myOrders')}
             </TabsTrigger>
             <TabsTrigger value="wishlist" className="font-univers">
-              Lista de Deseos
+              {t('wishlist')}
             </TabsTrigger>
             <TabsTrigger value="profile" className="font-univers">
-              Perfil
+              {t('profile')}
             </TabsTrigger>
           </TabsList>
 
@@ -129,25 +129,31 @@ export default async function AccountPage({ params }: AccountPageProps) {
               {/* Quick Actions */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg font-times-now">Acciones Rápidas</CardTitle>
+                  <CardTitle className="text-lg font-times-now">{t('quickActions')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Link href="/orders">
                     <Button variant="outline" className="w-full justify-start">
                       <ShoppingBag className="mr-2 h-4 w-4" />
-                      Ver todos mis pedidos
+                      {t('viewAllOrders')}
                     </Button>
                   </Link>
                   <Link href="/wishlist">
                     <Button variant="outline" className="w-full justify-start">
                       <Heart className="mr-2 h-4 w-4" />
-                      Mi lista de deseos
+                      {t('myWishlist')}
                     </Button>
                   </Link>
                   <Link href="/account?tab=profile">
                     <Button variant="outline" className="w-full justify-start">
                       <Settings className="mr-2 h-4 w-4" />
-                      Editar perfil
+                      {t('editProfile')}
+                    </Button>
+                  </Link>
+                  <Link href="/account/security">
+                    <Button variant="outline" className="w-full justify-start">
+                      <Shield className="mr-2 h-4 w-4" />
+                      {t('security')}
                     </Button>
                   </Link>
                 </CardContent>
@@ -156,15 +162,15 @@ export default async function AccountPage({ params }: AccountPageProps) {
               {/* Recent Orders */}
               <Card className="md:col-span-2">
                 <CardHeader>
-                  <CardTitle className="text-lg font-times-now">Pedidos Recientes</CardTitle>
+                  <CardTitle className="text-lg font-times-now">{t('recentOrders')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   {userData.recentOrders.length === 0 ? (
                     <div className="text-center py-8">
                       <ShoppingBag className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                      <p className="text-gray-600 font-univers">No tienes pedidos aún</p>
+                      <p className="text-gray-600 font-univers">{t('noOrdersYet')}</p>
                       <Link href="/products">
-                        <Button className="mt-4">Comenzar a comprar</Button>
+                        <Button className="mt-4">{t('startShopping')}</Button>
                       </Link>
                     </div>
                   ) : (
@@ -172,7 +178,7 @@ export default async function AccountPage({ params }: AccountPageProps) {
                       {userData.recentOrders.map((order) => (
                         <div key={order.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
                           <div>
-                            <p className="font-univers font-medium">Pedido #{order.orderNumber}</p>
+                            <p className="font-univers font-medium">{t('order')} #{order.orderNumber}</p>
                             <p className="text-sm text-gray-600 font-univers">
                               {new Date(order.createdAt!).toLocaleDateString('es-MX')}
                             </p>
@@ -187,17 +193,17 @@ export default async function AccountPage({ params }: AccountPageProps) {
                               order.status === 'paid' ? 'bg-yellow-100 text-yellow-800' :
                               'bg-gray-100 text-gray-800'
                             }`}>
-                              {order.status === 'delivered' ? 'Entregado' :
-                               order.status === 'shipped' ? 'Enviado' :
-                               order.status === 'paid' ? 'Pagado' :
-                               'Pendiente'}
+                              {order.status === 'delivered' ? t('delivered') :
+                               order.status === 'shipped' ? t('shipped') :
+                               order.status === 'paid' ? t('paid') :
+                               t('pending')}
                             </span>
                           </div>
                         </div>
                       ))}
                       <div className="text-center pt-4">
                         <Link href="/orders">
-                          <Button variant="outline">Ver todos los pedidos</Button>
+                          <Button variant="outline">{t('viewAllOrdersButton')}</Button>
                         </Link>
                       </div>
                     </div>
@@ -211,7 +217,7 @@ export default async function AccountPage({ params }: AccountPageProps) {
           <TabsContent value="orders">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg font-times-now">Historial de Pedidos</CardTitle>
+                <CardTitle className="text-lg font-times-now">{t('orderHistory')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <OrdersList userId={session.user.id} />
@@ -223,14 +229,14 @@ export default async function AccountPage({ params }: AccountPageProps) {
           <TabsContent value="wishlist">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg font-times-now">Mi Lista de Deseos</CardTitle>
+                <CardTitle className="text-lg font-times-now">{t('myWishlistTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-8">
                   <Heart className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 font-univers mb-4">Tu lista de deseos está vacía</p>
+                  <p className="text-gray-600 font-univers mb-4">{t('wishlistEmpty')}</p>
                   <Link href="/products">
-                    <Button>Explorar productos</Button>
+                    <Button>{t('exploreProducts')}</Button>
                   </Link>
                 </div>
               </CardContent>
@@ -241,7 +247,7 @@ export default async function AccountPage({ params }: AccountPageProps) {
           <TabsContent value="profile">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg font-times-now">Información del Perfil</CardTitle>
+                <CardTitle className="text-lg font-times-now">{t('profileInfo')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ProfileForm user={userData.user!} />
