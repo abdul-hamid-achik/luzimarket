@@ -37,7 +37,6 @@ export default function LanguageSwitcher() {
   return (
     <Select value={locale} onValueChange={handleLocaleChange}>
       <SelectTrigger className="w-[80px] border-0 bg-transparent">
-        <Globe className="h-4 w-4 mr-2" />
         <span className="font-univers">{locale === 'es' ? 'ES' : 'EN'}</span>
       </SelectTrigger>
       <SelectContent>

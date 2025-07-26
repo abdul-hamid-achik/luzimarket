@@ -75,7 +75,8 @@ export function AdminFinancialsClient({
   // Vendor balances columns
   const vendorBalanceColumns: ColumnDef<any>[] = [
     {
-      accessorKey: "vendor.businessName",
+      id: "vendorName",
+      accessorFn: (row) => row.vendor?.businessName || "",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t("vendors.vendor")} />
       ),
@@ -431,7 +432,7 @@ export function AdminFinancialsClient({
               <DataTable
                 columns={vendorBalanceColumns}
                 data={vendorBalances}
-                searchKey="vendor.businessName"
+                searchKey="vendorName"
                 searchPlaceholder={t("vendors.search")}
               />
             </CardContent>
