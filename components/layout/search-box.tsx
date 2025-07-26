@@ -19,7 +19,11 @@ interface SearchResult {
   type: "product" | "category" | "vendor";
 }
 
-export function SearchBox() {
+interface SearchBoxProps {
+  idSuffix?: string;
+}
+
+export function SearchBox({ idSuffix = "" }: SearchBoxProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -114,13 +118,13 @@ export function SearchBox() {
       <div className={`${showSearchInput ? 'block' : 'hidden'} md:block`}>
         <form onSubmit={handleSubmit}>
           <div className="relative">
-            <label htmlFor="search-input" className="sr-only">
+            <label htmlFor={`search-input${idSuffix}`} className="sr-only">
               {t('search')}
             </label>
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               ref={inputRef}
-              id="search-input"
+              id={`search-input${idSuffix}`}
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}

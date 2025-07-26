@@ -28,16 +28,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <>
       <head>
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
         <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
         <CsrfProvider>{null}</CsrfProvider>
       </head>
-      <body className="antialiased">
-        {children}
-      </body>
-    </html>
+      {children}
+    </>
   );
 }

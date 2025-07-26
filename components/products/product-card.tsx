@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import { useWishlist } from "@/contexts/wishlist-context";
+import { useCurrency } from "@/contexts/currency-context";
 import { toast } from "sonner";
 import { useTranslations } from 'next-intl';
 
@@ -30,6 +31,7 @@ interface ProductCardProps {
 export function ProductCard({ product, className, onQuickView }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { formatPrice } = useCurrency();
   const isWishlisted = isInWishlist(product.id);
   const t = useTranslations('Products');
 
@@ -146,7 +148,7 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
           </p>
         )}
         <p className="font-univers text-sm mt-2" data-testid="product-price">
-          ${parseFloat(product.price).toLocaleString('es-MX')}
+          {formatPrice(parseFloat(product.price))}
         </p>
       </div>
     </Link>

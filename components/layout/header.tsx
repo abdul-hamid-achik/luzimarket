@@ -6,7 +6,8 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Heart, ShoppingBag, User, Menu, LogOut, Search } from "lucide-react";
 import { SearchBox } from "./search-box";
-import { CurrencySwitch } from "./currency-switch";
+import LanguageSwitcher from "./language-switcher";
+import { ShippingLocationSelector } from "./shipping-location-selector";
 import { useState } from "react";
 import { useCart } from "@/contexts/cart-context";
 import { useWishlist } from "@/contexts/wishlist-context";
@@ -52,10 +53,10 @@ export function Header() {
         {/* Top bar - Desktop only */}
         <div className="hidden md:flex items-center justify-between py-2 text-xs border-b px-8">
           <div className="flex items-center gap-4">
-            <CurrencySwitch />
+            <LanguageSwitcher />
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-gray-600">{t('shippingTo', { location: 'MONTERREY, NL' })}</span>
+            <ShippingLocationSelector />
           </div>
         </div>
 
@@ -81,6 +82,10 @@ export function Header() {
                 </SheetTitle>
               </SheetHeader>
               <nav className="mt-8 space-y-4">
+                <div className="pb-4 border-b space-y-3">
+                  <LanguageSwitcher />
+                  <ShippingLocationSelector />
+                </div>
                 <Link
                   href="/best-sellers"
                   className="block py-2 text-sm font-univers"
@@ -141,7 +146,7 @@ export function Header() {
 
           {/* Search - Desktop */}
           <div className="hidden md:flex flex-1 max-w-2xl mx-8">
-            <SearchBox />
+            <SearchBox idSuffix="-desktop" />
           </div>
 
           {/* Actions */}
@@ -275,7 +280,7 @@ export function Header() {
 
         {/* Search - Mobile */}
         <div className="md:hidden pb-3 px-4">
-          <SearchBox />
+          <SearchBox idSuffix="-mobile" />
         </div>
 
         {/* Navigation - Desktop only */}
