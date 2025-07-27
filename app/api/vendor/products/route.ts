@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { products } from "@/db/schema";
 import { z } from "zod";
 import { nanoid } from "nanoid";
+import { createImageModerationRecords } from "@/lib/actions/image-moderation";
 
 const createProductSchema = z.object({
   name: z.string().min(3),
@@ -48,7 +49,18 @@ export async function POST(req: NextRequest) {
       images: validatedData.images,
       tags: validatedData.tags || [],
       isActive: true,
+      imagesPendingModeration: validatedData.images.length > 0,
+      imagesApproved: false,
     }).returning();
+
+    // Create image moderation records if there are images
+    if (validatedData.images.length > 0) {
+      await createImageModerationRecords(
+        newProduct.id,
+        session.user.id,
+        validatedData.images
+      );
+    }
 
     return NextResponse.json(newProduct);
   } catch (error) {

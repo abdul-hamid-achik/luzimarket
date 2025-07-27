@@ -15,7 +15,8 @@ import {
   DollarSign,
   ChevronLeft,
   ChevronRight,
-  Globe
+  Globe,
+  ImageIcon
 } from "lucide-react";
 import {
   Sidebar,
@@ -59,6 +60,11 @@ export function AdminSidebar({ userEmail }: AdminSidebarProps) {
       title: t("products"),
       href: "/admin/products",
       icon: Package,
+    },
+    {
+      title: t("imageModeration.title"),
+      href: "/admin/moderation/images",
+      icon: ImageIcon,
     },
     {
       title: t("vendors"),

@@ -134,6 +134,13 @@
       "when": 1753568416981,
       "tag": "0018_large_fabian_cortez",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1753643511123,
+      "tag": "0019_chief_valkyrie",
+      "breakpoints": true
     }
   ]
 }

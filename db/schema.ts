@@ -82,6 +82,8 @@ export const products = pgTable("products", {
   images: json("images").$type<string[]>().default([]),
   tags: json("tags").$type<string[]>().default([]),
   isActive: boolean("is_active").default(true),
+  imagesApproved: boolean("images_approved").default(false),
+  imagesPendingModeration: boolean("images_pending_moderation").default(false),
   stock: integer("stock").default(0),
   // Shipping fields
   weight: integer("weight").default(0), // in grams
@@ -777,3 +779,28 @@ export const userSessions = pgTable("user_sessions", {
 
 export type UserSession = typeof userSessions.$inferSelect;
 export type NewUserSession = typeof userSessions.$inferInsert;
+
+// Image Moderation table
+export const productImageModeration = pgTable("product_image_moderation", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  productId: uuid("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  vendorId: uuid("vendor_id").notNull().references(() => vendors.id, { onDelete: "cascade" }),
+  imageUrl: text("image_url").notNull(),
+  imageIndex: integer("image_index").notNull(), // Position in the product images array
+  status: text("status").notNull().default("pending"), // 'pending', 'approved', 'rejected'
+  reviewedBy: uuid("reviewed_by").references(() => adminUsers.id),
+  reviewedAt: timestamp("reviewed_at"),
+  rejectionReason: text("rejection_reason"),
+  rejectionCategory: text("rejection_category"), // 'quality', 'inappropriate', 'copyright', 'misleading', 'other'
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  productIdx: index("product_image_moderation_product_idx").on(table.productId),
+  vendorIdx: index("product_image_moderation_vendor_idx").on(table.vendorId),
+  statusIdx: index("product_image_moderation_status_idx").on(table.status),
+  createdAtIdx: index("product_image_moderation_created_at_idx").on(table.createdAt),
+}));
+
+export type ProductImageModeration = typeof productImageModeration.$inferSelect;
+export type NewProductImageModeration = typeof productImageModeration.$inferInsert;

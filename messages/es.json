@@ -455,6 +455,43 @@
       "saveSuccess": "Plantilla guardada exitosamente",
       "saveError": "Error al guardar la plantilla"
     },
+    "imageModeration": {
+      "title": "Moderación de Imágenes",
+      "subtitle": "Revisa y aprueba las imágenes de productos subidas por los vendedores",
+      "pending": "Pendientes",
+      "approved": "Aprobadas",
+      "rejected": "Rechazadas",
+      "selectAll": "Seleccionar todo",
+      "deselectAll": "Deseleccionar todo",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "approveSelected": "Aprobar seleccionadas",
+      "rejectSelected": "Rechazar seleccionadas",
+      "viewFullSize": "Ver tamaño completo",
+      "productName": "Producto",
+      "vendorName": "Vendedor",
+      "uploadedAt": "Subida",
+      "reviewedAt": "Revisada",
+      "rejectionReason": "Razón de rechazo",
+      "rejectionCategory": "Categoría",
+      "rejectionCategories": {
+        "quality": "Baja calidad",
+        "inappropriate": "Contenido inapropiado",
+        "copyright": "Derechos de autor",
+        "misleading": "Engañosa",
+        "other": "Otra"
+      },
+      "provideReason": "Proporciona una razón para el rechazo",
+      "additionalNotes": "Notas adicionales (opcional)",
+      "confirmApproval": "¿Estás seguro de que quieres aprobar {count} imagen(es)?",
+      "confirmRejection": "¿Estás seguro de que quieres rechazar {count} imagen(es)?",
+      "noImages": "No hay imágenes para moderar",
+      "stats": {
+        "pendingCount": "{count} pendientes",
+        "approvedCount": "{count} aprobadas",
+        "rejectedCount": "{count} rechazadas"
+      }
+    },
     "vendorsPage": {
       "title": "Vendedores",
       "subtitle": "Administra los vendedores de la plataforma",
@@ -536,6 +573,27 @@
       "timestamps": "Marcas de Tiempo",
       "created": "Creado",
       "updated": "Última Actualización"
+    },
+    "emailTemplates": {
+      "title": "Plantillas de Email",
+      "subtitle": "Gestiona las plantillas de correo electrónico del sistema",
+      "createNew": "Crear Nueva",
+      "templateTypes": {
+        "welcome": "Bienvenida",
+        "orderConfirmation": "Confirmación de Pedido",
+        "passwordReset": "Restablecimiento de Contraseña",
+        "vendorApproval": "Aprobación de Vendedor"
+      },
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "subject": "Asunto",
+      "variables": "Variables",
+      "lastModified": "Última modificación",
+      "edit": "Editar",
+      "preview": "Vista previa",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "delete": "Eliminar"
     },
     "usersPage": {
       "title": "Usuarios",

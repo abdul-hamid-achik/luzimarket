@@ -28,11 +28,11 @@ test.describe('Admin Dashboard', () => {
     // Check dashboard elements
     await expect(page.locator('h1').filter({ hasText: /Dashboard|Panel de control/i })).toBeVisible();
     
-    // Should have navigation menu with translated text
-    const sidebar = page.locator('aside');
+    // Should have navigation menu with translated text - using new sidebar structure
+    const sidebar = page.locator('div[data-sidebar="sidebar"]').first();
     await expect(sidebar).toBeVisible();
-    await expect(sidebar.locator('text="Órdenes"')).toBeVisible();
-    await expect(sidebar.locator('text="Productos"')).toBeVisible();
+    await expect(page.locator('text="Órdenes"')).toBeVisible();
+    await expect(page.locator('text="Productos"')).toBeVisible();
   });
 
   test('should show dashboard statistics', async ({ page }) => {
@@ -205,16 +205,19 @@ test.describe('Admin Dashboard', () => {
   test('should handle bulk actions', async ({ page }) => {
     await page.goto('/admin/products');
     
-    // Select multiple items
-    const checkboxes = page.locator('input[type="checkbox"]').filter({ hasNotText: /all|todos/ });
+    // Wait for products to load
+    await page.waitForSelector('table');
+    
+    // Select multiple items - shadcn checkboxes are buttons with role="checkbox"
+    const checkboxes = page.locator('button[role="checkbox"]').filter({ hasNotText: /all|todos/ });
     
     if (await checkboxes.first().isVisible()) {
-      // Select first few items
-      await checkboxes.nth(0).check();
-      await checkboxes.nth(1).check();
+      // Select first few items by clicking the checkbox button
+      await checkboxes.nth(0).click();
+      await checkboxes.nth(1).click();
       
-      // Bulk actions should appear
-      const bulkActions = page.locator('button, select').filter({ hasText: /Bulk|Actions|Selected/ }).first();
+      // Bulk actions should appear - look for Spanish text
+      const bulkActions = page.locator('button').filter({ hasText: /Seleccionados|Aprobar|Rechazar/ }).first();
       await expect(bulkActions).toBeVisible();
     }
   });
@@ -224,7 +227,7 @@ test.describe('Admin Dashboard', () => {
     
     // Should show products page header
     await expect(page.getByRole('heading', { name: 'Productos', exact: true })).toBeVisible();
-    await expect(page.getByText('Administra y aprueba productos de los vendedores')).toBeVisible();
+    await expect(page.getByText('Administra todos los productos de la plataforma')).toBeVisible();
     
     // Should show stats cards grid
     const statsGrid = page.locator('.grid').filter({ hasText: 'Total productos' });

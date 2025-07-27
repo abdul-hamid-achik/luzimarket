@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { products } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { z } from "zod";
+import { createImageModerationRecords } from "@/lib/actions/image-moderation";
 
 const updateProductSchema = z.object({
   name: z.string().min(3),
@@ -91,6 +92,9 @@ export async function PUT(
       );
     }
 
+    // Check if images have changed
+    const imagesChanged = JSON.stringify(existingProduct.images) !== JSON.stringify(validatedData.images);
+
     // Update the product
     const [updatedProduct] = await db
       .update(products)
@@ -104,6 +108,11 @@ export async function PUT(
         tags: validatedData.tags || [],
         isActive: validatedData.isActive,
         updatedAt: new Date(),
+        // If images changed, reset approval status
+        ...(imagesChanged && {
+          imagesPendingModeration: validatedData.images.length > 0,
+          imagesApproved: false,
+        }),
       })
       .where(
         and(
@@ -112,6 +121,15 @@ export async function PUT(
         )
       )
       .returning();
+
+    // If images changed, create new moderation records
+    if (imagesChanged && validatedData.images.length > 0) {
+      await createImageModerationRecords(
+        id,
+        session.user.id,
+        validatedData.images
+      );
+    }
 
     return NextResponse.json(updatedProduct);
   } catch (error) {

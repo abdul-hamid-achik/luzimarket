@@ -55,8 +55,9 @@ export async function getFilteredProducts(filters: ProductFilters = {}) {
     // Build where conditions
     const conditions = [];
     
-    // Only show active products
+    // Only show active products with approved images
     conditions.push(eq(products.isActive, true));
+    conditions.push(eq(products.imagesApproved, true));
     
     if (productIds.length > 0) {
       conditions.push(inArray(products.id, productIds));

@@ -987,7 +987,7 @@ async function main() {
 
       // Generate category images (only for categories without images, unless forced)
       console.log('🖼️  Generating category images...');
-      const categoriesToImage = forceRegenerateImages ? categories : categories.filter(c => !c.imageUrl);
+      const categoriesToImage = forceRegenerateImages ? categories : categories.filter(c => !c.imageUrl || c.imageUrl === null);
       console.log(`📊 Found ${categoriesToImage.length} categories ${forceRegenerateImages ? '(forced regeneration)' : 'without images'}`);
 
       for (const category of categoriesToImage) {

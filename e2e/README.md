@@ -14,6 +14,37 @@ This directory contains end-to-end tests for the Luzimarket e-commerce platform 
    npx playwright install
    ```
 
+3. Setup test database (runs automatically on first test run):
+   ```bash
+   npx tsx e2e/setup/test-database.ts
+   ```
+
+## Test Database Setup
+
+The tests require specific data to pass. We have a test setup script that ensures:
+- Categories exist with correct names (matching UI)
+- Test users are verified and can login
+- Test vendor exists
+- Admin user exists
+
+### Automatic Setup
+
+Tests will automatically run the database setup on first run. To skip:
+
+```bash
+SETUP_TEST_DB=false npm test
+```
+
+### Manual Setup
+
+```bash
+# Run test database setup manually
+npx tsx e2e/setup/test-database.ts
+
+# Or if you need full seeding (without AI images)
+npm run db:seed -- --no-images
+```
+
 ## Running Tests
 
 ### Run all tests
@@ -36,17 +67,49 @@ npm run test:e2e:headed
 npm run test:e2e:debug
 ```
 
+### Run specific tests
+```bash
+# Run specific test file
+npm test tests/auth.spec.ts
+
+# Run tests with specific grep pattern
+npm test -- --grep "login"
+
+# Run tests with JSON output (for CI/debugging)
+npm run test:json
+
+# Run tests with LLM-friendly output
+npm run test:llm
+```
+
 ### View test report
 ```bash
 npm run test:e2e:report
 ```
+
+## Test Credentials
+
+These accounts are created by the test setup:
+
+- **Admin**: admin@luzimarket.shop / admin123
+- **Vendor**: vendor@luzimarket.shop / password123
+- **Customer**: customer1@example.com / password123 (verified)
+- **Customer 2**: customer2@example.com / password123 (verified)
 
 ## Test Structure
 
 ```
 e2e/
 ├── fixtures/
-│   └── test.ts          # Custom test fixtures
+│   ├── test.ts          # Custom test fixtures
+│   ├── test-product.jpg # Test images
+│   └── users.ts         # Test user data
+├── setup/
+│   ├── test-database.ts # Database setup script
+│   └── test-vendor.ts   # Vendor setup (legacy)
+├── helpers/
+│   ├── navigation.ts    # Navigation helpers
+│   └── i18n.ts         # Internationalization helpers
 ├── tests/
 │   ├── homepage.spec.ts      # Homepage tests
 │   ├── products.spec.ts      # Product catalog tests
@@ -54,8 +117,17 @@ e2e/
 │   ├── vendor.spec.ts        # Vendor registration tests
 │   ├── auth.spec.ts          # Authentication tests
 │   └── mockup-compliance.spec.ts  # Design mockup compliance
-└── global.setup.ts      # Global setup (auth, test data)
+├── .auth/               # Saved authentication states (gitignored)
+├── global.setup.ts      # Global setup (auth, test data)
+└── README.md           # This file
 ```
+
+## Known Issues
+
+1. **Category Names**: The seed.ts uses Spanish names like "Flores y Arreglos" but the UI shows "Flores & Amores"
+2. **Email Verification**: Customer users must have `emailVerified=true` to login
+3. **Missing Translations**: Some admin email template translations may show errors
+4. **Foreign Key Constraints**: Product creation tests fail if categories don't exist in test DB
 
 ## Test Categories
 
@@ -83,12 +155,22 @@ e2e/
 - Field validation
 - Delivery options
 - Terms acceptance
+- Product management
+- Dashboard analytics
 
 ### Authentication Tests
 - Login for customers/vendors/admins
 - Registration flow
 - Password validation
 - Logout functionality
+- Account lockout protection
+
+### Admin Tests
+- Dashboard statistics
+- Product approval workflow
+- Vendor management
+- Order management
+- Email templates
 
 ### Mockup Compliance Tests
 - Design system adherence
@@ -112,6 +194,45 @@ e2e/
      });
    });
    ```
+
+## Common Test Patterns
+
+### Login Helpers
+```typescript
+// Login as vendor
+await page.goto('/login');
+await page.click('button[role="tab"]:has-text("Vendedor")');
+await page.fill('#vendor-email', 'vendor@luzimarket.shop');
+await page.fill('#vendor-password', 'password123');
+await page.click('button[type="submit"]');
+await page.waitForURL('**/vendor');
+
+// Login as admin
+await page.goto('/login');
+await page.click('button[role="tab"]:has-text("Admin")');
+await page.fill('#admin-email', 'admin@luzimarket.shop');
+await page.fill('#admin-password', 'admin123');
+await page.click('button[type="submit"]');
+await page.waitForURL('**/admin');
+```
+
+### Working with shadcn/ui Components
+
+```typescript
+// Select from dropdown
+await page.getByRole('combobox').click();
+await page.waitForTimeout(300); // Wait for animation
+await page.getByRole('option', { name: 'Option Text' }).click();
+
+// Handle checkboxes (they're buttons in shadcn/ui)
+await page.locator('button[role="checkbox"]').click();
+
+// Handle Sheet/Dialog components
+await page.getByRole('dialog');
+
+// Wait for toast notifications
+await page.waitForSelector('[role="alert"]');
+```
 
 ## Test Selectors
 
@@ -149,6 +270,8 @@ We use `data-testid` attributes throughout the application for reliable test sel
 3. **Use descriptive test names** that explain what is being tested
 4. **Keep tests independent** - each test should run in isolation
 5. **Use Page Object Model** for complex pages (create in `e2e/pages/`)
+6. **Handle animations** - add small delays after UI interactions
+7. **Check for Spanish text** - most UI is in Spanish by default
 
 ## Debugging Failed Tests
 
@@ -156,6 +279,8 @@ We use `data-testid` attributes throughout the application for reliable test sel
 2. Use `page.pause()` to pause execution
 3. Check screenshots in `test-results/` folder
 4. View traces for failed tests in the HTML report
+5. Check error context `.md` files for page structure
+6. Verify test data exists: `npx tsx e2e/setup/test-database.ts`
 
 ## CI/CD Integration
 
@@ -181,13 +306,14 @@ Add to your GitHub Actions workflow:
 Tests use the same `.env.local` file as the application. For CI/CD, set:
 - `CI=true` - Enables retries and disables test.only
 - `NEXT_PUBLIC_APP_URL` - Base URL for tests
+- `SETUP_TEST_DB=false` - Skip automatic database setup in CI
 
 ## Troubleshooting
 
 ### Tests timing out
 - Increase timeout in `playwright.config.ts`
 - Check if dev server is running
-- Verify database is seeded
+- Verify database is seeded with test data
 
 ### Element not found
 - Use Playwright Inspector: `npx playwright test --debug`
@@ -196,7 +322,7 @@ Tests use the same `.env.local` file as the application. For CI/CD, set:
 - For shadcn/ui components, use role selectors (e.g., `role="dialog"` for Sheet)
 
 ### Authentication issues
-- Ensure test users exist in database (run `npm run db:seed`)
+- Ensure test users exist and are verified: `npx tsx e2e/setup/test-database.ts`
 - Check session handling in global.setup.ts
 - Verify AUTH_SECRET and NEXTAUTH_SECRET are set in `.env.local`
 
@@ -210,6 +336,11 @@ Tests use the same `.env.local` file as the application. For CI/CD, set:
 - For Radix UI checkboxes (like terms acceptance), click the label not the checkbox
 - Submit button may have dynamic text with price - use regex matcher
 - Stripe integration requires proper API keys in environment variables
+
+### Foreign Key Constraint Errors
+- Run test database setup: `npx tsx e2e/setup/test-database.ts`
+- Ensure categories exist before creating products
+- Check that vendor and user IDs are valid
 
 ### Testing shadcn/ui Components
 

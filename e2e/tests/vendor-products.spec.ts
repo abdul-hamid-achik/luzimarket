@@ -32,10 +32,12 @@ test.describe('Vendor Product Management', () => {
       await page.fill('input[name="stock"]', '25');
       
       // Select category - handle shadcn/ui Select component
-      await page.getByRole('combobox').first().click();
-      await page.waitForTimeout(300);
-      // Select "Flores & Amores" category
-      await page.getByRole('option', { name: 'Flores & Amores' }).click();
+      const categorySelect = page.locator('[role="combobox"]').filter({ hasText: /Selecciona una categoría/i }).first();
+      await categorySelect.click();
+      await page.waitForTimeout(500); // Wait for dropdown animation
+      
+      // Select "Flores & Amores" category (as shown in the dropdown)
+      await page.locator('[role="option"]').filter({ hasText: 'Flores & Amores' }).click();
       
       // Add product specifications
       const addSpecButton = page.locator('button').filter({ hasText: /Agregar especificación|Add specification|Característica|Feature/i });
