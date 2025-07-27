@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
 import { ProductsGrid } from "@/components/products/products-grid";
 import { FilterSidebar } from "@/components/products/filter-sidebar";
+import { SortDropdown } from "@/components/products/sort-dropdown";
 import { getFilteredProducts, getProductFilterOptions } from "@/lib/actions/products";
 import { db } from "@/db";
 import { vendors } from "@/db/schema";
@@ -107,19 +108,7 @@ export default async function HandpickedPage({ params, searchParams }: Handpicke
               <p className="text-sm font-univers text-gray-600">
                 {productsResult.products.length} {productsResult.products.length === 1 ? 'producto encontrado' : 'productos encontrados'}
               </p>
-              <div className="flex items-center gap-2">
-                <label htmlFor="sort" className="text-sm font-univers text-gray-600">{t('sortBy')}:</label>
-                <select 
-                  id="sort" 
-                  defaultValue={filters.sort || 'newest'}
-                  className="border border-gray-300 rounded px-3 py-1 text-sm"
-                >
-                  <option value="newest">{t('newest')}</option>
-                  <option value="price-asc">{t('priceAsc')}</option>
-                  <option value="price-desc">{t('priceDesc')}</option>
-                  <option value="name">{t('name')}</option>
-                </select>
-              </div>
+              <SortDropdown />
             </div>
 
             {/* Products */}

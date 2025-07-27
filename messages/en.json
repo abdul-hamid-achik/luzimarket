@@ -1650,6 +1650,58 @@
         "address": "Address",
         "hours": "Business hours"
       }
+    },
+    "platformUse": {
+      "title": "Use of the Platform",
+      "description": "When using Luzimarket, you agree to:",
+      "eligibility": "Meet the minimum age requirement of 18 years",
+      "account": "Provide accurate and complete information when creating an account",
+      "prohibited": "Not engage in fraudulent, illegal, or harmful activities"
+    },
+    "purchases": {
+      "title": "Purchases and Payments",
+      "description": "All prices are displayed in Mexican Pesos (MXN) and include applicable taxes.",
+      "pricing": "Prices are subject to change without notice",
+      "payment": "We accept credit/debit cards and OXXO payments through Stripe",
+      "oxxo": "OXXO payments have a maximum limit of 10,000 MXN and expire after 3 days",
+      "confirmation": "Order confirmation will be sent to your registered email"
+    },
+    "shipping": {
+      "title": "Shipping and Delivery",
+      "description": "We ship throughout Mexico with the following conditions:",
+      "zones": "Shipping costs vary by zone (Zone A: 89 MXN, Zone B: 119 MXN, Zone C: 149 MXN)",
+      "times": "Estimated delivery: 3-10 business days depending on location",
+      "costs": "Free shipping on orders over 1,000 MXN"
+    },
+    "returns": {
+      "title": "Returns and Refunds",
+      "description": "In compliance with PROFECO regulations:",
+      "period": "You have 30 days to return products in original condition",
+      "conditions": "Products must be unused, with tags and original packaging",
+      "process": "Contact support@luzimarket.shop to initiate a return",
+      "refunds": "Refunds are processed within 10 business days after receiving the return"
+    },
+    "intellectual": {
+      "title": "Intellectual Property",
+      "description": "All content on Luzimarket, including logos, text, images, and designs, is protected by intellectual property laws. Vendors retain rights to their product listings and images."
+    },
+    "liability": {
+      "title": "Limitation of Liability",
+      "description": "Luzimarket serves as a marketplace connecting buyers and vendors. We are not responsible for the quality, safety, or legality of products listed by independent vendors."
+    },
+    "profeco": {
+      "title": "PROFECO Consumer Protection",
+      "description": "As a Mexican e-commerce platform, we comply with all PROFECO regulations. For consumer complaints:",
+      "info": "PROFECO (Procuraduría Federal del Consumidor)",
+      "phone": "Phone: 55 5568 8722",
+      "website": "Website: www.profeco.gob.mx"
+    },
+    "contact": {
+      "title": "Contact Information",
+      "description": "For questions about these terms:",
+      "company": "MOMENTO ESPECIAL SAPI DE CV",
+      "email": "legal@luzimarket.shop",
+      "address": "Mexico City, CDMX, Mexico"
     }
   },
   "About": {
@@ -1923,67 +1975,6 @@
       "description": "For privacy-related inquiries or to exercise your ARCO rights, contact us at:",
       "company": "MOMENTO ESPECIAL SAPI DE CV",
       "email": "privacy@luzimarket.shop",
-      "address": "Mexico City, CDMX, Mexico"
-    }
-  },
-  "Terms": {
-    "title": "Terms and Conditions",
-    "lastUpdated": "Last updated: January 2025",
-    "intro": "Welcome to Luzimarket. These Terms and Conditions govern your use of our platform and services. By accessing or using Luzimarket, you agree to be bound by these terms.",
-    "acceptance": {
-      "title": "Acceptance of Terms",
-      "description": "By using our platform, you confirm that you are at least 18 years old and have the legal capacity to enter into contracts under Mexican law."
-    },
-    "platformUse": {
-      "title": "Use of the Platform",
-      "description": "When using Luzimarket, you agree to:",
-      "eligibility": "Meet the minimum age requirement of 18 years",
-      "account": "Provide accurate and complete information when creating an account",
-      "prohibited": "Not engage in fraudulent, illegal, or harmful activities"
-    },
-    "purchases": {
-      "title": "Purchases and Payments",
-      "description": "All prices are displayed in Mexican Pesos (MXN) and include applicable taxes.",
-      "pricing": "Prices are subject to change without notice",
-      "payment": "We accept credit/debit cards and OXXO payments through Stripe",
-      "oxxo": "OXXO payments have a maximum limit of 10,000 MXN and expire after 3 days",
-      "confirmation": "Order confirmation will be sent to your registered email"
-    },
-    "shipping": {
-      "title": "Shipping and Delivery",
-      "description": "We ship throughout Mexico with the following conditions:",
-      "zones": "Shipping costs vary by zone (Zone A: 89 MXN, Zone B: 119 MXN, Zone C: 149 MXN)",
-      "times": "Estimated delivery: 3-10 business days depending on location",
-      "costs": "Free shipping on orders over 1,000 MXN"
-    },
-    "returns": {
-      "title": "Returns and Refunds",
-      "description": "In compliance with PROFECO regulations:",
-      "period": "You have 30 days to return products in original condition",
-      "conditions": "Products must be unused, with tags and original packaging",
-      "process": "Contact support@luzimarket.shop to initiate a return",
-      "refunds": "Refunds are processed within 10 business days after receiving the return"
-    },
-    "intellectual": {
-      "title": "Intellectual Property",
-      "description": "All content on Luzimarket, including logos, text, images, and designs, is protected by intellectual property laws. Vendors retain rights to their product listings and images."
-    },
-    "liability": {
-      "title": "Limitation of Liability",
-      "description": "Luzimarket serves as a marketplace connecting buyers and vendors. We are not responsible for the quality, safety, or legality of products listed by independent vendors."
-    },
-    "profeco": {
-      "title": "PROFECO Consumer Protection",
-      "description": "As a Mexican e-commerce platform, we comply with all PROFECO regulations. For consumer complaints:",
-      "info": "PROFECO (Procuraduría Federal del Consumidor)",
-      "phone": "Phone: 55 5568 8722",
-      "website": "Website: www.profeco.gob.mx"
-    },
-    "contact": {
-      "title": "Contact Information",
-      "description": "For questions about these terms:",
-      "company": "MOMENTO ESPECIAL SAPI DE CV",
-      "email": "legal@luzimarket.shop",
       "address": "Mexico City, CDMX, Mexico"
     }
   },
@@ -2349,6 +2340,119 @@
         "viewOrder": "View order",
         "viewDetails": "View details"
       }
+    }
+  },
+  "orders": {
+    "title": "My Orders",
+    "subtitle": "View the history and status of all your orders",
+    "backToAccount": "Back to Account",
+    "exportOrders": "Export Orders",
+    "orderNumber": "Order #",
+    "viewDetails": "View details",
+    "view": "View",
+    "track": "Track",
+    "paid": "Paid",
+    "pending": "Pending",
+    "item": "item",
+    "items": "items",
+    "moreItems": "more",
+    "noOrders": {
+      "title": "You don't have any orders yet",
+      "description": "When you place your first order, it will appear here along with tracking information.",
+      "startShopping": "Start Shopping"
+    },
+    "noResults": {
+      "title": "No orders found",
+      "description": "Try adjusting your search filters to find what you're looking for.",
+      "clearFilters": "Clear Filters"
+    },
+    "statuses": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "filters": {
+      "searchPlaceholder": "Search by order number...",
+      "statusPlaceholder": "Filter by status",
+      "allStatuses": "All statuses",
+      "fromDate": "From date",
+      "toDate": "To date"
+    },
+    "table": {
+      "order": "Order",
+      "vendor": "Store",
+      "items": "Items",
+      "date": "Date",
+      "status": "Status",
+      "total": "Total",
+      "actions": "Actions"
+    },
+    "pagination": {
+      "showing": "Showing",
+      "of": "of",
+      "previous": "Previous",
+      "next": "Next"
+    }
+  },
+  "orderDetail": {
+    "orderTitle": "Order #",
+    "placedOn": "Placed on",
+    "backToOrders": "Back to Orders",
+    "completed": "Completed",
+    "pending": "Pending",
+    "notYet": "Not yet",
+    "estimating": "Estimating...",
+    "quantity": "Quantity",
+    "unitPrice": "Unit price",
+    "statuses": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "progress": {
+      "ordered": "Order placed",
+      "paid": "Payment confirmed",
+      "shipped": "Shipped",
+      "delivered": "Delivered"
+    },
+    "orderItems": "Order items",
+    "tracking": {
+      "title": "Tracking information",
+      "number": "Tracking number",
+      "carrier": "Carrier",
+      "copy": "Copy",
+      "track": "Track"
+    },
+    "summary": {
+      "title": "Order summary",
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "tax": "Tax",
+      "total": "Total"
+    },
+    "customer": {
+      "title": "Customer information"
+    },
+    "vendor": {
+      "title": "Vendor information"
+    },
+    "shipping": {
+      "title": "Shipping address"
+    },
+    "payment": {
+      "title": "Payment information",
+      "completed": "Payment completed",
+      "pending": "Payment pending"
+    },
+    "actions": {
+      "title": "Actions",
+      "buyAgain": "Buy again",
+      "downloadInvoice": "Download invoice",
+      "needHelp": "Need help?"
     }
   }
 }

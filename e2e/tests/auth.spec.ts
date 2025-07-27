@@ -110,7 +110,7 @@ test.describe('Authentication', () => {
     await page.waitForURL(/\/(?:en\/)?admin/, { timeout: 10000 });
   });
 
-  test.skip('should logout', async ({ page }) => {
+  test('should logout', async ({ page }) => {
     // First login
     await page.goto(routes.login);
     await page.fill('#customer-email', 'customer1@example.com');
@@ -133,7 +133,7 @@ test.describe('Authentication', () => {
     await expect(page).toHaveURL(/\/(es\/)?(login)?$/);
   });
 
-  test.skip('should show register link', async ({ page }) => {
+  test('should show register link', async ({ page }) => {
     await page.goto(routes.login);
     
     // Skip because register page doesn't exist yet
@@ -142,7 +142,7 @@ test.describe('Authentication', () => {
     await expect(registerLink).toBeVisible();
   });
 
-  test.skip('should show forgot password link', async ({ page }) => {
+  test('should show forgot password link', async ({ page }) => {
     await page.goto(routes.login);
     
     // Skip this test as forgot password link is not visible in current implementation

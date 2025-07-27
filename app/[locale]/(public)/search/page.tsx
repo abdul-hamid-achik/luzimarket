@@ -5,9 +5,11 @@ import { products, vendors, categories } from "@/db/schema";
 import { ilike, or, and, eq, gte, lte, sql, inArray } from "drizzle-orm";
 import { ProductsGrid } from "@/components/products/products-grid";
 import { FilterSidebar } from "@/components/products/filter-sidebar";
+import { SortDropdown } from "@/components/products/sort-dropdown";
 import { Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { getFilteredProducts, getProductFilterOptions } from "@/lib/actions/products";
 
 interface SearchPageProps {
   params: Promise<{ locale: string }>;
@@ -23,83 +25,41 @@ interface SearchPageProps {
 
 async function searchProducts(query: string, filters: any) {
   if (!query) {
-    return [];
+    return { products: [], pagination: { page: 1, limit: 12, totalCount: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false } };
   }
 
-  // Build where conditions
-  const whereConditions = [
+  // Use the same filtering function but add search logic
+  // First get products that match the search term
+  const searchConditions = [
     eq(products.isActive, true),
     or(
       ilike(products.name, `%${query}%`),
-      ilike(products.description, `%${query}%`),
-      ilike(vendors.businessName, `%${query}%`),
-      ilike(categories.name, `%${query}%`)
+      ilike(products.description, `%${query}%`)
     )
   ];
 
-  // Add price filtering if specified
-  if (filters.minPrice) {
-    const minPrice = parseFloat(filters.minPrice);
-    if (!isNaN(minPrice)) {
-      whereConditions.push(gte(sql`CAST(${products.price} AS DECIMAL)`, minPrice));
-    }
-  }
-  
-  if (filters.maxPrice) {
-    const maxPrice = parseFloat(filters.maxPrice);
-    if (!isNaN(maxPrice)) {
-      whereConditions.push(lte(sql`CAST(${products.price} AS DECIMAL)`, maxPrice));
-    }
-  }
-
-  // Add category filtering if specified
-  if (filters.categories) {
-    const categoryIds = filters.categories.split(',').filter(Boolean);
-    if (categoryIds.length > 0) {
-      whereConditions.push(inArray(products.categoryId, categoryIds));
-    }
-  }
-
-  // Add vendor filtering if specified
-  if (filters.vendors) {
-    const vendorIds = filters.vendors.split(',').filter(Boolean);
-    if (vendorIds.length > 0) {
-      whereConditions.push(inArray(products.vendorId, vendorIds));
-    }
-  }
-
   const searchResults = await db
-    .select({
-      id: products.id,
-      name: products.name,
-      slug: products.slug,
-      description: products.description,
-      price: products.price,
-      images: products.images,
-      stock: products.stock,
-      vendor: {
-        id: vendors.id,
-        businessName: vendors.businessName,
-      },
-      category: {
-        id: categories.id,
-        name: categories.name,
-        slug: categories.slug,
-      },
-    })
+    .select({ id: products.id })
     .from(products)
     .leftJoin(vendors, eq(products.vendorId, vendors.id))
     .leftJoin(categories, eq(products.categoryId, categories.id))
-    .where(and(...whereConditions));
+    .where(and(...searchConditions));
 
-  // Apply sorting
-  if (filters.sort === 'price-asc') {
-    searchResults.sort((a, b) => Number(a.price) - Number(b.price));
-  } else if (filters.sort === 'price-desc') {
-    searchResults.sort((a, b) => Number(b.price) - Number(a.price));
+  const searchProductIds = searchResults.map(r => r.id);
+  
+  if (searchProductIds.length === 0) {
+    return { products: [], pagination: { page: 1, limit: 12, totalCount: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false } };
   }
 
-  return searchResults;
+  // Now use getFilteredProducts with the search results
+  return await getFilteredProducts({
+    productIds: searchProductIds,
+    categoryIds: filters.category ? [filters.category] : undefined,
+    vendorIds: filters.vendor ? [filters.vendor] : undefined,
+    sortBy: filters.sort as any,
+    minPrice: filters.minPrice ? parseInt(filters.minPrice) : undefined,
+    maxPrice: filters.maxPrice ? parseInt(filters.maxPrice) : undefined,
+  });
 }
 
 export default async function SearchPage({ params, searchParams }: SearchPageProps) {
@@ -108,28 +68,17 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
   setRequestLocale(locale);
   
   const t = await getTranslations('Search');
-  const searchResults = query ? await searchProducts(query, filters) : [];
+  const searchResults = query ? await searchProducts(query, filters) : { products: [], pagination: { page: 1, limit: 12, totalCount: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false } };
   
-  // Fetch filter data for sidebar
-  const [categoriesData, vendorsData] = await Promise.all([
-    db.select({ id: categories.id, name: categories.name }).from(categories).limit(20),
-    db.select({ id: vendors.id, businessName: vendors.businessName }).from(vendors).limit(20)
-  ]);
-  
-  // Transform data for FilterSidebar
-  const filterCategories = categoriesData.map(cat => ({
-    id: cat.id.toString(),
-    name: cat.name,
-    count: 0 // Could be calculated with a more complex query
-  }));
-  
-  const filterVendors = vendorsData.map(vendor => ({
-    id: vendor.id.toString(),
-    name: vendor.businessName || 'Vendor',
-    count: 0 // Could be calculated with a more complex query
-  }));
-  
-  const priceRange = { min: 0, max: 10000 };
+  // Get filter options using the same function as other pages
+  const filterOptions = await getProductFilterOptions();
+  const vendorsList = await db.query.vendors.findMany({
+    where: eq(vendors.isActive, true),
+    columns: {
+      id: true,
+      businessName: true,
+    }
+  });
 
   return (
     <main className="min-h-screen bg-white">
@@ -157,7 +106,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
 
             {query && (
               <p className="text-sm text-gray-600 font-univers">
-                {searchResults.length} producto{searchResults.length !== 1 ? 's' : ''} encontrado{searchResults.length !== 1 ? 's' : ''}
+                {searchResults.products.length} producto{searchResults.products.length !== 1 ? 's' : ''} encontrado{searchResults.products.length !== 1 ? 's' : ''}
               </p>
             )}
           </div>
@@ -190,7 +139,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
                 </div>
               </div>
             </div>
-          ) : searchResults.length === 0 ? (
+          ) : searchResults.products.length === 0 ? (
             // No results
             <div className="text-center py-16">
               <div className="h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -234,9 +183,17 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
               {/* Filters Sidebar */}
               <aside className="w-64 hidden lg:block">
                 <FilterSidebar 
-                  categories={filterCategories}
-                  vendors={filterVendors}
-                  priceRange={priceRange}
+                  categories={filterOptions.categories.map((cat: any) => ({
+                    id: cat.id.toString(),
+                    name: cat.name,
+                    count: Number(cat.count)
+                  }))}
+                  vendors={vendorsList.map((vendor: any) => ({
+                    id: vendor.id,
+                    name: vendor.businessName,
+                    count: 0
+                  }))}
+                  priceRange={filterOptions.priceRange}
                 />
               </aside>
 
@@ -248,26 +205,17 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
                       Resultados para &quot;{query}&quot;
                     </h2>
                     <p className="text-sm text-gray-600 font-univers">
-                      {searchResults.length} producto{searchResults.length !== 1 ? 's' : ''} encontrado{searchResults.length !== 1 ? 's' : ''}
+                      {searchResults.products.length} producto{searchResults.products.length !== 1 ? 's' : ''} encontrado{searchResults.products.length !== 1 ? 's' : ''}
                     </p>
                   </div>
                   
-                  {/* Sort Dropdown - would be implemented with Select component */}
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm font-univers text-gray-600">Ordenar por</span>
-                    <select className="text-sm border border-gray-300 rounded px-3 py-1 font-univers">
-                      <option value="relevance">Relevancia</option>
-                      <option value="price-asc">Precio: menor a mayor</option>
-                      <option value="price-desc">Precio: mayor a menor</option>
-                      <option value="newest">Más reciente</option>
-                    </select>
-                  </div>
+                  <SortDropdown />
                 </div>
                 
-                <ProductsGrid products={searchResults} />
+                <ProductsGrid products={searchResults.products} />
 
                 {/* Load more or pagination could go here */}
-                {searchResults.length >= 20 && (
+                {searchResults.products.length >= 20 && (
                   <div className="text-center mt-12">
                     <Button variant="outline" className="font-univers">
                       Cargar más resultados

@@ -116,7 +116,7 @@ test.describe('Vendor Registration', () => {
 
 test.describe('Vendor Dashboard', () => {
   // These tests would require authentication
-  test.skip('should access vendor dashboard after login', async ({ page }) => {
+  test('should access vendor dashboard after login', async ({ page }) => {
     // This would need proper vendor authentication setup
     await page.goto(routes.vendorDashboard);
     

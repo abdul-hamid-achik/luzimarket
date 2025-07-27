@@ -27,7 +27,7 @@ export function ShippingLocationSelector() {
       <MapPin className="h-3 w-3" />
       <span className="hidden sm:inline">{t('shippingTo', { location: '' }).replace(': ', '')}:</span>
       <Select value={location.displayName} onValueChange={handleLocationChange}>
-        <SelectTrigger className="border-0 bg-transparent h-auto p-0 font-medium text-gray-900 hover:text-gray-600">
+        <SelectTrigger className="border-0 bg-transparent h-auto p-0 font-medium text-gray-900 hover:text-gray-600" aria-label="Select shipping location">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

@@ -3,6 +3,7 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/cart-context";
+import { useCurrency } from "@/contexts/currency-context";
 import Image from "next/image";
 import { Minus, Plus, X } from "lucide-react";
 import { Link } from "@/i18n/navigation";
@@ -10,6 +11,7 @@ import { useTranslations } from 'next-intl';
 
 export default function CartSheet() {
   const { state, toggleCart, removeFromCart, updateQuantity, getTotalPrice, getTotalItems } = useCart();
+  const { formatPrice } = useCurrency();
   const t = useTranslations('Cart');
 
   return (
@@ -44,7 +46,7 @@ export default function CartSheet() {
                     <div className="flex-1 space-y-1">
                       <h3 className="font-univers text-sm font-medium">{item.name}</h3>
                       <p className="text-xs text-gray-600 font-univers">{t('by')} {item.vendorName}</p>
-                      <p className="font-univers text-sm">${item.price.toLocaleString('es-MX')} MXN</p>
+                      <p className="font-univers text-sm">{formatPrice(item.price)}</p>
                     </div>
 
                     {/* Quantity Controls */}
@@ -90,7 +92,7 @@ export default function CartSheet() {
               <div className="flex justify-between items-center">
                 <span className="font-univers text-lg">{t('total')}</span>
                 <span className="font-univers text-lg font-semibold">
-                  ${getTotalPrice().toLocaleString('es-MX')} MXN
+                  {formatPrice(getTotalPrice())}
                 </span>
               </div>
               

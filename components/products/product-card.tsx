@@ -11,6 +11,9 @@ import { useWishlist } from "@/contexts/wishlist-context";
 import { useCurrency } from "@/contexts/currency-context";
 import { toast } from "sonner";
 import { useTranslations } from 'next-intl';
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 
 interface ProductCardProps {
   product: {
@@ -30,6 +33,9 @@ interface ProductCardProps {
 
 export function ProductCard({ product, className, onQuickView }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const { data: session } = useSession();
+  const router = useRouter();
+  const locale = useLocale();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { formatPrice } = useCurrency();
   const isWishlisted = isInWishlist(product.id);
@@ -38,6 +44,13 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    // Check if user is authenticated
+    if (!session?.user) {
+      // Redirect to login page
+      router.push(`/${locale}/iniciar-sesion`);
+      return;
+    }
     
     if (isWishlisted) {
       removeFromWishlist(product.id);

@@ -8,6 +8,7 @@ import { Heart, ShoppingBag, User, Menu, LogOut, Search } from "lucide-react";
 import { SearchBox } from "./search-box";
 import LanguageSwitcher from "./language-switcher";
 import { ShippingLocationSelector } from "./shipping-location-selector";
+import { CurrencySwitch } from "./currency-switch";
 import { useState } from "react";
 import { useCart } from "@/contexts/cart-context";
 import { useWishlist } from "@/contexts/wishlist-context";
@@ -54,6 +55,7 @@ export function Header() {
         <div className="hidden md:flex items-center justify-between py-2 text-xs border-b px-8">
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
+            <CurrencySwitch />
           </div>
           <div className="flex items-center gap-4">
             <ShippingLocationSelector />

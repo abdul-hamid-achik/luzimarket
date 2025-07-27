@@ -7,6 +7,7 @@ import { z } from "zod";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from 'next-intl';
 import { useCart } from "@/contexts/cart-context";
+import { useCurrency } from "@/contexts/currency-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -55,6 +56,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const t = useTranslations('Checkout');
   const { state, getTotalPrice, clearCart } = useCart();
+  const { formatPrice } = useCurrency();
   const items = state.items;
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -506,7 +508,7 @@ export default function CheckoutPage() {
                         Procesando...
                       </>
                     ) : (
-                      `Finalizar compra - $${total.toLocaleString('es-MX')}`
+                      `Finalizar compra - ${formatPrice(total)}`
                     )}
                   </Button>
                 </div>
@@ -545,12 +547,12 @@ export default function CheckoutPage() {
                         <div className="flex-1">
                           <h4 className="font-univers font-medium text-sm">{item.name}</h4>
                           <p className="text-sm text-gray-600 font-univers">
-                            ${item.price.toLocaleString('es-MX')} c/u
+                            {formatPrice(item.price)} c/u
                           </p>
                         </div>
                         <div className="text-right">
                           <p className="font-univers font-medium">
-                            ${(item.price * item.quantity).toLocaleString('es-MX')}
+                            {formatPrice(item.price * item.quantity)}
                           </p>
                         </div>
                       </div>
@@ -563,7 +565,7 @@ export default function CheckoutPage() {
                   <div className="space-y-2">
                     <div className="flex justify-between font-univers">
                       <span>Subtotal</span>
-                      <span>${subtotal.toLocaleString('es-MX')}</span>
+                      <span>{formatPrice(subtotal)}</span>
                     </div>
                     <div className="flex justify-between font-univers" data-testid="shipping-line">
                       <span>Envío</span>
@@ -571,18 +573,18 @@ export default function CheckoutPage() {
                         {shippingCost === 0 && selectedShipping ? (
                           <span className="text-green-600">GRATIS</span>
                         ) : (
-                          `$${shippingCost.toLocaleString('es-MX')}`
+                          formatPrice(shippingCost)
                         )}
                       </span>
                     </div>
                     <div className="flex justify-between font-univers" data-testid="tax-line">
                       <span>IVA (16%)</span>
-                      <span>${tax.toLocaleString('es-MX')}</span>
+                      <span>{formatPrice(tax)}</span>
                     </div>
                     <Separator />
                     <div className="flex justify-between font-times-now text-lg">
                       <span>Total</span>
-                      <span>${total.toLocaleString('es-MX')} MXN</span>
+                      <span>{formatPrice(total)}</span>
                     </div>
                   </div>
 

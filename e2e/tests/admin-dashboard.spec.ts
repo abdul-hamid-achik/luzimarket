@@ -6,25 +6,22 @@ test.describe('Admin Dashboard', () => {
     // Login as admin
     await page.goto(routes.login);
     
-    // Wait for page to load
-    await page.waitForLoadState('networkidle');
-    
-    // Click on Admin tab and wait a bit
-    const adminTab = page.locator(`button[role="tab"]:has-text("${uiText.es.adminTab}")`);
+    // Click on admin tab first
+    const adminTab = page.locator('button[role="tab"]').filter({ hasText: /Admin/i });
     await adminTab.click();
     
-    // Force wait for tab animation to complete
-    await page.waitForTimeout(1000);
+    // Use admin login form with admin credentials
+    await page.fill('input[id="admin-email"]', 'admin@luzimarket.shop');
+    await page.fill('input[id="admin-password"]', 'admin123');
     
-    // Try to interact with admin form using force option
-    await page.locator('#admin-email').fill('admin@luzimarket.shop', { force: true });
-    await page.locator('#admin-password').fill('admin123', { force: true });
+    const submitButton = page.locator('button[type="submit"]').filter({ hasText: /Iniciar sesión|Sign in/ });
+    await submitButton.click();
     
-    // Find and click submit button in admin form
-    await page.locator(`form:has(#admin-email) button[type="submit"]:has-text("${uiText.es.login}")`).click();
-    
-    // Wait for navigation to admin dashboard (more flexible URL matching)
-    await page.waitForURL((url: URL) => url.pathname.includes('/admin'), { timeout: 15000 });
+    // Wait for navigation to admin area (handle localized URLs like /es/admin)
+    await page.waitForURL((url: URL) => {
+      const path = url.pathname;
+      return path.includes('/admin') || !!path.match(/\/[a-z]{2}\/admin/);
+    }, { timeout: 15000 });
   });
 
   test('should display admin dashboard', async ({ page }) => {

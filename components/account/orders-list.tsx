@@ -1,55 +1,35 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { Package, Calendar, CreditCard, Eye, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import Image from "next/image";
-
-interface Order {
-  id: string;
-  orderNumber: string;
-  total: string;
-  status: string;
-  paymentStatus: string;
-  createdAt: string;
-  items?: Array<{
-    id: string;
-    quantity: number;
-    price: string;
-    product?: {
-      name: string;
-      images: string[];
-    };
-  }>;
-}
+import { useOrders } from "@/lib/hooks/use-orders";
+import { useTranslations } from "next-intl";
 
 interface OrdersListProps {
-  userId: string;
+  searchParams?: {
+    search?: string;
+    status?: string;
+    from?: string;
+    to?: string;
+    page?: string;
+  };
 }
 
-export function OrdersList({ userId }: OrdersListProps) {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchOrders = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/orders?userId=${userId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setOrders(data.orders || []);
-      }
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [userId]);
-
-  useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
+export function OrdersList({ searchParams = {} }: OrdersListProps) {
+  const t = useTranslations('orders');
+  
+  const { data, isLoading, error } = useOrders({
+    search: searchParams.search,
+    status: searchParams.status as any,
+    from: searchParams.from,
+    to: searchParams.to,
+    page: searchParams.page ? parseInt(searchParams.page) : 1,
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -69,38 +49,57 @@ export function OrdersList({ userId }: OrdersListProps) {
   const getStatusText = (status: string) => {
     switch (status) {
       case 'delivered':
-        return 'Entregado';
+        return t('statuses.delivered');
       case 'shipped':
-        return 'Enviado';
+        return t('statuses.shipped');
       case 'paid':
-        return 'Pagado';
+        return t('statuses.paid');
       case 'cancelled':
-        return 'Cancelado';
+        return t('statuses.cancelled');
       default:
-        return 'Pendiente';
+        return t('statuses.pending');
     }
   };
 
-  if (loading) {
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <Package className="h-12 w-12 text-red-400 mx-auto mb-4" />
+        <p className="text-red-600 font-univers mb-4">
+          {t('error.loading')}
+        </p>
+        <Button onClick={() => window.location.reload()} variant="outline">
+          {t('error.retry')}
+        </Button>
+      </div>
+    );
+  }
+
+  if (isLoading) {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="border border-gray-200 rounded-lg p-4 animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
-            <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+          <div key={i} className="border border-gray-200 rounded-lg p-4">
+            <div className="space-y-3">
+              <Skeleton className="h-4 w-1/4" />
+              <Skeleton className="h-3 w-1/3" />
+              <Skeleton className="h-3 w-1/2" />
+            </div>
           </div>
         ))}
       </div>
     );
   }
 
+  const orders = data?.orders || [];
+
   if (orders.length === 0) {
     return (
       <div className="text-center py-8">
         <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-        <p className="text-gray-600 font-univers">No tienes pedidos aún</p>
+        <p className="text-gray-600 font-univers">{t('noOrders.description')}</p>
         <Link href="/products">
-          <Button className="mt-4">Comenzar a comprar</Button>
+          <Button className="mt-4">{t('noOrders.startShopping')}</Button>
         </Link>
       </div>
     );
@@ -115,7 +114,7 @@ export function OrdersList({ userId }: OrdersListProps) {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-univers font-medium">
-                  Pedido #{order.orderNumber}
+                  {t('orderNumber')} {order.orderNumber}
                 </h3>
                 <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
                   <div className="flex items-center gap-1">
@@ -124,8 +123,13 @@ export function OrdersList({ userId }: OrdersListProps) {
                   </div>
                   <div className="flex items-center gap-1">
                     <CreditCard className="h-4 w-4" />
-                    {order.paymentStatus === 'succeeded' ? 'Pagado' : 'Pendiente'}
+                    {order.paymentStatus === 'succeeded' ? t('paid') : t('pending')}
                   </div>
+                  {order.vendor && (
+                    <p className="text-sm text-gray-600 font-univers">
+                      {order.vendor.businessName}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="text-right">
@@ -165,7 +169,7 @@ export function OrdersList({ userId }: OrdersListProps) {
                 })}
                 {order.items.length > 3 && (
                   <div className="text-sm text-gray-600 font-univers">
-                    +{order.items.length - 3} más
+                    +{order.items.length - 3} {t('moreItems')}
                   </div>
                 )}
               </div>
@@ -175,23 +179,23 @@ export function OrdersList({ userId }: OrdersListProps) {
           {/* Order Actions */}
           <div className="p-4 bg-gray-50 border-t">
             <div className="flex items-center gap-3">
-              <Link href={`/orders/${order.id}`}>
+              <Link href={`/orders/${order.orderNumber}`}>
                 <Button variant="outline" size="sm">
                   <Eye className="h-4 w-4 mr-2" />
-                  Ver detalles
+                  {t('viewDetails')}
                 </Button>
               </Link>
               
               {order.status === 'delivered' && (
                 <Button variant="outline" size="sm">
-                  Comprar de nuevo
+                  {t('actions.buyAgain')}
                 </Button>
               )}
 
               {order.status === 'shipped' && (
                 <Button variant="outline" size="sm">
                   <Truck className="h-4 w-4 mr-2" />
-                  Rastrear
+                  {t('track')}
                 </Button>
               )}
             </div>

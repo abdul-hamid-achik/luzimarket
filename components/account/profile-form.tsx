@@ -19,13 +19,13 @@ const profileSchema = z.object({
 type ProfileForm = z.infer<typeof profileSchema>;
 
 interface ProfileFormProps {
-  user: {
+  user?: {
     id: string;
     name: string | null;
     email: string;
     phone?: string | null;
     dateOfBirth?: string | null;
-  };
+  } | null;
 }
 
 export function ProfileForm({ user }: ProfileFormProps) {
@@ -35,10 +35,10 @@ export function ProfileForm({ user }: ProfileFormProps) {
   const form = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: user.name || "",
-      email: user.email,
-      phone: user.phone || "",
-      dateOfBirth: user.dateOfBirth || "",
+      name: user?.name || "",
+      email: user?.email || "",
+      phone: user?.phone || "",
+      dateOfBirth: user?.dateOfBirth || "",
     },
   });
 

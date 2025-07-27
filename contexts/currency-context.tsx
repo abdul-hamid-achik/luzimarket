@@ -14,19 +14,58 @@ interface CurrencyContextType {
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
-// Exchange rate from MXN to USD (you might want to fetch this from an API)
-const MXN_TO_USD_RATE = 0.059; // Approximately 1 USD = 17 MXN
+// Fallback exchange rate from MXN to USD
+const FALLBACK_MXN_TO_USD_RATE = 0.059;
+
+// Cache duration: 1 hour
+const CACHE_DURATION = 60 * 60 * 1000;
 
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   const [currency, setCurrency] = useState<Currency>('MXN');
-  const [exchangeRate] = useState(MXN_TO_USD_RATE);
+  const [exchangeRate, setExchangeRate] = useState(FALLBACK_MXN_TO_USD_RATE);
 
-  // Load currency preference from localStorage
+  // Fetch exchange rate from API
+  const fetchExchangeRate = async () => {
+    try {
+      // Check cache first
+      const cached = localStorage.getItem('mxn-usd-rate');
+      const cacheTimestamp = localStorage.getItem('mxn-usd-rate-timestamp');
+      
+      if (cached && cacheTimestamp) {
+        const age = Date.now() - parseInt(cacheTimestamp);
+        if (age < CACHE_DURATION) {
+          setExchangeRate(parseFloat(cached));
+          return;
+        }
+      }
+
+      // Fetch fresh rate from API
+      const response = await fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/mxn.json');
+      const data = await response.json();
+      
+      if (data.mxn && data.mxn.usd) {
+        const rate = data.mxn.usd;
+        setExchangeRate(rate);
+        
+        // Cache the result
+        localStorage.setItem('mxn-usd-rate', rate.toString());
+        localStorage.setItem('mxn-usd-rate-timestamp', Date.now().toString());
+      }
+    } catch (error) {
+      console.warn('Failed to fetch exchange rate, using fallback:', error);
+      // Fallback rate is already set as default
+    }
+  };
+
+  // Load currency preference from localStorage and fetch exchange rate
   useEffect(() => {
     const saved = localStorage.getItem('preferred-currency');
     if (saved === 'USD' || saved === 'MXN') {
       setCurrency(saved);
     }
+    
+    // Fetch exchange rate
+    fetchExchangeRate();
   }, []);
 
   // Save currency preference to localStorage

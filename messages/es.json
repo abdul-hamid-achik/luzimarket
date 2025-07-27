@@ -1559,6 +1559,58 @@
         "address": "Dirección",
         "hours": "Horario de atención"
       }
+    },
+    "platformUse": {
+      "title": "Uso de la Plataforma",
+      "description": "Al utilizar Luzimarket, te comprometes a:",
+      "eligibility": "Ser mayor de 18 años o contar con el consentimiento de tus padres o tutores",
+      "account": "Proporcionar información verdadera, precisa y completa en tu registro",
+      "prohibited": "No utilizar la plataforma para actividades ilegales, fraudulentas o que dañen a otros usuarios"
+    },
+    "purchases": {
+      "title": "Compras y Pagos",
+      "description": "Todas las compras están sujetas a las siguientes condiciones:",
+      "pricing": "Los precios están expresados en pesos mexicanos (MXN) e incluyen IVA cuando aplicable",
+      "payment": "Aceptamos tarjetas de crédito, débito y pagos en efectivo a través de OXXO mediante Stripe",
+      "oxxo": "Los pagos en OXXO tienen un límite máximo de 10,000 MXN y deben completarse dentro de 3 días calendario",
+      "confirmation": "Recibirás confirmación de tu pedido por correo electrónico con todos los detalles de la transacción"
+    },
+    "shipping": {
+      "title": "Envío y Entrega",
+      "description": "Realizamos envíos a toda la República Mexicana con las siguientes condiciones:",
+      "zones": "Costos de envío por zona: Zona A (89 MXN), Zona B (119 MXN), Zona C (149 MXN)",
+      "times": "Tiempos de entrega estimados de 3-10 días hábiles dependiendo de la ubicación",
+      "costs": "Envío gratuito en pedidos mayores a 1,000 MXN dentro de la República Mexicana"
+    },
+    "returns": {
+      "title": "Devoluciones y Reembolsos",
+      "description": "Garantizamos tu satisfacción con nuestra política de devoluciones:",
+      "period": "Tienes 30 días calendario desde la fecha de entrega para solicitar una devolución",
+      "conditions": "Los productos deben estar en perfecto estado, sin uso, con etiquetas originales y en su empaque original",
+      "process": "Las devoluciones se procesan en 5-7 días hábiles una vez recibido y verificado el producto",
+      "refunds": "Los reembolsos se realizan al método de pago original utilizado en la compra"
+    },
+    "intellectual": {
+      "title": "Propiedad Intelectual",
+      "description": "Todo el contenido de Luzimarket, incluyendo diseños, logos, textos, imágenes y software, está protegido por derechos de autor, marcas registradas y otras leyes de propiedad intelectual mexicanas e internacionales. Su uso no autorizado está prohibido."
+    },
+    "liability": {
+      "title": "Limitación de Responsabilidad",
+      "description": "Luzimarket actúa como intermediario facilitando transacciones entre compradores y vendedores independientes. No somos responsables por la calidad, autenticidad, seguridad o legalidad de los productos ofrecidos por terceros vendedores."
+    },
+    "profeco": {
+      "title": "Protección al Consumidor - PROFECO",
+      "description": "Como consumidor en México, tienes derechos protegidos por la Ley Federal de Protección al Consumidor. Para quejas, aclaraciones o controversias, puedes contactar a:",
+      "info": "Procuraduría Federal del Consumidor (PROFECO)",
+      "phone": "Teléfono PROFECO: 55 5568 8722 o 800 468 8722",
+      "website": "Portal oficial: www.gob.mx/profeco"
+    },
+    "contact": {
+      "title": "Información de Contacto",
+      "description": "Para consultas sobre estos Términos y Condiciones, contáctanos:",
+      "company": "MOMENTO ESPECIAL SAPI DE CV (Luzimarket)",
+      "email": "Correo electrónico: legal@luzimarket.shop",
+      "address": "Dirección: Ciudad de México, México"
     }
   },
   "About": {
@@ -1747,67 +1799,6 @@
     "needHelp": "¿Necesitas ayuda?",
     "contactSupport": "Contactar Soporte"
   },
-  "Terms": {
-    "title": "Términos y Condiciones",
-    "lastUpdated": "Última actualización: {date}",
-    "intro": "Bienvenido a LuziMarket. Al usar nuestra plataforma, aceptas estos términos y condiciones. Por favor, léelos cuidadosamente antes de utilizar nuestros servicios.",
-    "acceptance": {
-      "title": "1. Aceptación de Términos",
-      "description": "Al acceder y utilizar LuziMarket, aceptas cumplir con estos términos y condiciones, todas las leyes y regulaciones aplicables, y aceptas que eres responsable del cumplimiento de las leyes locales aplicables."
-    },
-    "platformUse": {
-      "title": "2. Uso de la Plataforma",
-      "description": "LuziMarket es un marketplace que conecta vendedores y compradores. Las siguientes reglas aplican:",
-      "eligibility": "Debes tener al menos 18 años para usar esta plataforma",
-      "account": "Eres responsable de mantener la confidencialidad de tu cuenta",
-      "prohibited": "Está prohibido usar la plataforma para actividades ilegales o fraudulentas"
-    },
-    "purchases": {
-      "title": "3. Compras y Pagos",
-      "description": "Todas las compras están sujetas a las siguientes condiciones:",
-      "pricing": "Los precios están en pesos mexicanos e incluyen IVA",
-      "payment": "Aceptamos tarjetas de crédito, débito y pagos en OXXO",
-      "oxxo": "Los pagos en OXXO deben completarse dentro de 3 días",
-      "confirmation": "Recibirás un correo de confirmación con los detalles de tu pedido"
-    },
-    "shipping": {
-      "title": "4. Envío y Entrega",
-      "description": "Los tiempos y costos de envío varían según el vendedor y la ubicación:",
-      "zones": "Envíos disponibles a toda la República Mexicana",
-      "times": "Los tiempos de entrega son estimados y pueden variar",
-      "costs": "Los costos de envío se calculan según el peso y destino"
-    },
-    "returns": {
-      "title": "5. Devoluciones y Reembolsos",
-      "description": "Nuestra política de devoluciones garantiza tu satisfacción:",
-      "period": "Tienes 30 días para solicitar una devolución",
-      "conditions": "Los productos deben estar en su condición original",
-      "process": "Las devoluciones se procesan dentro de 5-7 días hábiles",
-      "refunds": "Los reembolsos se realizan al método de pago original"
-    },
-    "intellectual": {
-      "title": "6. Propiedad Intelectual",
-      "description": "Todo el contenido en LuziMarket, incluyendo logos, textos e imágenes, está protegido por derechos de autor y otras leyes de propiedad intelectual."
-    },
-    "liability": {
-      "title": "7. Limitación de Responsabilidad",
-      "description": "LuziMarket actúa como intermediario entre vendedores y compradores. No somos responsables por la calidad, seguridad o legalidad de los productos listados."
-    },
-    "profeco": {
-      "title": "8. Protección al Consumidor",
-      "description": "Como consumidor en México, tienes derechos protegidos por la ley. Para cualquier queja o aclaración, también puedes contactar a:",
-      "info": "Procuraduría Federal del Consumidor (PROFECO)",
-      "phone": "Teléfono: 55 5568 8722",
-      "website": "www.gob.mx/profeco"
-    },
-    "contact": {
-      "title": "9. Contacto",
-      "description": "Si tienes preguntas sobre estos términos, contáctanos:",
-      "company": "LuziMarket S.A. de C.V.",
-      "email": "legal@luzimarket.shop",
-      "address": "Ciudad de México, México"
-    }
-  },
   "admin": {
     "financials": {
       "title": "Gestión Financiera",
@@ -1918,6 +1909,42 @@
       "payments": "Pagos",
       "settings": "Configuración",
       "logout": "Cerrar sesión"
+    },
+    "dashboard": {
+      "welcome": "Bienvenido, {businessName}",
+      "subtitle": "Aquí está el resumen de tu negocio",
+      "totalProducts": "Productos Totales",
+      "activeProducts": "Productos Activos",
+      "totalOrders": "Órdenes Totales",
+      "totalRevenue": "Ingresos Totales",
+      "addProduct": "Agregar Producto",
+      "quickActions": "Acciones Rápidas",
+      "viewProducts": "Ver Productos",
+      "viewOrders": "Ver Órdenes",
+      "analytics": "Análisis",
+      "settings": "Configuración",
+      "recentOrders": "Órdenes Recientes",
+      "viewAll": "Ver todas",
+      "noRecentOrders": "No hay órdenes recientes",
+      "orderStatus": {
+        "pending": "Pendiente",
+        "paid": "Pagado",
+        "shipped": "Enviado",
+        "delivered": "Entregado"
+      },
+      "accountPending": "Tu cuenta está pendiente de aprobación. Podrás agregar productos una vez que sea aprobada.",
+      "stripeConnect": {
+        "title": "Pagos con Stripe",
+        "description": "Configura tu cuenta para recibir pagos",
+        "active": "Activo",
+        "pending": "Pendiente",
+        "notConnected": "Necesitas configurar tu cuenta de Stripe para comenzar a recibir pagos.",
+        "incompleteSetup": "Tu cuenta de Stripe está pendiente de verificación. Completa la configuración para activar pagos.",
+        "fullyActive": "Tu cuenta de Stripe está activa. Puedes recibir pagos y gestionar tus finanzas.",
+        "setupPayments": "Configurar Pagos",
+        "managePayments": "Gestionar Pagos",
+        "completeSetup": "Completar Configuración"
+      }
     },
     "payouts": {
       "requestPayout": "Solicitar Pago",
@@ -2101,6 +2128,169 @@
         "viewOrder": "Ver orden",
         "viewDetails": "Ver detalles"
       }
+    },
+    "analytics": {
+      "title": "Analíticas",
+      "subtitle": "Estadísticas de tu negocio",
+      "revenue": "Ingresos",
+      "orders": "Órdenes",
+      "products": "Productos",
+      "customers": "Clientes"
+    },
+    "orders": {
+      "title": "Órdenes",
+      "subtitle": "Gestiona los pedidos de tus clientes",
+      "orderNumber": "Número de orden",
+      "customer": "Cliente",
+      "status": "Estado",
+      "total": "Total",
+      "date": "Fecha",
+      "pending": "Pendiente",
+      "processing": "Procesando",
+      "shipped": "Enviado",
+      "delivered": "Entregado",
+      "cancelled": "Cancelado"
+    },
+    "emailTemplates": {
+      "title": "Plantillas de Email",
+      "subtitle": "Gestiona las plantillas de correo electrónico del sistema",
+      "createNew": "Crear Nueva",
+      "templateTypes": {
+        "welcome": "Bienvenida",
+        "orderConfirmation": "Confirmación de Pedido",
+        "passwordReset": "Restablecimiento de Contraseña",
+        "vendorApproval": "Aprobación de Vendedor"
+      },
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "subject": "Asunto",
+      "variables": "Variables",
+      "lastModified": "Última modificación",
+      "edit": "Editar",
+      "preview": "Vista previa",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "delete": "Eliminar"
+    }
+  },
+  "orders": {
+    "title": "Mis Pedidos",
+    "subtitle": "Consulta el historial y estado de todos tus pedidos",
+    "backToAccount": "Volver a Mi Cuenta",
+    "exportOrders": "Exportar Pedidos",
+    "orderNumber": "Pedido #",
+    "viewDetails": "Ver detalles",
+    "view": "Ver",
+    "track": "Rastrear",
+    "paid": "Pagado",
+    "pending": "Pendiente",
+    "item": "artículo",
+    "items": "artículos",
+    "moreItems": "más",
+    "noOrders": {
+      "title": "Aún no tienes pedidos",
+      "description": "Cuando realices tu primera compra, aparecerá aquí junto con la información de seguimiento.",
+      "startShopping": "Comenzar a Comprar"
+    },
+    "noResults": {
+      "title": "No se encontraron pedidos",
+      "description": "Intenta ajustar tus filtros de búsqueda para encontrar lo que buscas.",
+      "clearFilters": "Limpiar Filtros"
+    },
+    "statuses": {
+      "pending": "Pendiente",
+      "paid": "Pagado",
+      "shipped": "Enviado",
+      "delivered": "Entregado",
+      "cancelled": "Cancelado"
+    },
+    "filters": {
+      "searchPlaceholder": "Buscar por número de pedido...",
+      "statusPlaceholder": "Filtrar por estado",
+      "allStatuses": "Todos los estados",
+      "fromDate": "Fecha desde",
+      "toDate": "Fecha hasta"
+    },
+    "table": {
+      "order": "Pedido",
+      "vendor": "Tienda",
+      "items": "Artículos",
+      "date": "Fecha",
+      "status": "Estado",
+      "total": "Total",
+      "actions": "Acciones"
+    },
+    "pagination": {
+      "showing": "Mostrando",
+      "of": "de",
+      "previous": "Anterior",
+      "next": "Siguiente"
+    },
+    "error": {
+      "loading": "Error al cargar los pedidos",
+      "retry": "Reintentar"
+    },
+    "actions": {
+      "buyAgain": "Comprar de nuevo"
+    }
+  },
+  "orderDetail": {
+    "orderTitle": "Pedido #",
+    "placedOn": "Realizado el",
+    "backToOrders": "Volver a Pedidos",
+    "completed": "Completado",
+    "pending": "Pendiente",
+    "notYet": "Aún no",
+    "estimating": "Estimando...",
+    "quantity": "Cantidad",
+    "unitPrice": "Precio unitario",
+    "statuses": {
+      "pending": "Pendiente",
+      "paid": "Pagado",
+      "shipped": "Enviado",
+      "delivered": "Entregado",
+      "cancelled": "Cancelado"
+    },
+    "progress": {
+      "ordered": "Pedido realizado",
+      "paid": "Pago confirmado",
+      "shipped": "Enviado",
+      "delivered": "Entregado"
+    },
+    "orderItems": "Artículos del pedido",
+    "tracking": {
+      "title": "Información de seguimiento",
+      "number": "Número de seguimiento",
+      "carrier": "Paquetería",
+      "copy": "Copiar",
+      "track": "Rastrear"
+    },
+    "summary": {
+      "title": "Resumen del pedido",
+      "subtotal": "Subtotal",
+      "shipping": "Envío",
+      "tax": "Impuestos",
+      "total": "Total"
+    },
+    "customer": {
+      "title": "Información del cliente"
+    },
+    "vendor": {
+      "title": "Información del vendedor"
+    },
+    "shipping": {
+      "title": "Dirección de envío"
+    },
+    "payment": {
+      "title": "Información de pago",
+      "completed": "Pago completado",
+      "pending": "Pago pendiente"
+    },
+    "actions": {
+      "title": "Acciones",
+      "buyAgain": "Comprar de nuevo",
+      "downloadInvoice": "Descargar factura",
+      "needHelp": "¿Necesitas ayuda?"
     }
   }
 }

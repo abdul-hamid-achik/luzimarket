@@ -102,7 +102,14 @@ test.describe('Accessibility Tests', () => {
     const formAccessibility = await page.evaluate(() => {
       const inputs = Array.from(document.querySelectorAll('input, select, textarea'));
       const buttonCheckboxes = Array.from(document.querySelectorAll('button[role="checkbox"]'));
-      const allElements = [...inputs, ...buttonCheckboxes];
+      
+      // Filter out hidden Radix UI implementation elements
+      const visibleInputs = inputs.filter(input => {
+        const ariaHidden = input.getAttribute('aria-hidden');
+        return ariaHidden !== 'true';
+      });
+      
+      const allElements = [...visibleInputs, ...buttonCheckboxes];
 
       return allElements.map((input, index) => {
         const id = input.id;

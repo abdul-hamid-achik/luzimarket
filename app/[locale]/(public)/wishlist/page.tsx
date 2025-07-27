@@ -5,9 +5,41 @@ import { ProductCard } from "@/components/products/product-card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Heart } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
+import { useEffect } from "react";
 
 export default function WishlistPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const locale = useLocale();
   const { state, clearWishlist } = useWishlist();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (status === "loading") return; // Still loading
+    if (!session?.user) {
+      router.push(`/${locale}/iniciar-sesion`);
+    }
+  }, [session, status, router, locale]);
+
+  // Show loading while checking authentication
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mx-auto"></div>
+          <p className="mt-2 text-gray-600">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render anything if not authenticated (will redirect)
+  if (!session?.user) {
+    return null;
+  }
 
   if (state.items.length === 0) {
     return (

@@ -4,6 +4,9 @@ import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWishlist } from "@/contexts/wishlist-context";
 import { cn } from "@/lib/utils";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 
 interface WishlistButtonProps {
   product: {
@@ -22,10 +25,20 @@ export function WishlistButton({
   variant = "icon", 
   className 
 }: WishlistButtonProps) {
+  const { data: session } = useSession();
+  const router = useRouter();
+  const locale = useLocale();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const inWishlist = isInWishlist(product.id);
 
   const handleToggle = () => {
+    // Check if user is authenticated
+    if (!session?.user) {
+      // Redirect to login page
+      router.push(`/${locale}/iniciar-sesion`);
+      return;
+    }
+
     if (inWishlist) {
       removeFromWishlist(product.id);
     } else {

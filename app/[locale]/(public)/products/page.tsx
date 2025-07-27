@@ -1,11 +1,12 @@
 import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
 import { db } from "@/db";
-import { products, vendors, categories } from "@/db/schema";
+import { vendors } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { ProductsGrid } from "@/components/products/products-grid";
 import { FilterSidebar } from "@/components/products/filter-sidebar";
 import { SortDropdown } from "@/components/products/sort-dropdown";
+import { getFilteredProducts, getProductFilterOptions } from "@/lib/actions/products";
 
 interface ProductsPageProps {
   params: Promise<{ locale: string }>;
@@ -18,43 +19,7 @@ interface ProductsPageProps {
   }>;
 }
 
-async function getProducts(filters: any) {
-  const allProducts = await db
-    .select({
-      id: products.id,
-      name: products.name,
-      slug: products.slug,
-      description: products.description,
-      price: products.price,
-      images: products.images,
-      stock: products.stock,
-      vendor: {
-        id: vendors.id,
-        businessName: vendors.businessName,
-      },
-      category: {
-        id: categories.id,
-        name: categories.name,
-        slug: categories.slug,
-      },
-    })
-    .from(products)
-    .leftJoin(vendors, eq(products.vendorId, vendors.id))
-    .leftJoin(categories, eq(products.categoryId, categories.id))
-    .where(eq(products.isActive, true));
 
-  // Apply filters here (category, vendor, price range, etc.)
-  let filteredProducts = allProducts;
-
-  // Apply sorting
-  if (filters.sort === 'price-asc') {
-    filteredProducts.sort((a, b) => Number(a.price) - Number(b.price));
-  } else if (filters.sort === 'price-desc') {
-    filteredProducts.sort((a, b) => Number(b.price) - Number(a.price));
-  }
-
-  return filteredProducts;
-}
 
 export default async function ProductsPage({ params, searchParams }: ProductsPageProps) {
   const { locale } = await params;
@@ -62,7 +27,24 @@ export default async function ProductsPage({ params, searchParams }: ProductsPag
   setRequestLocale(locale);
   
   const t = await getTranslations('Products');
-  const productList = await getProducts(filters);
+  
+  // Get products using the same filtering logic as handpicked page
+  const productsResult = await getFilteredProducts({
+    categoryIds: filters.category ? [filters.category] : undefined,
+    vendorIds: filters.vendor ? [filters.vendor] : undefined,
+    sortBy: filters.sort as any,
+    minPrice: filters.minPrice ? parseInt(filters.minPrice) : undefined,
+    maxPrice: filters.maxPrice ? parseInt(filters.maxPrice) : undefined,
+  });
+
+  const filterOptions = await getProductFilterOptions();
+  const vendorsList = await db.query.vendors.findMany({
+    where: eq(vendors.isActive, true),
+    columns: {
+      id: true,
+      businessName: true,
+    }
+  });
 
   return (
     <main className="min-h-screen">
@@ -96,7 +78,19 @@ export default async function ProductsPage({ params, searchParams }: ProductsPag
           <div className="flex gap-8">
             {/* Filters Sidebar */}
             <aside className="w-64 hidden lg:block">
-              <FilterSidebar />
+              <FilterSidebar 
+                categories={filterOptions.categories.map((cat: any) => ({
+                  id: cat.id.toString(),
+                  name: cat.name,
+                  count: Number(cat.count)
+                }))}
+                vendors={vendorsList.map((vendor: any) => ({
+                  id: vendor.id,
+                  name: vendor.businessName,
+                  count: 0 // We don't have count data for vendors in this context
+                }))}
+                priceRange={filterOptions.priceRange}
+              />
             </aside>
 
             {/* Products Grid */}
@@ -104,7 +98,7 @@ export default async function ProductsPage({ params, searchParams }: ProductsPag
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <p className="text-sm text-gray-600 font-univers">
-                    {productList.length} {t('productsFound')}
+                    {productsResult.products.length} {t('productsFound')}
                   </p>
                 </div>
                 
@@ -112,7 +106,7 @@ export default async function ProductsPage({ params, searchParams }: ProductsPag
                 <SortDropdown />
               </div>
               
-              <ProductsGrid products={productList} />
+              <ProductsGrid products={productsResult.products} />
             </div>
           </div>
         </div>

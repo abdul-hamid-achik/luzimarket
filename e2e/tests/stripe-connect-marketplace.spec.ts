@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { authenticatedTestVendor } from '../fixtures/authenticated-test';
 
-test.describe.skip('Stripe Connect Marketplace', () => {
+test.describe('Stripe Connect Marketplace', () => {
   test.describe('Vendor Stripe Connect Onboarding', () => {
     test('should complete Stripe Connect onboarding flow', async ({ page }) => {
       await authenticatedTestVendor(page, async () => {

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useSession } from "next-auth/react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from 'next-intl';
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ type LookupForm = z.infer<typeof lookupSchema>;
 export default function OrderLookupPage() {
   const router = useRouter();
   const t = useTranslations('Orders');
+  const { data: session } = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -174,15 +176,26 @@ export default function OrderLookupPage() {
             </CardContent>
           </Card>
 
-          {/* Create account prompt */}
-          <div className="mt-8 text-center">
-            <p className="text-sm text-gray-600 font-univers">
-              ¿Quieres un acceso más fácil a tus pedidos?
-            </p>
-            <Link href="/register" className="text-sm font-univers font-medium text-black hover:underline">
-              Crea una cuenta gratis
-            </Link>
-          </div>
+          {/* Create account prompt - only show if user is not logged in */}
+          {!session ? (
+            <div className="mt-8 text-center">
+              <p className="text-sm text-gray-600 font-univers">
+                ¿Quieres un acceso más fácil a tus pedidos?
+              </p>
+              <Link href="/register" className="text-sm font-univers font-medium text-black hover:underline">
+                Crea una cuenta gratis
+              </Link>
+            </div>
+          ) : (
+            <div className="mt-8 text-center">
+              <p className="text-sm text-gray-600 font-univers">
+                ¿Buscas tus pedidos como usuario registrado?
+              </p>
+              <Link href="/orders" className="text-sm font-univers font-medium text-black hover:underline">
+                Ver mis pedidos
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </div>

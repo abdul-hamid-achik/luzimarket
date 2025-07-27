@@ -6,15 +6,22 @@ test.describe('Admin Approval Workflows', () => {
   async function loginAsAdmin(page: any) {
     await page.goto(routes.login);
     
-    // Use regular customer login form with admin credentials
-    await page.fill('input[type="email"]', 'admin@luzimarket.shop');
-    await page.fill('input[type="password"]', 'admin123');
+    // Click on admin tab first
+    const adminTab = page.locator('button[role="tab"]').filter({ hasText: /Admin/i });
+    await adminTab.click();
+    
+    // Use admin login form with admin credentials
+    await page.fill('input[id="admin-email"]', 'admin@luzimarket.shop');
+    await page.fill('input[id="admin-password"]', 'admin123');
     
     const submitButton = page.locator('button[type="submit"]').filter({ hasText: /Iniciar sesión|Sign in/ });
     await submitButton.click();
     
-    // Wait for navigation to admin area (more flexible URL matching)
-    await page.waitForURL((url: URL) => url.pathname.includes('/admin'), { timeout: 15000 });
+    // Wait for navigation to admin area (handle localized URLs like /es/admin)
+    await page.waitForURL((url: URL) => {
+      const path = url.pathname;
+      return path.includes('/admin') || !!path.match(/\/[a-z]{2}\/admin/);
+    }, { timeout: 15000 });
   }
 
   test.beforeEach(async ({ page }) => {

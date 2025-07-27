@@ -197,8 +197,8 @@ test.describe('Checkout Flow', () => {
     await expect(checkoutButton).toBeVisible();
     await checkoutButton.click();
 
-    // Should navigate to checkout page
-    await expect(page).toHaveURL(/\/checkout/);
+    // Should navigate to checkout page (handle localized URLs like /es/pagar)
+    await expect(page).toHaveURL(/\/(checkout|pagar)/);
   });
 
   test('should show checkout form', async ({ page }) => {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCart } from "@/contexts/cart-context";
+import { useCurrency } from "@/contexts/currency-context";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { getStateFromPostalCode } from "@/lib/utils/shipping-zones";
 
 export default function CartPage() {
   const { state, removeFromCart, updateQuantity, getTotalPrice } = useCart();
+  const { formatPrice } = useCurrency();
   const [postalCode, setPostalCode] = useState("");
   const [estimatedShipping, setEstimatedShipping] = useState<number | null>(null);
 
@@ -131,7 +133,7 @@ export default function CartPage() {
 
                       {/* Price */}
                       <p className="font-univers font-medium">
-                        ${(item.price * item.quantity).toLocaleString('es-MX')}
+                        {formatPrice(item.price * item.quantity)}
                       </p>
                     </div>
                   </div>
@@ -148,11 +150,11 @@ export default function CartPage() {
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm font-univers">
                   <span>Subtotal</span>
-                  <span>${subtotal.toLocaleString('es-MX')}</span>
+                  <span>{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm font-univers">
                   <span>IVA (16%)</span>
-                  <span>${tax.toLocaleString('es-MX')}</span>
+                  <span>{formatPrice(tax)}</span>
                 </div>
                 <div className="flex justify-between text-sm font-univers">
                   <span>Envío</span>
@@ -160,7 +162,7 @@ export default function CartPage() {
                     {shipping === 0 ? (
                       <span className="text-green-600">Gratis</span>
                     ) : (
-                      `$${shipping.toLocaleString('es-MX')}`
+                      formatPrice(shipping)
                     )}
                   </span>
                 </div>
@@ -206,7 +208,7 @@ export default function CartPage() {
                 <div className="flex justify-between font-univers">
                   <span className="font-medium">Total</span>
                   <span className="font-medium text-lg">
-                    ${total.toLocaleString('es-MX')} MXN
+                    {formatPrice(total)}
                   </span>
                 </div>
               </div>
@@ -218,7 +220,7 @@ export default function CartPage() {
               </Link>
 
               <p className="text-xs text-center text-gray-500 font-univers mt-4">
-                Envío gratis en compras superiores a $1,000 MXN
+                Envío gratis en compras superiores a {formatPrice(1000)}
               </p>
             </div>
 

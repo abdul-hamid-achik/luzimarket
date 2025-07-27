@@ -8,22 +8,24 @@ function withCors(handler: any) {
                              process.env.PLAYWRIGHT_TEST === 'true' ||
                              request.headers.get('user-agent')?.includes('Playwright');
     
-    // Allow requests from test environment or local development
+    const response = await handler(request);
+    
+    // Create new response with CORS headers for test environment
     if (isTestEnvironment || origin === null || origin?.includes('localhost')) {
-      const response = await handler(request);
+      const corsHeaders = new Headers(response.headers);
+      corsHeaders.set('Access-Control-Allow-Origin', '*');
+      corsHeaders.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+      corsHeaders.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      corsHeaders.set('Access-Control-Allow-Credentials', 'true');
       
-      // Add CORS headers for test environment
-      if (isTestEnvironment || origin === null) {
-        response.headers.set('Access-Control-Allow-Origin', '*');
-        response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        response.headers.set('Access-Control-Allow-Credentials', 'true');
-      }
-      
-      return response;
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: corsHeaders,
+      });
     }
     
-    return handler(request);
+    return response;
   };
 }
 

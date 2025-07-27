@@ -10,7 +10,8 @@ import { Heart, ShoppingBag, Package, Shield, Gift } from "lucide-react";
 import { ProductReviews } from "@/components/products/product-reviews";
 import { ProductsGrid } from "@/components/products/products-grid";
 import { AddToCartButton } from "@/components/cart/add-to-cart-button";
-import { AddToCartWithQuantity } from "@/components/cart/add-to-cart-with-quantity";
+import { AddToCartWithQuantityWrapper } from "@/components/cart/add-to-cart-with-quantity-wrapper";
+import { ProductPriceDisplay } from "@/components/products/product-price-display";
 import { WishlistButton } from "@/components/wishlist/wishlist-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -141,9 +142,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </p>
             </div>
 
-            <div className="text-3xl font-univers">
-              ${Number(product.price).toLocaleString(locale === 'es' ? 'es-MX' : 'en-US')} MXN
-            </div>
+            <ProductPriceDisplay price={Number(product.price)} />
 
             <div className="prose prose-sm font-univers">
               <p>{product.description}</p>
@@ -151,7 +150,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
             {/* Actions */}
             <div className="space-y-4">
-              <AddToCartWithQuantity 
+              <AddToCartWithQuantityWrapper 
                 product={{
                   id: product.id,
                   name: product.name,
