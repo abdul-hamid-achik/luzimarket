@@ -1,3 +1,5 @@
+export const runtime = 'nodejs';
+
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { users, emailVerificationTokens } from "@/db/schema";

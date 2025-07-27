@@ -1,5 +1,7 @@
 "use server";
 
+export const runtime = 'nodejs';
+
 import { db } from "@/db";
 import { users, vendors, adminUsers } from "@/db/schema";
 import { eq, and, gt } from "drizzle-orm";
