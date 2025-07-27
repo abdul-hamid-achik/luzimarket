@@ -30,6 +30,7 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '2mb',
     },
   },
+  serverExternalPackages: ['bcryptjs', 'postgres'],
   compiler: {
     // Remove data-testid attributes in production
     reactRemoveProperties: process.env.NODE_ENV === 'production' ? {
