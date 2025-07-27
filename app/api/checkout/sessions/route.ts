@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     } else if (process.env.NODE_ENV === 'production') {
       appUrlForImages = 'https://luzimarket.shop';
     } else {
-      appUrlForImages = 'http://localhost:3000';
+      appUrlForImages = `http://localhost:${process.env.PORT || '3000'}`;
     }
     
     // Create line items for Stripe
@@ -256,7 +256,7 @@ export async function POST(request: NextRequest) {
         appUrl = 'https://luzimarket.shop';
       } else {
         // Local development
-        appUrl = 'http://localhost:3000';
+        appUrl = `http://localhost:${process.env.PORT || '3000'}`;
       }
       
       console.log('Checkout URLs:', {

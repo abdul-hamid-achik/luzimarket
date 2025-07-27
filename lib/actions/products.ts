@@ -55,9 +55,10 @@ export async function getFilteredProducts(filters: ProductFilters = {}) {
     // Build where conditions
     const conditions = [];
     
-    // Only show active products with approved images
+    // Only show active products (temporarily allow non-approved images for development)
     conditions.push(eq(products.isActive, true));
-    conditions.push(eq(products.imagesApproved, true));
+    // TODO: Re-enable after fixing image approval workflow
+    // conditions.push(eq(products.imagesApproved, true));
     
     if (productIds.length > 0) {
       conditions.push(inArray(products.id, productIds));

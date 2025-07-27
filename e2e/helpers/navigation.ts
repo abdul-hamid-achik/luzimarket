@@ -18,7 +18,7 @@ export const routes = {
   adminOrders: '/admin/orders',
   adminVendors: '/admin/vendors',
   adminProducts: '/admin/products',
-  adminProductsPending: '/admin/products/pending',
+  adminProductsPending: '/admin/products', // Pending products are shown on main admin products page
   adminUsers: '/admin/users',
   wishlist: '/es/favoritos',
   bestSellers: '/es/mas-vendidos',
@@ -44,7 +44,7 @@ export const enRoutes = {
   adminOrders: '/admin/orders',
   adminVendors: '/admin/vendors',
   adminProducts: '/admin/products',
-  adminProductsPending: '/admin/products/pending',
+  adminProductsPending: '/admin/products', // Pending products are shown on main admin products page
   adminUsers: '/admin/users',
   wishlist: '/en/wishlist',
   bestSellers: '/en/best-sellers',

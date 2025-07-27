@@ -30,7 +30,7 @@ export default async function ProductsPage({ params, searchParams }: ProductsPag
   
   // Get products using the same filtering logic as handpicked page
   const productsResult = await getFilteredProducts({
-    categoryIds: filters.category && !isNaN(parseInt(filters.category)) ? [parseInt(filters.category)] : undefined,
+    categoryIds: filters.category && !isNaN(parseInt(filters.category)) ? [filters.category] : undefined,
     vendorIds: filters.vendor ? [filters.vendor] : undefined,
     sortBy: filters.sort as any,
     minPrice: filters.minPrice && !isNaN(parseInt(filters.minPrice)) ? parseInt(filters.minPrice) : undefined,

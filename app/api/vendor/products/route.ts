@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { products } from "@/db/schema";
+import { products, categories } from "@/db/schema";
 import { z } from "zod";
 import { nanoid } from "nanoid";
+import { eq } from "drizzle-orm";
 import { createImageModerationRecords } from "@/lib/actions/image-moderation";
 
 const createProductSchema = z.object({
@@ -29,6 +30,20 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const validatedData = createProductSchema.parse(body);
+
+    // Validate that the category exists
+    const [category] = await db
+      .select()
+      .from(categories)
+      .where(eq(categories.id, validatedData.categoryId))
+      .limit(1);
+
+    if (!category) {
+      return NextResponse.json(
+        { error: "Categoría no encontrada" },
+        { status: 400 }
+      );
+    }
 
     // Generate a slug from the name
     const slug = validatedData.name

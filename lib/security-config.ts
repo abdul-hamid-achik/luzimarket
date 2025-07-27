@@ -6,9 +6,13 @@ export const getAllowedOrigins = (): string[] => {
 
   // Always allow localhost in development
   if (process.env.NODE_ENV === 'development') {
+    const port = process.env.PORT || '3000'
     origins.push(
+      `http://localhost:${port}`,
       'http://localhost:3000',
       'http://localhost:3001',
+      'http://localhost:3005',
+      `http://127.0.0.1:${port}`,
       'http://127.0.0.1:3000'
     )
   }

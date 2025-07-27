@@ -61,7 +61,8 @@ export async function POST(request: Request) {
     });
     
     // Send verification email
-    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/auth/verify-email?token=${verificationToken}`;
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || `http://localhost:${process.env.PORT || '3000'}`;
+    const verificationUrl = `${appUrl}/api/auth/verify-email?token=${verificationToken}`;
     
     await sendEmail({
       to: newUser.email,

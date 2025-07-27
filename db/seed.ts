@@ -567,6 +567,95 @@ async function main() {
     const products = await db.insert(schema.products).values(productData).returning();
     console.log(`✅ Created ${products.length} products`);
 
+    // 5.1 Create Image Moderation Records for Test Products
+    console.log("🖼️  Creating image moderation records...");
+    const imageModerationData: schema.NewProductImageModeration[] = [];
+    
+    // Create moderation records for products with images
+    for (const product of products.slice(0, 20)) { // First 20 products for testing
+      if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+        product.images.forEach((imageUrl, index) => {
+          // Create some approved, some pending, some rejected records for testing
+          let status: 'pending' | 'approved' | 'rejected';
+          let reviewedAt: Date | null = null;
+          let rejectionReason: string | null = null;
+          let rejectionCategory: string | null = null;
+          
+          const randomStatus = Math.random();
+          if (randomStatus < 0.6) {
+            status = 'approved';
+            reviewedAt = faker.date.recent({ days: 7 });
+          } else if (randomStatus < 0.8) {
+            status = 'pending';
+          } else {
+            status = 'rejected';
+            reviewedAt = faker.date.recent({ days: 7 });
+            rejectionReason = faker.helpers.arrayElement([
+              'La imagen está borrosa y no muestra el producto claramente',
+              'La calidad de la imagen es muy baja',
+              'La imagen no corresponde con la descripción del producto',
+              'Se requiere mejor iluminación en la fotografía'
+            ]);
+            rejectionCategory = faker.helpers.arrayElement(['quality', 'misleading', 'inappropriate']);
+          }
+          
+          imageModerationData.push({
+            productId: product.id,
+            vendorId: product.vendorId,
+            imageUrl,
+            imageIndex: index,
+            status,
+            reviewedAt,
+            rejectionReason,
+            rejectionCategory,
+          });
+        });
+      }
+    }
+
+    if (imageModerationData.length > 0) {
+      await db.insert(schema.productImageModeration).values(imageModerationData);
+      console.log(`✅ Created ${imageModerationData.length} image moderation records`);
+      
+      // Update products with moderation status
+      const approvedProductIds = new Set();
+      const pendingProductIds = new Set();
+      
+      for (const record of imageModerationData) {
+        if (record.status === 'approved') {
+          approvedProductIds.add(record.productId);
+        } else if (record.status === 'pending') {
+          pendingProductIds.add(record.productId);
+        }
+      }
+      
+      // Update products with all approved images
+      for (const productId of approvedProductIds) {
+        const productIdStr = productId as string;
+        const productRecords = imageModerationData.filter(r => r.productId === productIdStr);
+        const allApproved = productRecords.every(r => r.status === 'approved');
+        const hasPending = productRecords.some(r => r.status === 'pending');
+        
+        if (allApproved) {
+          await db.update(schema.products)
+            .set({ 
+              imagesApproved: true, 
+              imagesPendingModeration: false 
+            })
+            .where(eq(schema.products.id, productIdStr));
+        } else if (hasPending) {
+          await db.update(schema.products)
+            .set({ 
+              imagesApproved: false, 
+              imagesPendingModeration: true 
+            })
+            .where(eq(schema.products.id, productIdStr));
+        }
+      }
+      
+      console.log(`✅ Updated product approval statuses`);
+    }
+
     // 5.5 Seed Product Variants
     console.log("🎨 Creating product variants...");
     const variantData = [];

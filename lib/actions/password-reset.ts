@@ -77,7 +77,8 @@ export async function requestPasswordReset(formData: FormData) {
     })
     
     // Send reset email
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password?token=${token}`
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || `http://localhost:${process.env.PORT || '3000'}`
+    const resetUrl = `${appUrl}/reset-password?token=${token}`
     
     try {
       await sendEmail({

@@ -63,8 +63,20 @@ npm run dev
 # Start dev server
 npm run dev
 
+# Start dev server on custom port (e.g., for testing)
+PORT=3005 npm run dev
+
 # Optional: Run Stripe CLI for webhook testing
 npm run dev:stripe
+```
+
+### Running Tests with Custom Port
+```bash
+# Run tests on custom port (useful when port 3000 is in use)
+PORT=3005 npm test
+
+# Example: Run tests on port 3005 while working on port 3000
+PORT=3005 npm run test:llm
 ```
 
 ### Commands

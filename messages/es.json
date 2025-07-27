@@ -575,25 +575,102 @@
       "updated": "Última Actualización"
     },
     "emailTemplates": {
-      "title": "Plantillas de Email",
-      "subtitle": "Gestiona las plantillas de correo electrónico del sistema",
-      "createNew": "Crear Nueva",
-      "templateTypes": {
-        "welcome": "Bienvenida",
-        "orderConfirmation": "Confirmación de Pedido",
-        "passwordReset": "Restablecimiento de Contraseña",
-        "vendorApproval": "Aprobación de Vendedor"
-      },
-      "active": "Activo",
-      "inactive": "Inactivo",
+      "title": "Plantillas de correo",
+      "subtitle": "Administra las plantillas de correo electrónico",
+      "template": "Plantilla",
+      "type": "Tipo",
       "subject": "Asunto",
-      "variables": "Variables",
       "lastModified": "Última modificación",
-      "edit": "Editar",
+      "actions": "Acciones",
       "preview": "Vista previa",
-      "save": "Guardar",
+      "edit": "Editar",
+      "createNew": "Crear nueva plantilla",
+      "templateTypes": {
+        "orderConfirmation": "Confirmación de orden",
+        "orderShipped": "Orden enviada",
+        "vendorNewOrder": "Nueva orden (vendedor)",
+        "accountLocked": "Cuenta bloqueada",
+        "passwordReset": "Restablecer contraseña",
+        "welcome": "Bienvenida",
+        "reviewRequest": "Solicitud de reseña",
+        "promotional": "Promocional",
+        "abandonedCart": "Carrito abandonado"
+      },
+      "active": "Activa",
+      "inactive": "Inactiva",
+      "editTemplate": "Editar plantilla",
+      "previewTemplate": "Vista previa de plantilla",
+      "templateName": "Nombre de la plantilla",
+      "templateSubject": "Asunto del correo",
+      "templateContent": "Contenido",
+      "variables": "Variables disponibles",
+      "saveChanges": "Guardar cambios",
       "cancel": "Cancelar",
-      "delete": "Eliminar"
+      "testEmail": "Enviar correo de prueba",
+      "testEmailAddress": "Correo de prueba",
+      "sendTest": "Enviar prueba",
+      "backToTemplates": "Volver a plantillas",
+      "loading": "Cargando...",
+      "notFound": "Plantilla no encontrada",
+      "editTitle": "Editar plantilla",
+      "emailSubject": "Asunto del correo",
+      "subjectPlaceholder": "Ingresa el asunto del correo...",
+      "new": {
+        "validation": {
+          "name": "El nombre debe tener al menos 3 caracteres",
+          "type": "Selecciona un tipo de plantilla",
+          "subject": "El asunto debe tener al menos 5 caracteres",
+          "htmlContent": "El contenido HTML es requerido"
+        },
+        "toast": {
+          "createError": "Error al crear la plantilla",
+          "createSuccess": "Plantilla creada exitosamente"
+        },
+        "labels": {
+          "backToTemplates": "Volver a plantillas",
+          "newTemplate": "Nueva Plantilla de Email",
+          "createDescription": "Crea una nueva plantilla de correo electrónico",
+          "basicInfo": "Información Básica",
+          "templateName": "Nombre de la Plantilla",
+          "templateType": "Tipo de Plantilla",
+          "selectType": "Selecciona un tipo",
+          "emailSubject": "Asunto del Email",
+          "description": "Descripción (opcional)",
+          "descriptionPlaceholder": "Describe el propósito de esta plantilla...",
+          "activeTemplate": "Plantilla Activa",
+          "inactiveTemplatesNote": "Las plantillas inactivas no se usarán",
+          "availableVariables": "Variables Disponibles",
+          "clickToInsert": "Haz clic para insertar en el editor",
+          "html": "HTML",
+          "plainText": "Texto Plano",
+          "preview": "Vista Previa",
+          "desktop": "Desktop",
+          "mobile": "Mobile",
+          "plainTextVersion": "Versión en texto plano del email...",
+          "uploadingImages": "Subiendo imágenes...",
+          "dragImages": "Arrastra imágenes aquí o haz clic para seleccionar",
+          "imageFormats": "PNG, JPG hasta 5MB",
+          "principal": "Principal",
+          "cancel": "Cancelar",
+          "save": "Guardar Plantilla",
+          "saving": "Guardando...",
+          "creating": "Creando..."
+        },
+        "placeholders": {
+          "templateName": "Ej: Confirmación de Orden",
+          "subjectWithVariables": "Ej: Tu orden #{{order_number}} ha sido confirmada",
+          "variableUsage": "Puedes usar variables como"
+        },
+        "templateTypes": {
+          "orderConfirmation": "Confirmación de Orden",
+          "welcome": "Bienvenida",
+          "passwordReset": "Restablecer Contraseña",
+          "shippingNotification": "Notificación de Envío",
+          "reviewRequest": "Solicitud de Reseña",
+          "promotional": "Promocional",
+          "abandonedCart": "Carrito Abandonado"
+        }
+      }
     },
     "usersPage": {
       "title": "Usuarios",
@@ -739,64 +816,6 @@
       "mxn": "MXN - Peso Mexicano",
       "usd": "USD - Dólar Estadounidense",
       "saveChanges": "Guardar cambios"
-    },
-    "emailTemplates": {
-      "new": {
-        "validation": {
-          "name": "El nombre debe tener al menos 3 caracteres",
-          "type": "Selecciona un tipo de plantilla",
-          "subject": "El asunto debe tener al menos 5 caracteres",
-          "htmlContent": "El contenido HTML es requerido"
-        },
-        "toast": {
-          "createError": "Error al crear la plantilla",
-          "createSuccess": "Plantilla creada exitosamente"
-        },
-        "labels": {
-          "backToTemplates": "Volver a plantillas",
-          "newTemplate": "Nueva Plantilla de Email",
-          "createDescription": "Crea una nueva plantilla de correo electrónico",
-          "basicInfo": "Información Básica",
-          "templateName": "Nombre de la Plantilla",
-          "templateType": "Tipo de Plantilla",
-          "selectType": "Selecciona un tipo",
-          "emailSubject": "Asunto del Email",
-          "description": "Descripción (opcional)",
-          "descriptionPlaceholder": "Describe el propósito de esta plantilla...",
-          "activeTemplate": "Plantilla Activa",
-          "inactiveTemplatesNote": "Las plantillas inactivas no se usarán",
-          "availableVariables": "Variables Disponibles",
-          "clickToInsert": "Haz clic para insertar en el editor",
-          "html": "HTML",
-          "plainText": "Texto Plano",
-          "preview": "Vista Previa",
-          "desktop": "Desktop",
-          "mobile": "Mobile",
-          "plainTextVersion": "Versión en texto plano del email...",
-          "uploadingImages": "Subiendo imágenes...",
-          "dragImages": "Arrastra imágenes aquí o haz clic para seleccionar",
-          "imageFormats": "PNG, JPG hasta 5MB",
-          "principal": "Principal",
-          "cancel": "Cancelar",
-          "save": "Guardar Plantilla",
-          "saving": "Guardando...",
-          "creating": "Creando..."
-        },
-        "placeholders": {
-          "templateName": "Ej: Confirmación de Orden",
-          "subjectWithVariables": "Ej: Tu orden #{{order_number}} ha sido confirmada",
-          "variableUsage": "Puedes usar variables como"
-        },
-        "templateTypes": {
-          "orderConfirmation": "Confirmación de Orden",
-          "welcome": "Bienvenida",
-          "passwordReset": "Restablecer Contraseña",
-          "shippingNotification": "Notificación de Envío",
-          "reviewRequest": "Solicitud de Reseña",
-          "promotional": "Promocional",
-          "abandonedCart": "Carrito Abandonado"
-        }
-      }
     }
   },
   "Vendor": {
@@ -2189,15 +2208,31 @@
     },
     "analytics": {
       "title": "Analíticas",
+      "description": "Estadísticas y métricas de tu negocio",
       "subtitle": "Estadísticas de tu negocio",
       "revenue": "Ingresos",
       "orders": "Órdenes",
       "products": "Productos",
-      "customers": "Clientes"
+      "customers": "Clientes",
+      "totalRevenue": "Ingresos Totales",
+      "totalOrders": "Órdenes Totales",
+      "averageOrder": "Orden Promedio",
+      "uniqueCustomers": "Clientes Únicos",
+      "overview": "Vista General",
+      "recentOrders": "Órdenes Recientes",
+      "salesOverview": "Resumen de Ventas",
+      "last30Days": "Últimos 30 días",
+      "chartComingSoon": "Gráfico próximamente",
+      "topSellingProducts": "Productos Más Vendidos",
+      "unitsSold": "{count} unidades vendidas",
+      "latestSuccessfulOrders": "Últimas órdenes exitosas",
+      "items": "artículos"
     },
     "orders": {
       "title": "Órdenes",
+      "description": "Gestiona los pedidos de tus clientes",
       "subtitle": "Gestiona los pedidos de tus clientes",
+      "loading": "Cargando órdenes...",
       "orderNumber": "Número de orden",
       "customer": "Cliente",
       "status": "Estado",
@@ -2207,28 +2242,20 @@
       "processing": "Procesando",
       "shipped": "Enviado",
       "delivered": "Entregado",
-      "cancelled": "Cancelado"
-    },
-    "emailTemplates": {
-      "title": "Plantillas de Email",
-      "subtitle": "Gestiona las plantillas de correo electrónico del sistema",
-      "createNew": "Crear Nueva",
-      "templateTypes": {
-        "welcome": "Bienvenida",
-        "orderConfirmation": "Confirmación de Pedido",
-        "passwordReset": "Restablecimiento de Contraseña",
-        "vendorApproval": "Aprobación de Vendedor"
+      "cancelled": "Cancelado",
+      "status": {
+        "pending": "Pendiente",
+        "paid": "Pagado",
+        "processing": "Procesando",
+        "shipped": "Enviado",
+        "delivered": "Entregado",
+        "cancelled": "Cancelado"
       },
-      "active": "Activo",
-      "inactive": "Inactivo",
-      "subject": "Asunto",
-      "variables": "Variables",
-      "lastModified": "Última modificación",
-      "edit": "Editar",
-      "preview": "Vista previa",
-      "save": "Guardar",
-      "cancel": "Cancelar",
-      "delete": "Eliminar"
+      "payment": {
+        "pending": "Pago Pendiente",
+        "succeeded": "Pago Exitoso",
+        "failed": "Pago Fallido"
+      }
     }
   },
   "orders": {

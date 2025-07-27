@@ -6,6 +6,7 @@ import { eq, desc, and, inArray, or } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { sendImageApprovalNotification, sendImageRejectionNotification } from "@/lib/email";
 
 // Schema for approving images
 const approveImagesSchema = z.object({
@@ -143,7 +144,7 @@ export async function approveImages(data: z.infer<typeof approveImagesSchema>) {
 
     const productIds = [...new Set(moderationRecords.map(r => r.productId))];
 
-    // Check if all images for each product are approved
+    // Check if all images for each product are approved and send notifications
     for (const productId of productIds) {
       const productImages = await db
         .select()
@@ -152,6 +153,7 @@ export async function approveImages(data: z.infer<typeof approveImagesSchema>) {
 
       const allApproved = productImages.every(img => img.status === "approved");
       const hasPending = productImages.some(img => img.status === "pending");
+      const approvedCount = productImages.filter(img => img.status === "approved").length;
 
       await db
         .update(products)
@@ -161,6 +163,39 @@ export async function approveImages(data: z.infer<typeof approveImagesSchema>) {
           updatedAt: new Date(),
         })
         .where(eq(products.id, productId));
+
+      // Send notification to vendor if any images were approved
+      if (approvedCount > 0) {
+        try {
+          const productDetails = await db
+            .select({
+              name: products.name,
+              slug: products.slug,
+              vendor: {
+                email: vendors.email,
+                businessName: vendors.businessName,
+              },
+            })
+            .from(products)
+            .leftJoin(vendors, eq(products.vendorId, vendors.id))
+            .where(eq(products.id, productId))
+            .limit(1);
+
+          if (productDetails[0]?.vendor?.email) {
+            await sendImageApprovalNotification({
+              vendorEmail: productDetails[0].vendor.email,
+              vendorName: productDetails[0].vendor.businessName || "Vendedor",
+              productName: productDetails[0].name,
+              productSlug: productDetails[0].slug,
+              approvedImageCount: approvedCount,
+              totalImageCount: productImages.length,
+            });
+          }
+        } catch (error) {
+          console.error("Failed to send approval notification:", error);
+          // Don't fail the entire operation if email fails
+        }
+      }
     }
 
     revalidatePath("/admin/moderation/images");
@@ -210,7 +245,7 @@ export async function rejectImages(data: z.infer<typeof rejectImagesSchema>) {
 
     const productIds = [...new Set(moderationRecords.map(r => r.productId))];
 
-    // Update product status
+    // Update product status and send notifications
     for (const productId of productIds) {
       const productImages = await db
         .select()
@@ -219,6 +254,7 @@ export async function rejectImages(data: z.infer<typeof rejectImagesSchema>) {
 
       const allApproved = productImages.every(img => img.status === "approved");
       const hasPending = productImages.some(img => img.status === "pending");
+      const rejectedCount = productImages.filter(img => img.status === "rejected").length;
 
       await db
         .update(products)
@@ -228,6 +264,42 @@ export async function rejectImages(data: z.infer<typeof rejectImagesSchema>) {
           updatedAt: new Date(),
         })
         .where(eq(products.id, productId));
+
+      // Send notification to vendor if any images were rejected
+      if (rejectedCount > 0) {
+        try {
+          const productDetails = await db
+            .select({
+              name: products.name,
+              slug: products.slug,
+              vendor: {
+                email: vendors.email,
+                businessName: vendors.businessName,
+              },
+            })
+            .from(products)
+            .leftJoin(vendors, eq(products.vendorId, vendors.id))
+            .where(eq(products.id, productId))
+            .limit(1);
+
+          if (productDetails[0]?.vendor?.email) {
+            await sendImageRejectionNotification({
+              vendorEmail: productDetails[0].vendor.email,
+              vendorName: productDetails[0].vendor.businessName || "Vendedor",
+              productName: productDetails[0].name,
+              productSlug: productDetails[0].slug,
+              rejectedImageCount: rejectedCount,
+              totalImageCount: productImages.length,
+              rejectionReason: validatedData.reason,
+              rejectionCategory: validatedData.category,
+              notes: validatedData.notes,
+            });
+          }
+        } catch (error) {
+          console.error("Failed to send rejection notification:", error);
+          // Don't fail the entire operation if email fails
+        }
+      }
     }
 
     revalidatePath("/admin/moderation/images");
@@ -306,9 +378,9 @@ export async function getModerationStats() {
     return {
       success: true,
       data: {
-        pending: pending[0]?.count || 0,
-        approved: approved[0]?.count || 0,
-        rejected: rejected[0]?.count || 0,
+        pending: pending.length,
+        approved: approved.length,
+        rejected: rejected.length,
       },
     };
   } catch (error) {

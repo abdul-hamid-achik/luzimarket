@@ -22,10 +22,10 @@ export default async function ImageModerationPage() {
       />
 
       <ImageModerationClient
-        initialPendingImages={pendingResult.success ? pendingResult.data : []}
-        initialApprovedImages={approvedResult.success ? approvedResult.data : []}
-        initialRejectedImages={rejectedResult.success ? rejectedResult.data : []}
-        stats={statsResult.success ? statsResult.data : { pending: 0, approved: 0, rejected: 0 }}
+        initialPendingImages={pendingResult.success ? (pendingResult.data || []) : []}
+        initialApprovedImages={approvedResult.success ? (approvedResult.data || []) : []}
+        initialRejectedImages={rejectedResult.success ? (rejectedResult.data || []) : []}
+        stats={statsResult.success ? (statsResult.data || { pending: 0, approved: 0, rejected: 0 }) : { pending: 0, approved: 0, rejected: 0 }}
       />
     </div>
   );
