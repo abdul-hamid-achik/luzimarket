@@ -41,12 +41,12 @@ export const measurePerformance = (name: string, fn: () => void | Promise<void>)
 // Web Vitals tracking
 export const trackWebVitals = () => {
   if (typeof window !== 'undefined') {
-    import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-      getCLS(console.log);
-      getFID(console.log);
-      getFCP(console.log);
-      getLCP(console.log);
-      getTTFB(console.log);
+    import('web-vitals').then(({ onCLS, onINP, onFCP, onLCP, onTTFB }) => {
+      onCLS(console.log);
+      onINP(console.log); // INP replaced FID in web-vitals v4
+      onFCP(console.log);
+      onLCP(console.log);
+      onTTFB(console.log);
     });
   }
 };

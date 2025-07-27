@@ -17,7 +17,7 @@ export default function LanguageSwitcher() {
 
   const handleLocaleChange = (newLocale: string) => {
     // Use next-intl's router which handles locale switching automatically
-    router.replace(pathname, { locale: newLocale });
+    router.replace(pathname as any, { locale: newLocale });
   };
 
   return (

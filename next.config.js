@@ -1,7 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    ppr: true,
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // Suppress Edge Runtime warnings for Node.js modules
+      config.ignoreWarnings = [
+        { module: /node_modules\/bcryptjs/ },
+        { module: /node_modules\/postgres/ },
+        { message: /A Node\.js module is loaded/ },
+        { message: /A Node\.js API is used/ },
+      ];
+    }
+    return config;
   },
   images: {
     remotePatterns: [

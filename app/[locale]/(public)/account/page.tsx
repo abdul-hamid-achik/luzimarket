@@ -220,7 +220,7 @@ export default async function AccountPage({ params }: AccountPageProps) {
                 <CardTitle className="text-lg font-times-now">{t('orderHistory')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <OrdersList userId={session.user.id} />
+                <OrdersList />
               </CardContent>
             </Card>
           </TabsContent>

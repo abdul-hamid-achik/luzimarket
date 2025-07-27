@@ -48,6 +48,10 @@ export function ProfileForm({ user }: ProfileFormProps) {
 
     try {
       // Update user profile
+      if (!user?.id) {
+        throw new Error('User ID not available');
+      }
+      
       const response = await fetch(`/api/users/${user.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },

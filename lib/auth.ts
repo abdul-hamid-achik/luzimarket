@@ -1,3 +1,5 @@
+export const runtime = 'nodejs';
+
 import NextAuth, { CredentialsSignin } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { db } from "@/db";

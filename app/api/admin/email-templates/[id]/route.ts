@@ -1,3 +1,4 @@
+export const runtime = 'nodejs';
 import { db } from "@/db";
 import { emailTemplates } from "@/db/schema";
 import { eq } from "drizzle-orm";

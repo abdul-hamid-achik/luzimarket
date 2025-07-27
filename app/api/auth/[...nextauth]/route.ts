@@ -1,3 +1,5 @@
+export const runtime = 'nodejs';
+
 import { handlers } from "@/lib/auth";
 
 // Handle CORS for test environment
@@ -53,6 +55,3 @@ export async function OPTIONS(request: Request) {
   
   return new Response(null, { status: 405 });
 }
-
-// Export runtime to fix potential edge runtime issues
-export const runtime = 'nodejs';
