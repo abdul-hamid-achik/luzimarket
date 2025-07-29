@@ -342,6 +342,24 @@
       "availableMultiple": "solo quedan {count}",
       "shippingStandard": "📦 Envío estándar en México",
       "paymentDescription": "🇲🇽 Compra de productos únicos mexicanos - Luzimarket"
+    },
+    "acceptTerms": {
+      "prefix": "Acepto los",
+      "termsAndConditions": "términos y condiciones",
+      "and": "y la",
+      "privacyPolicy": "política de privacidad"
+    },
+    "validation": {
+      "invalidEmail": "Email inválido",
+      "firstNameRequired": "Nombre requerido",
+      "lastNameRequired": "Apellido requerido",
+      "invalidPhone": "Teléfono inválido",
+      "addressRequired": "Dirección requerida",
+      "cityRequired": "Ciudad requerida",
+      "stateRequired": "Estado requerido",
+      "invalidPostalCode": "Código postal inválido",
+      "countryRequired": "País requerido",
+      "acceptTermsRequired": "Debes aceptar los términos"
     }
   },
   "VendorRegistration": {
@@ -712,6 +730,19 @@
       "editTitle": "Editar plantilla",
       "emailSubject": "Asunto del correo",
       "subjectPlaceholder": "Ingresa el asunto del correo...",
+      "noTemplatesYet": "No hay plantillas de email aún",
+      "created": "Creado",
+      "infoHeader": "Plantillas de Email: Bienvenida, Confirmación de Orden, Notificación de Envío, Solicitud de Reseña",
+      "recommendedTemplates": "Plantillas Recomendadas",
+      "recommendedDescription": "Estas son las plantillas de email más comunes que tu tienda debería tener:",
+      "orderConfirmationName": "Confirmación de Orden",
+      "orderConfirmationDesc": "Se envía cuando un cliente completa una compra",
+      "shippingNotificationName": "Notificación de Envío",
+      "shippingNotificationDesc": "Se envía cuando el pedido es enviado",
+      "welcomeName": "Bienvenida",
+      "welcomeDesc": "Se envía cuando un nuevo usuario se registra",
+      "reviewRequestName": "Solicitud de Reseña",
+      "reviewRequestDesc": "Se envía días después de recibir el producto",
       "new": {
         "validation": {
           "name": "El nombre debe tener al menos 3 caracteres",
@@ -1318,7 +1349,20 @@
     "newest": "Más reciente",
     "priceLowToHigh": "Precio: Menor a Mayor",
     "priceHighToLow": "Precio: Mayor a Menor",
-    "bestSelling": "Más vendido"
+    "bestSelling": "Más vendido",
+    "quickViewModal": {
+      "title": "Vista rápida de {name}",
+      "close": "Cerrar vista rápida",
+      "viewImage": "Ver imagen {number}",
+      "by": "Por",
+      "review": "opinión",
+      "reviews": "opiniones",
+      "categoryLabel": "Categoría:",
+      "available": "{count} disponibles",
+      "noStock": "Sin stock disponible",
+      "outOfStock": "Sin stock",
+      "viewFullDetails": "Ver detalles completos"
+    }
   },
   "Security": {
     "rateLimitAuth": "Demasiados intentos de autenticación. Intenta de nuevo en 15 minutos.",
@@ -2027,8 +2071,22 @@
         "viewTransactions": "Ver transacciones",
         "requestPayout": "Solicitar pago",
         "exportReport": "Exportar reporte",
-        "refresh": "Actualizar"
+        "refresh": "Actualizar",
+        "openMenu": "Abrir menú"
       },
+      "feeStatus": {
+        "pending": "Pendiente",
+        "collected": "Cobrado",
+        "transferred": "Transferido",
+        "failed": "Fallido"
+      },
+      "payoutStatus": {
+        "pending": "Pendiente",
+        "processing": "Procesando",
+        "paid": "Pagado",
+        "failed": "Fallido"
+      },
+      "viewOrder": "Ver orden",
       "reports": {
         "title": "Reportes Financieros",
         "description": "Análisis completo del rendimiento de la plataforma",
@@ -2083,6 +2141,37 @@
       "payments": "Pagos",
       "settings": "Configuración",
       "logout": "Cerrar sesión"
+    },
+    "orderStatusUpdater": {
+      "orderNumber": "Orden #{number}",
+      "total": "Total",
+      "date": "Fecha",
+      "customer": "Cliente",
+      "products": "Productos",
+      "quantity": "Cantidad",
+      "updateStatus": "Actualizar Estado",
+      "newStatus": "Nuevo Estado",
+      "trackingNumber": "Número de Rastreo (Opcional)",
+      "trackingNumberPlaceholder": "Ingresa el número de rastreo",
+      "additionalNotes": "Notas Adicionales (Opcional)",
+      "notesPlaceholder": "Agrega notas sobre esta actualización...",
+      "updateButton": "Actualizar Estado",
+      "updating": "Actualizando...",
+      "status": {
+        "processing": "📦 Procesando orden",
+        "shipped": "🚚 Enviado",
+        "delivered": "✅ Entregado",
+        "cancelled": "❌ Cancelado"
+      },
+      "errors": {
+        "noChanges": "No hay cambios para actualizar",
+        "updateFailed": "Error al actualizar el estado",
+        "generic": "Error"
+      },
+      "success": {
+        "statusUpdated": "✅ Estado actualizado exitosamente",
+        "statusUpdatedDescription": "La orden #{orderNumber} ha sido actualizada. El cliente será notificado automáticamente."
+      }
     },
     "dashboard": {
       "welcome": "Bienvenido, {businessName}",
@@ -2265,18 +2354,61 @@
       },
       "edit": {
         "title": "Editar Producto",
+        "backToProducts": "Volver a productos",
+        "editProduct": "Editar Producto",
+        "updateProductInfo": "Actualiza la información de tu producto",
+        "deleteButton": "Eliminar",
+        "deleteDialogTitle": "¿Estás seguro?",
+        "deleteDialogDescription": "Esta acción no se puede deshacer. El producto será eliminado permanentemente.",
+        "deleteDialogCancel": "Cancelar",
+        "deleteDialogConfirm": "Eliminar",
+        "deleting": "Eliminando...",
+        "basicInfo": "Información Básica",
+        "productName": "Nombre del Producto",
+        "productNamePlaceholder": "Ejemplo: Ramo de Rosas Rojas",
+        "description": "Descripción",
+        "descriptionPlaceholder": "Describe tu producto en detalle...",
+        "category": "Categoría",
+        "selectCategoryPlaceholder": "Selecciona una categoría",
+        "tags": "Etiquetas (opcional)",
+        "tagsPlaceholder": "rosas, amor, aniversario",
+        "tagsSeparator": "Separa las etiquetas con comas",
+        "priceAndInventory": "Precio e Inventario",
+        "price": "Precio (MXN)",
+        "pricePlaceholder": "299.99",
+        "stock": "Stock Disponible",
+        "stockPlaceholder": "50",
+        "productActive": "Producto activo (visible en la tienda)",
+        "productImages": "Imágenes del Producto",
+        "uploadingImages": "Subiendo imágenes...",
+        "dragDropText": "Arrastra imágenes aquí o haz clic para seleccionar",
+        "imageFormats": "PNG, JPG hasta 5MB",
+        "mainImage": "Principal",
+        "cancelButton": "Cancelar",
+        "saveButton": "Guardar Cambios",
+        "saving": "Guardando...",
+        "categories": {
+          "1": "Flores & Amores",
+          "2": "Dulces & Postres",
+          "3": "Eventos & Cenas",
+          "4": "Tienda de Regalos"
+        },
         "validation": {
-          "name": "El nombre debe tener al menos 3 caracteres",
-          "description": "La descripción debe tener al menos 10 caracteres",
-          "price": "El precio debe ser mayor a 0",
-          "stock": "El stock debe ser un número entero positivo",
-          "category": "Por favor selecciona una categoría"
+          "nameMinLength": "El nombre debe tener al menos 3 caracteres",
+          "descriptionMinLength": "La descripción debe tener al menos 10 caracteres",
+          "priceInvalid": "El precio debe ser un número mayor a 0",
+          "stockInvalid": "El stock debe ser un número positivo",
+          "categoryRequired": "Selecciona una categoría",
+          "imagesRequired": "Agrega al menos una imagen"
         },
         "toast": {
+          "loadError": "Error al cargar el producto",
+          "uploadError": "Error al subir las imágenes",
+          "imagesAdded": "{count} imagen(es) agregadas",
           "updateSuccess": "Producto actualizado exitosamente",
           "updateError": "Error al actualizar el producto",
-          "uploadError": "Error al subir la imagen",
-          "deleteImageError": "Error al eliminar la imagen"
+          "deleteSuccess": "Producto eliminado exitosamente",
+          "deleteError": "Error al eliminar el producto"
         },
         "placeholders": {
           "name": "Nombre del producto",

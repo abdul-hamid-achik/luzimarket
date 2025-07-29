@@ -12,6 +12,7 @@ import {
 import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import Link from "next/link";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { useTranslations } from "next-intl";
 
 interface ProductQuickView {
   id: string;
@@ -35,6 +36,7 @@ interface QuickViewModalProps {
 
 export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const t = useTranslations("Products.quickViewModal");
 
   if (!product) return null;
 
@@ -45,13 +47,13 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
         <VisuallyHidden>
-          <DialogTitle>Vista rápida de {product.name}</DialogTitle>
+          <DialogTitle>{t("title", { name: product.name })}</DialogTitle>
         </VisuallyHidden>
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          aria-label="Cerrar vista rápida"
+          aria-label={t("close")}
           className="absolute right-4 top-4 z-10 rounded-full bg-white p-2 shadow-md hover:bg-gray-100"
         >
           <X className="h-4 w-4" />
@@ -77,7 +79,7 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
-                    aria-label={`Ver imagen ${index + 1}`}
+                    aria-label={t("viewImage", { number: index + 1 })}
                     className={`relative w-16 h-16 rounded-md overflow-hidden border-2 transition-colors ${
                       index === selectedImageIndex
                         ? "border-black"
@@ -102,7 +104,7 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
             <div>
               <h2 className="text-2xl font-times-now mb-2">{product.name}</h2>
               <p className="text-sm font-univers text-gray-600 mb-3">
-                Por {product.vendorName}
+                {t("by")} {product.vendorName}
               </p>
               
               {/* Rating */}
@@ -121,7 +123,7 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
                     ))}
                   </div>
                   <span className="text-sm font-univers text-gray-600">
-                    {product.averageRating.toFixed(1)} ({product.totalReviews} {product.totalReviews === 1 ? "opinión" : "opiniones"})
+                    {product.averageRating.toFixed(1)} ({product.totalReviews} {product.totalReviews === 1 ? t("review") : t("reviews")})
                   </span>
                 </div>
               )}
@@ -144,7 +146,7 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
             {/* Category */}
             {product.categoryName && (
               <p className="text-sm font-univers text-gray-600">
-                Categoría: <span className="font-medium">{product.categoryName}</span>
+                {t("categoryLabel")} <span className="font-medium">{product.categoryName}</span>
               </p>
             )}
 
@@ -152,10 +154,10 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
             <p className="text-sm font-univers">
               {product.stock > 0 ? (
                 <span className="text-green-600">
-                  {product.stock} disponibles
+                  {t("available", { count: product.stock })}
                 </span>
               ) : (
-                <span className="text-red-600">Sin stock disponible</span>
+                <span className="text-red-600">{t("noStock")}</span>
               )}
             </p>
 
@@ -176,7 +178,7 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
                   />
                 ) : (
                   <Button disabled className="flex-1">
-                    Sin stock
+                    {t("outOfStock")}
                   </Button>
                 )}
                 <Button
@@ -190,7 +192,7 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
               
               <Link href={`/products/${product.id}`} className="block">
                 <Button variant="outline" className="w-full">
-                  Ver detalles completos
+                  {t("viewFullDetails")}
                 </Button>
               </Link>
             </div>

@@ -82,11 +82,11 @@ export function AdminFinancialsClient({
       ),
       cell: ({ row }) => {
         const vendor = row.original.vendor;
-        return (
+        return vendor ? (
           <Link href={`/admin/vendors/${vendor.id}`} className="text-blue-600 hover:underline">
-            {vendor.businessName}
+            {vendor?.businessName || "-"}
           </Link>
-        );
+        ) : "-";
       },
     },
     {
@@ -132,11 +132,11 @@ export function AdminFinancialsClient({
       cell: ({ row }) => {
         const vendor = row.original.vendor;
 
-        return (
+        return vendor ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Abrir menú</span>
+                <span className="sr-only">{t("actions.openMenu")}</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -158,7 +158,7 @@ export function AdminFinancialsClient({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        );
+        ) : null;
       },
     },
   ];
@@ -181,7 +181,7 @@ export function AdminFinancialsClient({
         const vendor = row.original.vendor;
         return vendor ? (
           <Link href={`/admin/vendors/${vendor.id}`} className="text-blue-600 hover:underline">
-            {vendor.businessName}
+            {vendor?.businessName || "-"}
           </Link>
         ) : "-";
       },
@@ -195,7 +195,7 @@ export function AdminFinancialsClient({
         const orderId = row.original.fee.orderId;
         return (
           <Link href={`/admin/orders/${orderId}`} className="text-blue-600 hover:underline text-sm">
-            Ver orden
+            {t("viewOrder")}
           </Link>
         );
       },
@@ -233,10 +233,10 @@ export function AdminFinancialsClient({
       cell: ({ row }) => {
         const status = row.original.fee.status;
         const statusConfig = {
-          pending: { label: "Pendiente", icon: Clock, color: "text-yellow-600" },
-          collected: { label: "Cobrado", icon: CheckCircle, color: "text-green-600" },
-          transferred: { label: "Transferido", icon: CheckCircle, color: "text-blue-600" },
-          failed: { label: "Fallido", icon: AlertCircle, color: "text-red-600" },
+          pending: { label: t("feeStatus.pending"), icon: Clock, color: "text-yellow-600" },
+          collected: { label: t("feeStatus.collected"), icon: CheckCircle, color: "text-green-600" },
+          transferred: { label: t("feeStatus.transferred"), icon: CheckCircle, color: "text-blue-600" },
+          failed: { label: t("feeStatus.failed"), icon: AlertCircle, color: "text-red-600" },
         };
 
         const config = statusConfig[status as keyof typeof statusConfig] || {
@@ -275,7 +275,7 @@ export function AdminFinancialsClient({
         const vendor = row.original.vendor;
         return vendor ? (
           <Link href={`/admin/vendors/${vendor.id}`} className="text-blue-600 hover:underline">
-            {vendor.businessName}
+            {vendor?.businessName || "-"}
           </Link>
         ) : "-";
       },
@@ -299,10 +299,10 @@ export function AdminFinancialsClient({
       cell: ({ row }) => {
         const status = row.original.payout.status;
         const statusMap = {
-          pending: { label: "Pendiente", variant: "secondary" as const },
-          processing: { label: "Procesando", variant: "outline" as const },
-          paid: { label: "Pagado", variant: "default" as const },
-          failed: { label: "Fallido", variant: "destructive" as const },
+          pending: { label: t("payoutStatus.pending"), variant: "secondary" as const },
+          processing: { label: t("payoutStatus.processing"), variant: "outline" as const },
+          paid: { label: t("payoutStatus.paid"), variant: "default" as const },
+          failed: { label: t("payoutStatus.failed"), variant: "destructive" as const },
         };
 
         const config = statusMap[status as keyof typeof statusMap] || {

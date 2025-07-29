@@ -342,6 +342,24 @@
       "availableMultiple": "only {count} left",
       "shippingStandard": "📦 Standard shipping in Mexico",
       "paymentDescription": "🇲🇽 Unique Mexican products purchase - Luzimarket"
+    },
+    "acceptTerms": {
+      "prefix": "I accept the",
+      "termsAndConditions": "terms and conditions",
+      "and": "and the",
+      "privacyPolicy": "privacy policy"
+    },
+    "validation": {
+      "invalidEmail": "Invalid email",
+      "firstNameRequired": "First name required",
+      "lastNameRequired": "Last name required",
+      "invalidPhone": "Invalid phone",
+      "addressRequired": "Address required",
+      "cityRequired": "City required",
+      "stateRequired": "State required",
+      "invalidPostalCode": "Invalid postal code",
+      "countryRequired": "Country required",
+      "acceptTermsRequired": "You must accept the terms"
     }
   },
   "VendorRegistration": {
@@ -550,7 +568,20 @@
       "saving": "Saving...",
       "loadError": "Failed to load template",
       "saveSuccess": "Template saved successfully",
-      "saveError": "Failed to save template"
+      "saveError": "Failed to save template",
+      "noTemplatesYet": "No email templates yet",
+      "created": "Created",
+      "infoHeader": "Email Templates: Welcome, Order Confirmation, Shipping Notification, Review Request",
+      "recommendedTemplates": "Recommended Templates",
+      "recommendedDescription": "These are the most common email templates your store should have:",
+      "orderConfirmationName": "Order Confirmation",
+      "orderConfirmationDesc": "Sent when a customer completes a purchase",
+      "shippingNotificationName": "Shipping Notification",
+      "shippingNotificationDesc": "Sent when the order is shipped",
+      "welcomeName": "Welcome",
+      "welcomeDesc": "Sent when a new user registers",
+      "reviewRequestName": "Review Request",
+      "reviewRequestDesc": "Sent days after receiving the product"
     },
     "vendorsPage": {
       "title": "Vendors",
@@ -1336,7 +1367,20 @@
     "newest": "Newest",
     "priceLowToHigh": "Price: Low to High",
     "priceHighToLow": "Price: High to Low",
-    "bestSelling": "Best selling"
+    "bestSelling": "Best selling",
+    "quickViewModal": {
+      "title": "Quick view of {name}",
+      "close": "Close quick view",
+      "viewImage": "View image {number}",
+      "by": "By",
+      "review": "review",
+      "reviews": "reviews",
+      "categoryLabel": "Category:",
+      "available": "{count} available",
+      "noStock": "Out of stock",
+      "outOfStock": "Out of stock",
+      "viewFullDetails": "View full details"
+    }
   },
   "Security": {
     "rateLimitAuth": "Too many authentication attempts. Try again in 15 minutes.",
@@ -2181,8 +2225,22 @@
         "viewTransactions": "View transactions",
         "requestPayout": "Request payout",
         "exportReport": "Export report",
-        "refresh": "Refresh"
+        "refresh": "Refresh",
+        "openMenu": "Open menu"
       },
+      "feeStatus": {
+        "pending": "Pending",
+        "collected": "Collected",
+        "transferred": "Transferred",
+        "failed": "Failed"
+      },
+      "payoutStatus": {
+        "pending": "Pending",
+        "processing": "Processing",
+        "paid": "Paid",
+        "failed": "Failed"
+      },
+      "viewOrder": "View order",
       "reports": {
         "title": "Financial Reports",
         "description": "Comprehensive analysis of platform performance",
@@ -2237,6 +2295,37 @@
       "payments": "Payments",
       "settings": "Settings",
       "logout": "Log out"
+    },
+    "orderStatusUpdater": {
+      "orderNumber": "Order #{number}",
+      "total": "Total",
+      "date": "Date",
+      "customer": "Customer",
+      "products": "Products",
+      "quantity": "Quantity",
+      "updateStatus": "Update Status",
+      "newStatus": "New Status",
+      "trackingNumber": "Tracking Number (Optional)",
+      "trackingNumberPlaceholder": "Enter tracking number",
+      "additionalNotes": "Additional Notes (Optional)",
+      "notesPlaceholder": "Add notes about this update...",
+      "updateButton": "Update Status",
+      "updating": "Updating...",
+      "status": {
+        "processing": "📦 Processing order",
+        "shipped": "🚚 Shipped",
+        "delivered": "✅ Delivered",
+        "cancelled": "❌ Cancelled"
+      },
+      "errors": {
+        "noChanges": "No changes to update",
+        "updateFailed": "Failed to update status",
+        "generic": "Error"
+      },
+      "success": {
+        "statusUpdated": "✅ Status updated successfully",
+        "statusUpdatedDescription": "Order #{orderNumber} has been updated. The customer will be notified automatically."
+      }
     },
     "financials": {
       "title": "Financial Dashboard",
@@ -2420,6 +2509,64 @@
         "updateSuccess": "Product updated successfully",
         "deleteError": "Error deleting product",
         "deleteSuccess": "Product deleted successfully"
+      },
+      "edit": {
+        "backToProducts": "Back to products",
+        "editProduct": "Edit Product",
+        "updateProductInfo": "Update your product information",
+        "deleteButton": "Delete",
+        "deleteDialogTitle": "Are you sure?",
+        "deleteDialogDescription": "This action cannot be undone. The product will be permanently deleted.",
+        "deleteDialogCancel": "Cancel",
+        "deleteDialogConfirm": "Delete",
+        "deleting": "Deleting...",
+        "basicInfo": "Basic Information",
+        "productName": "Product Name",
+        "productNamePlaceholder": "Example: Red Rose Bouquet",
+        "description": "Description",
+        "descriptionPlaceholder": "Describe your product in detail...",
+        "category": "Category",
+        "selectCategoryPlaceholder": "Select a category",
+        "tags": "Tags (optional)",
+        "tagsPlaceholder": "roses, love, anniversary",
+        "tagsSeparator": "Separate tags with commas",
+        "priceAndInventory": "Pricing & Inventory",
+        "price": "Price (MXN)",
+        "pricePlaceholder": "299.99",
+        "stock": "Available Stock",
+        "stockPlaceholder": "50",
+        "productActive": "Active product (visible in store)",
+        "productImages": "Product Images",
+        "uploadingImages": "Uploading images...",
+        "dragDropText": "Drag images here or click to select",
+        "imageFormats": "PNG, JPG up to 5MB",
+        "mainImage": "Main",
+        "cancelButton": "Cancel",
+        "saveButton": "Save Changes",
+        "saving": "Saving...",
+        "categories": {
+          "1": "Flowers & Love",
+          "2": "Sweets & Desserts",
+          "3": "Events & Dinners",
+          "4": "Gift Shop"
+        },
+        "validation": {
+          "nameMinLength": "Name must be at least 3 characters",
+          "descriptionMinLength": "Description must be at least 10 characters",
+          "priceInvalid": "Price must be a number greater than 0",
+          "stockInvalid": "Stock must be a positive number",
+          "categoryRequired": "Select a category",
+          "imagesRequired": "Add at least one image"
+        },
+        "toast": {
+          "loadError": "Error loading product",
+          "uploadError": "Error uploading images",
+          "imagesAdded": "{count} image(s) added",
+          "updateSuccess": "Product updated successfully",
+          "updateError": "Error updating product",
+          "deleteSuccess": "Product deleted successfully",
+          "deleteError": "Error deleting product"
+        }
       }
     },
     "shipping": {

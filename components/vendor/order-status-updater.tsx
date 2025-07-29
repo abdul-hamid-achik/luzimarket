@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Truck, Package, CheckCircle, XCircle } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 interface OrderStatusUpdaterProps {
   order: {
@@ -36,22 +37,23 @@ interface OrderStatusUpdaterProps {
   onStatusUpdate?: (orderId: string, newStatus: string) => void;
 }
 
-const statusOptions = [
-  { value: "processing", label: "📦 Procesando orden", icon: Package, color: "bg-blue-500" },
-  { value: "shipped", label: "🚚 Enviado", icon: Truck, color: "bg-orange-500" },
-  { value: "delivered", label: "✅ Entregado", icon: CheckCircle, color: "bg-green-500" },
-  { value: "cancelled", label: "❌ Cancelado", icon: XCircle, color: "bg-red-500" },
-];
-
 export function OrderStatusUpdater({ order, onStatusUpdate }: OrderStatusUpdaterProps) {
+  const t = useTranslations("vendor.orderStatusUpdater");
   const [selectedStatus, setSelectedStatus] = useState(order.status);
   const [notes, setNotes] = useState("");
   const [trackingNumber, setTrackingNumber] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
+  
+  const statusOptions = [
+    { value: "processing", label: t("status.processing"), icon: Package, color: "bg-blue-500" },
+    { value: "shipped", label: t("status.shipped"), icon: Truck, color: "bg-orange-500" },
+    { value: "delivered", label: t("status.delivered"), icon: CheckCircle, color: "bg-green-500" },
+    { value: "cancelled", label: t("status.cancelled"), icon: XCircle, color: "bg-red-500" },
+  ];
 
   const handleStatusUpdate = async () => {
     if (selectedStatus === order.status && !notes && !trackingNumber) {
-      toast.error("No hay cambios para actualizar");
+      toast.error(t("errors.noChanges"));
       return;
     }
 
@@ -72,13 +74,13 @@ export function OrderStatusUpdater({ order, onStatusUpdate }: OrderStatusUpdater
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Error al actualizar el estado");
+        throw new Error(errorData.error || t("errors.updateFailed"));
       }
 
       const result = await response.json();
       
-      toast.success("✅ Estado actualizado exitosamente", {
-        description: `La orden #${order.orderNumber} ha sido actualizada. El cliente será notificado automáticamente.`,
+      toast.success(t("success.statusUpdated"), {
+        description: t("success.statusUpdatedDescription", { orderNumber: order.orderNumber }),
       });
 
       // Reset form
@@ -89,8 +91,8 @@ export function OrderStatusUpdater({ order, onStatusUpdate }: OrderStatusUpdater
       onStatusUpdate?.(order.id, selectedStatus);
     } catch (error) {
       console.error("Error updating order status:", error);
-      toast.error("Error", {
-        description: error instanceof Error ? error.message : "No se pudo actualizar el estado",
+      toast.error(t("errors.generic"), {
+        description: error instanceof Error ? error.message : t("errors.updateFailed"),
       });
     } finally {
       setIsUpdating(false);
@@ -114,20 +116,20 @@ export function OrderStatusUpdater({ order, onStatusUpdate }: OrderStatusUpdater
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
-          <span>Orden #{order.orderNumber}</span>
+          <span>{t("orderNumber", { number: order.orderNumber })}</span>
           {getStatusBadge(order.status)}
         </CardTitle>
         <div className="text-sm text-gray-600">
-          <p>Total: ${order.total} {order.currency}</p>
-          <p>Fecha: {new Date(order.createdAt).toLocaleDateString('es-MX')}</p>
-          {order.user && <p>Cliente: {order.user.name} ({order.user.email})</p>}
+          <p>{t("total")}: ${order.total} {order.currency}</p>
+          <p>{t("date")}: {new Date(order.createdAt).toLocaleDateString('es-MX')}</p>
+          {order.user && <p>{t("customer")}: {order.user?.name} ({order.user?.email})</p>}
         </div>
       </CardHeader>
 
       <CardContent className="space-y-4">
         {/* Order Items */}
         <div>
-          <h4 className="font-medium mb-2">Productos</h4>
+          <h4 className="font-medium mb-2">{t("products")}</h4>
           <div className="space-y-2">
             {order.items.map((item) => (
               <div key={item.id} className="flex items-center gap-3 p-2 bg-gray-50 rounded">
@@ -143,7 +145,7 @@ export function OrderStatusUpdater({ order, onStatusUpdate }: OrderStatusUpdater
                 </div>
                 <div className="flex-1">
                   <p className="font-medium text-sm">{item.product.name}</p>
-                  <p className="text-xs text-gray-600">Cantidad: {item.quantity}</p>
+                  <p className="text-xs text-gray-600">{t("quantity")}: {item.quantity}</p>
                 </div>
               </div>
             ))}
@@ -152,11 +154,11 @@ export function OrderStatusUpdater({ order, onStatusUpdate }: OrderStatusUpdater
 
         {/* Status Update Form */}
         <div className="border-t pt-4">
-          <h4 className="font-medium mb-3">Actualizar Estado</h4>
+          <h4 className="font-medium mb-3">{t("updateStatus")}</h4>
           
           <div className="space-y-3">
             <div>
-              <Label htmlFor="status">Nuevo Estado</Label>
+              <Label htmlFor="status">{t("newStatus")}</Label>
               <Select value={selectedStatus} onValueChange={setSelectedStatus}>
                 <SelectTrigger>
                   <SelectValue />
@@ -179,23 +181,23 @@ export function OrderStatusUpdater({ order, onStatusUpdate }: OrderStatusUpdater
 
             {selectedStatus === "shipped" && (
               <div>
-                <Label htmlFor="tracking">Número de Rastreo (Opcional)</Label>
+                <Label htmlFor="tracking">{t("trackingNumber")}</Label>
                 <Input
                   id="tracking"
                   value={trackingNumber}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTrackingNumber(e.target.value)}
-                  placeholder="Ingresa el número de rastreo"
+                  placeholder={t("trackingNumberPlaceholder")}
                 />
               </div>
             )}
 
             <div>
-              <Label htmlFor="notes">Notas Adicionales (Opcional)</Label>
+              <Label htmlFor="notes">{t("additionalNotes")}</Label>
               <Textarea
                 id="notes"
                 value={notes}
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNotes(e.target.value)}
-                placeholder="Agrega notas sobre esta actualización..."
+                placeholder={t("notesPlaceholder")}
                 rows={3}
               />
             </div>
@@ -205,7 +207,7 @@ export function OrderStatusUpdater({ order, onStatusUpdate }: OrderStatusUpdater
               disabled={isUpdating}
               className="w-full"
             >
-              {isUpdating ? "Actualizando..." : "Actualizar Estado"}
+              {isUpdating ? t("updating") : t("updateButton")}
             </Button>
           </div>
         </div>

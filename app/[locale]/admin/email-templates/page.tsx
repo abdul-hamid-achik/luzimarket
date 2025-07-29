@@ -67,7 +67,7 @@ export default async function EmailTemplatesPage() {
 
       {/* Templates Grid */}
       <div className="text-sm text-gray-600 mb-4">
-        Email Templates: Welcome, Order Confirmation, Shipping Notification, Review Request
+        {t("infoHeader")}
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -75,7 +75,7 @@ export default async function EmailTemplatesPage() {
           <div className="col-span-full text-center py-12 bg-white rounded-lg border border-gray-200">
             <Mail className="h-12 w-12 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 font-univers mb-4">
-              No hay plantillas de email aún
+              {t("noTemplatesYet")}
             </p>
             <Link href="/admin/email-templates/new">
               <Button variant="outline">
@@ -126,7 +126,7 @@ export default async function EmailTemplatesPage() {
               {/* Template Stats */}
               <div className="flex items-center gap-4 text-xs font-univers text-gray-500 mb-4">
                 {template.createdAt && (
-                  <span>Creado {new Date(template.createdAt).toLocaleDateString('es-MX')}</span>
+                  <span>{t("created")} {new Date(template.createdAt).toLocaleDateString('es-MX')}</span>
                 )}
                 {template.updatedAt && (
                   <span>• {t("lastModified")} {new Date(template.updatedAt).toLocaleDateString('es-MX')}</span>
@@ -155,44 +155,44 @@ export default async function EmailTemplatesPage() {
 
       {/* Common Templates Info */}
       <div className="bg-blue-50 rounded-lg p-6">
-        <h3 className="font-univers font-medium mb-2">Plantillas Recomendadas</h3>
+        <h3 className="font-univers font-medium mb-2">{t("recommendedTemplates")}</h3>
         <p className="text-sm font-univers text-gray-700 mb-4">
-          Estas son las plantillas de email más comunes que tu tienda debería tener:
+          {t("recommendedDescription")}
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div className="flex items-start gap-2">
             <span>📦</span>
             <div>
-              <p className="text-sm font-univers font-medium">Confirmación de Orden</p>
+              <p className="text-sm font-univers font-medium">{t("orderConfirmationName")}</p>
               <p className="text-xs font-univers text-gray-600">
-                Se envía cuando un cliente completa una compra
+                {t("orderConfirmationDesc")}
               </p>
             </div>
           </div>
           <div className="flex items-start gap-2">
             <span>🚚</span>
             <div>
-              <p className="text-sm font-univers font-medium">Notificación de Envío</p>
+              <p className="text-sm font-univers font-medium">{t("shippingNotificationName")}</p>
               <p className="text-xs font-univers text-gray-600">
-                Se envía cuando el pedido es enviado
+                {t("shippingNotificationDesc")}
               </p>
             </div>
           </div>
           <div className="flex items-start gap-2">
             <span>👋</span>
             <div>
-              <p className="text-sm font-univers font-medium">Bienvenida</p>
+              <p className="text-sm font-univers font-medium">{t("welcomeName")}</p>
               <p className="text-xs font-univers text-gray-600">
-                Se envía cuando un nuevo usuario se registra
+                {t("welcomeDesc")}
               </p>
             </div>
           </div>
           <div className="flex items-start gap-2">
             <span>⭐</span>
             <div>
-              <p className="text-sm font-univers font-medium">Solicitud de Reseña</p>
+              <p className="text-sm font-univers font-medium">{t("reviewRequestName")}</p>
               <p className="text-xs font-univers text-gray-600">
-                Se envía días después de recibir el producto
+                {t("reviewRequestDesc")}
               </p>
             </div>
           </div>

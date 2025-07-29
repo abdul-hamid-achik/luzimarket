@@ -23,19 +23,19 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useSession } from "next-auth/react";
 import { ShippingCalculator } from "@/components/checkout/shipping-calculator";
 
-const checkoutSchema = z.object({
+const createCheckoutSchema = (t: any) => z.object({
   // Personal Information
-  email: z.string().email("Email inválido"),
-  firstName: z.string().min(1, "Nombre requerido"),
-  lastName: z.string().min(1, "Apellido requerido"),
-  phone: z.string().min(10, "Teléfono inválido"),
+  email: z.string().email(t("validation.invalidEmail")),
+  firstName: z.string().min(1, t("validation.firstNameRequired")),
+  lastName: z.string().min(1, t("validation.lastNameRequired")),
+  phone: z.string().min(10, t("validation.invalidPhone")),
   
   // Shipping Address
-  address: z.string().min(1, "Dirección requerida"),
-  city: z.string().min(1, "Ciudad requerida"),
-  state: z.string().min(1, "Estado requerido"),
-  postalCode: z.string().min(5, "Código postal inválido"),
-  country: z.string().min(1, "País requerido"),
+  address: z.string().min(1, t("validation.addressRequired")),
+  city: z.string().min(1, t("validation.cityRequired")),
+  state: z.string().min(1, t("validation.stateRequired")),
+  postalCode: z.string().min(5, t("validation.invalidPostalCode")),
+  country: z.string().min(1, t("validation.countryRequired")),
   
   // Optional fields
   apartment: z.string().optional(),
@@ -46,11 +46,11 @@ const checkoutSchema = z.object({
   sameAsBilling: z.boolean(),
   
   // Terms
-  acceptTerms: z.boolean().refine(val => val === true, "Debes aceptar los términos"),
+  acceptTerms: z.boolean().refine(val => val === true, t("validation.acceptTermsRequired")),
   newsletter: z.boolean().optional(),
 });
 
-type CheckoutForm = z.infer<typeof checkoutSchema>;
+type CheckoutForm = z.infer<ReturnType<typeof createCheckoutSchema>>;
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -62,6 +62,8 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null);
   const [checkoutMode, setCheckoutMode] = useState<"guest" | "login">("guest");
   const { data: session } = useSession();
+  
+  const checkoutSchema = createCheckoutSchema(t);
 
   const form = useForm<CheckoutForm>({
     resolver: zodResolver(checkoutSchema),
@@ -461,13 +463,13 @@ export default function CheckoutPage() {
                       className="mt-1"
                     />
                     <Label htmlFor="acceptTerms" className="ml-2 text-sm font-univers">
-                      Acepto los{" "}
+                      {t("acceptTerms.prefix")}{" "}
                       <Link href="/terms" className="text-black hover:underline">
-                        términos y condiciones
+                        {t("acceptTerms.termsAndConditions")}
                       </Link>{" "}
-                      y la{" "}
+                      {t("acceptTerms.and")}{" "}
                       <Link href="/privacy" className="text-black hover:underline">
-                        política de privacidad
+                        {t("acceptTerms.privacyPolicy")}
                       </Link>
                     </Label>
                   </div>

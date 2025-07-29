@@ -15,6 +15,7 @@ import { ChevronLeft, Upload, X, Loader2, Trash2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,32 +28,35 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-const productSchema = z.object({
-  name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
-  description: z.string().min(10, "La descripción debe tener al menos 10 caracteres"),
+const createProductSchema = (t: any) => z.object({
+  name: z.string().min(3, t("validation.nameMinLength")),
+  description: z.string().min(10, t("validation.descriptionMinLength")),
   price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
-    message: "El precio debe ser un número mayor a 0",
+    message: t("validation.priceInvalid"),
   }),
   stock: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
-    message: "El stock debe ser un número positivo",
+    message: t("validation.stockInvalid"),
   }),
-  categoryId: z.string().min(1, "Selecciona una categoría"),
+  categoryId: z.string().min(1, t("validation.categoryRequired")),
   tags: z.string().optional(),
-  images: z.array(z.string()).min(1, "Agrega al menos una imagen"),
+  images: z.array(z.string()).min(1, t("validation.imagesRequired")),
   isActive: z.boolean(),
 });
 
-type ProductForm = z.infer<typeof productSchema>;
+type ProductForm = z.infer<ReturnType<typeof createProductSchema>>;
 
 export default function EditProductPage() {
   const router = useRouter();
   const params = useParams();
   const productId = params.id as string;
+  const t = useTranslations("vendor.products.edit");
   
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+
+  const productSchema = createProductSchema(t);
 
   const form = useForm<ProductForm>({
     resolver: zodResolver(productSchema),
@@ -91,13 +95,13 @@ export default function EditProductPage() {
         
         setImageUrls(product.images || []);
       } catch (error) {
-        toast.error("Error al cargar el producto");
+        toast.error(t("toast.loadError"));
         router.push("/vendor/products");
       }
     }
     
     loadProduct();
-  }, [productId, form, router]);
+  }, [productId, form, router, t]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
@@ -111,9 +115,9 @@ export default function EditProductPage() {
 
       setImageUrls([...imageUrls, ...newImageUrls]);
       form.setValue("images", [...imageUrls, ...newImageUrls]);
-      toast.success(`${files.length} imagen(es) agregadas`);
+      toast.success(t("toast.imagesAdded", { count: files.length }));
     } catch (error) {
-      toast.error("Error al subir las imágenes");
+      toast.error(t("toast.uploadError"));
     } finally {
       setUploadingImages(false);
     }
@@ -142,13 +146,13 @@ export default function EditProductPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Error al actualizar el producto");
+        throw new Error(t("toast.updateError"));
       }
 
-      toast.success("Producto actualizado exitosamente");
+      toast.success(t("toast.updateSuccess"));
       router.push("/vendor/products");
     } catch (error) {
-      toast.error("Error al actualizar el producto");
+      toast.error(t("toast.updateError"));
     } finally {
       setIsLoading(false);
     }
@@ -163,13 +167,13 @@ export default function EditProductPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Error al eliminar el producto");
+        throw new Error(t("toast.deleteError"));
       }
 
-      toast.success("Producto eliminado exitosamente");
+      toast.success(t("toast.deleteSuccess"));
       router.push("/vendor/products");
     } catch (error) {
-      toast.error("Error al eliminar el producto");
+      toast.error(t("toast.deleteError"));
     } finally {
       setIsDeleting(false);
     }
@@ -184,14 +188,14 @@ export default function EditProductPage() {
           className="inline-flex items-center text-sm font-univers text-gray-600 hover:text-gray-900 mb-4"
         >
           <ChevronLeft className="h-4 w-4 mr-1" />
-          Volver a productos
+          {t("backToProducts")}
         </Link>
         
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-univers text-gray-900">Editar Producto</h1>
+            <h1 className="text-2xl font-univers text-gray-900">{t("editProduct")}</h1>
             <p className="text-sm text-gray-600 font-univers mt-1">
-              Actualiza la información de tu producto
+              {t("updateProductInfo")}
             </p>
           </div>
           
@@ -199,24 +203,24 @@ export default function EditProductPage() {
             <AlertDialogTrigger asChild>
               <Button variant="destructive" size="sm">
                 <Trash2 className="h-4 w-4 mr-2" />
-                Eliminar
+                {t("deleteButton")}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+                <AlertDialogTitle>{t("deleteDialogTitle")}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Esta acción no se puede deshacer. El producto será eliminado permanentemente.
+                  {t("deleteDialogDescription")}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogCancel>{t("deleteDialogCancel")}</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={handleDelete}
                   disabled={isDeleting}
                   className="bg-red-600 text-white hover:bg-red-700"
                 >
-                  {isDeleting ? "Eliminando..." : "Eliminar"}
+                  {isDeleting ? t("deleting") : t("deleteDialogConfirm")}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -228,7 +232,7 @@ export default function EditProductPage() {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           {/* Basic Information */}
           <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h2 className="text-lg font-univers mb-6">Información Básica</h2>
+            <h2 className="text-lg font-univers mb-6">{t("basicInfo")}</h2>
             
             <div className="space-y-6">
               <FormField
@@ -236,10 +240,10 @@ export default function EditProductPage() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nombre del Producto</FormLabel>
+                    <FormLabel>{t("productName")}</FormLabel>
                     <FormControl>
                       <InputWithValidation
-                        placeholder="Ejemplo: Ramo de Rosas Rojas"
+                        placeholder={t("productNamePlaceholder")}
                         {...field}
                         showValidation={form.formState.dirtyFields.name}
                         isValid={form.formState.dirtyFields.name && !form.formState.errors.name}
@@ -256,10 +260,10 @@ export default function EditProductPage() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Descripción</FormLabel>
+                    <FormLabel>{t("description")}</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Describe tu producto en detalle..."
+                        placeholder={t("descriptionPlaceholder")}
                         rows={4}
                         {...field}
                       />
@@ -275,18 +279,18 @@ export default function EditProductPage() {
                   name="categoryId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Categoría</FormLabel>
+                      <FormLabel>{t("category")}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecciona una categoría" />
+                            <SelectValue placeholder={t("selectCategoryPlaceholder")} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="1">Flores & Amores</SelectItem>
-                          <SelectItem value="2">Dulces & Postres</SelectItem>
-                          <SelectItem value="3">Eventos & Cenas</SelectItem>
-                          <SelectItem value="4">Tienda de Regalos</SelectItem>
+                          <SelectItem value="1">{t("categories.1")}</SelectItem>
+                          <SelectItem value="2">{t("categories.2")}</SelectItem>
+                          <SelectItem value="3">{t("categories.3")}</SelectItem>
+                          <SelectItem value="4">{t("categories.4")}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -299,15 +303,15 @@ export default function EditProductPage() {
                   name="tags"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Etiquetas (opcional)</FormLabel>
+                      <FormLabel>{t("tags")}</FormLabel>
                       <FormControl>
                         <InputWithValidation
-                          placeholder="rosas, amor, aniversario"
+                          placeholder={t("tagsPlaceholder")}
                           {...field}
                         />
                       </FormControl>
                       <p className="text-xs text-gray-500 mt-1">
-                        Separa las etiquetas con comas
+                        {t("tagsSeparator")}
                       </p>
                     </FormItem>
                   )}
@@ -318,7 +322,7 @@ export default function EditProductPage() {
 
           {/* Pricing & Inventory */}
           <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h2 className="text-lg font-univers mb-6">Precio e Inventario</h2>
+            <h2 className="text-lg font-univers mb-6">{t("priceAndInventory")}</h2>
             
             <div className="grid grid-cols-2 gap-6">
               <FormField
@@ -326,12 +330,12 @@ export default function EditProductPage() {
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Precio (MXN)</FormLabel>
+                    <FormLabel>{t("price")}</FormLabel>
                     <FormControl>
                       <InputWithValidation
                         type="number"
                         step="0.01"
-                        placeholder="299.99"
+                        placeholder={t("pricePlaceholder")}
                         {...field}
                         showValidation={form.formState.dirtyFields.price}
                         isValid={form.formState.dirtyFields.price && !form.formState.errors.price}
@@ -348,11 +352,11 @@ export default function EditProductPage() {
                 name="stock"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Stock Disponible</FormLabel>
+                    <FormLabel>{t("stock")}</FormLabel>
                     <FormControl>
                       <InputWithValidation
                         type="number"
-                        placeholder="50"
+                        placeholder={t("stockPlaceholder")}
                         {...field}
                         showValidation={form.formState.dirtyFields.stock}
                         isValid={form.formState.dirtyFields.stock && !form.formState.errors.stock}
@@ -380,7 +384,7 @@ export default function EditProductPage() {
                       />
                     </FormControl>
                     <FormLabel className="!mt-0 cursor-pointer">
-                      Producto activo (visible en la tienda)
+                      {t("productActive")}
                     </FormLabel>
                   </FormItem>
                 )}
@@ -390,7 +394,7 @@ export default function EditProductPage() {
 
           {/* Images */}
           <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h2 className="text-lg font-univers mb-6">Imágenes del Producto</h2>
+            <h2 className="text-lg font-univers mb-6">{t("productImages")}</h2>
             
             <FormField
               control={form.control}
@@ -408,14 +412,14 @@ export default function EditProductPage() {
                               {uploadingImages ? (
                                 <span className="flex items-center justify-center">
                                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                                  Subiendo imágenes...
+                                  {t("uploadingImages")}
                                 </span>
                               ) : (
-                                "Arrastra imágenes aquí o haz clic para seleccionar"
+                                t("dragDropText")
                               )}
                             </p>
                             <p className="text-xs text-gray-500 mt-1">
-                              PNG, JPG hasta 5MB
+                              {t("imageFormats")}
                             </p>
                           </div>
                           <input
@@ -451,7 +455,7 @@ export default function EditProductPage() {
                               </button>
                               {index === 0 && (
                                 <span className="absolute bottom-2 left-2 bg-black text-white text-xs px-2 py-1 rounded">
-                                  Principal
+                                  {t("mainImage")}
                                 </span>
                               )}
                             </div>
@@ -474,7 +478,7 @@ export default function EditProductPage() {
               onClick={() => router.push("/vendor/products")}
               disabled={isLoading}
             >
-              Cancelar
+              {t("cancelButton")}
             </Button>
             <Button
               type="submit"
@@ -484,10 +488,10 @@ export default function EditProductPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Guardando...
+                  {t("saving")}
                 </>
               ) : (
-                "Guardar Cambios"
+                t("saveButton")
               )}
             </Button>
           </div>
