@@ -102,6 +102,11 @@ export default async function VendorDashboard() {
     .where(eq(vendorStripeAccounts.vendorId, vendorId))
     .limit(1);
 
+  // Handle case where vendor info is not found
+  if (!vendorInfo) {
+    redirect("/vendor/register");
+  }
+
   const statsCards = [
     {
       title: t("dashboard.totalProducts"),
@@ -139,7 +144,7 @@ export default async function VendorDashboard() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-univers text-gray-900">
-            {t("dashboard.welcome", { businessName: vendorInfo.businessName })}
+            {t("dashboard.welcome", { businessName: vendorInfo?.businessName || "Vendor" })}
           </h1>
           <p className="text-sm text-gray-600 font-univers mt-1">
             {t("dashboard.subtitle")}

@@ -13,27 +13,30 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 
-const registerSchema = z.object({
-  name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
-  email: z.string().email("Correo electrónico inválido"),
-  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+const createRegisterSchema = (t: any) => z.object({
+  name: z.string().min(2, t("validation.nameMinLength")),
+  email: z.string().email(t("validation.invalidEmail")),
+  password: z.string().min(6, t("validation.passwordMinLength")),
   confirmPassword: z.string(),
-  acceptTerms: z.boolean().refine(val => val === true, "Debes aceptar los términos y condiciones"),
+  acceptTerms: z.boolean().refine(val => val === true, t("validation.acceptTerms")),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Las contraseñas no coinciden",
+  message: t("validation.passwordsDoNotMatch"),
   path: ["confirmPassword"],
 });
 
-type RegisterForm = z.infer<typeof registerSchema>;
+type RegisterForm = z.infer<ReturnType<typeof createRegisterSchema>>;
 
 export default function RegisterPage() {
   const router = useRouter();
-  const t = useTranslations('Common');
+  const t = useTranslations('RegisterPage');
+  const tCommon = useTranslations('Common');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
+  const registerSchema = createRegisterSchema(t);
 
   const form = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
@@ -66,10 +69,10 @@ export default function RegisterPage() {
       if (response.ok) {
         setSuccess(true);
       } else {
-        setError(result.error || "Error al crear la cuenta");
+        setError(result.error || t("errors.accountCreationError"));
       }
     } catch (error) {
-      setError("Error de conexión. Inténtalo de nuevo.");
+      setError(t("errors.connectionError"));
     } finally {
       setIsLoading(false);
     }
@@ -84,16 +87,16 @@ export default function RegisterPage() {
               <div className="mx-auto h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
                 <Mail className="h-8 w-8 text-blue-600" />
               </div>
-              <h2 className="text-2xl font-times-now text-gray-900">¡Verifica tu correo electrónico!</h2>
+              <h2 className="text-2xl font-times-now text-gray-900">{t("success.title")}</h2>
               <p className="text-sm text-gray-600 font-univers mt-4">
-                Hemos enviado un enlace de verificación a tu correo electrónico.
+                {t("success.message")}
               </p>
               <p className="text-sm text-gray-600 font-univers mt-2">
-                Por favor revisa tu bandeja de entrada y haz clic en el enlace para activar tu cuenta.
+                {t("success.checkEmail")}
               </p>
               <div className="mt-6">
                 <Link href="/login" className="text-sm text-black hover:underline font-univers">
-                  Volver al inicio de sesión
+                  {t("success.backToLogin")}
                 </Link>
               </div>
             </div>
@@ -110,10 +113,10 @@ export default function RegisterPage() {
         <div className="text-center">
           <h1 className="text-3xl font-times-now">LUZIMARKET</h1>
           <p className="mt-2 text-sm text-gray-600 font-univers">
-            Crea tu cuenta
+            {t("subtitle")}
           </p>
           <p className="text-xs text-gray-500 font-univers mt-1">
-            Únete a nuestra comunidad de regalos extraordinarios
+            {t("description")}
           </p>
         </div>
 
@@ -123,7 +126,7 @@ export default function RegisterPage() {
             {/* Name Field */}
             <div>
               <Label htmlFor="name" className="block text-sm font-univers text-gray-700">
-                Nombre completo
+                {t("fields.fullName")}
               </Label>
               <div className="mt-1 relative">
                 <Input
@@ -132,7 +135,7 @@ export default function RegisterPage() {
                   {...form.register("name")}
                   disabled={isLoading}
                   className="block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-black focus:border-black"
-                  placeholder="Tu nombre completo"
+                  placeholder={t("placeholders.fullName")}
                 />
                 <User className="h-4 w-4 text-gray-400 absolute left-3 top-3" />
               </div>
@@ -146,7 +149,7 @@ export default function RegisterPage() {
             {/* Email Field */}
             <div>
               <Label htmlFor="email" className="block text-sm font-univers text-gray-700">
-                Correo electrónico
+                {t("fields.email")}
               </Label>
               <div className="mt-1 relative">
                 <Input
@@ -155,7 +158,7 @@ export default function RegisterPage() {
                   {...form.register("email")}
                   disabled={isLoading}
                   className="block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-black focus:border-black"
-                  placeholder="tu@email.com"
+                  placeholder={t("placeholders.email")}
                 />
                 <Mail className="h-4 w-4 text-gray-400 absolute left-3 top-3" />
               </div>
@@ -169,7 +172,7 @@ export default function RegisterPage() {
             {/* Password Field */}
             <div>
               <Label htmlFor="password" className="block text-sm font-univers text-gray-700">
-                Contraseña
+                {t("fields.password")}
               </Label>
               <div className="mt-1 relative">
                 <Input
@@ -178,7 +181,7 @@ export default function RegisterPage() {
                   {...form.register("password")}
                   disabled={isLoading}
                   className="block w-full px-3 py-2 pl-10 pr-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-black focus:border-black"
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder={t("placeholders.password")}
                 />
                 <Lock className="h-4 w-4 text-gray-400 absolute left-3 top-3" />
                 <button
@@ -199,7 +202,7 @@ export default function RegisterPage() {
             {/* Confirm Password Field */}
             <div>
               <Label htmlFor="confirmPassword" className="block text-sm font-univers text-gray-700">
-                Confirmar contraseña
+                {t("fields.confirmPassword")}
               </Label>
               <div className="mt-1 relative">
                 <Input
@@ -208,7 +211,7 @@ export default function RegisterPage() {
                   {...form.register("confirmPassword")}
                   disabled={isLoading}
                   className="block w-full px-3 py-2 pl-10 pr-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-black focus:border-black"
-                  placeholder="Repite tu contraseña"
+                  placeholder={t("placeholders.confirmPassword")}
                 />
                 <Lock className="h-4 w-4 text-gray-400 absolute left-3 top-3" />
                 <button
@@ -236,13 +239,13 @@ export default function RegisterPage() {
                 className="mt-1"
               />
               <Label htmlFor="acceptTerms" className="ml-2 text-sm font-univers text-gray-700">
-                Acepto los{" "}
+                {t("terms.accept")}{" "}
                 <Link href="/terms" className="text-black hover:underline">
-                  términos y condiciones
+                  {t("terms.termsAndConditions")}
                 </Link>{" "}
-                y la{" "}
+                {t("terms.and")}{" "}
                 <Link href="/privacy" className="text-black hover:underline">
-                  política de privacidad
+                  {t("terms.privacyPolicy")}
                 </Link>
               </Label>
             </div>
@@ -268,17 +271,17 @@ export default function RegisterPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creando cuenta...
+                  {t("creatingAccount")}
                 </>
               ) : (
-                "Crear cuenta"
+                t("createAccount")
               )}
             </Button>
 
             {/* Login Link */}
             <div className="text-center">
               <Link href="/login" className="text-sm text-gray-600 hover:text-black font-univers">
-                ¿Ya tienes cuenta? Inicia sesión
+                {t("alreadyHaveAccount")}
               </Link>
             </div>
           </form>

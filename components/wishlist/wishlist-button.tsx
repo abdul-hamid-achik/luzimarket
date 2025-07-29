@@ -6,7 +6,7 @@ import { useWishlist } from "@/contexts/wishlist-context";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 interface WishlistButtonProps {
   product: {
@@ -28,6 +28,7 @@ export function WishlistButton({
   const { data: session } = useSession();
   const router = useRouter();
   const locale = useLocale();
+  const t = useTranslations("Common");
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const inWishlist = isInWishlist(product.id);
 
@@ -91,7 +92,7 @@ export function WishlistButton({
           inWishlist ? "fill-white text-white" : "text-gray-600"
         )} 
       />
-      {inWishlist ? "En lista de deseos" : "Agregar a lista"}
+      {inWishlist ? t("inWishlist") : t("addToWishlist")}
     </Button>
   );
 }

@@ -43,7 +43,9 @@
     "myOrders": "My Orders",
     "trackOrder": "Track Order",
     "user": "User",
-    "clearSearch": "Clear search"
+    "clearSearch": "Clear search",
+    "inWishlist": "In wishlist",
+    "addToWishlist": "Add to wishlist"
   },
   "Navigation": {
     "home": "Home",
@@ -173,6 +175,76 @@
     "accountLockedEmailReset": "If you forgot your password, you can reset it here:",
     "resetPassword": "Reset password"
   },
+  "LoginPage": {
+    "subtitle": "Sign in to your account",
+    "tabs": {
+      "customer": "Customer",
+      "vendor": "Vendor",
+      "admin": "Admin"
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Password"
+    },
+    "loginButton": "Sign in",
+    "loggingIn": "Signing in...",
+    "noAccount": "Don't have an account? Sign up",
+    "forgotPassword": "Forgot your password?",
+    "wantToBeVendor": "Want to be a vendor? Register",
+    "resendVerificationLink": "Didn't receive the email? Resend verification link",
+    "emailVerifiedSuccess": "Your email has been successfully verified! You can now sign in.",
+    "errors": {
+      "invalidToken": "The verification link is invalid.",
+      "expiredToken": "The verification link has expired. Please register again.",
+      "verificationFailed": "Error verifying your email. Please try again."
+    },
+    "validation": {
+      "invalidEmail": "Invalid email",
+      "passwordMinLength": "Password must be at least 6 characters"
+    }
+  },
+  "RegisterPage": {
+    "subtitle": "Create your account",
+    "description": "Join our community of extraordinary gifts",
+    "fields": {
+      "fullName": "Full name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password"
+    },
+    "placeholders": {
+      "fullName": "Your full name",
+      "email": "you@email.com",
+      "password": "Minimum 6 characters",
+      "confirmPassword": "Repeat your password"
+    },
+    "terms": {
+      "accept": "I accept the",
+      "termsAndConditions": "terms and conditions",
+      "and": "and the",
+      "privacyPolicy": "privacy policy"
+    },
+    "createAccount": "Create account",
+    "creatingAccount": "Creating account...",
+    "alreadyHaveAccount": "Already have an account? Sign in",
+    "validation": {
+      "nameMinLength": "Name must be at least 2 characters",
+      "invalidEmail": "Invalid email",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "acceptTerms": "You must accept the terms and conditions"
+    },
+    "errors": {
+      "accountCreationError": "Error creating account",
+      "connectionError": "Connection error. Please try again."
+    },
+    "success": {
+      "title": "Verify your email!",
+      "message": "We've sent a verification link to your email.",
+      "checkEmail": "Please check your inbox and click the link to activate your account.",
+      "backToLogin": "Back to sign in"
+    }
+  },
   "ComingSoon": {
     "title": "Handpicked extraordinary gifts",
     "description": "LUZIMARKET® is a new online platform offering curation, sales, and home delivery of exceptional gifts for special moments, with a catalog of selected brands and stores throughout Mexico.",
@@ -210,6 +282,31 @@
       "addedSuccessDescriptionMultiple": "{count} units of {productName} were added successfully. Great choice!",
       "addError": "❌ Error adding item",
       "addErrorDescription": "We couldn't add the product to your cart. Please try again or contact support."
+    },
+    "pageTitle": "Shopping Cart",
+    "emptyDescription": "Add some products to get started",
+    "exploreProducts": "Explore products",
+    "orderSummary": "Order Summary",
+    "freeShipping": "Free",
+    "calculateShipping": "Calculate your shipping",
+    "postalCode": "Postal code",
+    "calculate": "Calculate",
+    "invalidPostalCode": "Invalid postal code",
+    "freeShippingThreshold": "Free shipping on orders over {amount}",
+    "securePayment": "🔒 Secure payment with Stripe",
+    "steps": {
+      "cart": {
+        "title": "Cart",
+        "description": "Review your products"
+      },
+      "info": {
+        "title": "Information",
+        "description": "Contact and shipping details"
+      },
+      "payment": {
+        "title": "Payment",
+        "description": "Payment method"
+      }
     }
   },
   "Checkout": {

@@ -10,17 +10,19 @@ import { ProgressSteps, MobileProgressSteps } from "@/components/ui/progress-ste
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { getStateFromPostalCode } from "@/lib/utils/shipping-zones";
+import { useTranslations } from "next-intl";
 
 export default function CartPage() {
   const { state, removeFromCart, updateQuantity, getTotalPrice } = useCart();
   const { formatPrice } = useCurrency();
   const [postalCode, setPostalCode] = useState("");
   const [estimatedShipping, setEstimatedShipping] = useState<number | null>(null);
+  const t = useTranslations("Cart");
 
   const cartSteps = [
-    { id: "cart", title: "Carrito", description: "Revisa tus productos" },
-    { id: "info", title: "Información", description: "Datos de contacto y envío" },
-    { id: "payment", title: "Pago", description: "Método de pago" },
+    { id: "cart", title: t("steps.cart.title"), description: t("steps.cart.description") },
+    { id: "info", title: t("steps.info.title"), description: t("steps.info.description") },
+    { id: "payment", title: t("steps.payment.title"), description: t("steps.payment.description") },
   ];
 
   const subtotal = getTotalPrice();
@@ -30,13 +32,13 @@ export default function CartPage() {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="text-center">
-          <h1 className="text-2xl font-times-now mb-4">Tu carrito está vacío</h1>
+          <h1 className="text-2xl font-times-now mb-4">{t("empty")}</h1>
           <p className="text-gray-600 font-univers mb-8">
-            Agrega algunos productos para comenzar
+            {t("emptyDescription")}
           </p>
           <Link href="/products">
             <Button className="bg-black text-white hover:bg-gray-800">
-              Explorar productos
+              {t("exploreProducts")}
             </Button>
           </Link>
         </div>
@@ -63,7 +65,7 @@ export default function CartPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="container mx-auto px-4 max-w-6xl">
-        <h1 className="text-3xl font-times-now mb-8">Carrito de compras</h1>
+        <h1 className="text-3xl font-times-now mb-8">{t("pageTitle")}</h1>
 
         {/* Progress Steps */}
         <div className="mb-8">
@@ -100,7 +102,7 @@ export default function CartPage() {
                       <div>
                         <h3 className="font-univers font-medium">{item.name}</h3>
                         <p className="text-sm text-gray-600 font-univers">
-                          Por {item.vendorName}
+                          {t("by")} {item.vendorName}
                         </p>
                       </div>
                       <button
@@ -145,22 +147,22 @@ export default function CartPage() {
           {/* Order Summary */}
           <div>
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-lg font-univers mb-4">Resumen del pedido</h2>
+              <h2 className="text-lg font-univers mb-4">{t("orderSummary")}</h2>
               
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm font-univers">
-                  <span>Subtotal</span>
+                  <span>{t("subtotal")}</span>
                   <span>{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm font-univers">
-                  <span>IVA (16%)</span>
+                  <span>{t("tax")}</span>
                   <span>{formatPrice(tax)}</span>
                 </div>
                 <div className="flex justify-between text-sm font-univers">
-                  <span>Envío</span>
+                  <span>{t("shipping")}</span>
                   <span>
                     {shipping === 0 ? (
-                      <span className="text-green-600">Gratis</span>
+                      <span className="text-green-600">{t("freeShipping")}</span>
                     ) : (
                       formatPrice(shipping)
                     )}
@@ -172,12 +174,12 @@ export default function CartPage() {
               <div className="mb-4 space-y-2">
                 <label className="text-sm font-univers text-gray-600 flex items-center gap-1">
                   <MapPin className="h-4 w-4" />
-                  Calcula tu envío
+                  {t("calculateShipping")}
                 </label>
                 <div className="flex gap-2">
                   <Input
                     type="text"
-                    placeholder="Código postal"
+                    placeholder={t("postalCode")}
                     value={postalCode}
                     onChange={(e) => {
                       const value = e.target.value.replace(/\D/g, '').slice(0, 5);
@@ -196,17 +198,17 @@ export default function CartPage() {
                     onClick={() => setEstimatedShipping(getShippingEstimate())}
                     disabled={postalCode.length !== 5}
                   >
-                    Calcular
+                    {t("calculate")}
                   </Button>
                 </div>
                 {postalCode.length === 5 && !getStateFromPostalCode(postalCode) && (
-                  <p className="text-xs text-red-600">Código postal inválido</p>
+                  <p className="text-xs text-red-600">{t("invalidPostalCode")}</p>
                 )}
               </div>
 
               <div className="border-t pt-4 mb-6">
                 <div className="flex justify-between font-univers">
-                  <span className="font-medium">Total</span>
+                  <span className="font-medium">{t("total")}</span>
                   <span className="font-medium text-lg">
                     {formatPrice(total)}
                   </span>
@@ -215,19 +217,19 @@ export default function CartPage() {
 
               <Link href="/checkout" className="block">
                 <Button className="w-full bg-black text-white hover:bg-gray-800">
-                  Proceder al pago
+                  {t("checkout")}
                 </Button>
               </Link>
 
               <p className="text-xs text-center text-gray-500 font-univers mt-4">
-                Envío gratis en compras superiores a {formatPrice(1000)}
+                {t("freeShippingThreshold", { amount: formatPrice(1000) })}
               </p>
             </div>
 
             {/* Security Info */}
             <div className="mt-4 p-4 bg-gray-100 rounded-lg">
               <p className="text-xs font-univers text-gray-600 text-center">
-                🔒 Pago seguro con Stripe
+                {t("securePayment")}
               </p>
             </div>
           </div>

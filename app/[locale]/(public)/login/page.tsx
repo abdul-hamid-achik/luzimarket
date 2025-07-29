@@ -14,11 +14,11 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, CheckCircle } from "lucide-react";
 import Link from "next/link";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
-const loginSchema = z.object({
-  email: z.string().email("Correo electrónico inválido"),
-  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+const createLoginSchema = (t: any) => z.object({
+  email: z.string().email(t("validation.invalidEmail")),
+  password: z.string().min(6, t("validation.passwordMinLength")),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
@@ -28,24 +28,28 @@ export default function LoginPage() {
   const nextRouter = useNextRouter();
   const searchParams = useSearchParams();
   const locale = useLocale();
+  const t = useTranslations("LoginPage");
+  const tAuth = useTranslations("Auth");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  
+  const loginSchema = createLoginSchema(t);
 
   useEffect(() => {
     // Check for verification success
     if (searchParams.get("verified") === "true") {
-      setSuccessMessage("\u00a1Tu correo electr\u00f3nico ha sido verificado exitosamente! Ahora puedes iniciar sesi\u00f3n.");
+      setSuccessMessage(t("emailVerifiedSuccess"));
     }
 
     // Check for error messages
     const errorParam = searchParams.get("error");
     if (errorParam === "invalid-token") {
-      setError("El enlace de verificaci\u00f3n es inv\u00e1lido.");
+      setError(t("errors.invalidToken"));
     } else if (errorParam === "expired-token") {
-      setError("El enlace de verificaci\u00f3n ha expirado. Por favor reg\u00edstrate nuevamente.");
+      setError(t("errors.expiredToken"));
     } else if (errorParam === "verification-failed") {
-      setError("Error al verificar tu correo electr\u00f3nico. Por favor int\u00e9ntalo de nuevo.");
+      setError(t("errors.verificationFailed"));
     }
   }, [searchParams]);
 
@@ -72,11 +76,11 @@ export default function LoginPage() {
 
       if (!authResult.success) {
         if (authResult.isLocked) {
-          setError(authResult.error || "Cuenta bloqueada temporalmente");
+          setError(authResult.error || tAuth("accountLocked", { minutes: 30 }));
         } else if (authResult.remainingAttempts !== undefined && authResult.remainingAttempts < 3) {
-          setError(`Credenciales inválidas. ${authResult.remainingAttempts} intentos restantes antes del bloqueo.`);
+          setError(tAuth("remainingAttempts", { attempts: authResult.remainingAttempts }));
         } else {
-          setError(authResult.error || "Credenciales inválidas");
+          setError(authResult.error || tAuth("invalidCredentials"));
         }
         return;
       }
@@ -90,7 +94,7 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        setError("Error al iniciar sesión");
+        setError(tAuth("loginError"));
       } else {
         // Redirect based on user type
         switch (userType) {
@@ -105,7 +109,7 @@ export default function LoginPage() {
         }
       }
     } catch (error) {
-      setError("Error al iniciar sesión");
+      setError(tAuth("loginError"));
     } finally {
       setIsLoading(false);
     }
@@ -117,7 +121,7 @@ export default function LoginPage() {
         <div className="text-center">
           <h1 className="text-3xl font-times-now">LUZIMARKET</h1>
           <p className="mt-2 text-sm text-gray-600 font-univers">
-            Inicia sesión en tu cuenta
+            {t("subtitle")}
           </p>
         </div>
 
@@ -132,16 +136,16 @@ export default function LoginPage() {
 
         <Tabs defaultValue="customer" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="customer" className="font-univers text-sm">Cliente</TabsTrigger>
-            <TabsTrigger value="vendor" className="font-univers text-sm">Vendedor</TabsTrigger>
-            <TabsTrigger value="admin" className="font-univers text-sm">Admin</TabsTrigger>
+            <TabsTrigger value="customer" className="font-univers text-sm">{t("tabs.customer")}</TabsTrigger>
+            <TabsTrigger value="vendor" className="font-univers text-sm">{t("tabs.vendor")}</TabsTrigger>
+            <TabsTrigger value="admin" className="font-univers text-sm">{t("tabs.admin")}</TabsTrigger>
           </TabsList>
 
           {/* Customer Login */}
           <TabsContent value="customer">
             <form onSubmit={customerForm.handleSubmit((data) => handleLogin(data, "customer"))} className="space-y-4">
               <div>
-                <Label htmlFor="customer-email">Correo electrónico</Label>
+                <Label htmlFor="customer-email">{t("fields.email")}</Label>
                 <Input
                   id="customer-email"
                   type="email"
@@ -154,7 +158,7 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <Label htmlFor="customer-password">Contraseña</Label>
+                <Label htmlFor="customer-password">{t("fields.password")}</Label>
                 <Input
                   id="customer-password"
                   type="password"
@@ -175,7 +179,7 @@ export default function LoginPage() {
                   {error.includes("verifica tu correo electrónico") && (
                     <div className="mt-2">
                       <Link href="/resend-verification" className="text-sm text-blue-600 hover:text-blue-800 underline">
-                        ¿No recibiste el correo? Reenviar enlace de verificación
+                        {t("resendVerificationLink")}
                       </Link>
                     </div>
                   )}
@@ -190,19 +194,19 @@ export default function LoginPage() {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Iniciando sesión...
+                    {t("loggingIn")}
                   </>
                 ) : (
-                  "Iniciar sesión"
+                  t("loginButton")
                 )}
               </Button>
 
               <div className="text-center space-y-2">
                 <Link href="/register" className="text-sm text-gray-600 hover:text-black font-univers block">
-                  ¿No tienes cuenta? Regístrate
+                  {t("noAccount")}
                 </Link>
                 <Link href="/forgot-password" className="text-sm text-gray-600 hover:text-black font-univers block">
-                  ¿Olvidaste tu contraseña?
+                  {t("forgotPassword")}
                 </Link>
               </div>
             </form>
@@ -212,7 +216,7 @@ export default function LoginPage() {
           <TabsContent value="vendor">
             <form onSubmit={vendorForm.handleSubmit((data) => handleLogin(data, "vendor"))} className="space-y-4">
               <div>
-                <Label htmlFor="vendor-email">Correo electrónico</Label>
+                <Label htmlFor="vendor-email">{t("fields.email")}</Label>
                 <Input
                   id="vendor-email"
                   type="email"
@@ -225,7 +229,7 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <Label htmlFor="vendor-password">Contraseña</Label>
+                <Label htmlFor="vendor-password">{t("fields.password")}</Label>
                 <Input
                   id="vendor-password"
                   type="password"
@@ -254,19 +258,19 @@ export default function LoginPage() {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Iniciando sesión...
+                    {t("loggingIn")}
                   </>
                 ) : (
-                  "Iniciar sesión"
+                  t("loginButton")
                 )}
               </Button>
 
               <div className="text-center space-y-2">
                 <Link href="/vendor/register" className="text-sm text-gray-600 hover:text-black font-univers block">
-                  ¿Quieres ser vendedor? Regístrate
+                  {t("wantToBeVendor")}
                 </Link>
                 <Link href="/forgot-password" className="text-sm text-gray-600 hover:text-black font-univers block">
-                  ¿Olvidaste tu contraseña?
+                  {t("forgotPassword")}
                 </Link>
               </div>
             </form>
@@ -276,7 +280,7 @@ export default function LoginPage() {
           <TabsContent value="admin">
             <form onSubmit={adminForm.handleSubmit((data) => handleLogin(data, "admin"))} className="space-y-4">
               <div>
-                <Label htmlFor="admin-email">Correo electrónico</Label>
+                <Label htmlFor="admin-email">{t("fields.email")}</Label>
                 <Input
                   id="admin-email"
                   type="email"
@@ -289,7 +293,7 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <Label htmlFor="admin-password">Contraseña</Label>
+                <Label htmlFor="admin-password">{t("fields.password")}</Label>
                 <Input
                   id="admin-password"
                   type="password"
@@ -318,16 +322,16 @@ export default function LoginPage() {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Iniciando sesión...
+                    {t("loggingIn")}
                   </>
                 ) : (
-                  "Iniciar sesión"
+                  t("loginButton")
                 )}
               </Button>
 
               <div className="text-center">
                 <Link href="/forgot-password" className="text-sm text-gray-600 hover:text-black font-univers">
-                  ¿Olvidaste tu contraseña?
+                  {t("forgotPassword")}
                 </Link>
               </div>
             </form>

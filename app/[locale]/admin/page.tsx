@@ -108,7 +108,7 @@ export default async function AdminDashboard() {
 
   const statsCards = [
     {
-      title: "Ingresos Totales",
+      title: t("totalRevenue"),
       value: `$${stats.totalRevenue.toLocaleString('es-MX')}`,
       change: "+12.5%",
       trend: "up",
@@ -117,7 +117,7 @@ export default async function AdminDashboard() {
       bgColor: "bg-green-50"
     },
     {
-      title: "Órdenes Totales",
+      title: t("totalOrders"),
       value: stats.totalOrders.toString(),
       change: "+8.2%",
       trend: "up",
@@ -126,7 +126,7 @@ export default async function AdminDashboard() {
       bgColor: "bg-blue-50"
     },
     {
-      title: "Productos Activos",
+      title: t("activeProducts"),
       value: stats.totalProducts.toString(),
       change: "+3.7%",
       trend: "up",
@@ -135,7 +135,7 @@ export default async function AdminDashboard() {
       bgColor: "bg-purple-50"
     },
     {
-      title: "Vendedores Activos",
+      title: t("activeVendors"),
       value: stats.totalVendors.toString(),
       change: "-2.1%",
       trend: "down",

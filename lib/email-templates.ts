@@ -45,7 +45,7 @@ export async function generateVendorNewOrderEmail(data: OrderEmailData): Promise
 
   const html = `
     <h2>${t('newOrderTitle')}</h2>
-    <p>${t('newOrderGreeting', { businessName: data.order.vendor.businessName })}</p>
+    <p>${t('newOrderGreeting', { businessName: data.order.vendor?.businessName || 'Vendor' })}</p>
     <p>${t('newOrderMessage')}</p>
     
     <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
@@ -72,10 +72,10 @@ export async function generateVendorNewOrderEmail(data: OrderEmailData): Promise
     <h3>${t('shippingTitle')}</h3>
     <div style="background-color: #e3f2fd; padding: 15px; border-radius: 8px; border-left: 4px solid #2196f3;">
       <p style="margin: 0;">
-        ${data.order.shippingAddress.street}<br>
-        ${data.order.shippingAddress.city}, ${data.order.shippingAddress.state}<br>
-        ${locale === 'es' ? 'C.P.' : 'ZIP'} ${data.order.shippingAddress.postalCode}<br>
-        ${data.order.shippingAddress.country}
+        ${data.order.shippingAddress?.street || ''}<br>
+        ${data.order.shippingAddress?.city || ''}, ${data.order.shippingAddress?.state || ''}<br>
+        ${locale === 'es' ? 'C.P.' : 'ZIP'} ${data.order.shippingAddress?.postalCode || ''}<br>
+        ${data.order.shippingAddress?.country || ''}
       </p>
     </div>
     
@@ -118,7 +118,7 @@ export async function generateCustomerConfirmationEmail(data: OrderEmailData): P
       <h3>${t('orderSummaryTitle')}</h3>
       <table style="width: 100%; border-collapse: collapse;">
         <tr><td><strong>${t('../Vendor.orderManagement.orderNumber')}</strong></td><td>${data.order.orderNumber}</td></tr>
-        <tr><td><strong>${t('vendor')}</strong></td><td>${data.order.vendor.businessName}</td></tr>
+        <tr><td><strong>${t('vendor')}</strong></td><td>${data.order.vendor?.businessName || 'Vendor'}</td></tr>
         <tr><td><strong>${t('subtotal')}</strong></td><td>$${Number(data.order.subtotal).toLocaleString(locale === 'es' ? 'es-MX' : 'en-US', { minimumFractionDigits: 2 })} ${data.order.currency}</td></tr>
         <tr><td><strong>${t('tax')}</strong></td><td>$${Number(data.order.tax).toLocaleString(locale === 'es' ? 'es-MX' : 'en-US', { minimumFractionDigits: 2 })} ${data.order.currency}</td></tr>
         <tr><td><strong>${t('shipping')}</strong></td><td>$${Number(data.order.shipping).toLocaleString(locale === 'es' ? 'es-MX' : 'en-US', { minimumFractionDigits: 2 })} ${data.order.currency}</td></tr>
@@ -175,7 +175,7 @@ export async function generateShippingNotificationEmail(data: OrderEmailData): P
     <p>${t('confirmationGreeting', { customerName: data.order.user?.name || 'Cliente' })}</p>
     <p>${t('shippingMessage', { 
       orderNumber: data.order.orderNumber, 
-      vendorName: data.order.vendor.businessName 
+      vendorName: data.order.vendor?.businessName || 'Vendor' 
     })}</p>
     
     <div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2196f3;">

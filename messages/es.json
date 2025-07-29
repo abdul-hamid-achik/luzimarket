@@ -43,7 +43,9 @@
     "myOrders": "Mis pedidos",
     "trackOrder": "Rastrear pedido",
     "user": "Usuario",
-    "clearSearch": "Limpiar búsqueda"
+    "clearSearch": "Limpiar búsqueda",
+    "inWishlist": "En lista de deseos",
+    "addToWishlist": "Agregar a lista"
   },
   "Navigation": {
     "home": "Inicio",
@@ -173,6 +175,76 @@
     "accountLockedEmailReset": "Si olvidaste tu contraseña, puedes restablecerla aquí:",
     "resetPassword": "Restablecer contraseña"
   },
+  "LoginPage": {
+    "subtitle": "Inicia sesión en tu cuenta",
+    "tabs": {
+      "customer": "Cliente",
+      "vendor": "Vendedor",
+      "admin": "Admin"
+    },
+    "fields": {
+      "email": "Correo electrónico",
+      "password": "Contraseña"
+    },
+    "loginButton": "Iniciar sesión",
+    "loggingIn": "Iniciando sesión...",
+    "noAccount": "¿No tienes cuenta? Regístrate",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "wantToBeVendor": "¿Quieres ser vendedor? Regístrate",
+    "resendVerificationLink": "¿No recibiste el correo? Reenviar enlace de verificación",
+    "emailVerifiedSuccess": "¡Tu correo electrónico ha sido verificado exitosamente! Ahora puedes iniciar sesión.",
+    "errors": {
+      "invalidToken": "El enlace de verificación es inválido.",
+      "expiredToken": "El enlace de verificación ha expirado. Por favor regístrate nuevamente.",
+      "verificationFailed": "Error al verificar tu correo electrónico. Por favor inténtalo de nuevo."
+    },
+    "validation": {
+      "invalidEmail": "Correo electrónico inválido",
+      "passwordMinLength": "La contraseña debe tener al menos 6 caracteres"
+    }
+  },
+  "RegisterPage": {
+    "subtitle": "Crea tu cuenta",
+    "description": "Únete a nuestra comunidad de regalos extraordinarios",
+    "fields": {
+      "fullName": "Nombre completo",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar contraseña"
+    },
+    "placeholders": {
+      "fullName": "Tu nombre completo",
+      "email": "tu@email.com",
+      "password": "Mínimo 6 caracteres",
+      "confirmPassword": "Repite tu contraseña"
+    },
+    "terms": {
+      "accept": "Acepto los",
+      "termsAndConditions": "términos y condiciones",
+      "and": "y la",
+      "privacyPolicy": "política de privacidad"
+    },
+    "createAccount": "Crear cuenta",
+    "creatingAccount": "Creando cuenta...",
+    "alreadyHaveAccount": "¿Ya tienes cuenta? Inicia sesión",
+    "validation": {
+      "nameMinLength": "El nombre debe tener al menos 2 caracteres",
+      "invalidEmail": "Correo electrónico inválido",
+      "passwordMinLength": "La contraseña debe tener al menos 6 caracteres",
+      "passwordsDoNotMatch": "Las contraseñas no coinciden",
+      "acceptTerms": "Debes aceptar los términos y condiciones"
+    },
+    "errors": {
+      "accountCreationError": "Error al crear la cuenta",
+      "connectionError": "Error de conexión. Inténtalo de nuevo."
+    },
+    "success": {
+      "title": "¡Verifica tu correo electrónico!",
+      "message": "Hemos enviado un enlace de verificación a tu correo electrónico.",
+      "checkEmail": "Por favor revisa tu bandeja de entrada y haz clic en el enlace para activar tu cuenta.",
+      "backToLogin": "Volver al inicio de sesión"
+    }
+  },
   "ComingSoon": {
     "title": "Handpicked extraordinary gifts",
     "description": "LUZIMARKET® es una nueva plataforma online que ofrece curaduría, venta y envío a domicilio de regalos excepcionales para momentos especiales, con un catálogo de marcas y tiendas seleccionadas en todo México.",
@@ -210,6 +282,31 @@
       "addedSuccessDescriptionMultiple": "{count} unidades de {productName} se agregaron exitosamente. ¡Excelente elección!",
       "addError": "❌ Error al agregar",
       "addErrorDescription": "No pudimos agregar el producto al carrito. Por favor, intenta de nuevo o contacta a soporte."
+    },
+    "pageTitle": "Carrito de compras",
+    "emptyDescription": "Agrega algunos productos para comenzar",
+    "exploreProducts": "Explorar productos",
+    "orderSummary": "Resumen del pedido",
+    "freeShipping": "Gratis",
+    "calculateShipping": "Calcula tu envío",
+    "postalCode": "Código postal",
+    "calculate": "Calcular",
+    "invalidPostalCode": "Código postal inválido",
+    "freeShippingThreshold": "Envío gratis en compras superiores a {amount}",
+    "securePayment": "🔒 Pago seguro con Stripe",
+    "steps": {
+      "cart": {
+        "title": "Carrito",
+        "description": "Revisa tus productos"
+      },
+      "info": {
+        "title": "Información",
+        "description": "Datos de contacto y envío"
+      },
+      "payment": {
+        "title": "Pago",
+        "description": "Método de pago"
+      }
     }
   },
   "Checkout": {
