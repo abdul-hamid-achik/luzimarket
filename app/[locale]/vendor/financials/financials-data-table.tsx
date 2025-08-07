@@ -53,6 +53,7 @@ interface FinancialsDataTableProps {
 
 export function FinancialsDataTable({ transactions, payouts }: FinancialsDataTableProps) {
   const t = useTranslations("vendor.financials");
+  const tCommon = useTranslations("Common.dataTable");
   const [activeTab, setActiveTab] = useState<"transactions" | "payouts">("transactions");
 
   const formatCurrency = (amount: string | number) => {
@@ -126,7 +127,7 @@ export function FinancialsDataTable({ transactions, payouts }: FinancialsDataTab
           <div>
             <p className="font-medium">{description}</p>
             {orderId && (
-              <p className="text-sm text-muted-foreground">Orden: {orderId}</p>
+              <p className="text-sm text-muted-foreground">{t("transactions.order")}: {orderId}</p>
             )}
           </div>
         );
@@ -171,22 +172,22 @@ export function FinancialsDataTable({ transactions, payouts }: FinancialsDataTab
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Abrir menú</span>
+                <span className="sr-only">{t("transactions.actions.openMenu")}</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+              <DropdownMenuLabel>{t("transactions.actions.title")}</DropdownMenuLabel>
               <DropdownMenuItem
                 onClick={() => navigator.clipboard.writeText(transaction.id)}
               >
-                Copiar ID de transacción
+                {t("transactions.actions.copyTransactionId")}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               {transaction.orderId && (
-                <DropdownMenuItem>Ver orden</DropdownMenuItem>
+                <DropdownMenuItem>{t("transactions.actions.viewOrder")}</DropdownMenuItem>
               )}
-              <DropdownMenuItem>Ver detalles</DropdownMenuItem>
+              <DropdownMenuItem>{t("transactions.actions.viewDetails")}</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -257,20 +258,20 @@ export function FinancialsDataTable({ transactions, payouts }: FinancialsDataTab
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Abrir menú</span>
+                <span className="sr-only">{t("payouts.actions.openMenu")}</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+              <DropdownMenuLabel>{t("payouts.actions.title")}</DropdownMenuLabel>
               <DropdownMenuItem
                 onClick={() => navigator.clipboard.writeText(payout.id)}
               >
-                Copiar ID de pago
+                {t("payouts.actions.copyPayoutId")}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Ver detalles</DropdownMenuItem>
-              <DropdownMenuItem>Descargar recibo</DropdownMenuItem>
+              <DropdownMenuItem>{t("payouts.actions.viewDetails")}</DropdownMenuItem>
+              <DropdownMenuItem>{t("payouts.actions.downloadReceipt")}</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -304,6 +305,13 @@ export function FinancialsDataTable({ transactions, payouts }: FinancialsDataTab
           searchKey="description"
           searchPlaceholder={t("transactions.searchPlaceholder")}
           pageSize={10}
+          translations={{
+            columns: tCommon("columns"),
+            noResults: tCommon("noResults"),
+            rowsSelected: tCommon("rowsSelected"),
+            previous: tCommon("previous"),
+            next: tCommon("next"),
+          }}
         />
       ) : (
         <DataTable
@@ -312,6 +320,13 @@ export function FinancialsDataTable({ transactions, payouts }: FinancialsDataTab
           searchKey="reference"
           searchPlaceholder={t("payouts.searchPlaceholder")}
           pageSize={10}
+          translations={{
+            columns: tCommon("columns"),
+            noResults: tCommon("noResults"),
+            rowsSelected: tCommon("rowsSelected"),
+            previous: tCommon("previous"),
+            next: tCommon("next"),
+          }}
         />
       )}
 

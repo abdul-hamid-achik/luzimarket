@@ -8,9 +8,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit, Eye, EyeOff } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 export default async function VendorProductsPage() {
   const session = await auth();
+  const t = await getTranslations("vendor.products");
   
   if (!session || session.user.role !== "vendor") {
     redirect("/login");
@@ -36,15 +38,15 @@ export default async function VendorProductsPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-univers text-gray-900">Mis Productos</h1>
+          <h1 className="text-2xl font-univers text-gray-900">{t("title")}</h1>
           <p className="text-sm text-gray-600 font-univers mt-1">
-            Administra tu catálogo de productos
+            {t("description")}
           </p>
         </div>
         <Link href="/vendor/products/new">
           <Button className="bg-black text-white hover:bg-gray-800">
             <Plus className="h-4 w-4 mr-2" />
-            Agregar Producto
+            {t("addProduct")}
           </Button>
         </Link>
       </div>
@@ -138,7 +140,7 @@ export default async function VendorProductsPage() {
                           <span className={`mr-1.5 h-2 w-2 rounded-full ${
                             product.isActive ? 'bg-green-400' : 'bg-gray-400'
                           }`} />
-                          {product.isActive ? 'Activo' : 'Inactivo'}
+                          {product.isActive ? t("active") : t("inactive")}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-univers">

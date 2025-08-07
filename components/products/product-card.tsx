@@ -155,7 +155,7 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
         <h3 className="font-univers text-sm font-medium" data-testid="product-name">
           {product.name}
         </h3>
-        {product.vendor && (
+        {product.vendor?.businessName && (
           <p className="text-xs text-gray-500 font-univers" data-testid="vendor-name">
             + {product.vendor.businessName.toUpperCase()}
           </p>

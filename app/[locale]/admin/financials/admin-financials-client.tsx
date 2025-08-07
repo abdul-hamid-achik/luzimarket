@@ -53,6 +53,7 @@ export function AdminFinancialsClient({
   payouts,
 }: AdminFinancialsClientProps) {
   const t = useTranslations("admin.financials");
+  const tCommon = useTranslations("Common.dataTable");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const formatCurrency = (amount: string | number) => {
@@ -434,6 +435,13 @@ export function AdminFinancialsClient({
                 data={vendorBalances}
                 searchKey="vendorName"
                 searchPlaceholder={t("vendors.search")}
+                translations={{
+                  columns: tCommon("columns"),
+                  noResults: tCommon("noResults"),
+                  rowsSelected: tCommon("rowsSelected"),
+                  previous: tCommon("previous"),
+                  next: tCommon("next"),
+                }}
               />
             </CardContent>
           </Card>
@@ -450,6 +458,13 @@ export function AdminFinancialsClient({
                 columns={platformFeeColumns}
                 data={platformFees}
                 pageSize={20}
+                translations={{
+                  columns: tCommon("columns"),
+                  noResults: tCommon("noResults"),
+                  rowsSelected: tCommon("rowsSelected"),
+                  previous: tCommon("previous"),
+                  next: tCommon("next"),
+                }}
               />
             </CardContent>
           </Card>
@@ -466,6 +481,13 @@ export function AdminFinancialsClient({
                 columns={payoutColumns}
                 data={payouts}
                 pageSize={20}
+                translations={{
+                  columns: tCommon("columns"),
+                  noResults: tCommon("noResults"),
+                  rowsSelected: tCommon("rowsSelected"),
+                  previous: tCommon("previous"),
+                  next: tCommon("next"),
+                }}
               />
             </CardContent>
           </Card>

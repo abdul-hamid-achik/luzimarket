@@ -40,6 +40,13 @@ interface DataTableProps<TData, TValue> {
   showColumnToggle?: boolean;
   showPagination?: boolean;
   pageSize?: number;
+  translations?: {
+    columns?: string;
+    noResults?: string;
+    rowsSelected?: string;
+    previous?: string;
+    next?: string;
+  };
 }
 
 export function DataTable<TData, TValue>({
@@ -50,7 +57,16 @@ export function DataTable<TData, TValue>({
   showColumnToggle = true,
   showPagination = true,
   pageSize = 10,
+  translations = {},
 }: DataTableProps<TData, TValue>) {
+  // Default translations
+  const t = {
+    columns: translations.columns || "Columns",
+    noResults: translations.noResults || "No results.",
+    rowsSelected: translations.rowsSelected || "{selected} of {total} row(s) selected.",
+    previous: translations.previous || "Previous",
+    next: translations.next || "Next",
+  };
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -97,7 +113,7 @@ export function DataTable<TData, TValue>({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-auto">
-                Columnas <ChevronDown className="ml-2 h-4 w-4" />
+                {t.columns} <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -159,7 +175,7 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No hay resultados.
+                  {t.noResults}
                 </TableCell>
               </TableRow>
             )}
@@ -169,8 +185,9 @@ export function DataTable<TData, TValue>({
       {showPagination && (
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="flex-1 text-sm text-muted-foreground">
-            {table.getFilteredSelectedRowModel().rows.length} de{" "}
-            {table.getFilteredRowModel().rows.length} fila(s) seleccionada(s).
+            {t.rowsSelected
+              .replace("{selected}", table.getFilteredSelectedRowModel().rows.length.toString())
+              .replace("{total}", table.getFilteredRowModel().rows.length.toString())}
           </div>
           <div className="space-x-2">
             <Button
@@ -179,7 +196,7 @@ export function DataTable<TData, TValue>({
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
-              Anterior
+              {t.previous}
             </Button>
             <Button
               variant="outline"
@@ -187,7 +204,7 @@ export function DataTable<TData, TValue>({
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              Siguiente
+              {t.next}
             </Button>
           </div>
         </div>

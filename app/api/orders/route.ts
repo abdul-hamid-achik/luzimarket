@@ -40,9 +40,23 @@ export async function GET(request: NextRequest) {
     const { search, status, from, to, page, limit } = validationResult.data;
     const offset = (page - 1) * limit;
     const userId = session.user.id;
+    const userEmail = session.user.email;
 
-    // Build where conditions
-    let whereConditions = [eq(orders.userId, userId)];
+    // Build where conditions based on user role
+    let whereConditions = [];
+    
+    if (session.user.role === 'customer' && userId) {
+      // For customers, check both userId and email
+      whereConditions.push(
+        sql`(${orders.userId} = ${userId} OR ${orders.guestEmail} = ${userEmail})`
+      );
+    } else if (userEmail) {
+      // For vendors or users without userId, only check by email
+      whereConditions.push(eq(orders.guestEmail, userEmail));
+    } else {
+      // Fallback - should not happen but prevents empty results
+      whereConditions.push(sql`1 = 0`);
+    }
 
     if (search) {
       whereConditions.push(ilike(orders.orderNumber, `%${search}%`));

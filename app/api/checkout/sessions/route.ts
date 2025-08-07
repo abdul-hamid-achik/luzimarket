@@ -5,9 +5,13 @@ import { db } from "@/db";
 import { orders, orderItems, vendorStripeAccounts, platformFees } from "@/db/schema";
 import { eq, inArray } from "drizzle-orm";
 import { generateOrderNumber } from "@/lib/utils/order-id";
+import { auth } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
+    // Get the session to check if user is logged in
+    const session = await auth();
+    
     const body = await request.json();
     const { items, shippingAddress, billingAddress, isGuest, selectedShipping } = body;
 
@@ -171,17 +175,20 @@ export async function POST(request: NextRequest) {
       const commissionRate = stripeAccount?.commissionRate ? parseFloat(stripeAccount.commissionRate) : 15;
       const platformFeeAmount = vendorSubtotal * (commissionRate / 100);
 
-      const [order] = await db.insert(orders).values({
+      // Ensure decimal values are properly formatted
+      const orderData = {
         orderNumber: orderNumber,
         vendorId: vendorId,
-        status: "pending",
-        subtotal: vendorSubtotal.toString(),
-        tax: vendorTax.toString(),
-        shipping: vendorShipping.toString(),
-        total: vendorTotal.toString(),
+        status: "pending" as const,
+        subtotal: vendorSubtotal.toFixed(2),
+        tax: vendorTax.toFixed(2),
+        shipping: vendorShipping.toFixed(2),
+        total: vendorTotal.toFixed(2),
         currency: "MXN",
-        // Guest order fields
-        ...(isGuest ? {
+        // Set userId if user is logged in (only for customers who have records in users table)
+        ...(session?.user?.id && session.user.role === 'customer' ? { userId: session.user.id } : {}),
+        // Guest order fields (for guest users, vendors, or admins placing orders)
+        ...((isGuest && !session?.user) || session?.user?.role === 'vendor' || session?.user?.role === 'admin' ? {
           guestEmail: shippingAddress.email,
           guestName: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
           guestPhone: shippingAddress.phone,
@@ -200,15 +207,17 @@ export async function POST(request: NextRequest) {
           postalCode: billingAddress.postalCode,
           country: 'MX',
         } : null,
-      }).returning({ id: orders.id });
+      };
+
+      const [order] = await db.insert(orders).values(orderData).returning({ id: orders.id });
 
       // Create order items
       const orderItemsData = (vendorItems as any[]).map(item => ({
         orderId: order.id,
         productId: item.id,
         quantity: item.quantity,
-        price: item.price.toString(),
-        total: (item.price * item.quantity).toString(),
+        price: item.price.toFixed(2),
+        total: (item.price * item.quantity).toFixed(2),
       }));
 
       await db.insert(orderItems).values(orderItemsData);
@@ -229,10 +238,10 @@ export async function POST(request: NextRequest) {
         await db.insert(platformFees).values({
           orderId: order.id,
           vendorId: vendorId,
-          orderAmount: vendorTotal.toString(),
-          feePercentage: commissionRate.toString(),
-          feeAmount: platformFeeAmount.toString(),
-          vendorEarnings: (vendorTotal - platformFeeAmount).toString(),
+          orderAmount: vendorTotal.toFixed(2),
+          feePercentage: commissionRate.toFixed(2),
+          feeAmount: platformFeeAmount.toFixed(2),
+          vendorEarnings: (vendorTotal - platformFeeAmount).toFixed(2),
           currency: "MXN",
           status: "pending",
         });

@@ -8,7 +8,7 @@ export async function GET() {
   try {
     const session = await auth();
     
-    if (!session || session.user.role !== "vendor") {
+    if (!session || session.user.role !== "vendor" || !session.user.vendor?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -29,7 +29,7 @@ export async function GET() {
       })
       .from(orders)
       .leftJoin(users, eq(orders.userId, users.id))
-      .where(eq(orders.vendorId, session.user.id))
+      .where(eq(orders.vendorId, session.user.vendor.id))
       .orderBy(desc(orders.createdAt));
 
     return NextResponse.json(vendorOrders);

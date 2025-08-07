@@ -45,7 +45,14 @@
     "user": "Usuario",
     "clearSearch": "Limpiar búsqueda",
     "inWishlist": "En lista de deseos",
-    "addToWishlist": "Agregar a lista"
+    "addToWishlist": "Agregar a lista",
+    "dataTable": {
+      "columns": "Columnas",
+      "noResults": "No hay resultados.",
+      "rowsSelected": "{selected} de {total} fila(s) seleccionada(s).",
+      "previous": "Anterior",
+      "next": "Siguiente"
+    }
   },
   "Navigation": {
     "home": "Inicio",
@@ -1362,6 +1369,21 @@
       "noStock": "Sin stock disponible",
       "outOfStock": "Sin stock",
       "viewFullDetails": "Ver detalles completos"
+    },
+    "reviews": {
+      "title": "Opiniones de clientes",
+      "review": "opinión",
+      "reviews": "opiniones",
+      "writeReview": "Escribir una opinión",
+      "cancel": "Cancelar",
+      "noReviews": "Aún no hay opiniones para este producto. ¡Sé el primero en opinar!",
+      "verifiedPurchase": "Compra verificada",
+      "helpful": "¿Te resultó útil?",
+      "yourRating": "Tu calificación",
+      "yourOpinion": "Tu opinión",
+      "submitReview": "Enviar opinión",
+      "submitting": "Enviando...",
+      "submitError": "Error al enviar tu opinión. Por favor intenta de nuevo."
     }
   },
   "Security": {
@@ -2330,6 +2352,13 @@
       }
     },
     "products": {
+      "title": "Mis Productos",
+      "description": "Administra tu catálogo de productos",
+      "addProduct": "Agregar Producto",
+      "noImage": "Sin imagen",
+      "stockItems": "{count} items",
+      "active": "Activo",
+      "inactive": "Inactivo",
       "new": {
         "validation": {
           "name": "El nombre debe tener al menos 3 caracteres",
@@ -2419,6 +2448,55 @@
         }
       }
     },
+    "financials": {
+      "tabs": {
+        "transactions": "Transacciones",
+        "payouts": "Pagos"
+      },
+      "status": {
+        "completed": "Completado",
+        "pending": "Pendiente",
+        "failed": "Fallido",
+        "processing": "Procesando",
+        "paid": "Pagado",
+        "inTransit": "En tránsito"
+      },
+      "transactions": {
+        "type": "Tipo",
+        "description": "Descripción",
+        "amount": "Monto",
+        "status": "Estado",
+        "date": "Fecha",
+        "searchPlaceholder": "Buscar transacciones...",
+        "order": "Orden",
+        "actions": {
+          "openMenu": "Abrir menú",
+          "title": "Acciones",
+          "copyTransactionId": "Copiar ID de transacción",
+          "viewOrder": "Ver orden",
+          "viewDetails": "Ver detalles"
+        }
+      },
+      "payouts": {
+        "date": "Fecha",
+        "amount": "Monto",
+        "method": "Método",
+        "status": "Estado",
+        "arrivalDate": "Fecha de llegada",
+        "bankAccount": "Cuenta bancaria",
+        "searchPlaceholder": "Buscar pagos...",
+        "actions": {
+          "openMenu": "Abrir menú",
+          "title": "Acciones",
+          "copyPayoutId": "Copiar ID de pago",
+          "viewDetails": "Ver detalles",
+          "downloadReceipt": "Descargar recibo"
+        }
+      },
+      "actions": {
+        "export": "Exportar"
+      }
+    },
     "shipping": {
       "toast": {
         "updateSuccess": "Configuración de envío actualizada",
@@ -2492,7 +2570,7 @@
     "subtitle": "Consulta el historial y estado de todos tus pedidos",
     "backToAccount": "Volver a Mi Cuenta",
     "exportOrders": "Exportar Pedidos",
-    "orderNumber": "Pedido #",
+    "orderNumber": "Pedido #{number}",
     "viewDetails": "Ver detalles",
     "view": "Ver",
     "track": "Rastrear",
@@ -2501,10 +2579,16 @@
     "item": "artículo",
     "items": "artículos",
     "moreItems": "más",
-    "noOrders": {
-      "title": "Aún no tienes pedidos",
-      "description": "Cuando realices tu primera compra, aparecerá aquí junto con la información de seguimiento.",
-      "startShopping": "Comenzar a Comprar"
+    "noOrders": "Aún no tienes pedidos",
+    "startShopping": "Comenzar a Comprar",
+    "unknownVendor": "Vendedor desconocido",
+    "status": {
+      "pending": "Pendiente",
+      "paid": "Pagado",
+      "processing": "Procesando",
+      "shipped": "Enviado",
+      "delivered": "Entregado",
+      "cancelled": "Cancelado"
     },
     "noResults": {
       "title": "No se encontraron pedidos",

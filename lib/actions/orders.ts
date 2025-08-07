@@ -287,21 +287,24 @@ async function handleStatusChangeNotifications(
  */
 async function sendVendorNewOrderNotification(order: OrderWithDetails): Promise<void> {
   try {
-    // TODO: Fix type compatibility issue with generateVendorNewOrderEmail
-    // const { subject, html } = await generateVendorNewOrderEmail({
-    //   order,
-    //   locale: 'es' // Default to Spanish for Mexican market
-    // });
-
-    // Temporary simple email notification
-    const subject = `Nueva orden #${order.orderNumber} - Luzimarket`;
-    const html = `
-      <h2>Nueva orden recibida</h2>
-      <p>Hola ${order.vendor.businessName},</p>
-      <p>Has recibido una nueva orden #${order.orderNumber}.</p>
-      <p>Total: $${order.total} ${order.currency}</p>
-      <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/vendor/orders/${order.id}">Ver detalles</a></p>
-    `;
+    const { subject, html } = await generateVendorNewOrderEmail({
+      order: {
+        ...order,
+        shippingAddress: order.shippingAddress || {
+          street: '',
+          city: '',
+          state: '',
+          postalCode: '',
+          country: ''
+        },
+        items: order.items.map(item => ({
+          product: { name: item.product.name },
+          quantity: item.quantity,
+          total: item.total
+        }))
+      },
+      locale: 'es' // Default to Spanish for Mexican market
+    });
 
     await sendEmail({
       to: order.vendor.email,
@@ -319,11 +322,39 @@ async function sendVendorNewOrderNotification(order: OrderWithDetails): Promise<
 async function sendCustomerOrderConfirmation(order: OrderWithDetails): Promise<void> {
   if (!order.user) return;
 
-  const itemsList = order.items.map(item => 
-    `- ${item.product.name} (Cantidad: ${item.quantity}) - $${item.total} MXN`
-  ).join('\n');
+  try {
+    const { subject, html } = await generateCustomerConfirmationEmail({
+      order: {
+        ...order,
+        shippingAddress: order.shippingAddress || {
+          street: '',
+          city: '',
+          state: '',
+          postalCode: '',
+          country: ''
+        },
+        items: order.items.map(item => ({
+          product: { name: item.product.name },
+          quantity: item.quantity,
+          total: item.total
+        }))
+      },
+      locale: 'es' // Default to Spanish for Mexican market
+    });
 
-  const emailContent = `
+    await sendEmail({
+      to: order.user.email,
+      subject,
+      html,
+    });
+  } catch (error) {
+    console.error('Error sending customer confirmation email:', error);
+    // Fallback to simple email if template fails
+    const itemsList = order.items.map(item => 
+      `- ${item.product.name} (Cantidad: ${item.quantity}) - $${item.total} MXN`
+    ).join('\n');
+    
+    const emailContent = `
     <h2>🎉 ¡Gracias por tu compra en Luzimarket!</h2>
     <p>Estimado(a) ${order.user.name},</p>
     <p>Tu orden ha sido confirmada exitosamente y está siendo procesada por nuestro vendedor. ¡Estamos emocionados de que hayas elegido productos únicos de México!</p>
@@ -371,11 +402,12 @@ async function sendCustomerOrderConfirmation(order: OrderWithDetails): Promise<v
     </p>
   `;
 
-  await sendEmail({
-    to: order.user.email,
-    subject: `Confirmación de orden #${order.orderNumber} - Luzimarket`,
-    html: emailContent,
-  });
+    await sendEmail({
+      to: order.user.email,
+      subject: `Confirmación de orden #${order.orderNumber} - Luzimarket`,
+      html: emailContent,
+    });
+  }
 }
 
 /**
@@ -384,11 +416,40 @@ async function sendCustomerOrderConfirmation(order: OrderWithDetails): Promise<v
 async function sendCustomerShippingNotification(order: OrderWithDetails, trackingNumber?: string): Promise<void> {
   if (!order.user) return;
 
-  const trackingInfo = trackingNumber 
-    ? `<p><strong>Número de rastreo:</strong> ${trackingNumber}</p>`
-    : '';
+  try {
+    const { subject, html } = await generateShippingNotificationEmail({
+      order: {
+        ...order,
+        shippingAddress: order.shippingAddress || {
+          street: '',
+          city: '',
+          state: '',
+          postalCode: '',
+          country: ''
+        },
+        items: order.items.map(item => ({
+          product: { name: item.product.name },
+          quantity: item.quantity,
+          total: item.total
+        }))
+      },
+      trackingNumber,
+      locale: 'es' // Default to Spanish for Mexican market
+    });
 
-  const emailContent = `
+    await sendEmail({
+      to: order.user.email,
+      subject,
+      html,
+    });
+  } catch (error) {
+    console.error('Error sending shipping notification email:', error);
+    // Fallback to simple email if template fails
+    const trackingInfo = trackingNumber 
+      ? `<p><strong>Número de rastreo:</strong> ${trackingNumber}</p>`
+      : '';
+
+    const emailContent = `
     <h2>📦 ¡Tu orden está en camino!</h2>
     <p>Estimado(a) ${order.user.name},</p>
     <p>¡Excelentes noticias! Tu orden #${order.orderNumber} ha sido enviada por <strong>${order.vendor.businessName}</strong> y está en camino hacia ti.</p>
@@ -423,11 +484,12 @@ async function sendCustomerShippingNotification(order: OrderWithDetails, trackin
     </p>
   `;
 
-  await sendEmail({
-    to: order.user.email,
-    subject: `Tu orden #${order.orderNumber} ha sido enviada - Luzimarket`,
-    html: emailContent,
-  });
+    await sendEmail({
+      to: order.user.email,
+      subject: `Tu orden #${order.orderNumber} ha sido enviada - Luzimarket`,
+      html: emailContent,
+    });
+  }
 }
 
 /**

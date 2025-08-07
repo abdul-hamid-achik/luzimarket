@@ -21,7 +21,10 @@ const createLoginSchema = (t: any) => z.object({
   password: z.string().min(6, t("validation.passwordMinLength")),
 });
 
-type LoginForm = z.infer<typeof loginSchema>;
+type LoginForm = {
+  email: string;
+  password: string;
+};
 
 export default function LoginPage() {
   const router = useRouter();
@@ -51,7 +54,7 @@ export default function LoginPage() {
     } else if (errorParam === "verification-failed") {
       setError(t("errors.verificationFailed"));
     }
-  }, [searchParams]);
+  }, [searchParams, t]);
 
   const customerForm = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Star, ThumbsUp, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -39,6 +40,7 @@ export function ProductReviews({
   ratingDistribution,
   canReview,
 }: ProductReviewsProps) {
+  const t = useTranslations("Products.reviews");
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [helpfulReviews, setHelpfulReviews] = useState<Set<string>>(new Set());
 
@@ -60,7 +62,7 @@ export function ProductReviews({
 
   return (
     <div className="mt-16">
-      <h2 className="text-2xl font-times-now mb-8">Opiniones de clientes</h2>
+      <h2 className="text-2xl font-times-now mb-8">{t("title")}</h2>
 
       {/* Rating Summary */}
       <div className="grid md:grid-cols-3 gap-8 mb-12">
@@ -82,7 +84,7 @@ export function ProductReviews({
             </div>
           </div>
           <p className="text-sm text-gray-600 font-univers">
-            {totalReviews} {totalReviews === 1 ? "opinión" : "opiniones"}
+            {totalReviews} {totalReviews === 1 ? t("review") : t("reviews")}
           </p>
         </div>
 
@@ -118,12 +120,12 @@ export function ProductReviews({
             {showReviewForm ? (
               <>
                 <ChevronUp className="h-4 w-4 mr-2" />
-                Cancelar
+                {t("cancel")}
               </>
             ) : (
               <>
                 <ChevronDown className="h-4 w-4 mr-2" />
-                Escribir una opinión
+                {t("writeReview")}
               </>
             )}
           </Button>
@@ -140,7 +142,7 @@ export function ProductReviews({
       <div className="space-y-6">
         {reviews.length === 0 ? (
           <p className="text-center text-gray-500 font-univers py-8">
-            Aún no hay opiniones para este producto. ¡Sé el primero en opinar!
+            {t("noReviews")}
           </p>
         ) : (
           reviews.map((review) => (
@@ -160,10 +162,10 @@ export function ProductReviews({
                         />
                       ))}
                     </div>
-                    <span className="font-univers font-medium">{review.user.name}</span>
+                    <span className="font-univers font-medium">{review.user?.name || "Anonymous"}</span>
                     {review.isVerifiedPurchase && (
                       <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded font-univers">
-                        Compra verificada
+                        {t("verifiedPurchase")}
                       </span>
                     )}
                   </div>
@@ -245,7 +247,7 @@ function ReviewForm({ productId, onSuccess }: { productId: string; onSuccess: ()
       }
     } catch (error) {
       console.error("Error submitting review:", error);
-      alert("Error al enviar tu opinión. Por favor intenta de nuevo.");
+      alert(t("submitError"));
     } finally {
       setIsSubmitting(false);
     }
@@ -255,7 +257,7 @@ function ReviewForm({ productId, onSuccess }: { productId: string; onSuccess: ()
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Rating Selection */}
       <div>
-        <label className="block text-sm font-univers mb-2">Tu calificación</label>
+        <label className="block text-sm font-univers mb-2">{t("yourRating")}</label>
         <div className="flex gap-2">
           {[1, 2, 3, 4, 5].map((star) => (
             <button
@@ -294,7 +296,7 @@ function ReviewForm({ productId, onSuccess }: { productId: string; onSuccess: ()
       {/* Comment */}
       <div>
         <label htmlFor="comment" className="block text-sm font-univers mb-2">
-          Tu opinión
+          {t("yourOpinion")}
         </label>
         <textarea
           id="comment"
@@ -313,7 +315,7 @@ function ReviewForm({ productId, onSuccess }: { productId: string; onSuccess: ()
         disabled={rating === 0 || isSubmitting}
         className="w-full bg-black text-white hover:bg-gray-800"
       >
-        {isSubmitting ? "Enviando..." : "Enviar opinión"}
+        {isSubmitting ? t("submitting") : t("submitReview")}
       </Button>
     </form>
   );

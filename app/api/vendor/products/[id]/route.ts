@@ -25,7 +25,7 @@ export async function GET(
     const { id } = await params;
     const session = await auth();
     
-    if (!session || session.user.role !== "vendor") {
+    if (!session || session.user.role !== "vendor" || !session.user.vendor?.id) {
       return NextResponse.json(
         { error: "No autorizado" },
         { status: 401 }
@@ -35,7 +35,7 @@ export async function GET(
     const product = await db.query.products.findFirst({
       where: and(
         eq(products.id, id),
-        eq(products.vendorId, session.user.id)
+        eq(products.vendorId, session.user.vendor.id)
       ),
       with: {
         category: true,
@@ -81,7 +81,7 @@ export async function PUT(
     const existingProduct = await db.query.products.findFirst({
       where: and(
         eq(products.id, id),
-        eq(products.vendorId, session.user.id)
+        eq(products.vendorId, session.user.vendor.id)
       ),
     });
 
@@ -117,7 +117,7 @@ export async function PUT(
       .where(
         and(
           eq(products.id, id),
-          eq(products.vendorId, session.user.id)
+          eq(products.vendorId, session.user.vendor.id)
         )
       )
       .returning();
@@ -126,7 +126,7 @@ export async function PUT(
     if (imagesChanged && validatedData.images.length > 0) {
       await createImageModerationRecords(
         id,
-        session.user.id,
+        session.user.vendor.id,
         validatedData.images
       );
     }
@@ -168,7 +168,7 @@ export async function DELETE(
     const existingProduct = await db.query.products.findFirst({
       where: and(
         eq(products.id, id),
-        eq(products.vendorId, session.user.id)
+        eq(products.vendorId, session.user.vendor.id)
       ),
     });
 
@@ -185,7 +185,7 @@ export async function DELETE(
       .where(
         and(
           eq(products.id, id),
-          eq(products.vendorId, session.user.id)
+          eq(products.vendorId, session.user.vendor.id)
         )
       );
 

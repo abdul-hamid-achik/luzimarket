@@ -17,8 +17,9 @@ export default function NotFound() {
         
         <div className="space-y-2">
           <h1 className="text-6xl font-times-now">404</h1>
-          <h2 className="text-2xl font-univers">Not Found</h2>
+          <h2 className="text-2xl font-univers">Page Not Found / Página no encontrada</h2>
           <p className="text-gray-600 font-univers">
+            The page you're looking for doesn't exist or has been moved.<br />
             La página que buscas no existe o ha sido movida.
           </p>
         </div>
@@ -26,12 +27,12 @@ export default function NotFound() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
           <Link href="/">
             <Button variant="default" className="bg-black text-white hover:bg-gray-800">
-              Volver al Inicio
+              Back to Home / Volver al Inicio
             </Button>
           </Link>
           <Link href="/products">
             <Button variant="outline">
-              Ver Productos
+              View Products / Ver Productos
             </Button>
           </Link>
         </div>

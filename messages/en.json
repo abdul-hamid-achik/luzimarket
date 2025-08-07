@@ -45,7 +45,14 @@
     "user": "User",
     "clearSearch": "Clear search",
     "inWishlist": "In wishlist",
-    "addToWishlist": "Add to wishlist"
+    "addToWishlist": "Add to wishlist",
+    "dataTable": {
+      "columns": "Columns",
+      "noResults": "No results.",
+      "rowsSelected": "{selected} of {total} row(s) selected.",
+      "previous": "Previous",
+      "next": "Next"
+    }
   },
   "Navigation": {
     "home": "Home",
@@ -582,6 +589,43 @@
       "welcomeDesc": "Sent when a new user registers",
       "reviewRequestName": "Review Request",
       "reviewRequestDesc": "Sent days after receiving the product"
+    },
+    "imageModeration": {
+      "title": "Image Moderation",
+      "subtitle": "Review and approve product images uploaded by vendors",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "approve": "Approve",
+      "reject": "Reject",
+      "approveSelected": "Approve selected",
+      "rejectSelected": "Reject selected",
+      "viewFullSize": "View full size",
+      "productName": "Product",
+      "vendorName": "Vendor",
+      "uploadedAt": "Uploaded",
+      "reviewedAt": "Reviewed",
+      "rejectionReason": "Rejection reason",
+      "rejectionCategory": "Category",
+      "rejectionCategories": {
+        "quality": "Poor quality",
+        "inappropriate": "Inappropriate content",
+        "copyright": "Copyright",
+        "misleading": "Misleading",
+        "other": "Other"
+      },
+      "provideReason": "Provide a reason for rejection",
+      "additionalNotes": "Additional notes (optional)",
+      "confirmApproval": "Are you sure you want to approve {count} image(s)?",
+      "confirmRejection": "Are you sure you want to reject {count} image(s)?",
+      "noImages": "No images to moderate",
+      "stats": {
+        "pendingCount": "{count} pending",
+        "approvedCount": "{count} approved",
+        "rejectedCount": "{count} rejected"
+      }
     },
     "vendorsPage": {
       "title": "Vendors",
@@ -1380,6 +1424,21 @@
       "noStock": "Out of stock",
       "outOfStock": "Out of stock",
       "viewFullDetails": "View full details"
+    },
+    "reviews": {
+      "title": "Customer reviews",
+      "review": "review",
+      "reviews": "reviews",
+      "writeReview": "Write a review",
+      "cancel": "Cancel",
+      "noReviews": "No reviews yet for this product. Be the first to review!",
+      "verifiedPurchase": "Verified purchase",
+      "helpful": "Was this helpful?",
+      "yourRating": "Your rating",
+      "yourOpinion": "Your review",
+      "submitReview": "Submit review",
+      "submitting": "Submitting...",
+      "submitError": "Error submitting your review. Please try again."
     }
   },
   "Security": {
@@ -2376,7 +2435,15 @@
         "amount": "Amount",
         "status": "Status",
         "date": "Date",
-        "searchPlaceholder": "Search transactions..."
+        "searchPlaceholder": "Search transactions...",
+        "orderPrefix": "Order:",
+        "actions": {
+          "openMenu": "Open menu",
+          "title": "Actions",
+          "copyTransactionId": "Copy transaction ID",
+          "viewOrder": "View order",
+          "viewDetails": "View details"
+        }
       },
       "payouts": {
         "title": "Payout history",
@@ -2389,7 +2456,14 @@
         "method": "Method",
         "status": "Status",
         "arrivalDate": "Arrival date",
-        "searchPlaceholder": "Search payouts..."
+        "searchPlaceholder": "Search payouts...",
+        "actions": {
+          "openMenu": "Open menu",
+          "title": "Actions",
+          "copyPayoutId": "Copy payout ID",
+          "viewDetails": "View details",
+          "downloadReceipt": "Download receipt"
+        }
       },
       "accountInfo": {
         "title": "Account information",
@@ -2488,6 +2562,13 @@
       }
     },
     "products": {
+      "title": "My Products",
+      "description": "Manage your product catalog",
+      "addProduct": "Add Product",
+      "noImage": "No image",
+      "stockItems": "{count} items",
+      "active": "Active",
+      "inactive": "Inactive",
       "new": {
         "title": "New Product",
         "editTitle": "Edit Product"
@@ -2591,7 +2672,7 @@
     "subtitle": "View the history and status of all your orders",
     "backToAccount": "Back to Account",
     "exportOrders": "Export Orders",
-    "orderNumber": "Order #",
+    "orderNumber": "Order #{number}",
     "viewDetails": "View details",
     "view": "View",
     "track": "Track",
@@ -2600,10 +2681,16 @@
     "item": "item",
     "items": "items",
     "moreItems": "more",
-    "noOrders": {
-      "title": "You don't have any orders yet",
-      "description": "When you place your first order, it will appear here along with tracking information.",
-      "startShopping": "Start Shopping"
+    "noOrders": "You don't have any orders yet",
+    "startShopping": "Start Shopping",
+    "unknownVendor": "Unknown vendor",
+    "status": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "processing": "Processing",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
     },
     "noResults": {
       "title": "No orders found",

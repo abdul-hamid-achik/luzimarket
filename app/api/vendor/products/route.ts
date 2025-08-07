@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await auth();
     
-    if (!session || session.user.role !== "vendor") {
+    if (!session || session.user.role !== "vendor" || !session.user.vendor?.id) {
       return NextResponse.json(
         { error: "No autorizado" },
         { status: 401 }
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
 
     // Create the product
     const [newProduct] = await db.insert(products).values({
-      vendorId: session.user.id,
+      vendorId: session.user.vendor.id,
       name: validatedData.name,
       slug,
       description: validatedData.description,
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
     if (validatedData.images.length > 0) {
       await createImageModerationRecords(
         newProduct.id,
-        session.user.id,
+        session.user.vendor.id,
         validatedData.images
       );
     }
@@ -99,7 +99,7 @@ export async function GET(req: NextRequest) {
   try {
     const session = await auth();
     
-    if (!session || session.user.role !== "vendor") {
+    if (!session || session.user.role !== "vendor" || !session.user.vendor?.id) {
       return NextResponse.json(
         { error: "No autorizado" },
         { status: 401 }
@@ -107,7 +107,7 @@ export async function GET(req: NextRequest) {
     }
 
     const vendorProducts = await db.query.products.findMany({
-      where: (products, { eq }) => eq(products.vendorId, session.user.id),
+      where: (products, { eq }) => eq(products.vendorId, session.user.vendor.id),
       with: {
         category: true,
       },
