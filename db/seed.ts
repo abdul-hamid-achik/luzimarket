@@ -13,6 +13,56 @@ config({ path: ".env.local" });
 
 import { db } from "./index";
 
+type ImageMode = 'ai' | 'placeholders' | 'none';
+
+function resolveImageMode(): ImageMode {
+  // CLI flags take precedence
+  if (process.argv.includes('--no-images')) return 'none';
+  if (process.argv.includes('--placeholders')) return 'placeholders';
+  if (process.argv.includes('--ai')) return 'ai';
+
+  // Env override
+  const envMode = (process.env.SEED_IMAGE_MODE || '').toLowerCase();
+  if (envMode === 'none') return 'none';
+  if (envMode === 'placeholders') return 'placeholders';
+  if (envMode === 'ai') return 'ai';
+
+  // Default behavior: placeholders in dev/test, AI in prod if key exists
+  const isProd = process.env.NODE_ENV === 'production';
+  if (isProd && process.env.OPENAI_SECRET_KEY) return 'ai';
+  return 'placeholders';
+}
+
+function isProbablyProdEnvironment(): boolean {
+  const url = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || '';
+  // Treat any non-localhost URL as production-ish
+  return process.env.NODE_ENV === 'production' || (!!url && !url.includes('localhost'));
+}
+
+function buildPlaceholderImageUrl(kind: 'category' | 'product', slug: string): string {
+  // Deterministic selection of a few curated Unsplash image IDs
+  const productImageIds = [
+    'photo-1542291026-7eec264c27ff', // generic flowers
+    'photo-1519681393784-d120267933ba', // gift box
+    'photo-1504754524776-8f4f37790ca0', // chocolate
+    'photo-1519681394823-2bda8d494253', // candles
+    'photo-1512291319326-9f4cebe47745', // jewelry
+    'photo-1486427944299-d1955d23e34d', // decor
+  ];
+  const categoryImageIds = [
+    'photo-1525182008055-f88b95ff7980',
+    'photo-1481833761820-0509d3217039',
+    'photo-1491553895911-0055eca6402d',
+    'photo-1503602642458-232111445657',
+    'photo-1442458017215-285b83f65851',
+  ];
+
+  const ids = kind === 'category' ? categoryImageIds : productImageIds;
+  const hash = Array.from(slug).reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+  const id = ids[hash % ids.length];
+  return `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1024&q=60&ixlib=rb-4.0.3`;
+}
+
 // Set a fixed seed for consistent data generation
 faker.seed(12345);
 
@@ -263,10 +313,19 @@ async function main() {
   // --no-images: Skip AI image generation
   // --force-images: Force regenerate existing images
   // --fast: Limit image generation to 10 items for testing
+  // --placeholders: Force placeholder images instead of AI
+  // --ai: Force AI images (if key is present)
+
+  // Safety guard to avoid seeding production accidentally
+  if (isProbablyProdEnvironment() && process.env.SEED_ALLOW_PROD !== '1') {
+    console.error("❌ Refusing to run seed in production-like environment. Set SEED_ALLOW_PROD=1 to override.");
+    process.exit(1);
+  }
 
   // Check command line flags
   const shouldReset = !process.argv.includes('--no-reset');
-  const shouldGenerateImages = !process.argv.includes('--no-images') && !!process.env.OPENAI_SECRET_KEY;
+  const imageMode = resolveImageMode();
+  const shouldGenerateAIImages = imageMode === 'ai' && !!process.env.OPENAI_SECRET_KEY && !process.argv.includes('--no-images');
   const forceRegenerateImages = process.argv.includes('--force-images'); // Force regenerate existing images
   const imageBatchSize = process.argv.includes('--fast') ? 10 : 100; // Limit images in fast mode
 
@@ -540,7 +599,7 @@ async function main() {
         categoryId: category.id,
         vendorId: vendor.id,
         price: String(Math.round(price / 50) * 50), // Round to nearest 50
-        images: null, // Will be generated with AI
+        images: [], // Will be generated later (AI or placeholders)
         tags: faker.helpers.arrayElements(["nuevo", "popular", "oferta", "exclusivo", "limitado", "artesanal", "eco-friendly", "premium"], { min: 1, max: 4 }),
         stock: faker.helpers.weightedArrayElement([
           { value: faker.number.int({ min: 1, max: 10 }), weight: 2 }, // Low stock
@@ -567,93 +626,167 @@ async function main() {
     const products = await db.insert(schema.products).values(productData).returning();
     console.log(`✅ Created ${products.length} products`);
 
-    // 5.1 Create Image Moderation Records for Test Products
+    // IMAGE HANDLING PHASE
+    // 5.1 Assign images via placeholders or AI, respecting existing images and flags
+    if (imageMode === 'placeholders') {
+      console.log('\n🖼️  Assigning placeholder images...');
+      // Categories without imageUrl
+      const categoriesToSet = forceRegenerateImages ? categories : categories.filter(c => !c.imageUrl);
+      for (const category of categoriesToSet) {
+        const imageUrl = buildPlaceholderImageUrl('category', category.slug);
+        await db.update(schema.categories)
+          .set({ imageUrl })
+          .where(eq(schema.categories.id, category.id));
+      }
+      console.log(`✅ Set placeholder images for ${categoriesToSet.length} categories`);
+
+      // Products without images
+      const productTargets = forceRegenerateImages ? products : products.filter(p => !p.images || (Array.isArray(p.images) && p.images.length === 0));
+      let updatedCount = 0;
+      for (const product of productTargets.slice(0, imageBatchSize)) {
+        const imageUrl = buildPlaceholderImageUrl('product', product.slug);
+        await db.update(schema.products)
+          .set({ images: [imageUrl], imagesApproved: true, imagesPendingModeration: false })
+          .where(eq(schema.products.id, product.id));
+        updatedCount++;
+      }
+      console.log(`✅ Set placeholder images for ${updatedCount} products`);
+    }
+
+    // 5.2 Generate AI images (optional)
+    if (shouldGenerateAIImages) {
+      console.log("\n🎨 Generating AI images for products and categories...");
+      // Create uploads directory for local development
+      if (process.env.NODE_ENV === 'development' && !process.env.BLOB_READ_WRITE_TOKEN) {
+        const fs = await import('fs/promises');
+        const path = await import('path');
+        const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'ai-generated');
+        await fs.mkdir(uploadsDir, { recursive: true });
+        console.log('📁 Created local uploads directory\n');
+      }
+
+      // Generate category images
+      console.log('🖼️  Generating category images...');
+      const categoriesToImage = forceRegenerateImages ? categories : categories.filter(c => !c.imageUrl || c.imageUrl === null);
+      console.log(`📊 Found ${categoriesToImage.length} categories ${forceRegenerateImages ? '(forced regeneration)' : 'without images'}`);
+
+      for (const category of categoriesToImage) {
+        try {
+          const prompt = generateCategoryImagePrompt({
+            name: category.name,
+            description: category.description || '',
+          });
+          const imageUrl = await generateAndUploadImage(
+            prompt,
+            `category-${category.slug}.png`,
+            { size: '1792x1024', quality: 'hd', style: 'natural' }
+          );
+          await db.update(schema.categories)
+            .set({ imageUrl })
+            .where(eq(schema.categories.id, category.id));
+        } catch (error) {
+          console.error(`❌ Error generating image for category ${category.name}:`, error);
+        }
+      }
+
+      // Generate product images
+      console.log('\n🖼️  Generating product images...');
+      const productsNeedingImages = forceRegenerateImages ? products : products.filter(p => !p.images || (Array.isArray(p.images) && p.images.length === 0));
+      const productsToImage = productsNeedingImages.slice(0, imageBatchSize);
+      console.log(`📊 Found ${productsNeedingImages.length} products ${forceRegenerateImages ? '(forced regeneration)' : 'without images'}, generating for ${productsToImage.length}`);
+
+      for (const product of productsToImage) {
+        try {
+          const prompt = generateProductImagePrompt({
+            name: product.name,
+            description: product.description || '',
+            tags: (product.tags as string[]) || [],
+          });
+          const imageUrl = await generateAndUploadImage(
+            prompt,
+            `product-${product.slug}.png`,
+            { size: '1024x1024', quality: 'standard', style: 'natural' }
+          );
+          await db.update(schema.products)
+            .set({ images: [imageUrl] })
+            .where(eq(schema.products.id, product.id));
+        } catch (error) {
+          console.error(`❌ Error generating image for product ${product.name}:`, error);
+        }
+      }
+
+      console.log('\n✨ AI image generation completed!');
+    } else if (imageMode === 'none') {
+      console.log("\n⏭️  Skipping image assignment (imageMode=none)");
+    }
+
+    // 5.3 Create Image Moderation Records AFTER images exist
     console.log("🖼️  Creating image moderation records...");
+    const productsWithImages = await db.query.products.findMany({
+      where: sql`json_array_length(${schema.products.images}) > 0`,
+      columns: { id: true, vendorId: true, images: true }
+    });
+    const sample = productsWithImages.slice(0, 20);
+
     const imageModerationData: schema.NewProductImageModeration[] = [];
-    
-    // Create moderation records for products with images
-    for (const product of products.slice(0, 20)) { // First 20 products for testing
-      if (product.images && Array.isArray(product.images) && product.images.length > 0) {
-        product.images.forEach((imageUrl, index) => {
-          // Create some approved, some pending, some rejected records for testing
-          let status: 'pending' | 'approved' | 'rejected';
-          let reviewedAt: Date | null = null;
-          let rejectionReason: string | null = null;
-          let rejectionCategory: string | null = null;
-          
-          const randomStatus = Math.random();
-          if (randomStatus < 0.6) {
+    for (const product of sample) {
+      (product.images as string[]).forEach((imageUrl, index) => {
+        // In placeholder mode, mark as approved. In AI mode, vary statuses
+        let status: 'pending' | 'approved' | 'rejected' = imageMode === 'placeholders' ? 'approved' : 'approved';
+        let reviewedAt: Date | null = new Date();
+        let rejectionReason: string | null = null;
+        let rejectionCategory: string | null = null;
+
+        if (imageMode === 'ai') {
+          const r = Math.random();
+          if (r < 0.7) {
             status = 'approved';
-            reviewedAt = faker.date.recent({ days: 7 });
-          } else if (randomStatus < 0.8) {
+          } else if (r < 0.9) {
             status = 'pending';
+            reviewedAt = null;
           } else {
             status = 'rejected';
-            reviewedAt = faker.date.recent({ days: 7 });
-            rejectionReason = faker.helpers.arrayElement([
-              'La imagen está borrosa y no muestra el producto claramente',
-              'La calidad de la imagen es muy baja',
-              'La imagen no corresponde con la descripción del producto',
-              'Se requiere mejor iluminación en la fotografía'
-            ]);
-            rejectionCategory = faker.helpers.arrayElement(['quality', 'misleading', 'inappropriate']);
+            rejectionReason = 'Mejorar calidad o iluminación';
+            rejectionCategory = 'quality';
           }
-          
-          imageModerationData.push({
-            productId: product.id,
-            vendorId: product.vendorId,
-            imageUrl,
-            imageIndex: index,
-            status,
-            reviewedAt,
-            rejectionReason,
-            rejectionCategory,
-          });
+        }
+
+        imageModerationData.push({
+          productId: product.id,
+          vendorId: product.vendorId,
+          imageUrl,
+          imageIndex: index,
+          status,
+          reviewedAt: reviewedAt || undefined,
+          rejectionReason: rejectionReason || undefined,
+          rejectionCategory: rejectionCategory || undefined,
         });
-      }
+      });
     }
 
     if (imageModerationData.length > 0) {
       await db.insert(schema.productImageModeration).values(imageModerationData);
-      console.log(`✅ Created ${imageModerationData.length} image moderation records`);
-      
-      // Update products with moderation status
-      const approvedProductIds = new Set();
-      const pendingProductIds = new Set();
-      
-      for (const record of imageModerationData) {
-        if (record.status === 'approved') {
-          approvedProductIds.add(record.productId);
-        } else if (record.status === 'pending') {
-          pendingProductIds.add(record.productId);
-        }
+
+      // Update product flags based on moderation
+      const byProduct = new Map<string, schema.NewProductImageModeration[]>();
+      for (const rec of imageModerationData) {
+        const arr = byProduct.get(rec.productId) || [];
+        arr.push(rec);
+        byProduct.set(rec.productId, arr);
       }
-      
-      // Update products with all approved images
-      for (const productId of approvedProductIds) {
-        const productIdStr = productId as string;
-        const productRecords = imageModerationData.filter(r => r.productId === productIdStr);
-        const allApproved = productRecords.every(r => r.status === 'approved');
-        const hasPending = productRecords.some(r => r.status === 'pending');
-        
-        if (allApproved) {
-          await db.update(schema.products)
-            .set({ 
-              imagesApproved: true, 
-              imagesPendingModeration: false 
-            })
-            .where(eq(schema.products.id, productIdStr));
-        } else if (hasPending) {
-          await db.update(schema.products)
-            .set({ 
-              imagesApproved: false, 
-              imagesPendingModeration: true 
-            })
-            .where(eq(schema.products.id, productIdStr));
-        }
+      for (const [productId, records] of byProduct.entries()) {
+        const allApproved = records.every(r => r.status === 'approved');
+        const hasPending = records.some(r => r.status === 'pending');
+        await db.update(schema.products)
+          .set({
+            imagesApproved: allApproved,
+            imagesPendingModeration: !allApproved && hasPending,
+          })
+          .where(eq(schema.products.id, productId));
       }
-      
-      console.log(`✅ Updated product approval statuses`);
+      console.log(`✅ Created ${imageModerationData.length} image moderation records and updated flags`);
+    } else {
+      console.log('ℹ️  No products with images found to moderate at this stage');
     }
 
     // 5.5 Seed Product Variants
