@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, 
-  Package, 
+import { Link, usePathname, getPathname } from "@/i18n/navigation";
+import {
+  LayoutDashboard,
+  Package,
   ShoppingCart,
   BarChart3,
   Settings,
@@ -80,6 +79,11 @@ export function VendorSidebar({ userEmail, vendorName }: VendorSidebarProps) {
     },
   ];
 
+  const localizedMenuItems = menuItems.map((item) => ({
+    ...item,
+    href: getPathname({ href: item.href }),
+  }));
+
   return (
     <Sidebar>
       <SidebarHeader className="border-b border-gray-200">
@@ -114,10 +118,10 @@ export function VendorSidebar({ userEmail, vendorName }: VendorSidebarProps) {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuItems.map((item) => {
-                const isActive = pathname === item.href || 
+              {localizedMenuItems.map((item) => {
+                const isActive = pathname === item.href ||
                   (item.href !== "/vendor/dashboard" && pathname.startsWith(item.href));
-                
+
                 return (
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton asChild isActive={isActive}>
@@ -144,9 +148,9 @@ export function VendorSidebar({ userEmail, vendorName }: VendorSidebarProps) {
             <p className="text-xs text-gray-600 px-2">{userEmail}</p>
           )}
           <form action="/api/auth/signout" method="POST">
-            <Button 
+            <Button
               type="submit"
-              variant="ghost" 
+              variant="ghost"
               className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
             >
               {state !== "collapsed" && t("logout")}

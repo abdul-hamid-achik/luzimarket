@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { Eye, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { useLocale } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { OrderStatusSelect } from "@/components/admin/order-status-select";
 import { exportToCSV, formatDate, formatOrderStatus, formatPaymentStatus } from "@/lib/utils/export";
 import { formatCurrency } from "@/lib/utils";
@@ -29,6 +30,7 @@ interface AdminOrdersClientProps {
 
 export function AdminOrdersClient({ orders, translations: t, updateOrderStatus }: AdminOrdersClientProps) {
   const [isExporting, setIsExporting] = useState(false);
+  const locale = useLocale();
 
   const statusColors: Record<string, string> = {
     pending: "bg-yellow-100 text-yellow-800",
@@ -46,21 +48,21 @@ export function AdminOrdersClient({ orders, translations: t, updateOrderStatus }
 
   const handleExport = () => {
     setIsExporting(true);
-    
+
     const columns = [
       { key: 'orderNumber', header: 'Número de Orden' },
-      { key: 'userName', header: 'Cliente' },
+      { key: 'userName', header: t.customer },
       { key: 'userEmail', header: 'Email' },
       { key: 'total', header: 'Total', formatter: (value: string) => formatCurrency(Number(value)) },
-      { key: 'itemCount', header: 'Artículos' },
-      { key: 'status', header: 'Estado', formatter: formatOrderStatus },
-      { key: 'paymentStatus', header: 'Estado de Pago', formatter: formatPaymentStatus },
-      { key: 'createdAt', header: 'Fecha', formatter: formatDate },
+      { key: 'itemCount', header: t.items },
+      { key: 'status', header: t.status, formatter: formatOrderStatus },
+      { key: 'paymentStatus', header: t.payment, formatter: formatPaymentStatus },
+      { key: 'createdAt', header: t.date, formatter: formatDate },
     ];
-    
-    const filename = `ordenes_${new Date().toISOString().split('T')[0]}.csv`;
+
+    const filename = `orders_${new Date().toISOString().split('T')[0]}.csv`;
     exportToCSV(orders, columns, filename);
-    
+
     setTimeout(() => setIsExporting(false), 1000);
   };
 
@@ -173,20 +175,19 @@ export function AdminOrdersClient({ orders, translations: t, updateOrderStatus }
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-univers ${
-                        order.paymentStatus ? paymentStatusColors[order.paymentStatus] || 'bg-gray-100 text-gray-800' : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {order.paymentStatus === 'succeeded' ? t.paymentSucceeded : 
-                         order.paymentStatus === 'failed' ? t.paymentFailed : 
-                         t.paymentPending}
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-univers ${order.paymentStatus ? paymentStatusColors[order.paymentStatus] || 'bg-gray-100 text-gray-800' : 'bg-gray-100 text-gray-800'
+                        }`}>
+                        {order.paymentStatus === 'succeeded' ? t.paymentSucceeded :
+                          order.paymentStatus === 'failed' ? t.paymentFailed :
+                            t.paymentPending}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900 font-univers">
-                        {order.createdAt ? new Date(order.createdAt).toLocaleDateString('es-MX') : '-'}
+                        {order.createdAt ? new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(new Date(order.createdAt)) : '-'}
                       </div>
                       <div className="text-xs text-gray-500 font-univers">
-                        {order.createdAt ? new Date(order.createdAt).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }) : '-'}
+                        {order.createdAt ? new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }).format(new Date(order.createdAt)) : '-'}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

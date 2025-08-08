@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { routing } from "@/i18n/routing";
+import { redirect } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
 import { getTranslations } from "next-intl/server";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
@@ -12,10 +11,10 @@ export default async function AdminLayout({
 }) {
   const session = await auth();
   const t = await getTranslations("Admin");
-  
+
   if (!session || session.user?.role !== "admin") {
-    // Redirect to Spanish login by default (as es is the default locale)
-    redirect(`/${routing.defaultLocale}/iniciar-sesion`);
+    // Locale-aware redirect to login preserving current locale
+    redirect("/login");
   }
 
   return (

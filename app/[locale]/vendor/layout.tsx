@@ -1,6 +1,5 @@
-import { redirect } from "next/navigation";
+import { redirect } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
-import { routing } from "@/i18n/routing";
 import { getTranslations } from "next-intl/server";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { VendorSidebar } from "./vendor-sidebar";
@@ -15,11 +14,11 @@ export default async function VendorLayout({
 }) {
   const session = await auth();
   const t = await getTranslations("vendor.layout");
-  
+
   // Skip auth check for registration page - will be handled by parallel route
   if (!session || !session.user || session.user.role !== "vendor") {
-    // Redirect to Spanish login by default (as es is the default locale)
-    redirect(`/${routing.defaultLocale}/iniciar-sesion`);
+    // Locale-aware redirect to login
+    redirect("/login");
   }
 
   // Get vendor details
@@ -37,8 +36,8 @@ export default async function VendorLayout({
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full">
-        <VendorSidebar 
-          userEmail={session.user.email} 
+        <VendorSidebar
+          userEmail={session.user.email}
           vendorName={vendorName}
         />
         <SidebarInset className="flex-1">

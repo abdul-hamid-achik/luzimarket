@@ -1,13 +1,13 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, 
-  Package, 
-  Store, 
-  Users, 
+import {
+  LayoutDashboard,
+  Package,
+  Store,
+  Users,
   ShoppingCart,
   Mail,
   Settings,
@@ -108,14 +108,13 @@ export function AdminSidebar({ userEmail }: AdminSidebarProps) {
       <SidebarHeader className="border-b border-gray-200">
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center gap-2">
-            <Image 
-              src="/images/logos/logo-operations.png" 
-              alt="Luzimarket Operations" 
-              width={150} 
+            <Image
+              src="/images/logos/logo-operations.png"
+              alt="Luzimarket Operations"
+              width={150}
               height={40}
-              className={`transition-all duration-200 object-contain ${
-                state === "collapsed" ? "h-8 w-auto max-w-[100px]" : "h-10 w-auto max-w-[150px]"
-              }`}
+              className={`transition-all duration-200 object-contain ${state === "collapsed" ? "h-8 w-auto max-w-[100px]" : "h-10 w-auto max-w-[150px]"
+                }`}
               priority
             />
           </div>
@@ -139,9 +138,9 @@ export function AdminSidebar({ userEmail }: AdminSidebarProps) {
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => {
-                const isActive = pathname === item.href || 
+                const isActive = pathname === item.href ||
                   (item.href !== "/admin" && pathname.startsWith(item.href));
-                
+
                 return (
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton asChild isActive={isActive}>

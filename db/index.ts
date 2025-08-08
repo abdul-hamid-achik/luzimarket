@@ -12,11 +12,16 @@ function getDatabase(): PostgresJsDatabase<typeof schema> {
       require('dotenv').config({ path: '.env.local' });
     }
 
-    if (!process.env.DATABASE_URL) {
-      throw new Error('DATABASE_URL is not set');
+    const isPlaywright = process.env.PLAYWRIGHT_TEST === 'true' || process.env.SEED_USE_TEST_DB === 'true';
+    const databaseUrl = isPlaywright && process.env.DATABASE_URL_TEST
+      ? process.env.DATABASE_URL_TEST
+      : process.env.DATABASE_URL;
+
+    if (!databaseUrl) {
+      throw new Error('DATABASE_URL is not set (and DATABASE_URL_TEST not provided for tests)');
     }
 
-    const client = postgres(process.env.DATABASE_URL);
+    const client = postgres(databaseUrl);
     _db = drizzle(client, { schema });
   }
   return _db;

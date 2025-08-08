@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
-import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { Eye, Package, Calendar, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +22,7 @@ interface Order {
 
 export function VendorOrdersTable() {
   const t = useTranslations("vendor.orders");
+  const locale = useLocale();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -111,7 +112,7 @@ export function VendorOrdersTable() {
             {orders.map((order) => {
               const status = statusConfig[order.status as keyof typeof statusConfig] || statusConfig.pending;
               const paymentStatus = paymentStatusConfig[order.paymentStatus as keyof typeof paymentStatusConfig] || paymentStatusConfig.pending;
-              
+
               return (
                 <tr key={order.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -151,14 +152,14 @@ export function VendorOrdersTable() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900 font-univers">
-                      {new Date(order.createdAt).toLocaleDateString()}
+                      {new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(order.createdAt))}
                     </div>
                     <div className="text-xs text-gray-500 font-univers">
-                      {new Date(order.createdAt).toLocaleTimeString()}
+                      {new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(order.createdAt))}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <Link href={`/vendor/orders/${order.id}`}>
+                    <Link href={{ pathname: "/vendor/orders/[id]", params: { id: order.id } }}>
                       <Button size="sm" variant="ghost">
                         <Eye className="h-4 w-4" />
                       </Button>

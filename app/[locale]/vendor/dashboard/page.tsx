@@ -1,19 +1,19 @@
-import { redirect } from "next/navigation";
+import { redirect } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { products, orders, vendors, vendorStripeAccounts } from "@/db/schema";
 import { eq, sql, and } from "drizzle-orm";
-import { 
-  Package, 
-  DollarSign, 
-  ShoppingCart, 
+import {
+  Package,
+  DollarSign,
+  ShoppingCart,
   TrendingUp,
   Plus,
   ArrowUpRight,
   CreditCard,
   AlertCircle
 } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -31,7 +31,7 @@ async function getVendorStats(vendorId: string) {
     db.select({ count: sql<number>`count(*)` })
       .from(products)
       .where(eq(products.vendorId, vendorId)),
-    
+
     // Active products
     db.select({ count: sql<number>`count(*)` })
       .from(products)
@@ -39,22 +39,22 @@ async function getVendorStats(vendorId: string) {
         eq(products.vendorId, vendorId),
         eq(products.isActive, true)
       )),
-    
+
     // Total orders
     db.select({ count: sql<number>`count(*)` })
       .from(orders)
       .where(eq(orders.vendorId, vendorId)),
-    
+
     // Total revenue
-    db.select({ 
-      total: sql<number>`COALESCE(SUM(${orders.total}::numeric), 0)` 
+    db.select({
+      total: sql<number>`COALESCE(SUM(${orders.total}::numeric), 0)`
     })
       .from(orders)
       .where(and(
         eq(orders.vendorId, vendorId),
         eq(orders.paymentStatus, 'succeeded')
       )),
-    
+
     // Recent orders
     db.select({
       id: orders.id,
@@ -63,10 +63,10 @@ async function getVendorStats(vendorId: string) {
       status: orders.status,
       createdAt: orders.createdAt,
     })
-    .from(orders)
-    .where(eq(orders.vendorId, vendorId))
-    .orderBy(sql`${orders.createdAt} DESC`)
-    .limit(5)
+      .from(orders)
+      .where(eq(orders.vendorId, vendorId))
+      .orderBy(sql`${orders.createdAt} DESC`)
+      .limit(5)
   ]);
 
   return {
@@ -81,10 +81,6 @@ async function getVendorStats(vendorId: string) {
 export default async function VendorDashboard() {
   const session = await auth();
   const t = await getTranslations("vendor");
-  
-  if (!session || session.user.role !== "vendor") {
-    redirect("/login");
-  }
 
   const vendorId = session.user.id;
   const stats = await getVendorStats(vendorId);
@@ -162,7 +158,7 @@ export default async function VendorDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statsCards.map((stat) => {
           const Icon = stat.icon;
-          
+
           return (
             <div key={stat.title} className="bg-white rounded-lg border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
@@ -213,7 +209,7 @@ export default async function VendorDashboard() {
               {t("dashboard.viewAll")}
             </Link>
           </div>
-          
+
           {stats.recentOrders.length === 0 ? (
             <p className="text-sm text-gray-500 font-univers text-center py-8">
               {t("dashboard.noRecentOrders")}
@@ -231,16 +227,15 @@ export default async function VendorDashboard() {
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-univers ${
-                      order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-univers ${order.status === 'delivered' ? 'bg-green-100 text-green-800' :
                       order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                      order.status === 'paid' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
+                        order.status === 'paid' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-gray-100 text-gray-800'
+                      }`}>
                       {order.status === 'delivered' ? t("dashboard.orderStatus.delivered") :
-                       order.status === 'shipped' ? t("dashboard.orderStatus.shipped") :
-                       order.status === 'paid' ? t("dashboard.orderStatus.paid") :
-                       t("dashboard.orderStatus.pending")}
+                        order.status === 'shipped' ? t("dashboard.orderStatus.shipped") :
+                          order.status === 'paid' ? t("dashboard.orderStatus.paid") :
+                            t("dashboard.orderStatus.pending")}
                     </span>
                     <p className="text-sm font-univers font-medium text-gray-900">
                       ${Number(order.total).toLocaleString('es-MX')}
@@ -308,9 +303,9 @@ export default async function VendorDashboard() {
             <Link href="/vendor/stripe-onboarding">
               <Button className="w-full" variant={stripeAccount?.chargesEnabled ? "outline" : "default"}>
                 <CreditCard className="h-4 w-4 mr-2" />
-                {!stripeAccount ? t("dashboard.stripeConnect.setupPayments") : 
-                 stripeAccount.chargesEnabled && stripeAccount.payoutsEnabled ? t("dashboard.stripeConnect.managePayments") : 
-                 t("dashboard.stripeConnect.completeSetup")}
+                {!stripeAccount ? t("dashboard.stripeConnect.setupPayments") :
+                  stripeAccount.chargesEnabled && stripeAccount.payoutsEnabled ? t("dashboard.stripeConnect.managePayments") :
+                    t("dashboard.stripeConnect.completeSetup")}
               </Button>
             </Link>
           </div>

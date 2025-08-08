@@ -28,7 +28,8 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env.NEXT_PUBLIC_APP_URL || `http://localhost:${process.env.PORT || '3000'}`,
+    // Force localhost for tests to avoid hitting production/staging URLs by mistake
+    baseURL: `http://localhost:${process.env.PORT || '3000'}`,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -111,7 +112,9 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 180 * 1000,
     env: {
-      PLAYWRIGHT_TEST: 'true'
+      PLAYWRIGHT_TEST: 'true',
+      // Ensure app URL resolves to localhost inside tests
+      NEXT_PUBLIC_APP_URL: `http://localhost:${process.env.PORT || '3000'}`,
     },
   },
 });

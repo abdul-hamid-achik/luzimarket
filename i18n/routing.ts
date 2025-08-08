@@ -1,15 +1,15 @@
-import {defineRouting} from 'next-intl/routing';
+import { defineRouting } from 'next-intl/routing';
 
 export const routing = defineRouting({
   // Supported locales
   locales: ['es', 'en'],
-  
+
   // Default locale (Spanish for northern Mexico focus)
   defaultLocale: 'es',
-  
+
   // Locale prefix configuration
   localePrefix: 'always', // Always show locale in URL
-  
+
   // Define localized pathnames
   pathnames: {
     '/': '/',
@@ -45,7 +45,43 @@ export const routing = defineRouting({
       es: '/vendedor/productos',
       en: '/vendor/products'
     },
+    '/vendor/products/[id]': {
+      es: '/vendedor/productos/[id]',
+      en: '/vendor/products/[id]'
+    },
+    '/vendor/products/new': {
+      es: '/vendedor/productos/nuevo',
+      en: '/vendor/products/new'
+    },
+    '/vendor/orders': {
+      es: '/vendedor/ordenes',
+      en: '/vendor/orders'
+    },
+    '/vendor/orders/[id]': {
+      es: '/vendedor/ordenes/[id]',
+      en: '/vendor/orders/[id]'
+    },
+    '/vendor/analytics': {
+      es: '/vendedor/analiticas',
+      en: '/vendor/analytics'
+    },
+    '/vendor/financials': {
+      es: '/vendedor/finanzas',
+      en: '/vendor/financials'
+    },
+    '/vendor/settings': {
+      es: '/vendedor/configuracion',
+      en: '/vendor/settings'
+    },
+    '/vendor/stripe-onboarding': {
+      es: '/vendedor/pagos',
+      en: '/vendor/stripe-onboarding'
+    },
     '/admin': '/admin', // Keep admin routes in English
+    '/admin/orders': '/admin/orders',
+    '/admin/orders/[id]': '/admin/orders/[id]',
+    '/admin/vendors': '/admin/vendors',
+    '/admin/vendors/[id]': '/admin/vendors/[id]',
     '/coming-soon': {
       es: '/proximamente',
       en: '/coming-soon'
