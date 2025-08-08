@@ -289,7 +289,16 @@ async function sendVendorNewOrderNotification(order: OrderWithDetails): Promise<
   try {
     const { subject, html } = await generateVendorNewOrderEmail({
       order: {
-        ...order,
+        id: order.id,
+        orderNumber: order.orderNumber,
+        total: order.total,
+        subtotal: order.subtotal,
+        tax: order.tax,
+        shipping: order.shipping,
+        currency: 'MXN',
+        createdAt: order.createdAt,
+        vendor: { businessName: order.vendor.businessName },
+        user: order.user ? { name: order.user.name } : undefined,
         shippingAddress: order.shippingAddress || {
           street: '',
           city: '',
@@ -325,7 +334,16 @@ async function sendCustomerOrderConfirmation(order: OrderWithDetails): Promise<v
   try {
     const { subject, html } = await generateCustomerConfirmationEmail({
       order: {
-        ...order,
+        id: order.id,
+        orderNumber: order.orderNumber,
+        total: order.total,
+        subtotal: order.subtotal,
+        tax: order.tax,
+        shipping: order.shipping,
+        currency: 'MXN',
+        createdAt: order.createdAt,
+        vendor: { businessName: order.vendor.businessName },
+        user: order.user ? { name: order.user.name } : undefined,
         shippingAddress: order.shippingAddress || {
           street: '',
           city: '',
@@ -419,7 +437,16 @@ async function sendCustomerShippingNotification(order: OrderWithDetails, trackin
   try {
     const { subject, html } = await generateShippingNotificationEmail({
       order: {
-        ...order,
+        id: order.id,
+        orderNumber: order.orderNumber,
+        total: order.total,
+        subtotal: order.subtotal,
+        tax: order.tax,
+        shipping: order.shipping,
+        currency: 'MXN',
+        createdAt: order.createdAt,
+        vendor: { businessName: order.vendor.businessName },
+        user: order.user ? { name: order.user.name } : undefined,
         shippingAddress: order.shippingAddress || {
           street: '',
           city: '',

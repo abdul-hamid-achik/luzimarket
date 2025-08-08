@@ -188,7 +188,7 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
                 </Button>
               </div>
 
-              <Link href={`/products/${product.id}`} className="block">
+              <Link href={{ pathname: '/products/[slug]', params: { slug: product.id } }} className="block">
                 <Button variant="outline" className="w-full">
                   {t("viewFullDetails")}
                 </Button>

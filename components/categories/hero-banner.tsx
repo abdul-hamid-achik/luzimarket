@@ -52,7 +52,7 @@ export function HeroBanner({
               {description}
             </p>
 
-            <Link href={`/category/${categorySlug}`}>
+            <Link href={{ pathname: "/category/[slug]", params: { slug: categorySlug } }}>
               <Button
                 variant="secondary"
                 className="bg-white text-black hover:bg-gray-100 font-univers rounded-full px-6"

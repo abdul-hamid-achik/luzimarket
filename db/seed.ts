@@ -1195,7 +1195,7 @@ async function main() {
     }
 
     // Generate AI images if enabled
-    if (shouldGenerateImages) {
+    if (shouldGenerateAIImages) {
       console.log("\n🎨 Generating AI images for products and categories...");
 
       // Create uploads directory for local development

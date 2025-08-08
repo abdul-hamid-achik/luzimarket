@@ -11,8 +11,8 @@ interface Order {
   orderNumber: string;
   total: string;
   status: string;
-  paymentStatus: string;
-  createdAt: string;
+  paymentStatus: string | null;
+  createdAt: string | null;
   itemCount: number;
   customerName: string | null;
   customerEmail: string | null;
@@ -21,7 +21,11 @@ interface Order {
 export async function VendorOrdersTable() {
   const t = await getTranslations("vendor.orders");
   const locale = await getLocale();
-  const orders: Order[] = await getCurrentVendorOrders();
+  const rawOrders = await getCurrentVendorOrders();
+  const orders: Order[] = rawOrders.map((o: any) => ({
+    ...o,
+    createdAt: o.createdAt ? new Date(o.createdAt).toISOString() : null,
+  }));
 
   const statusConfig = {
     pending: { label: t("status.pending"), color: "bg-gray-100 text-gray-800" },
@@ -124,10 +128,10 @@ export async function VendorOrdersTable() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900 font-univers">
-                      {new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(order.createdAt))}
+                      {order.createdAt ? new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(order.createdAt)) : "-"}
                     </div>
                     <div className="text-xs text-gray-500 font-univers">
-                      {new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(order.createdAt))}
+                      {order.createdAt ? new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(order.createdAt)) : "-"}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

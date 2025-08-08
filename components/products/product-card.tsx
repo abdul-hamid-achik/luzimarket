@@ -68,7 +68,7 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
 
   return (
     <Link
-      href={`/products/${product.slug}`}
+      href={{ pathname: '/products/[slug]', params: { slug: product.slug } }}
       className={cn("group block", className)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

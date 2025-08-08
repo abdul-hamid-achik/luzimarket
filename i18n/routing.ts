@@ -163,6 +163,10 @@ export const routing = defineRouting({
       es: '/reenviar-verificacion',
       en: '/resend-verification'
     },
+    '/orders/lookup': {
+      es: '/pedidos/buscar',
+      en: '/orders/lookup'
+    },
     '/orders': {
       es: '/pedidos',
       en: '/orders'

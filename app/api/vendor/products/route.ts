@@ -107,7 +107,7 @@ export async function GET(req: NextRequest) {
     }
 
     const vendorProducts = await db.query.products.findMany({
-      where: (products, { eq }) => eq(products.vendorId, session.user.vendor.id),
+      where: (products, { eq }) => eq(products.vendorId, session.user.vendor!.id),
       with: {
         category: true,
       },

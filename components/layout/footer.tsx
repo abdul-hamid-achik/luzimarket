@@ -66,11 +66,13 @@ export function Footer() {
               <h3 className="font-univers font-bold mb-4">{t('followUs')}</h3>
               <div className="flex gap-4">
                 {socialLinks.map((social) => (
-                  <Link
+                  <a
                     key={social.name}
                     href={social.href}
                     className="hover:opacity-70 transition-opacity"
                     aria-label={social.name}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     <Image
                       src={social.icon}
@@ -79,7 +81,7 @@ export function Footer() {
                       height={24}
                       className="w-6 h-6"
                     />
-                  </Link>
+                  </a>
                 ))}
               </div>
             </div>

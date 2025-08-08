@@ -18,8 +18,8 @@ export default function LanguageSwitcher() {
   const params = useParams() as Record<string, string> | null;
 
   const handleLocaleChange = (newLocale: string) => {
-    // Provide current route params for dynamic routes (e.g., [slug])
-    router.replace(pathname as any, { locale: newLocale, params: params ?? undefined });
+    // Switch locale while keeping the same pathname
+    router.replace(pathname as any, { locale: newLocale });
   };
 
   return (

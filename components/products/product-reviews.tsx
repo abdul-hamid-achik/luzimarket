@@ -220,6 +220,7 @@ function ReviewForm({ productId, onSuccess }: { productId: string; onSuccess: ()
   const [title, setTitle] = useState("");
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const t = useTranslations("Products.reviews");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
