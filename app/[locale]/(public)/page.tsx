@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 interface HomePageProps {
   params: Promise<{ locale: string }>;
@@ -37,7 +37,7 @@ const categories = [
 export default async function HomePage({ params }: HomePageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
-  
+
   const t = await getTranslations('HomePage');
 
   return (
@@ -62,7 +62,7 @@ export default async function HomePage({ params }: HomePageProps) {
               className={`relative aspect-square group overflow-hidden ${category.bgColor}`}
             >
               <Link
-                href={`/category/${category.slug}`}
+                href={{ pathname: "/category/[slug]", params: { slug: category.slug } }}
                 className="relative block w-full h-full"
               >
                 <Image
@@ -72,7 +72,7 @@ export default async function HomePage({ params }: HomePageProps) {
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                
+
                 {/* Category title */}
                 <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
                   <h3 className="text-black text-sm font-univers tracking-wider bg-white px-6 py-2 inline-block">

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Heart, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -12,8 +12,8 @@ import { useCurrency } from "@/contexts/currency-context";
 import { toast } from "sonner";
 import { useTranslations } from 'next-intl';
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useLocale } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
+// Removed useLocale in favor of i18n-aware router
 
 interface ProductCardProps {
   product: {
@@ -35,7 +35,6 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
   const [isHovered, setIsHovered] = useState(false);
   const { data: session } = useSession();
   const router = useRouter();
-  const locale = useLocale();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { formatPrice } = useCurrency();
   const isWishlisted = isInWishlist(product.id);
@@ -44,14 +43,13 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     // Check if user is authenticated
     if (!session?.user) {
-      // Redirect to login page
-      router.push(`/${locale}/iniciar-sesion`);
+      router.push('/login');
       return;
     }
-    
+
     if (isWishlisted) {
       removeFromWishlist(product.id);
       toast.success(t('removedFromWishlist'));
@@ -69,8 +67,8 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
   };
 
   return (
-    <Link 
-      href={`/products/${product.slug}`} 
+    <Link
+      href={`/products/${product.slug}`}
       className={cn("group block", className)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -83,13 +81,13 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-110"
         />
-        
+
         {/* Overlay on hover */}
         <div className={cn(
           "absolute inset-0 bg-black/0 transition-all duration-300",
           isHovered && "bg-black/10"
         )} />
-        
+
         {/* Wishlist button */}
         <Button
           size="icon"
@@ -102,14 +100,14 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
           aria-label={isWishlisted ? t('removeFromWishlist') : t('addToWishlist')}
           data-testid={`wishlist-button-${product.slug}`}
         >
-          <Heart 
+          <Heart
             className={cn(
               "h-4 w-4 transition-colors",
               isWishlisted ? "fill-red-500 text-red-500" : "text-gray-700"
-            )} 
+            )}
           />
         </Button>
-        
+
         {/* Quick actions on hover */}
         <div className={cn(
           "absolute bottom-0 left-0 right-0 p-3 transition-all duration-300 pointer-events-none",
@@ -135,12 +133,12 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
             <AddToCartButton
               product={{
                 id: product.id,
-              name: product.name,
-              price: parseFloat(product.price),
-              image: product.images[0] || "/images/links/pia-riverola.webp",
-              vendorId: product.vendor?.id || "",
-              vendorName: product.vendor?.businessName || t('vendor'),
-            }}
+                name: product.name,
+                price: parseFloat(product.price),
+                image: product.images[0] || "/images/links/pia-riverola.webp",
+                vendorId: product.vendor?.id || "",
+                vendorName: product.vendor?.businessName || t('vendor'),
+              }}
               className={cn(
                 "h-10 text-sm",
                 onQuickView ? "flex-1" : "w-full"
@@ -150,7 +148,7 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
           </div>
         </div>
       </div>
-      
+
       <div className="space-y-1">
         <h3 className="font-univers text-sm font-medium" data-testid="product-name">
           {product.name}

@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { db } from "@/db";
 import { categories, products } from "@/db/schema";
@@ -54,7 +54,7 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
           {categoryList.map((category) => (
             <Link
               key={category.id}
-              href={`/category/${category.slug}`}
+              href={{ pathname: "/category/[slug]", params: { slug: category.slug } }}
               className="group"
             >
               <div className="relative aspect-square overflow-hidden bg-gray-100">

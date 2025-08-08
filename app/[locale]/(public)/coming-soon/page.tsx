@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useTranslations } from 'next-intl';
 
 export default function ComingSoonPage() {
@@ -9,23 +9,23 @@ export default function ComingSoonPage() {
     <div className="min-h-screen flex flex-col bg-white">
       {/* Header */}
       <header className="flex justify-between items-center px-12 py-10">
-        <Link 
+        <a 
           href="https://instagram.com/luzimarket" 
           className="text-sm font-univers text-gray-700 hover:text-black transition-colors"
           target="_blank"
           rel="noopener noreferrer"
         >
           Instagram
-        </Link>
+        </a>
         <h1 className="text-3xl font-univers tracking-[0.15em] text-black">
           {tCommon('brand')}
         </h1>
-        <Link 
+        <a 
           href="mailto:hola@luzimarket.shop" 
           className="text-sm font-univers text-gray-700 hover:text-black transition-colors"
         >
           Contact
-        </Link>
+        </a>
       </header>
 
       {/* Main content */}

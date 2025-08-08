@@ -12,6 +12,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Link } from "@/i18n/navigation";
 
 export default async function CategoryVendorPage({
   params,
@@ -64,12 +65,16 @@ export default async function CategoryVendorPage({
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href={`/${locale}`}>{t("home")}</BreadcrumbLink>
+            <BreadcrumbLink asChild>
+              <Link href="/">{t("home")}</Link>
+            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href={`/${locale}/category/${categorySlug}`}>
-              {categoryData.name}
+            <BreadcrumbLink asChild>
+              <Link href={{ pathname: '/category/[slug]', params: { slug: categorySlug } }}>
+                {categoryData.name}
+              </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />

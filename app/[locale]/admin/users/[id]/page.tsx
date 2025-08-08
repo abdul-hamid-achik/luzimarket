@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
     User,
@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import { getAdminUsers } from "@/lib/actions/admin/users";
 
 type UserDetailData = {
     id: string;
@@ -42,46 +44,16 @@ export default function UserDetailPage() {
     const router = useRouter();
     const userId = params.id as string;
 
-    const [user, setUser] = useState<UserDetailData | null>(null);
-    const [activities, setActivities] = useState<ActivityItem[]>([]);
     const [activeTab, setActiveTab] = useState<string>("info");
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await fetch(`/api/admin/users/${userId}`);
-                if (!response.ok) {
-                    throw new Error('User not found');
-                }
-                const data = await response.json();
-                setUser(data);
-            } catch (error) {
-                console.error('Error fetching user:', error);
-                setError('Error loading user data');
-            } finally {
-                setIsLoading(false);
-            }
-        };
+    const { data: users = [], isLoading, error } = useQuery({
+        queryKey: ["admin", "users"],
+        queryFn: getAdminUsers,
+        staleTime: 60 * 1000,
+    });
 
-        const fetchUserActivities = async () => {
-            try {
-                const response = await fetch(`/api/admin/users/${userId}/activities`);
-                if (response.ok) {
-                    const data = await response.json();
-                    setActivities(data);
-                }
-            } catch (error) {
-                console.error('Error fetching activities:', error);
-            }
-        };
-
-        if (userId) {
-            fetchUserData();
-            fetchUserActivities();
-        }
-    }, [userId]);
+    const user = users.find((u) => u.id === userId) as unknown as UserDetailData | undefined;
+    const activities: ActivityItem[] = [];
 
     if (isLoading) {
         return (
@@ -105,7 +77,7 @@ export default function UserDetailPage() {
                     </Link>
                 </div>
                 <div className="text-center py-8">
-                    <p className="text-red-600 font-univers">{error || 'Usuario no encontrado'}</p>
+                    <p className="text-red-600 font-univers">{'Usuario no encontrado'}</p>
                 </div>
             </div>
         );

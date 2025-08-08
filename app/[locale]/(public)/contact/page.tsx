@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 export default async function ContactPage() {
   const t = await getTranslations("Contact");
@@ -116,7 +116,7 @@ export default async function ContactPage() {
       <div className="mt-16 text-center">
         <h2 className="text-2xl font-times-now mb-4">{t("faq.title")}</h2>
         <p className="text-gray-600 mb-4">{t("faq.description")}</p>
-        <Link href="/help" className="text-black underline hover:no-underline">
+        <Link href="/contact" className="text-black underline hover:no-underline">
           {t("faq.link")}
         </Link>
       </div>

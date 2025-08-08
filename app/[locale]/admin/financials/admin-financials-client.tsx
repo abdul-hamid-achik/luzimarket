@@ -82,9 +82,9 @@ export function AdminFinancialsClient({
         <DataTableColumnHeader column={column} title={t("vendors.vendor")} />
       ),
       cell: ({ row }) => {
-        const vendor = row.original.vendor;
+        const vendor = row.original.vendor as any;
         return vendor ? (
-          <Link href={`/admin/vendors/${vendor.id}`} className="text-blue-600 hover:underline">
+          <Link href={{ pathname: '/admin/vendors/[id]', params: { id: vendor.id } } as any} className="text-blue-600 hover:underline">
             {vendor?.businessName || "-"}
           </Link>
         ) : "-";
@@ -144,12 +144,12 @@ export function AdminFinancialsClient({
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>{t("actions.title")}</DropdownMenuLabel>
               <DropdownMenuItem asChild>
-                <Link href={`/admin/vendors/${vendor.id}`}>
+                <Link href={{ pathname: '/admin/vendors/[id]', params: { id: vendor.id } } as any}>
                   {t("actions.viewVendor")}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href={`/admin/vendors/${vendor.id}/transactions`}>
+                <Link href={{ pathname: '/admin/vendors/[id]/transactions', params: { id: vendor.id } } as any}>
                   {t("actions.viewTransactions")}
                 </Link>
               </DropdownMenuItem>
@@ -179,9 +179,9 @@ export function AdminFinancialsClient({
         <DataTableColumnHeader column={column} title={t("fees.vendor")} />
       ),
       cell: ({ row }) => {
-        const vendor = row.original.vendor;
+        const vendor = row.original.vendor as any;
         return vendor ? (
-          <Link href={`/admin/vendors/${vendor.id}`} className="text-blue-600 hover:underline">
+          <Link href={{ pathname: '/admin/vendors/[id]', params: { id: vendor.id } } as any} className="text-blue-600 hover:underline">
             {vendor?.businessName || "-"}
           </Link>
         ) : "-";
@@ -193,9 +193,9 @@ export function AdminFinancialsClient({
         <DataTableColumnHeader column={column} title={t("fees.order")} />
       ),
       cell: ({ row }) => {
-        const orderId = row.original.fee.orderId;
+        const orderId = row.original.fee.orderId as any;
         return (
-          <Link href={`/admin/orders/${orderId}`} className="text-blue-600 hover:underline text-sm">
+          <Link href={{ pathname: '/admin/orders/[id]', params: { id: orderId } } as any} className="text-blue-600 hover:underline text-sm">
             {t("viewOrder")}
           </Link>
         );
@@ -273,9 +273,9 @@ export function AdminFinancialsClient({
         <DataTableColumnHeader column={column} title={t("payouts.vendor")} />
       ),
       cell: ({ row }) => {
-        const vendor = row.original.vendor;
+        const vendor = row.original.vendor as any;
         return vendor ? (
-          <Link href={`/admin/vendors/${vendor.id}`} className="text-blue-600 hover:underline">
+          <Link href={{ pathname: '/admin/vendors/[id]', params: { id: vendor.id } } as any} className="text-blue-600 hover:underline">
             {vendor?.businessName || "-"}
           </Link>
         ) : "-";

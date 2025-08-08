@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { User, Mail, Calendar, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
+import { getAdminUsers } from "@/lib/actions/admin/users";
 
 type UserData = {
   id: string;
@@ -18,38 +20,17 @@ type UserData = {
 
 export default function AdminUsersPage() {
   const t = useTranslations("Admin.usersPage");
-  const [userList, setUserList] = useState<UserData[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<UserData[]>([]);
   const [activeFilter, setActiveFilter] = useState<string>("all");
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch('/api/admin/users');
-        const data = await response.json();
-        setUserList(data);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const { data: userList = [], isLoading } = useQuery<UserData[]>({
+    queryKey: ["admin", "users"],
+    queryFn: getAdminUsers,
+    staleTime: 60 * 1000,
+  });
 
-    fetchUsers();
-  }, []);
-
-  useEffect(() => {
-    const filterUsers = () => {
-      if (activeFilter === "all") {
-        setFilteredUsers(userList);
-      } else {
-        setFilteredUsers(userList.filter(user => user.userType === activeFilter));
-      }
-    };
-
-    filterUsers();
-  }, [userList, activeFilter]);
+  const filteredUsers = activeFilter === "all"
+    ? userList
+    : userList.filter(user => user.userType === activeFilter);
 
   const filterTabs = [
     { id: "all", label: t("filterAll"), count: userList.length },

@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { db } from "@/db";
 import { vendors, products } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
@@ -64,7 +64,7 @@ export default async function BrandsPage({ params }: BrandsPageProps) {
             {activeVendors.map((vendor) => (
               <Link
                 key={vendor.id}
-                href={`/brands/${vendor.slug}`}
+                href={{ pathname: "/brands/[slug]", params: { slug: vendor.slug } }}
                 className="group"
               >
                 <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">

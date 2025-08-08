@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
 import type { Metadata, ResolvingMetadata } from 'next';
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { db } from "@/db";
 import { vendors, products, categories } from "@/db/schema";

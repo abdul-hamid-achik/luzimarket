@@ -25,6 +25,10 @@ export const routing = defineRouting({
       es: '/categoria/[slug]',
       en: '/category/[slug]'
     },
+    '/category/[slug]/[vendor]': {
+      es: '/categoria/[slug]/[vendor]',
+      en: '/category/[slug]/[vendor]'
+    },
     '/cart': {
       es: '/carrito',
       en: '/cart'
@@ -82,6 +86,15 @@ export const routing = defineRouting({
     '/admin/orders/[id]': '/admin/orders/[id]',
     '/admin/vendors': '/admin/vendors',
     '/admin/vendors/[id]': '/admin/vendors/[id]',
+    '/admin/vendors/[id]/transactions': '/admin/vendors/[id]/transactions',
+    '/admin/products': '/admin/products',
+    '/admin/moderation/images': '/admin/moderation/images',
+    '/admin/users': '/admin/users',
+    '/admin/financials': '/admin/financials',
+    '/admin/categories': '/admin/categories',
+    '/admin/locked-accounts': '/admin/locked-accounts',
+    '/admin/email-templates': '/admin/email-templates',
+    '/admin/settings': '/admin/settings',
     '/coming-soon': {
       es: '/proximamente',
       en: '/coming-soon'
@@ -89,6 +102,10 @@ export const routing = defineRouting({
     '/brands': {
       es: '/tiendas-marcas',
       en: '/brands'
+    },
+    '/brands/[slug]': {
+      es: '/tiendas-marcas/[slug]',
+      en: '/brands/[slug]'
     },
     '/best-sellers': {
       es: '/mas-vendidos',
@@ -98,6 +115,10 @@ export const routing = defineRouting({
       es: '/seleccionados',
       en: '/handpicked'
     },
+    '/search': {
+      es: '/buscar',
+      en: '/search'
+    },
     '/categories': {
       es: '/categorias',
       en: '/categories'
@@ -106,9 +127,17 @@ export const routing = defineRouting({
       es: '/ocasiones',
       en: '/occasions'
     },
+    '/occasions/[id]': {
+      es: '/ocasiones/[id]',
+      en: '/occasions/[id]'
+    },
     '/editorial': {
       es: '/editorial',
       en: '/editorial'
+    },
+    '/editorial/[id]': {
+      es: '/editorial/[id]',
+      en: '/editorial/[id]'
     },
     '/wishlist': {
       es: '/favoritos',
@@ -141,6 +170,18 @@ export const routing = defineRouting({
     '/orders/[id]': {
       es: '/pedidos/[id]',
       en: '/orders/[id]'
+    },
+    '/orders/[orderNumber]': {
+      es: '/pedidos/[orderNumber]',
+      en: '/orders/[orderNumber]'
+    },
+    '/account': {
+      es: '/account',
+      en: '/account'
+    },
+    '/account/security': {
+      es: '/account/security',
+      en: '/account/security'
     },
     '/about': {
       es: '/acerca-de',

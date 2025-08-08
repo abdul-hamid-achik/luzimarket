@@ -8,7 +8,7 @@ import { FilterSidebar } from "@/components/products/filter-sidebar";
 import { SortDropdown } from "@/components/products/sort-dropdown";
 import { Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { getFilteredProducts, getProductFilterOptions } from "@/lib/actions/products";
 
 interface SearchPageProps {
@@ -130,7 +130,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
                 <p className="text-sm font-univers text-gray-500">Búsquedas populares:</p>
                 <div className="flex flex-wrap justify-center gap-2">
                   {['flores', 'chocolates', 'regalos', 'eventos', 'personalizado'].map((term) => (
-                    <Link key={term} href={`/search?q=${term}`}>
+                    <Link key={term} href={{ pathname: '/search', query: { q: term } }}>
                       <Button variant="outline" size="sm" className="font-univers">
                         {term}
                       </Button>

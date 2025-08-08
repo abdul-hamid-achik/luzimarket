@@ -17,7 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, CreditCard, MapPin, User, Phone, Mail, Truck, Shield, Package, UserCheck, UserX } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import Script from "next/script";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useSession } from "next-auth/react";
@@ -238,7 +238,7 @@ export default function CheckoutPage() {
                         <p className="text-sm font-univers mb-3">
                           Serás redirigido a la página de inicio de sesión
                         </p>
-                        <Link href="/login?redirect=/checkout">
+                        <Link href={{ pathname: "/login", query: { redirect: "/checkout" } }}>
                           <Button className="w-full bg-black text-white hover:bg-gray-800">
                             Ir a iniciar sesión
                           </Button>

@@ -16,6 +16,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getVendorProductById, updateVendorProduct, deleteVendorProduct } from "@/lib/actions/products";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -73,35 +75,27 @@ export default function EditProductPage() {
     mode: "onChange",
   });
 
-  // Load product data
+  const queryClient = useQueryClient();
+  const { data: product, isLoading: loadingProduct } = useQuery({
+    queryKey: ["vendor", "product", productId],
+    queryFn: () => getVendorProductById(productId),
+    staleTime: 60 * 1000,
+  });
+
   useEffect(() => {
-    async function loadProduct() {
-      try {
-        const response = await fetch(`/api/vendor/products/${productId}`);
-        if (!response.ok) throw new Error("Product not found");
-        
-        const product = await response.json();
-        
-        form.reset({
-          name: product.name,
-          description: product.description || "",
-          price: product.price.toString(),
-          stock: product.stock.toString(),
-          categoryId: product.categoryId.toString(),
-          tags: product.tags?.join(", ") || "",
-          images: product.images || [],
-          isActive: product.isActive,
-        });
-        
-        setImageUrls(product.images || []);
-      } catch (error) {
-        toast.error(t("toast.loadError"));
-        router.push("/vendor/products");
-      }
-    }
-    
-    loadProduct();
-  }, [productId, form, router, t]);
+    if (!product) return;
+    form.reset({
+      name: product.name,
+      description: product.description || "",
+      price: product.price.toString(),
+      stock: (product.stock ?? 0).toString(),
+      categoryId: product.categoryId?.toString() || "",
+      tags: (product.tags as string[] | null)?.join(", ") || "",
+      images: (product.images as string[] | null) || [],
+      isActive: product.isActive ?? true,
+    });
+    setImageUrls(((product.images as string[]) || []));
+  }, [product, form]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
@@ -131,24 +125,16 @@ export default function EditProductPage() {
 
   const onSubmit = async (data: ProductForm) => {
     setIsLoading(true);
-    
     try {
-      const response = await fetch(`/api/vendor/products/${productId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...data,
-          price: parseFloat(data.price),
-          stock: parseInt(data.stock),
-          categoryId: parseInt(data.categoryId),
-          tags: data.tags ? data.tags.split(",").map(tag => tag.trim()) : [],
-        }),
+      await updateVendorProduct(productId, {
+        ...data,
+        price: parseFloat(data.price),
+        stock: parseInt(data.stock),
+        categoryId: parseInt(data.categoryId),
+        tags: data.tags ? data.tags.split(",").map(tag => tag.trim()) : [],
       });
-
-      if (!response.ok) {
-        throw new Error(t("toast.updateError"));
-      }
-
+      await queryClient.invalidateQueries({ queryKey: ["vendor", "product", productId] });
+      await queryClient.invalidateQueries({ queryKey: ["vendor", "products"] });
       toast.success(t("toast.updateSuccess"));
       router.push("/vendor/products");
     } catch (error) {
@@ -160,16 +146,9 @@ export default function EditProductPage() {
 
   const handleDelete = async () => {
     setIsDeleting(true);
-    
     try {
-      const response = await fetch(`/api/vendor/products/${productId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error(t("toast.deleteError"));
-      }
-
+      await deleteVendorProduct(productId);
+      await queryClient.invalidateQueries({ queryKey: ["vendor", "products"] });
       toast.success(t("toast.deleteSuccess"));
       router.push("/vendor/products");
     } catch (error) {
@@ -485,7 +464,7 @@ export default function EditProductPage() {
               disabled={isLoading}
               className="bg-black text-white hover:bg-gray-800"
             >
-              {isLoading ? (
+              {isLoading || loadingProduct ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   {t("saving")}

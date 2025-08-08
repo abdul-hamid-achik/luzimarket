@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { orders, orderItems, products, vendors, users } from "@/db/schema";
 import { eq, desc, sql, ilike, and, gte, lte } from "drizzle-orm";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +12,7 @@ import { Package, Calendar, Eye } from "lucide-react";
 
 interface OrdersPageProps {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ 
+  searchParams: Promise<{
     status?: string;
     search?: string;
     page?: string;
@@ -22,10 +22,10 @@ interface OrdersPageProps {
 export default async function OrdersPage({ params, searchParams }: OrdersPageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
-  
+
   const session = await auth();
   const t = await getTranslations('orders');
-  
+
   if (!session || !session.user) {
     redirect("/login");
   }
@@ -39,7 +39,7 @@ export default async function OrdersPage({ params, searchParams }: OrdersPagePro
 
   // Build where conditions based on user role
   let whereConditions = [];
-  
+
   if (session.user.role === 'customer' && session.user.id) {
     // For customers, check both userId and email
     whereConditions.push(
@@ -83,7 +83,7 @@ export default async function OrdersPage({ params, searchParams }: OrdersPagePro
 
   // Get order items for each order
   const ordersWithItems = [];
-  
+
   for (const order of userOrders) {
     const items = await db
       .select({
@@ -135,12 +135,12 @@ export default async function OrdersPage({ params, searchParams }: OrdersPagePro
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">{t('title')}</h1>
-      
+
       {ordersWithItems.length === 0 ? (
         <div className="text-center py-16">
           <Package className="w-16 h-16 mx-auto text-gray-400 mb-4" />
           <p className="text-xl text-gray-600">{t('noOrders')}</p>
-          <Link href={`/${locale}`}>
+          <Link href="/">
             <Button className="mt-6">{t('startShopping')}</Button>
           </Link>
         </div>
@@ -153,7 +153,7 @@ export default async function OrdersPage({ params, searchParams }: OrdersPagePro
                   <h3 className="text-lg font-semibold">{t('orderNumber', { number: order.orderNumber })}</h3>
                   <p className="text-sm text-gray-600 flex items-center gap-2 mt-1">
                     <Calendar className="w-4 h-4" />
-                    {new Date(order.createdAt).toLocaleDateString(locale)}
+                    {order.createdAt ? new Date(order.createdAt as unknown as string).toLocaleDateString(locale) : ''}
                   </p>
                   <p className="text-sm text-gray-600 mt-1">
                     {order.vendor?.businessName || t('unknownVendor')}
@@ -166,7 +166,7 @@ export default async function OrdersPage({ params, searchParams }: OrdersPagePro
                   <p className="text-lg font-semibold mt-2">{formatCurrency(parseFloat(order.total))}</p>
                 </div>
               </div>
-              
+
               <div className="border-t pt-4">
                 <p className="text-sm font-medium mb-2">{t('items')}:</p>
                 <div className="space-y-2">
@@ -178,9 +178,9 @@ export default async function OrdersPage({ params, searchParams }: OrdersPagePro
                   ))}
                 </div>
               </div>
-              
+
               <div className="flex justify-end">
-                <Link href={`/${locale}/orders/${order.orderNumber}`}>
+                <Link href={{ pathname: '/orders/[orderNumber]', params: { orderNumber: order.orderNumber } }}>
                   <Button variant="outline" size="sm">
                     <Eye className="w-4 h-4 mr-2" />
                     {t('viewDetails')}
@@ -189,11 +189,11 @@ export default async function OrdersPage({ params, searchParams }: OrdersPagePro
               </div>
             </div>
           ))}
-          
+
           {totalPages > 1 && (
             <div className="flex justify-center gap-2 mt-8">
               {currentPage > 1 && (
-                <Link href={`?page=${currentPage - 1}`}>
+                <Link href={{ pathname: '/orders', query: { page: String(currentPage - 1) } }}>
                   <Button variant="outline">{t('previous')}</Button>
                 </Link>
               )}
@@ -201,7 +201,7 @@ export default async function OrdersPage({ params, searchParams }: OrdersPagePro
                 {t('pageOf', { current: currentPage, total: totalPages })}
               </span>
               {currentPage < totalPages && (
-                <Link href={`?page=${currentPage + 1}`}>
+                <Link href={{ pathname: '/orders', query: { page: String(currentPage + 1) } }}>
                   <Button variant="outline">{t('next')}</Button>
                 </Link>
               )}

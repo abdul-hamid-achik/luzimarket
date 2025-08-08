@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import Image from "next/image";
+import { Link } from "@/i18n/navigation";
 import { db } from "@/db";
 import { products, vendors, categories } from "@/db/schema";
 import { eq, and, ne } from "drizzle-orm";
@@ -70,7 +71,7 @@ async function getProduct(slug: string) {
 export default async function ProductPage({ params }: ProductPageProps) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
-  
+
   const t = await getTranslations('Products');
   const productData = await getProduct(slug);
 
@@ -87,11 +88,23 @@ export default async function ProductPage({ params }: ProductPageProps) {
         {/* Breadcrumb */}
         <nav className="text-sm font-univers mb-8">
           <ol className="flex items-center gap-2 text-gray-600">
-            <li><a href={`/${locale}`} className="hover:text-black">{t('home')}</a></li>
+            <li>
+              <Link href="/" className="hover:text-black">{t('home')}</Link>
+            </li>
             <li>/</li>
-            <li><a href={`/${locale}/categories`} className="hover:text-black">{t('categories')}</a></li>
+            <li>
+              <Link href="/categories" className="hover:text-black">{t('categories')}</Link>
+            </li>
             <li>/</li>
-            <li><a href={`/${locale}/category/${product.category?.slug}`} className="hover:text-black">{product.category?.name}</a></li>
+            <li>
+              {product.category?.slug ? (
+                <Link href={{ pathname: '/category/[slug]', params: { slug: product.category.slug } }} className="hover:text-black">
+                  {product.category?.name}
+                </Link>
+              ) : (
+                <span>{product.category?.name}</span>
+              )}
+            </li>
             <li>/</li>
             <li className="text-black">{product.name}</li>
           </ol>
@@ -115,7 +128,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 </div>
               )}
             </div>
-            
+
             {/* Thumbnail gallery */}
             {images.length > 1 && (
               <div className="grid grid-cols-4 gap-2">
@@ -150,7 +163,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
             {/* Actions */}
             <div className="space-y-4">
-              <AddToCartWithQuantityWrapper 
+              <AddToCartWithQuantityWrapper
                 product={{
                   id: product.id,
                   name: product.name,
@@ -161,9 +174,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   stock: product.stock || 0,
                 }}
               />
-              
+
               <div className="flex justify-center">
-                <WishlistButton 
+                <WishlistButton
                   product={{
                     id: product.id,
                     name: product.name,
@@ -219,25 +232,25 @@ export default async function ProductPage({ params }: ProductPageProps) {
               {t('returns')}
             </TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="description" className="mt-6">
             <div className="prose prose-sm font-univers max-w-none">
               <p>{product.description}</p>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="specifications" className="mt-6">
             <div className="prose prose-sm font-univers max-w-none">
               <p>{t('specificationContent')}</p>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="shipping" className="mt-6">
             <div className="prose prose-sm font-univers max-w-none">
               <p>{t('shippingContent')}</p>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="returns" className="mt-6">
             <div className="prose prose-sm font-univers max-w-none">
               <p>{t('returnsContent')}</p>
@@ -246,8 +259,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </Tabs>
 
         {/* Reviews Section */}
-        <ProductReviews 
-          productId={product.id} 
+        <ProductReviews
+          productId={product.id}
           reviews={[]}
           averageRating={0}
           totalReviews={0}

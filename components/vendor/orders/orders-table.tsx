@@ -1,12 +1,10 @@
-"use client";
-
-import { useState, useEffect } from "react";
-import { useLocale, useTranslations } from "next-intl";
+import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Eye, Package, Calendar, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
+import { getCurrentVendorOrders } from "@/lib/actions/orders";
 
 interface Order {
   id: string;
@@ -20,28 +18,10 @@ interface Order {
   customerEmail: string | null;
 }
 
-export function VendorOrdersTable() {
-  const t = useTranslations("vendor.orders");
-  const locale = useLocale();
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-
-  const fetchOrders = async () => {
-    try {
-      const response = await fetch("/api/vendor/orders");
-      if (!response.ok) throw new Error("Failed to fetch orders");
-      const data = await response.json();
-      setOrders(data);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+export async function VendorOrdersTable() {
+  const t = await getTranslations("vendor.orders");
+  const locale = await getLocale();
+  const orders: Order[] = await getCurrentVendorOrders();
 
   const statusConfig = {
     pending: { label: t("status.pending"), color: "bg-gray-100 text-gray-800" },
@@ -57,14 +37,6 @@ export function VendorOrdersTable() {
     succeeded: { label: t("payment.succeeded"), color: "bg-green-100 text-green-800" },
     failed: { label: t("payment.failed"), color: "bg-red-100 text-red-800" },
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-      </div>
-    );
-  }
 
   if (orders.length === 0) {
     return (

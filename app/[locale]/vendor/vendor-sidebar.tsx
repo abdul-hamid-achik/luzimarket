@@ -79,10 +79,7 @@ export function VendorSidebar({ userEmail, vendorName }: VendorSidebarProps) {
     },
   ];
 
-  const localizedMenuItems = menuItems.map((item) => ({
-    ...item,
-    href: getPathname({ href: item.href }),
-  }));
+  const localizedMenuItems = menuItems;
 
   return (
     <Sidebar>
@@ -125,7 +122,7 @@ export function VendorSidebar({ userEmail, vendorName }: VendorSidebarProps) {
                 return (
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton asChild isActive={isActive}>
-                      <Link href={item.href}>
+                      <Link href={item.href as any}>
                         <item.icon className="h-4 w-4" />
                         <span>{item.title}</span>
                       </Link>

@@ -191,7 +191,7 @@ export function AdminOrdersClient({ orders, translations: t, updateOrderStatus }
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Link href={`/admin/orders/${order.id}`}>
+                      <Link href={{ pathname: '/admin/orders/[id]', params: { id: order.id } } as any}>
                         <Button size="sm" variant="ghost">
                           <Eye className="h-4 w-4" />
                         </Button>

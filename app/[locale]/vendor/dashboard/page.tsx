@@ -82,7 +82,10 @@ export default async function VendorDashboard() {
   const session = await auth();
   const t = await getTranslations("vendor");
 
-  const vendorId = session.user.id;
+  if (!session || !session.user?.vendor?.id) {
+    redirect({ href: "/login", locale: 'es' });
+  }
+  const vendorId = session!.user!.vendor!.id;
   const stats = await getVendorStats(vendorId);
 
   // Get vendor info and Stripe account
@@ -100,7 +103,7 @@ export default async function VendorDashboard() {
 
   // Handle case where vendor info is not found
   if (!vendorInfo) {
-    redirect("/vendor/register");
+    redirect({ href: "/vendor/register", locale: 'es' });
   }
 
   const statsCards = [

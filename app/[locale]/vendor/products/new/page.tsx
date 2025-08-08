@@ -16,6 +16,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { createVendorProduct } from "@/lib/actions/products";
 
 const productSchema = z.object({
   name: z.string().min(3),
@@ -82,24 +83,14 @@ export default function NewProductPage() {
 
   const onSubmit = async (data: ProductForm) => {
     setIsLoading(true);
-    
     try {
-      const response = await fetch("/api/vendor/products", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...data,
-          price: parseFloat(data.price),
-          stock: parseInt(data.stock),
-          categoryId: parseInt(data.categoryId),
-          tags: data.tags ? data.tags.split(",").map(tag => tag.trim()) : [],
-        }),
+      await createVendorProduct({
+        ...data,
+        price: parseFloat(data.price),
+        stock: parseInt(data.stock),
+        categoryId: parseInt(data.categoryId),
+        tags: data.tags ? data.tags.split(",").map(tag => tag.trim()) : [],
       });
-
-      if (!response.ok) {
-        throw new Error("Error al crear el producto");
-      }
-
       toast.success(t("toast.createSuccess"));
       router.push("/vendor/products");
     } catch (error) {

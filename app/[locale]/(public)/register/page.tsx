@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, User, Mail, Lock, Eye, EyeOff } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 const createRegisterSchema = (t: any) => z.object({
   name: z.string().min(2, t("validation.nameMinLength")),

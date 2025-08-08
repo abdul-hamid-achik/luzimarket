@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 
 interface OccasionsPageProps {
@@ -25,7 +25,7 @@ const occasions = [
 export default async function OccasionsPage({ params }: OccasionsPageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
-  
+
   const t = await getTranslations('Navigation');
 
   return (
@@ -48,7 +48,7 @@ export default async function OccasionsPage({ params }: OccasionsPageProps) {
           {occasions.map((occasion) => (
             <Link
               key={occasion.id}
-              href={`/occasions/${occasion.id}`}
+              href={{ pathname: "/occasions/[id]", params: { id: occasion.id } }}
               className="group"
             >
               <div className="relative aspect-square overflow-hidden bg-gray-100">

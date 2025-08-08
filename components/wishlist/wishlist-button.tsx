@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useWishlist } from "@/contexts/wishlist-context";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 
 interface WishlistButtonProps {
   product: {
@@ -20,14 +20,13 @@ interface WishlistButtonProps {
   className?: string;
 }
 
-export function WishlistButton({ 
-  product, 
-  variant = "icon", 
-  className 
+export function WishlistButton({
+  product,
+  variant = "icon",
+  className
 }: WishlistButtonProps) {
   const { data: session } = useSession();
   const router = useRouter();
-  const locale = useLocale();
   const t = useTranslations("Common");
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const inWishlist = isInWishlist(product.id);
@@ -35,8 +34,7 @@ export function WishlistButton({
   const handleToggle = () => {
     // Check if user is authenticated
     if (!session?.user) {
-      // Redirect to login page
-      router.push(`/${locale}/iniciar-sesion`);
+      router.push('/login');
       return;
     }
 
@@ -66,11 +64,11 @@ export function WishlistButton({
           className
         )}
       >
-        <Heart 
+        <Heart
           className={cn(
             "h-4 w-4",
             inWishlist ? "fill-red-500 text-red-500" : "text-gray-600"
-          )} 
+          )}
         />
       </Button>
     );
@@ -86,11 +84,11 @@ export function WishlistButton({
         className
       )}
     >
-      <Heart 
+      <Heart
         className={cn(
           "h-4 w-4",
           inWishlist ? "fill-white text-white" : "text-gray-600"
-        )} 
+        )}
       />
       {inWishlist ? t("inWishlist") : t("addToWishlist")}
     </Button>

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Mail, ArrowLeft, CheckCircle } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 const resendSchema = z.object({
   email: z.string().email("Correo electrónico inválido"),

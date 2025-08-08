@@ -9,7 +9,7 @@ import { User, Mail, Calendar, ShoppingBag, Heart, Settings, LogOut, Shield } fr
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { ProfileForm } from "@/components/account/profile-form";
 import { OrdersList } from "@/components/account/orders-list";
 
@@ -144,7 +144,7 @@ export default async function AccountPage({ params }: AccountPageProps) {
                       {t('myWishlist')}
                     </Button>
                   </Link>
-                  <Link href="/account?tab=profile">
+                  <Link href="/account">
                     <Button variant="outline" className="w-full justify-start">
                       <Settings className="mr-2 h-4 w-4" />
                       {t('editProfile')}

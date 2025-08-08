@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { AddToCartButton } from "@/components/cart/add-to-cart-button";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useTranslations } from "next-intl";
 
@@ -49,7 +49,7 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
         <VisuallyHidden>
           <DialogTitle>{t("title", { name: product.name })}</DialogTitle>
         </VisuallyHidden>
-        
+
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -71,7 +71,7 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
                 priority
               />
             </div>
-            
+
             {/* Image Thumbnails */}
             {productImages.length > 1 && (
               <div className="flex gap-2 mt-4 justify-center">
@@ -80,11 +80,10 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
                     aria-label={t("viewImage", { number: index + 1 })}
-                    className={`relative w-16 h-16 rounded-md overflow-hidden border-2 transition-colors ${
-                      index === selectedImageIndex
+                    className={`relative w-16 h-16 rounded-md overflow-hidden border-2 transition-colors ${index === selectedImageIndex
                         ? "border-black"
                         : "border-gray-200 hover:border-gray-400"
-                    }`}
+                      }`}
                   >
                     <Image
                       src={image}
@@ -106,7 +105,7 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
               <p className="text-sm font-univers text-gray-600 mb-3">
                 {t("by")} {product.vendorName}
               </p>
-              
+
               {/* Rating */}
               {product.averageRating && product.totalReviews && product.totalReviews > 0 && (
                 <div className="flex items-center gap-2 mb-4">
@@ -114,11 +113,10 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star
                         key={star}
-                        className={`h-4 w-4 ${
-                          star <= Math.round(product.averageRating!)
+                        className={`h-4 w-4 ${star <= Math.round(product.averageRating!)
                             ? "fill-yellow-400 text-yellow-400"
                             : "text-gray-300"
-                        }`}
+                          }`}
                       />
                     ))}
                   </div>
@@ -189,7 +187,7 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
                   <Heart className="h-5 w-5" />
                 </Button>
               </div>
-              
+
               <Link href={`/products/${product.id}`} className="block">
                 <Button variant="outline" className="w-full">
                   {t("viewFullDetails")}

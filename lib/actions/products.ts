@@ -228,3 +228,150 @@ export async function getProductFilterOptions() {
     throw new Error("Failed to fetch filter options");
   }
 }
+
+export async function getVendorProductById(productId: string) {
+  const { auth } = await import("@/lib/auth");
+  const session = await auth();
+  if (!session || session.user.role !== "vendor" || !session.user.vendor?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  const product = await db.query.products.findFirst({
+    where: and(
+      eq(products.id, productId),
+      eq(products.vendorId, session.user.vendor.id)
+    ),
+    with: {
+      category: true,
+    },
+  });
+
+  if (!product) {
+    throw new Error("Product not found");
+  }
+
+  return product;
+}
+
+export async function updateVendorProduct(
+  productId: string,
+  data: {
+    name: string;
+    description: string;
+    price: number;
+    stock: number;
+    categoryId: number;
+    tags: string[];
+    images: string[];
+    isActive: boolean;
+  }
+) {
+  const { auth } = await import("@/lib/auth");
+  const { createImageModerationRecords } = await import("@/lib/actions/image-moderation");
+  const session = await auth();
+  if (!session || session.user.role !== "vendor" || !session.user.vendor?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  const existing = await db.query.products.findFirst({
+    where: and(
+      eq(products.id, productId),
+      eq(products.vendorId, session.user.vendor.id)
+    ),
+  });
+  if (!existing) {
+    throw new Error("Product not found");
+  }
+
+  const imagesChanged = JSON.stringify(existing.images) !== JSON.stringify(data.images);
+
+  const [updatedProduct] = await db
+    .update(products)
+    .set({
+      name: data.name,
+      description: data.description,
+      price: data.price.toString(),
+      stock: data.stock,
+      categoryId: data.categoryId,
+      images: data.images,
+      tags: data.tags || [],
+      isActive: data.isActive,
+      updatedAt: new Date(),
+      ...(imagesChanged && {
+        imagesPendingModeration: data.images.length > 0,
+        imagesApproved: false,
+      }),
+    })
+    .where(and(eq(products.id, productId), eq(products.vendorId, session.user.vendor.id)))
+    .returning();
+
+  if (imagesChanged && data.images.length > 0) {
+    await createImageModerationRecords(productId, session.user.vendor.id, data.images);
+  }
+
+  return updatedProduct;
+}
+
+export async function deleteVendorProduct(productId: string) {
+  const { auth } = await import("@/lib/auth");
+  const session = await auth();
+  if (!session || session.user.role !== "vendor" || !session.user.vendor?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  const existing = await db.query.products.findFirst({
+    where: and(eq(products.id, productId), eq(products.vendorId, session.user.vendor.id)),
+  });
+  if (!existing) {
+    throw new Error("Product not found");
+  }
+
+  await db.delete(products).where(and(eq(products.id, productId), eq(products.vendorId, session.user.vendor.id)));
+  return { success: true };
+}
+
+export async function createVendorProduct(data: {
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  categoryId: number;
+  tags: string[];
+  images: string[];
+}) {
+  const { auth } = await import("@/lib/auth");
+  const { createImageModerationRecords } = await import("@/lib/actions/image-moderation");
+  const session = await auth();
+  if (!session || session.user.role !== "vendor" || !session.user.vendor?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  // Basic slugging: name + random suffix
+  const { customAlphabet } = await import("nanoid");
+  const nanoid = customAlphabet("0123456789abcdefghijklmnopqrstuvwxyz", 6);
+  const slug = `${data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}-${nanoid()}`;
+
+  const [product] = await db
+    .insert(products)
+    .values({
+      vendorId: session.user.vendor.id,
+      name: data.name,
+      slug,
+      description: data.description,
+      price: data.price.toString(),
+      stock: data.stock,
+      categoryId: data.categoryId,
+      images: data.images,
+      tags: data.tags || [],
+      isActive: true,
+      imagesPendingModeration: data.images.length > 0,
+      imagesApproved: false,
+    })
+    .returning();
+
+  if (data.images.length > 0) {
+    await createImageModerationRecords(product.id, session.user.vendor.id, data.images);
+  }
+
+  return product;
+}

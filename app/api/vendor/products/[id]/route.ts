@@ -67,7 +67,7 @@ export async function PUT(
     const { id } = await params;
     const session = await auth();
     
-    if (!session || session.user.role !== "vendor") {
+    if (!session || session.user.role !== "vendor" || !session.user.vendor?.id) {
       return NextResponse.json(
         { error: "No autorizado" },
         { status: 401 }
@@ -81,7 +81,7 @@ export async function PUT(
     const existingProduct = await db.query.products.findFirst({
       where: and(
         eq(products.id, id),
-        eq(products.vendorId, session.user.vendor.id)
+        eq(products.vendorId, session.user.vendor!.id)
       ),
     });
 
@@ -157,7 +157,7 @@ export async function DELETE(
     const { id } = await params;
     const session = await auth();
     
-    if (!session || session.user.role !== "vendor") {
+    if (!session || session.user.role !== "vendor" || !session.user.vendor?.id) {
       return NextResponse.json(
         { error: "No autorizado" },
         { status: 401 }
@@ -168,7 +168,7 @@ export async function DELETE(
     const existingProduct = await db.query.products.findFirst({
       where: and(
         eq(products.id, id),
-        eq(products.vendorId, session.user.vendor.id)
+        eq(products.vendorId, session.user.vendor!.id)
       ),
     });
 

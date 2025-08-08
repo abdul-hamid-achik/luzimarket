@@ -14,13 +14,13 @@ export default async function AdminLayout({
 
   if (!session || session.user?.role !== "admin") {
     // Locale-aware redirect to login preserving current locale
-    redirect("/login");
+    redirect({ href: "/login", locale: 'es' });
   }
 
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full">
-        <AdminSidebar userEmail={session.user?.email || 'Admin'} />
+        <AdminSidebar userEmail={session!.user?.email || 'Admin'} />
         <SidebarInset className="flex-1">
           <header className="flex h-16 items-center justify-between border-b bg-white px-6">
             <div className="flex items-center gap-4">

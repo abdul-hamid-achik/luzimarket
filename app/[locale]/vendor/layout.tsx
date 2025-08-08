@@ -18,14 +18,14 @@ export default async function VendorLayout({
   // Skip auth check for registration page - will be handled by parallel route
   if (!session || !session.user || session.user.role !== "vendor") {
     // Locale-aware redirect to login
-    redirect("/login");
+    redirect({ href: "/login", locale: 'es' });
   }
 
   // Get vendor details
   let vendorName = "";
-  if (session.user.email) {
+  if (session!.user?.email) {
     const vendor = await db.query.vendors.findFirst({
-      where: eq(vendors.email, session.user.email),
+      where: eq(vendors.email, session!.user!.email!),
       columns: {
         businessName: true,
       },
@@ -37,7 +37,7 @@ export default async function VendorLayout({
     <SidebarProvider>
       <div className="flex h-screen w-full">
         <VendorSidebar
-          userEmail={session.user.email}
+          userEmail={session!.user!.email!}
           vendorName={vendorName}
         />
         <SidebarInset className="flex-1">

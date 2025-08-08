@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 
 interface EditorialPageProps {
@@ -58,7 +58,7 @@ export default async function EditorialPage({ params }: EditorialPageProps) {
         <div className="max-w-4xl mx-auto space-y-12">
           {articles.map((article) => (
             <article key={article.id} className="group">
-              <Link href={`/editorial/${article.id}`}>
+              <Link href={{ pathname: "/editorial/[id]", params: { id: article.id } }}>
                 <div className="grid md:grid-cols-2 gap-8 items-center">
                   {/* Image */}
                   <div className="aspect-[16/9] bg-gray-100 relative overflow-hidden">

@@ -605,3 +605,45 @@ export async function getOrderStatistics() {
     return {};
   }
 }
+
+/**
+ * Gets orders for the currently authenticated vendor (lightweight list for tables)
+ * Replaces GET /api/vendor/orders
+ */
+export async function getCurrentVendorOrders() {
+  const { auth } = await import("@/lib/auth");
+  const { users, orderItems } = await import("@/db/schema");
+
+  try {
+    const session = await auth();
+
+    if (!session || session.user.role !== "vendor" || !session.user.vendor?.id) {
+      throw new Error("Unauthorized");
+    }
+
+    const vendorOrders = await db
+      .select({
+        id: orders.id,
+        orderNumber: orders.orderNumber,
+        total: orders.total,
+        status: orders.status,
+        paymentStatus: orders.paymentStatus,
+        createdAt: orders.createdAt,
+        customerName: sql<string>`COALESCE(${users.name}, ${orders.guestName})`,
+        customerEmail: sql<string>`COALESCE(${users.email}, ${orders.guestEmail})`,
+        itemCount: sql<number>`(
+          SELECT COUNT(*) FROM ${orderItems}
+          WHERE ${orderItems.orderId} = ${orders.id}
+        )`,
+      })
+      .from(orders)
+      .leftJoin(users, eq(orders.userId, users.id))
+      .where(eq(orders.vendorId, session.user.vendor.id))
+      .orderBy(desc(orders.createdAt));
+
+    return vendorOrders;
+  } catch (error) {
+    console.error("Error fetching current vendor orders:", error);
+    throw error;
+  }
+}

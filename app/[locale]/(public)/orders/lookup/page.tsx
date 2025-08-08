@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Search, Package, Info } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 const lookupSchema = z.object({
   email: z.string().email("Email inválido"),

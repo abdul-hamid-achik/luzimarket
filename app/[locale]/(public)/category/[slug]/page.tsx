@@ -2,7 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { db } from "@/db";
 import { products, categories, vendors } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
@@ -114,7 +114,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                 <p className="text-base font-univers mb-8 leading-relaxed">
                   {info.subtitle}
                 </p>
-                <Link href={`/${locale}/category/${slug}/flowershop`}>
+                <Link href={{ pathname: '/category/[slug]/[vendor]', params: { slug, vendor: 'flowershop' } }}>
                   <Button className="bg-white text-black hover:bg-gray-100 px-8">
                     Flowershop
                   </Button>
@@ -148,7 +148,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
             <div className="flex-1">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-times-now">Handpicked</h2>
-                <Link href="#" className="text-sm font-univers hover:underline">
+                <Link href="/products" className="text-sm font-univers hover:underline">
                   Ver todos
                 </Link>
               </div>

@@ -3,7 +3,7 @@
 import { useWishlist } from "@/contexts/wishlist-context";
 import { ProductCard } from "@/components/products/product-card";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Heart } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";

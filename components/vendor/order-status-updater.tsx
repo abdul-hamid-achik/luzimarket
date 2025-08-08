@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Truck, Package, CheckCircle, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { updateOrderStatus } from "@/lib/actions/orders";
 
 interface OrderStatusUpdaterProps {
   order: {
@@ -60,24 +61,16 @@ export function OrderStatusUpdater({ order, onStatusUpdate }: OrderStatusUpdater
     setIsUpdating(true);
 
     try {
-      const response = await fetch(`/api/vendor/orders/${order.id}/status`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          status: selectedStatus,
-          notes: notes.trim() || undefined,
-          trackingNumber: trackingNumber.trim() || undefined,
-        }),
-      });
+      const ok = await updateOrderStatus(
+        order.id,
+        selectedStatus as any,
+        notes.trim() || undefined,
+        trackingNumber.trim() || undefined
+      );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || t("errors.updateFailed"));
+      if (!ok) {
+        throw new Error(t("errors.updateFailed"));
       }
-
-      const result = await response.json();
       
       toast.success(t("success.statusUpdated"), {
         description: t("success.statusUpdatedDescription", { orderNumber: order.orderNumber }),
