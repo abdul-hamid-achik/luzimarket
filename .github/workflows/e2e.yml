@@ -13,6 +13,8 @@ jobs:
       # App/test server
       PORT: 3000
       CI: true
+      PW_WORKERS: 2
+      CI_ALL_BROWSERS: 0
       # Core secrets (exposed from repo secrets)
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}

@@ -13,6 +13,10 @@ dotenv.config({ path: path.resolve(__dirname, '.env.local') });
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
+const isCi = !!process.env.CI;
+const includeAdditionalBrowsers = isCi ? process.env.CI_ALL_BROWSERS === '1' : false;
+const workersCount = isCi ? Number(process.env.PW_WORKERS || '2') : undefined;
+
 export default defineConfig({
   testDir: './e2e',
   /* Run tests in files in parallel */
@@ -20,11 +24,13 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  retries: isCi ? 2 : 0,
+  /* Control workers in CI via PW_WORKERS (default 2). */
+  workers: workersCount,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
+  /* Run global setup to prepare DB/test data */
+  globalSetup: './e2e/global.setup.ts',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -65,8 +71,8 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
 
-    // Additional browsers only in CI for faster local development
-    ...(process.env.CI ? [
+    // Additional browsers enabled in CI only when CI_ALL_BROWSERS=1
+    ...(includeAdditionalBrowsers ? [
       {
         name: 'firefox',
         use: { ...devices['Desktop Firefox'] },
