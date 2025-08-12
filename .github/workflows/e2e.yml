@@ -4,6 +4,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   test:
@@ -19,8 +20,8 @@ jobs:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
       AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-      NEXTAUTH_URL: http://localhost:${{ env.PORT }}
-      NEXT_PUBLIC_APP_URL: http://localhost:${{ env.PORT }}
+      NEXTAUTH_URL: http://localhost:3000
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
       # Optional integrations (present in repo secrets)
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
