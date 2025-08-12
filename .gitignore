@@ -16,6 +16,10 @@
 /playwright-report/
 /playwright/.cache/
 
+# tmp artifacts (committed dir, ignored contents)
+/tmp/*
+!/tmp/.gitkeep
+
 # test artifacts
 test-results.json
 failed-results.json
