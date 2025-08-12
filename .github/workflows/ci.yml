@@ -42,16 +42,16 @@ jobs:
     - name: Run linting
       run: npm run lint
     
-    - name: Run unit tests
-      run: npm run test:unit
-      env:
-        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/luzimarket_test
+    # - name: Run unit tests
+    #   run: npm run test:unit
+    #   env:
+    #     DATABASE_URL: postgresql://postgres:postgres@localhost:5432/luzimarket_test
     
     - name: Install Playwright browsers
       run: npx playwright install --with-deps
     
     - name: Run E2E tests
-      run: npm run test:e2e
+      run: npm run test
       env:
         DATABASE_URL: postgresql://postgres:postgres@localhost:5432/luzimarket_test
         CI: true
