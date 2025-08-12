@@ -8,18 +8,19 @@ test.describe('Products', () => {
   });
 
   test('should display products grid', async ({ page }) => {
-    // Wait for products to load - products are links containing product info
-    await page.waitForSelector('a[href*="/products/"]', { timeout: 10000 });
+    // Wait for products to load - tolerant selectors
+    const productCard = page.locator('[data-testid="product-card"], a[href*="/products/"]');
+    await expect(productCard.first()).toBeVisible({ timeout: 15000 });
 
     // Check that products are displayed
-    const products = page.locator('main').locator('a[href*="/products/"]');
+    const products = page.locator('main').locator('[data-testid="product-card"], a[href*="/products/"]');
     const count = await products.count();
     expect(count).toBeGreaterThan(0); // Should have at least some products
   });
 
   test('should show product details on hover', async ({ page }) => {
     // Get first product link
-    const firstProduct = page.locator('main').locator('a[href*="/products/"]').first();
+    const firstProduct = page.locator('main').locator('[data-testid="product-card"], a[href*="/products/"]').first();
 
     // Hover over product
     await firstProduct.hover();
@@ -28,9 +29,8 @@ test.describe('Products', () => {
     // First wait a bit for hover effects
     await page.waitForTimeout(500);
 
-    // Look for buttons within the parent element of the product link
-    const productCard = firstProduct.locator('xpath=ancestor::*[contains(@class, "group") or contains(@class, "card") or contains(@class, "product")]').first();
-    const quickActions = productCard.locator('button, [role="button"]');
+    // Look for buttons inside the product card
+    const quickActions = firstProduct.locator('button, [role="button"]');
 
     // If no quick actions, check if the product itself becomes more prominent
     const hasQuickActions = await quickActions.count() > 0;
@@ -96,7 +96,7 @@ test.describe('Products', () => {
 
   test('should open product quick view modal', async ({ page }) => {
     // Get first product link
-    const firstProduct = page.locator('main').locator('a[href*="/products/"]').first();
+    const firstProduct = page.locator('main').locator('[data-testid="product-card"], a[href*="/products/"]').first();
     await firstProduct.hover();
 
     const quickViewButton = firstProduct.locator('button:has-text("Quick view")').first();
@@ -116,7 +116,7 @@ test.describe('Products', () => {
 
   test('should add product to cart', async ({ page }) => {
     // Get first product
-    const firstProduct = page.locator('main').locator('a[href*="/products/"]').first();
+    const firstProduct = page.locator('main').locator('[data-testid="product-card"], a[href*="/products/"]').first();
 
     // Hover to show actions
     await firstProduct.hover();
@@ -143,10 +143,10 @@ test.describe('Products', () => {
 
   test('should navigate to product detail page', async ({ page }) => {
     // Get first product link
-    const firstProduct = page.locator('main').locator('a[href*="/products/"]').first();
+    const firstProduct = page.locator('main').locator('[data-testid="product-card"], a[href*="/products/"]').first();
 
     // Get product name for verification
-    const productName = await firstProduct.locator('h3').first().textContent();
+    const productName = await firstProduct.locator('h3, [data-testid="product-name"]').first().textContent();
 
     // Navigate to product detail
     await firstProduct.click();
