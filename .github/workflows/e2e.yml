@@ -9,13 +9,18 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium, firefox, webkit]
 
     env:
       # App/test server
       PORT: 3000
       CI: true
       PW_WORKERS: 2
-      CI_ALL_BROWSERS: 0
+      # Enable all Playwright projects in CI (see playwright.config.ts)
+      CI_ALL_BROWSERS: 1
       # Core secrets (exposed from repo secrets)
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
@@ -49,13 +54,13 @@ jobs:
         run: npm run db:push
 
       - name: Run Playwright tests (LLM)
-        run: npm run test:llm
+        run: npm run test:llm -- --project="${{ matrix.project }}"
 
       - name: Upload LLM artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: llm-test-artifacts
+          name: llm-test-artifacts-${{ matrix.project }}
           path: |
             tmp/test-results.json
             tmp/junit-results.xml
@@ -65,6 +70,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.project }}
           path: playwright-report/
           if-no-files-found: warn
