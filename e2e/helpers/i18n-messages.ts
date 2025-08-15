@@ -43,7 +43,7 @@ export const testMessages = {
     
     // Product related
     addToCart: getMessage('es', 'Products.addToCart'),
-    vendor: getMessage('es', 'Products.vendor'),
+    vendor: getMessage('es', 'Products.Vendor'),
   },
   en: {
     // Common
@@ -61,6 +61,6 @@ export const testMessages = {
     
     // Product related
     addToCart: getMessage('en', 'Products.addToCart'),
-    vendor: getMessage('en', 'Products.vendor'),
+    vendor: getMessage('en', 'Products.Vendor'),
   }
 };
