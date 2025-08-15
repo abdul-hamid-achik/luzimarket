@@ -21,7 +21,7 @@ interface StripeOnboardingClientProps {
 }
 
 export function StripeOnboardingClient({ vendor, stripeAccount }: StripeOnboardingClientProps) {
-  const t = useTranslations("vendor.stripeOnboarding");
+  const t = useTranslations("Vendor.stripeOnboarding");
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 

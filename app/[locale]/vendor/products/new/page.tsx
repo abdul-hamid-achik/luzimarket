@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,10 +32,31 @@ type ProductForm = z.infer<typeof productSchema>;
 
 export default function NewProductPage() {
   const router = useRouter();
-  const t = useTranslations("vendor.products.new");
+  const t = useTranslations("Vendor.products.new");
   const [isLoading, setIsLoading] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/categories", { cache: "no-store" });
+        if (!res.ok) throw new Error("failed");
+        const data: { id: number; name: string }[] = await res.json();
+        if (isMounted) setCategories(data);
+      } catch (e) {
+        toast.error("No se pudieron cargar las categorías");
+      } finally {
+        if (isMounted) setCategoriesLoading(false);
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const form = useForm<ProductForm>({
     resolver: zodResolver(productSchema),
@@ -111,7 +132,7 @@ export default function NewProductPage() {
           <ChevronLeft className="h-4 w-4 mr-1" />
           Volver a productos
         </Link>
-        
+
         <h1 className="text-2xl font-univers text-gray-900">Agregar Nuevo Producto</h1>
         <p className="text-sm text-gray-600 font-univers mt-1">
           Completa la información para agregar un nuevo producto a tu catálogo
@@ -123,7 +144,7 @@ export default function NewProductPage() {
           {/* Basic Information */}
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <h2 className="text-lg font-univers mb-6">Información Básica</h2>
-            
+
             <div className="space-y-6">
               <FormField
                 control={form.control}
@@ -173,14 +194,15 @@ export default function NewProductPage() {
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecciona una categoría" />
+                            <SelectValue placeholder={categoriesLoading ? "Cargando categorías..." : "Selecciona una categoría"} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="1">Flores & Amores</SelectItem>
-                          <SelectItem value="2">Dulces & Postres</SelectItem>
-                          <SelectItem value="3">Eventos & Cenas</SelectItem>
-                          <SelectItem value="4">Tienda de Regalos</SelectItem>
+                          {categories.map((c) => (
+                            <SelectItem key={c.id} value={String(c.id)}>
+                              {c.name}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -213,7 +235,7 @@ export default function NewProductPage() {
           {/* Pricing & Inventory */}
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <h2 className="text-lg font-univers mb-6">Precio e Inventario</h2>
-            
+
             <div className="grid grid-cols-2 gap-6">
               <FormField
                 control={form.control}
@@ -263,7 +285,7 @@ export default function NewProductPage() {
           {/* Images */}
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <h2 className="text-lg font-univers mb-6">Imágenes del Producto</h2>
-            
+
             <FormField
               control={form.control}
               name="images"

@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 
 export default async function AdminSecurityPage() {
   const session = await auth();
-  const t = await getTranslations("admin.security");
+  const t = await getTranslations("Admin.security");
   
   if (!session || session.user.role !== "admin") {
     redirect("/login");

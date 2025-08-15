@@ -6,12 +6,12 @@ import { orders, orderItems, products } from "@/db/schema";
 import { eq, sql, and, gte, lte, desc } from "drizzle-orm";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  DollarSign, 
-  ShoppingCart, 
-  Package, 
+import {
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  ShoppingCart,
+  Package,
   Users,
   Calendar,
   ArrowUpRight,
@@ -22,7 +22,7 @@ async function getVendorAnalytics(vendorId: string) {
   const now = new Date();
   const thirtyDaysAgo = new Date(now);
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-  
+
   const previousThirtyDays = new Date(thirtyDaysAgo);
   previousThirtyDays.setDate(previousThirtyDays.getDate() - 30);
 
@@ -99,10 +99,10 @@ async function getVendorAnalytics(vendorId: string) {
     .limit(10);
 
   // Calculate changes
-  const revenueChange = previousStats.totalRevenue > 0 
+  const revenueChange = previousStats.totalRevenue > 0
     ? ((currentStats.totalRevenue - previousStats.totalRevenue) / previousStats.totalRevenue) * 100
     : 0;
-  
+
   const ordersChange = previousStats.totalOrders > 0
     ? ((currentStats.totalOrders - previousStats.totalOrders) / previousStats.totalOrders) * 100
     : 0;
@@ -124,8 +124,8 @@ async function getVendorAnalytics(vendorId: string) {
 
 export default async function VendorAnalyticsPage() {
   const session = await auth();
-  const t = await getTranslations("vendor.analytics");
-  
+  const t = await getTranslations("Vendor.analytics");
+
   if (!session || session.user.role !== "vendor") {
     redirect("/login");
   }
@@ -179,7 +179,7 @@ export default async function VendorAnalyticsPage() {
         {statsCards.map((stat) => {
           const Icon = stat.icon;
           const TrendIcon = stat.change >= 0 ? ArrowUpRight : ArrowDownRight;
-          
+
           return (
             <Card key={stat.title}>
               <CardContent className="p-6">
@@ -188,9 +188,8 @@ export default async function VendorAnalyticsPage() {
                     <Icon className={`h-6 w-6 ${stat.color}`} />
                   </div>
                   {stat.change !== 0 && (
-                    <div className={`flex items-center gap-1 text-sm ${
-                      stat.change >= 0 ? "text-green-600" : "text-red-600"
-                    }`}>
+                    <div className={`flex items-center gap-1 text-sm ${stat.change >= 0 ? "text-green-600" : "text-red-600"
+                      }`}>
                       <span>{stat.change > 0 ? "+" : ""}{stat.change.toFixed(1)}%</span>
                       <TrendIcon className="h-4 w-4" />
                     </div>
@@ -261,7 +260,7 @@ export default async function VendorAnalyticsPage() {
               ) : (
                 <div className="text-center py-8 text-gray-400">
                   <Package className="h-12 w-12 mx-auto mb-2" />
-                  <p>{t("noProductsSold")}</p>
+                  <p>{t("noProductsSold", { default: "Aún no hay productos vendidos" })}</p>
                 </div>
               )}
             </CardContent>

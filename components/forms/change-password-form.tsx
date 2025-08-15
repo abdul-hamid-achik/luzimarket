@@ -28,7 +28,7 @@ const changePasswordSchema = z.object({
 type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
 
 export function ChangePasswordForm() {
-  const t = useTranslations("vendor.security.changePassword");
+  const t = useTranslations("Vendor.security.changePassword");
   const [isLoading, setIsLoading] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);

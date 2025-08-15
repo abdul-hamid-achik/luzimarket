@@ -48,7 +48,7 @@ export default async function VendorOrderDetailPage({
 }) {
   const { id, locale } = await params;
   const session = await auth();
-  const t = await getTranslations("vendor.orderDetails");
+  const t = await getTranslations("Vendor.orderDetails");
   
   if (!session || session.user.role !== "vendor") {
     redirect("/vendor/login");

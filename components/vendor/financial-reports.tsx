@@ -54,7 +54,7 @@ interface FinancialReportsProps {
 }
 
 export function FinancialReports({ vendorId }: FinancialReportsProps) {
-  const t = useTranslations("vendor.reports");
+  const t = useTranslations("Vendor.reports");
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(new Date().setDate(new Date().getDate() - 30)),
     to: new Date(),

@@ -91,11 +91,11 @@
     "name": "Name",
     "occasion": "Occasion",
     "priceRange": "Price range",
-    "vendor": "Vendor",
     "showFilters": "Show filters",
     "hideFilters": "Hide filters",
     "noProducts": "No products found",
-    "tryAdjustingFilters": "Try adjusting filters to see more results"
+    "tryAdjustingFilters": "Try adjusting filters to see more results",
+    "Vendor": "Vendor"
   },
   "account": {
     "page": {
@@ -186,8 +186,8 @@
     "subtitle": "Sign in to your account",
     "tabs": {
       "customer": "Customer",
-      "vendor": "Vendor",
-      "admin": "Admin"
+      "Admin": "Admin",
+      "Vendor": "Vendor"
     },
     "fields": {
       "email": "Email",
@@ -259,7 +259,8 @@
     "comingSoon": "COMING SOON",
     "comingSoonEs": "PRÓXIMAMENTE",
     "comingSoonFr": "BIENTÔT",
-    "comingSoonKr": "곧 출시"
+    "comingSoonKr": "곧 출시",
+    "comingSoonEn": "COMING SOON"
   },
   "Cart": {
     "title": "Cart ({count})",
@@ -463,7 +464,116 @@
     "products": "Products",
     "vendors": "Vendors",
     "users": "Users",
-    "financials": "Financials",
+    "financials": {
+      "title": "Financial Management",
+      "description": "Monitor platform finances and vendor balances",
+      "stats": {
+        "totalRevenue": "Total Revenue",
+        "totalRevenueDescription": "Platform fees collected",
+        "pendingFees": "Pending Fees",
+        "pendingFeesDescription": "To be collected",
+        "vendorBalances": "Vendor Balances",
+        "pending": "pending",
+        "activeVendors": "Active Vendors",
+        "activeVendorsDescription": "With available balance"
+      },
+      "tabs": {
+        "vendorBalances": "Vendor Balances",
+        "platformFees": "Platform Fees",
+        "payouts": "Payouts"
+      },
+      "vendors": {
+        "title": "Vendor Balances",
+        "description": "Available and pending funds by vendor",
+        "available": "Available",
+        "pending": "Pending",
+        "lifetime": "Lifetime Total",
+        "search": "Search vendor...",
+        "Vendor": "Vendor"
+      },
+      "fees": {
+        "title": "Platform Fees",
+        "description": "Commission charged on each transaction",
+        "date": "Date",
+        "order": "Order",
+        "orderAmount": "Order Amount",
+        "rate": "Rate",
+        "platformFee": "Fee",
+        "status": "Status",
+        "Vendor": "Vendor"
+      },
+      "payouts": {
+        "title": "Payout History",
+        "description": "Processed payouts to vendors",
+        "date": "Date",
+        "amount": "Amount",
+        "status": "Status",
+        "reference": "Reference",
+        "Vendor": "Vendor"
+      },
+      "actions": {
+        "title": "Actions",
+        "viewVendor": "View vendor",
+        "viewTransactions": "View transactions",
+        "requestPayout": "Request payout",
+        "exportReport": "Export report",
+        "refresh": "Refresh",
+        "openMenu": "Open menu"
+      },
+      "feeStatus": {
+        "pending": "Pending",
+        "collected": "Collected",
+        "transferred": "Transferred",
+        "failed": "Failed"
+      },
+      "payoutStatus": {
+        "pending": "Pending",
+        "processing": "Processing",
+        "paid": "Paid",
+        "failed": "Failed"
+      },
+      "viewOrder": "View order",
+      "reports": {
+        "title": "Financial Reports",
+        "description": "Comprehensive analysis of platform performance",
+        "reports": "Reports",
+        "reportsDescription": "Generate detailed reports to analyze business performance",
+        "selectDateRange": "Select a date range",
+        "selectVendor": "Select vendor",
+        "allVendors": "All vendors",
+        "download": "Download",
+        "platformOverview": "Platform Overview",
+        "salesReport": "Sales Report",
+        "payoutsReport": "Payouts Report",
+        "platformRevenue": "Platform Revenue",
+        "commissionEarned": "Commission earned",
+        "totalSales": "Total Sales",
+        "orders": "orders",
+        "activeVendors": "Active Vendors",
+        "of": "of",
+        "total": "total",
+        "avgOrderValue": "Average Order Value",
+        "topVendorsByRevenue": "Top Vendors by Revenue",
+        "vendorPerformance": "Vendor Performance",
+        "revenue": "Revenue",
+        "avgOrder": "Avg Order",
+        "totalOrders": "Total Orders",
+        "totalRevenue": "Total Revenue",
+        "salesOverTime": "Sales Over Time",
+        "topProducts": "Top Products",
+        "soldUnits": "{count} units sold",
+        "totalPayouts": "Total Payouts",
+        "pendingPayouts": "Pending Payouts",
+        "completedPayouts": "Completed Payouts",
+        "failedPayouts": "Failed Payouts",
+        "payoutStatusBreakdown": "Payout Status Breakdown",
+        "recentPayouts": "Recent Payouts",
+        "reportError": "Error generating report",
+        "downloadSuccess": "Report downloaded successfully",
+        "downloadError": "Error downloading report",
+        "Vendor": "Vendor"
+      }
+    },
     "emails": "Emails",
     "settings": "Settings",
     "analytics": "Analytics",
@@ -749,7 +859,6 @@
       "category": "Category",
       "tags": "Tags",
       "vendorInfo": "Vendor Information",
-      "vendor": "Vendor",
       "vendorEmail": "Vendor Email",
       "vendorActive": "Active",
       "vendorInactive": "Inactive",
@@ -763,7 +872,8 @@
       "awaitingApproval": "This product is awaiting approval from administrators.",
       "timestamps": "Timestamps",
       "created": "Created",
-      "updated": "Last Updated"
+      "updated": "Last Updated",
+      "Vendor": "Vendor"
     },
     "usersPage": {
       "title": "Users",
@@ -786,9 +896,9 @@
         "actions": "Actions"
       },
       "userTypes": {
-        "admin": "Admin",
-        "vendor": "Vendor",
-        "customer": "Customer"
+        "customer": "Customer",
+        "Admin": "Admin",
+        "Vendor": "Vendor"
       },
       "locked": "Locked",
       "active": "Active",
@@ -846,7 +956,6 @@
       "selectAll": "Select all",
       "deselectAll": "Deselect all",
       "product": "Product",
-      "vendor": "Vendor",
       "category": "Category",
       "price": "Price",
       "stock": "Stock",
@@ -864,7 +973,8 @@
       "totalProducts": "Total products",
       "activeProducts": "Active",
       "pendingProducts": "Pending",
-      "withStock": "With stock"
+      "withStock": "With stock",
+      "Vendor": "Vendor"
     },
     "security": {
       "title": "Security",
@@ -940,13 +1050,15 @@
   "Vendor": {
     "layout": {
       "dashboard": "Dashboard",
-      "products": "Products",
+      "products": "My Products",
       "orders": "Orders",
       "analytics": "Analytics",
       "financials": "Financials",
       "payments": "Payments",
       "settings": "Settings",
-      "logout": "Logout"
+      "logout": "Log out",
+      "title": "LUZIMARKET",
+      "vendorPanel": "Vendor Panel"
     },
     "dashboard": {
       "welcome": "Welcome, {businessName}",
@@ -997,13 +1109,38 @@
         "processing": "Processing",
         "shipped": "Shipped",
         "delivered": "Delivered",
-        "cancelled": "Cancelled"
+        "cancelled": "Cancelled",
+        "paid": "Pagado"
       },
       "trackingNumber": "Tracking number",
       "trackingNumberPlaceholder": "Enter tracking number",
       "notes": "Notes",
       "notesPlaceholder": "Add notes about the status update",
-      "updateStatus": "Update status"
+      "updateStatus": "Update status",
+      "description": "Gestiona los pedidos de tus clientes",
+      "subtitle": "Gestiona los pedidos de tus clientes",
+      "loading": "Cargando órdenes...",
+      "orderNumber": "Pedido",
+      "customer": "Cliente",
+      "statusHeader": "Estado",
+      "total": "Total",
+      "date": "Fecha",
+      "pending": "Pendiente",
+      "processing": "Procesando",
+      "shipped": "Enviado",
+      "delivered": "Entregado",
+      "cancelled": "Cancelado",
+      "payment": {
+        "pending": "Pendiente",
+        "succeeded": "Exitoso",
+        "failed": "Fallido"
+      },
+      "paymentHeader": "Pago",
+      "items": "Artículos",
+      "actions": "Acciones",
+      "guest": "Invitado",
+      "noOrders": "No hay pedidos",
+      "noOrdersDescription": "Aún no has recibido pedidos"
     },
     "analytics": {
       "title": "Analytics",
@@ -1013,10 +1150,61 @@
       "averageOrder": "Average Order Value",
       "conversionRate": "Conversion Rate",
       "comingSoon": "Coming Soon",
-      "analyticsComingSoon": "Advanced analytics and reporting features are coming soon. Stay tuned for detailed insights about your business performance."
+      "analyticsComingSoon": "Advanced analytics and reporting features are coming soon. Stay tuned for detailed insights about your business performance.",
+      "subtitle": "Estadísticas de tu negocio",
+      "revenue": "Ingresos",
+      "orders": "Órdenes",
+      "products": "Productos",
+      "customers": "Clientes",
+      "totalRevenue": "Ingresos Totales",
+      "uniqueCustomers": "Clientes Únicos",
+      "overview": "Vista General",
+      "recentOrders": "Órdenes Recientes",
+      "salesOverview": "Resumen de Ventas",
+      "last30Days": "Últimos 30 días",
+      "chartComingSoon": "Gráfico próximamente",
+      "topSellingProducts": "Productos Más Vendidos",
+      "unitsSold": "{count} unidades vendidas",
+      "latestSuccessfulOrders": "Últimas órdenes exitosas",
+      "items": "artículos",
+      "noProductsSold": "No hay productos vendidos aún"
     },
     "profile": "Profile",
-    "settings": "Settings",
+    "settings": {
+      "title": "Settings",
+      "description": "Manage your account and store settings",
+      "shipping": {
+        "title": "Shipping",
+        "description": "Configure your shipping methods and rates"
+      },
+      "store": {
+        "title": "Store Information",
+        "description": "Update your store details and public profile"
+      },
+      "payments": {
+        "title": "Payments",
+        "description": "Manage your payment information and preferences"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "description": "Control how and when to receive notifications"
+      },
+      "security": {
+        "title": "Security",
+        "description": "Protect your account with security settings"
+      },
+      "accountInfo": {
+        "title": "Account Information",
+        "businessName": "Business Name",
+        "email": "Email",
+        "vendorId": "Vendor ID",
+        "status": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "notConfigured": "Not configured",
+        "memberSince": "Member Since"
+      }
+    },
     "earnings": "Earnings",
     "newOrder": "New order received!",
     "orderDetails": {
@@ -1141,12 +1329,12 @@
       "title": "Financial Dashboard",
       "description": "Manage your finances and review your transactions",
       "balance": {
-        "available": "Available Balance",
-        "availableDescription": "Funds ready for withdrawal",
-        "pending": "Pending Balance",
+        "available": "Available balance",
+        "availableDescription": "Funds ready to withdraw",
+        "pending": "Pending balance",
         "pendingDescription": "Funds being processed",
-        "lifetime": "Lifetime Volume",
-        "lifetimeDescription": "Total historical sales"
+        "lifetime": "Total sales",
+        "lifetimeDescription": "All-time sales total"
       },
       "actions": {
         "export": "Export",
@@ -1160,15 +1348,42 @@
         "payouts": "Payouts"
       },
       "transactions": {
-        "title": "Transaction History",
-        "description": "All your sales and movements",
-        "empty": "No transactions yet"
+        "title": "Transaction history",
+        "description": "Description",
+        "empty": "No transactions yet",
+        "type": "Type",
+        "amount": "Amount",
+        "status": "Status",
+        "date": "Date",
+        "searchPlaceholder": "Search transactions...",
+        "orderPrefix": "Order:",
+        "actions": {
+          "openMenu": "Open menu",
+          "title": "Actions",
+          "copyTransactionId": "Copy transaction ID",
+          "viewOrder": "View order",
+          "viewDetails": "View details"
+        }
       },
       "payouts": {
-        "title": "Payout History",
-        "description": "Deposits to your bank account",
-        "empty": "No payouts recorded",
-        "payoutTo": "Payout to {method}"
+        "title": "Payout history",
+        "description": "Payments sent to your bank account",
+        "empty": "No payouts yet",
+        "payoutTo": "Payout to {method}",
+        "bankAccount": "Bank account",
+        "date": "Date",
+        "amount": "Amount",
+        "method": "Method",
+        "status": "Status",
+        "arrivalDate": "Arrival date",
+        "searchPlaceholder": "Search payouts...",
+        "actions": {
+          "openMenu": "Open menu",
+          "title": "Actions",
+          "copyPayoutId": "Copy payout ID",
+          "viewDetails": "View details",
+          "downloadReceipt": "Download receipt"
+        }
       },
       "status": {
         "completed": "Completed",
@@ -1176,17 +1391,17 @@
         "failed": "Failed",
         "processing": "Processing",
         "paid": "Paid",
-        "inTransit": "In Transit"
+        "inTransit": "In transit"
       },
       "accountInfo": {
-        "title": "Account Information",
+        "title": "Account information",
         "accountId": "Account ID",
-        "commissionRate": "Commission Rate",
-        "payoutsEnabled": "Payouts Enabled",
-        "chargesEnabled": "Charges Enabled",
-        "enabled": "Enabled",
-        "disabled": "Disabled",
-        "manageAccount": "Manage Account"
+        "commissionRate": "Platform commission",
+        "payoutsEnabled": "Payouts enabled",
+        "chargesEnabled": "Charges enabled",
+        "enabled": "Active",
+        "disabled": "Inactive",
+        "manageAccount": "Manage account"
       },
       "export": {
         "transactions": "Export transactions",
@@ -1194,13 +1409,18 @@
       },
       "noStripeAccount": {
         "title": "Stripe account not configured",
-        "description": "You need to set up your Stripe account to view financial information.",
-        "action": "Set up Stripe"
+        "description": "You need to set up your Stripe Connect account to receive payments directly.",
+        "action": "Set up Stripe account"
       },
       "incompleteAccount": {
         "title": "Incomplete setup",
-        "description": "Complete your account setup to enable payments.",
+        "description": "Your Stripe Connect account needs additional information before it can process payments.",
         "action": "Complete setup"
+      },
+      "subtitle": "Manage your finances and payments",
+      "table": {
+        "viewOrder": "View order",
+        "viewDetails": "View details"
       }
     },
     "security": {
@@ -1247,7 +1467,7 @@
       "cancel": "Cancel",
       "confirm": "Confirm",
       "processing": "Processing...",
-      "success": "Payout request sent successfully",
+      "success": "Payout request submitted successfully",
       "errors": {
         "invalidAmount": "Please enter a valid amount",
         "minimumAmount": "Minimum amount is {amount}",
@@ -1267,7 +1487,7 @@
       "totalRevenue": "Total Revenue",
       "avgOrderValue": "Average Order Value",
       "revenueOverTime": "Revenue Over Time",
-      "topProducts": "Top Products",
+      "topProducts": "Top Selling Products",
       "soldUnits": "{count} units sold",
       "revenue": "Revenue",
       "availableBalance": "Available Balance",
@@ -1287,6 +1507,170 @@
       "reportError": "Error generating report",
       "downloadSuccess": "Report downloaded successfully",
       "downloadError": "Error downloading report"
+    },
+    "orderStatusUpdater": {
+      "orderNumber": "Order #{number}",
+      "total": "Total",
+      "date": "Date",
+      "customer": "Customer",
+      "products": "Products",
+      "quantity": "Quantity",
+      "updateStatus": "Update Status",
+      "newStatus": "New Status",
+      "trackingNumber": "Tracking Number (Optional)",
+      "trackingNumberPlaceholder": "Enter tracking number",
+      "additionalNotes": "Additional Notes (Optional)",
+      "notesPlaceholder": "Add notes about this update...",
+      "updateButton": "Update Status",
+      "updating": "Updating...",
+      "status": {
+        "processing": "📦 Processing order",
+        "shipped": "🚚 Shipped",
+        "delivered": "✅ Delivered",
+        "cancelled": "❌ Cancelled"
+      },
+      "errors": {
+        "noChanges": "No changes to update",
+        "updateFailed": "Failed to update status",
+        "generic": "Error"
+      },
+      "success": {
+        "statusUpdated": "✅ Status updated successfully",
+        "statusUpdatedDescription": "Order #{orderNumber} has been updated. The customer will be notified automatically."
+      }
+    },
+    "products": {
+      "title": "My Products",
+      "description": "Manage your product catalog",
+      "addProduct": "Add Product",
+      "noImage": "No image",
+      "stockItems": "{count} items",
+      "active": "Active",
+      "inactive": "Inactive",
+      "new": {
+        "title": "New Product",
+        "editTitle": "Edit Product",
+        "validation": {
+          "name": "El nombre debe tener al menos 3 caracteres",
+          "description": "La descripción debe tener al menos 10 caracteres",
+          "price": "El precio debe ser mayor a 0",
+          "stock": "El stock debe ser un número entero positivo",
+          "image": "Se requiere al menos una imagen",
+          "category": "Por favor selecciona una categoría"
+        },
+        "toast": {
+          "createSuccess": "Producto creado exitosamente",
+          "createError": "Error al crear el producto",
+          "uploadError": "Error al subir la imagen"
+        },
+        "placeholders": {
+          "name": "Nombre del producto",
+          "description": "Describe tu producto en detalle...",
+          "price": "0.00",
+          "stock": "0",
+          "sku": "SKU-001"
+        }
+      },
+      "form": {
+        "selectCategory": "Select a category",
+        "dragDropImages": "Drag images here or click to select"
+      },
+      "validation": {
+        "stockPositive": "Stock must be a positive number",
+        "categoryRequired": "Select a category",
+        "imagesRequired": "Add at least one image"
+      },
+      "toast": {
+        "uploadError": "Error uploading images",
+        "createError": "Error creating product",
+        "createSuccess": "Product created successfully",
+        "updateError": "Error updating product",
+        "updateSuccess": "Product updated successfully",
+        "deleteError": "Error deleting product",
+        "deleteSuccess": "Product deleted successfully"
+      },
+      "edit": {
+        "backToProducts": "Back to products",
+        "editProduct": "Edit Product",
+        "updateProductInfo": "Update your product information",
+        "deleteButton": "Delete",
+        "deleteDialogTitle": "Are you sure?",
+        "deleteDialogDescription": "This action cannot be undone. The product will be permanently deleted.",
+        "deleteDialogCancel": "Cancel",
+        "deleteDialogConfirm": "Delete",
+        "deleting": "Deleting...",
+        "basicInfo": "Basic Information",
+        "productName": "Product Name",
+        "productNamePlaceholder": "Example: Red Rose Bouquet",
+        "description": "Description",
+        "descriptionPlaceholder": "Describe your product in detail...",
+        "category": "Category",
+        "selectCategoryPlaceholder": "Select a category",
+        "tags": "Tags (optional)",
+        "tagsPlaceholder": "roses, love, anniversary",
+        "tagsSeparator": "Separate tags with commas",
+        "priceAndInventory": "Pricing & Inventory",
+        "price": "Price (MXN)",
+        "pricePlaceholder": "299.99",
+        "stock": "Available Stock",
+        "stockPlaceholder": "50",
+        "productActive": "Active product (visible in store)",
+        "productImages": "Product Images",
+        "uploadingImages": "Uploading images...",
+        "dragDropText": "Drag images here or click to select",
+        "imageFormats": "PNG, JPG up to 5MB",
+        "mainImage": "Main",
+        "cancelButton": "Cancel",
+        "saveButton": "Save Changes",
+        "saving": "Saving...",
+        "categories": {
+          "1": "Flowers & Love",
+          "2": "Sweets & Desserts",
+          "3": "Events & Dinners",
+          "4": "Gift Shop"
+        },
+        "validation": {
+          "nameMinLength": "Name must be at least 3 characters",
+          "descriptionMinLength": "Description must be at least 10 characters",
+          "priceInvalid": "Price must be a number greater than 0",
+          "stockInvalid": "Stock must be a positive number",
+          "categoryRequired": "Select a category",
+          "imagesRequired": "Add at least one image"
+        },
+        "toast": {
+          "loadError": "Error loading product",
+          "uploadError": "Error uploading images",
+          "imagesAdded": "{count} image(s) added",
+          "updateSuccess": "Product updated successfully",
+          "updateError": "Error updating product",
+          "deleteSuccess": "Product deleted successfully",
+          "deleteError": "Error deleting product"
+        },
+        "title": "Editar Producto",
+        "placeholders": {
+          "name": "Nombre del producto",
+          "description": "Describe tu producto en detalle...",
+          "price": "0.00",
+          "stock": "0",
+          "sku": "SKU-001"
+        }
+      }
+    },
+    "shipping": {
+      "toast": {
+        "loadError": "Could not load shipping data",
+        "saveSuccess": "Your shipping configuration has been updated",
+        "saveError": "Could not save configuration",
+        "updateSuccess": "Configuración de envío actualizada",
+        "updateError": "Error al actualizar la configuración"
+      },
+      "form": {
+        "selectState": "Select your state"
+      },
+      "placeholders": {
+        "basePrice": "Precio base de envío",
+        "additionalCost": "Costo adicional por producto"
+      }
     }
   },
   "Errors": {
@@ -1302,29 +1686,12 @@
     "passwordsDontMatch": "Passwords don't match"
   },
   "Emails": {
-    "vendor": {
-      "newOrderSubject": "New order #{orderNumber} - Luzimarket",
-      "newOrderTitle": "🎉 New order received at Luzimarket!",
-      "newOrderGreeting": "Dear {businessName},",
-      "newOrderMessage": "You've received a new order in your Luzimarket store:",
-      "orderDetailsTitle": "📋 Order details:",
-      "orderNumber": "🔢 Order number:",
-      "orderTotal": "💰 Total:",
-      "orderDate": "📅 Date:",
-      "productsTitle": "🛍️ Ordered products:",
-      "shippingTitle": "📍 Shipping address:",
-      "actionRequired": "⏰ Action required:",
-      "actionMessage": "Please process this order within the next 24 hours to maintain an excellent customer experience.",
-      "viewOrderButton": "📦 View full order",
-      "emailFooter": "This email was sent automatically by Luzimarket. If you have any questions, contact our support team."
-    },
     "customer": {
       "confirmationSubject": "Order confirmation #{orderNumber} - Luzimarket",
       "confirmationTitle": "🎉 Thank you for your purchase at Luzimarket!",
       "confirmationGreeting": "Dear {customerName},",
       "confirmationMessage": "Your order has been successfully confirmed and is being processed by our vendor. We're excited that you've chosen unique Mexican products!",
       "orderSummaryTitle": "📋 Order summary:",
-      "vendor": "🏪 Vendor:",
       "subtotal": "💵 Subtotal:",
       "tax": "🧾 Tax (16%):",
       "shipping": "📦 Shipping:",
@@ -1347,7 +1714,24 @@
       "stayInformedMessage": "We'll notify you as soon as your package is delivered. Meanwhile, you can track your order in real time.",
       "needHelpButton": "💬 Need help?",
       "mexicanProducts": "Thank you for choosing unique Mexican products! 🇲🇽",
-      "connectingMessage": "Luzimarket - Connecting Mexico with the world"
+      "connectingMessage": "Luzimarket - Connecting Mexico with the world",
+      "Vendor": "🏪 Vendor:"
+    },
+    "Vendor": {
+      "newOrderSubject": "New order #{orderNumber} - Luzimarket",
+      "newOrderTitle": "🎉 New order received at Luzimarket!",
+      "newOrderGreeting": "Dear {businessName},",
+      "newOrderMessage": "You've received a new order in your Luzimarket store:",
+      "orderDetailsTitle": "📋 Order details:",
+      "orderNumber": "🔢 Order number:",
+      "orderTotal": "💰 Total:",
+      "orderDate": "📅 Date:",
+      "productsTitle": "🛍️ Ordered products:",
+      "shippingTitle": "📍 Shipping address:",
+      "actionRequired": "⏰ Action required:",
+      "actionMessage": "Please process this order within the next 24 hours to maintain an excellent customer experience.",
+      "viewOrderButton": "📦 View full order",
+      "emailFooter": "This email was sent automatically by Luzimarket. If you have any questions, contact our support team."
     }
   },
   "Search": {
@@ -1413,7 +1797,6 @@
     "shippingAvailable": "Shipping available",
     "securePayment": "Secure purchase",
     "specialPackaging": "Special packaging available",
-    "vendor": "Vendor",
     "category": "Category",
     "description": "Description",
     "specifications": "Specifications",
@@ -1459,7 +1842,8 @@
       "submitReview": "Submit review",
       "submitting": "Submitting...",
       "submitError": "Error submitting your review. Please try again."
-    }
+    },
+    "Vendor": "Vendor"
   },
   "Security": {
     "rateLimitAuth": "Too many authentication attempts. Try again in 15 minutes.",
@@ -1748,18 +2132,18 @@
         "terms": {
           "platform": "\"Platform\"",
           "user": "\"User\"",
-          "vendor": "\"Vendor\"",
           "products": "\"Products\"",
-          "services": "\"Services\""
+          "services": "\"Services\"",
+          "Vendor": "\"Vendor\""
         },
         "descriptions": {
           "platform": "refers to the luzimarket.shop website and all its mobile applications and related services",
           "user": "any person who accesses or uses the Platform",
-          "vendor": "independent merchants who offer their products through our Platform",
           "products": "items, gifts, and merchandise offered for sale on the Platform by third-party vendors",
           "services": "all services provided by Luzimarket, including transaction facilitation, payment processing, and customer support",
           "marketplace": "\"Marketplace\" - digital platform that facilitates transactions between buyers and independent vendors",
-          "platformFee": "\"Platform Fee\" - percentage charged to vendors for each successful transaction (typically 15% of sale value)"
+          "platformFee": "\"Platform Fee\" - percentage charged to vendors for each successful transaction (typically 15% of sale value)",
+          "Vendor": "independent merchants who offer their products through our Platform"
         }
       },
       "acceptance": {
@@ -1885,8 +2269,13 @@
           "quality": "The quality, safety, or legality of listed products",
           "availability": "The continuous availability of the Platform",
           "accuracy": "The accuracy of information provided by vendors",
-          "thirdParty": "Actions or omissions of third parties, including vendors and shipping services"
-        }
+          "thirdParty": "Actions or omissions of third parties, including vendors and shipping services",
+          "vendorActions": "Las acciones, omisiones o incumplimientos de los vendedores",
+          "shipping": "Retrasos o daños en el envío causados por vendedores o empresas de mensajería",
+          "disputes": "Disputas directas entre compradores y vendedores",
+          "platformFees": "Los vendedores son responsables del pago de comisiones de plataforma"
+        },
+        "maxLiability": "En cualquier caso, la responsabilidad total de Luzimarket no excederá el valor de la transacción específica en cuestión."
       },
       "indemnification": {
         "title": "Indemnification",
@@ -2151,9 +2540,9 @@
         "select": "Select a subject",
         "order": "Order inquiry",
         "product": "Product question",
-        "vendor": "Vendor inquiry",
         "technical": "Technical support",
-        "other": "Other"
+        "other": "Other",
+        "Vendor": "Vendor inquiry"
       }
     },
     "successMessage": "Message sent successfully! We'll respond soon.",
@@ -2234,440 +2623,6 @@
     "needHelp": "Need help?",
     "contactSupport": "Contact Support"
   },
-  "admin": {
-    "financials": {
-      "title": "Financial Management",
-      "description": "Monitor platform finances and vendor balances",
-      "stats": {
-        "totalRevenue": "Total Revenue",
-        "totalRevenueDescription": "Platform fees collected",
-        "pendingFees": "Pending Fees",
-        "pendingFeesDescription": "To be collected",
-        "vendorBalances": "Vendor Balances",
-        "pending": "pending",
-        "activeVendors": "Active Vendors",
-        "activeVendorsDescription": "With available balance"
-      },
-      "tabs": {
-        "vendorBalances": "Vendor Balances",
-        "platformFees": "Platform Fees",
-        "payouts": "Payouts"
-      },
-      "vendors": {
-        "title": "Vendor Balances",
-        "description": "Available and pending funds by vendor",
-        "vendor": "Vendor",
-        "available": "Available",
-        "pending": "Pending",
-        "lifetime": "Lifetime Total",
-        "search": "Search vendor..."
-      },
-      "fees": {
-        "title": "Platform Fees",
-        "description": "Commission charged on each transaction",
-        "date": "Date",
-        "vendor": "Vendor",
-        "order": "Order",
-        "orderAmount": "Order Amount",
-        "rate": "Rate",
-        "platformFee": "Fee",
-        "status": "Status"
-      },
-      "payouts": {
-        "title": "Payout History",
-        "description": "Processed payouts to vendors",
-        "date": "Date",
-        "vendor": "Vendor",
-        "amount": "Amount",
-        "status": "Status",
-        "reference": "Reference"
-      },
-      "actions": {
-        "title": "Actions",
-        "viewVendor": "View vendor",
-        "viewTransactions": "View transactions",
-        "requestPayout": "Request payout",
-        "exportReport": "Export report",
-        "refresh": "Refresh",
-        "openMenu": "Open menu"
-      },
-      "feeStatus": {
-        "pending": "Pending",
-        "collected": "Collected",
-        "transferred": "Transferred",
-        "failed": "Failed"
-      },
-      "payoutStatus": {
-        "pending": "Pending",
-        "processing": "Processing",
-        "paid": "Paid",
-        "failed": "Failed"
-      },
-      "viewOrder": "View order",
-      "reports": {
-        "title": "Financial Reports",
-        "description": "Comprehensive analysis of platform performance",
-        "reports": "Reports",
-        "reportsDescription": "Generate detailed reports to analyze business performance",
-        "selectDateRange": "Select a date range",
-        "selectVendor": "Select vendor",
-        "allVendors": "All vendors",
-        "download": "Download",
-        "platformOverview": "Platform Overview",
-        "salesReport": "Sales Report",
-        "payoutsReport": "Payouts Report",
-        "platformRevenue": "Platform Revenue",
-        "commissionEarned": "Commission earned",
-        "totalSales": "Total Sales",
-        "orders": "orders",
-        "activeVendors": "Active Vendors",
-        "of": "of",
-        "total": "total",
-        "avgOrderValue": "Average Order Value",
-        "topVendorsByRevenue": "Top Vendors by Revenue",
-        "vendorPerformance": "Vendor Performance",
-        "vendor": "Vendor",
-        "revenue": "Revenue",
-        "avgOrder": "Avg Order",
-        "totalOrders": "Total Orders",
-        "totalRevenue": "Total Revenue",
-        "salesOverTime": "Sales Over Time",
-        "topProducts": "Top Products",
-        "soldUnits": "{count} units sold",
-        "totalPayouts": "Total Payouts",
-        "pendingPayouts": "Pending Payouts",
-        "completedPayouts": "Completed Payouts",
-        "failedPayouts": "Failed Payouts",
-        "payoutStatusBreakdown": "Payout Status Breakdown",
-        "recentPayouts": "Recent Payouts",
-        "reportError": "Error generating report",
-        "downloadSuccess": "Report downloaded successfully",
-        "downloadError": "Error downloading report"
-      }
-    }
-  },
-  "vendor": {
-    "layout": {
-      "title": "LUZIMARKET",
-      "vendorPanel": "Vendor Panel",
-      "dashboard": "Dashboard",
-      "products": "My Products",
-      "orders": "Orders",
-      "analytics": "Analytics",
-      "financials": "Financials",
-      "payments": "Payments",
-      "settings": "Settings",
-      "logout": "Log out"
-    },
-    "orderStatusUpdater": {
-      "orderNumber": "Order #{number}",
-      "total": "Total",
-      "date": "Date",
-      "customer": "Customer",
-      "products": "Products",
-      "quantity": "Quantity",
-      "updateStatus": "Update Status",
-      "newStatus": "New Status",
-      "trackingNumber": "Tracking Number (Optional)",
-      "trackingNumberPlaceholder": "Enter tracking number",
-      "additionalNotes": "Additional Notes (Optional)",
-      "notesPlaceholder": "Add notes about this update...",
-      "updateButton": "Update Status",
-      "updating": "Updating...",
-      "status": {
-        "processing": "📦 Processing order",
-        "shipped": "🚚 Shipped",
-        "delivered": "✅ Delivered",
-        "cancelled": "❌ Cancelled"
-      },
-      "errors": {
-        "noChanges": "No changes to update",
-        "updateFailed": "Failed to update status",
-        "generic": "Error"
-      },
-      "success": {
-        "statusUpdated": "✅ Status updated successfully",
-        "statusUpdatedDescription": "Order #{orderNumber} has been updated. The customer will be notified automatically."
-      }
-    },
-    "financials": {
-      "title": "Financial Dashboard",
-      "subtitle": "Manage your finances and payments",
-      "noStripeAccount": {
-        "title": "Stripe account not configured",
-        "description": "You need to set up your Stripe Connect account to receive payments directly.",
-        "action": "Set up Stripe account"
-      },
-      "incompleteAccount": {
-        "title": "Incomplete setup",
-        "description": "Your Stripe Connect account needs additional information before it can process payments.",
-        "action": "Complete setup"
-      },
-      "balance": {
-        "available": "Available balance",
-        "availableDescription": "Funds ready to withdraw",
-        "pending": "Pending balance",
-        "pendingDescription": "Funds being processed",
-        "lifetime": "Total sales",
-        "lifetimeDescription": "All-time sales total"
-      },
-      "status": {
-        "completed": "Completed",
-        "pending": "Pending",
-        "failed": "Failed",
-        "processing": "Processing",
-        "paid": "Paid",
-        "inTransit": "In transit"
-      },
-      "actions": {
-        "export": "Export",
-        "refresh": "Refresh"
-      },
-      "lastUpdated": "Last updated: {time}",
-      "tabs": {
-        "overview": "Overview",
-        "reports": "Reports",
-        "transactions": "Transactions",
-        "payouts": "Payouts"
-      },
-      "transactions": {
-        "title": "Transaction history",
-        "description": "Description",
-        "empty": "No transactions yet",
-        "type": "Type",
-        "amount": "Amount",
-        "status": "Status",
-        "date": "Date",
-        "searchPlaceholder": "Search transactions...",
-        "orderPrefix": "Order:",
-        "actions": {
-          "openMenu": "Open menu",
-          "title": "Actions",
-          "copyTransactionId": "Copy transaction ID",
-          "viewOrder": "View order",
-          "viewDetails": "View details"
-        }
-      },
-      "payouts": {
-        "title": "Payout history",
-        "description": "Payments sent to your bank account",
-        "empty": "No payouts yet",
-        "payoutTo": "Payout to {method}",
-        "bankAccount": "Bank account",
-        "date": "Date",
-        "amount": "Amount",
-        "method": "Method",
-        "status": "Status",
-        "arrivalDate": "Arrival date",
-        "searchPlaceholder": "Search payouts...",
-        "actions": {
-          "openMenu": "Open menu",
-          "title": "Actions",
-          "copyPayoutId": "Copy payout ID",
-          "viewDetails": "View details",
-          "downloadReceipt": "Download receipt"
-        }
-      },
-      "accountInfo": {
-        "title": "Account information",
-        "accountId": "Account ID",
-        "commissionRate": "Platform commission",
-        "payoutsEnabled": "Payouts enabled",
-        "chargesEnabled": "Charges enabled",
-        "enabled": "Active",
-        "disabled": "Inactive",
-        "manageAccount": "Manage account"
-      },
-      "table": {
-        "viewOrder": "View order",
-        "viewDetails": "View details"
-      }
-    },
-    "payouts": {
-      "requestPayout": "Request Payout",
-      "title": "Request Payout",
-      "description": "Available balance: {balance}",
-      "amount": "Amount to withdraw",
-      "minimumNote": "Minimum amount: {amount}",
-      "cancel": "Cancel",
-      "confirm": "Confirm",
-      "processing": "Processing...",
-      "success": "Payout request submitted successfully",
-      "errors": {
-        "invalidAmount": "Please enter a valid amount",
-        "minimumAmount": "Minimum amount is {amount}",
-        "insufficientBalance": "Insufficient balance",
-        "requestFailed": "Failed to process request. Please try again."
-      }
-    },
-    "reports": {
-      "title": "Financial Reports",
-      "description": "Analyze your business performance with detailed reports",
-      "selectDateRange": "Select a date range to generate the report",
-      "salesReport": "Sales",
-      "revenueReport": "Revenue",
-      "productsReport": "Products",
-      "download": "Download",
-      "totalOrders": "Total Orders",
-      "totalRevenue": "Total Revenue",
-      "avgOrderValue": "Average Order Value",
-      "revenueOverTime": "Revenue Over Time",
-      "topProducts": "Top Selling Products",
-      "soldUnits": "{count} units sold",
-      "revenue": "Revenue",
-      "availableBalance": "Available Balance",
-      "pendingBalance": "Pending Balance",
-      "reservedBalance": "Reserved Balance",
-      "transactionBreakdown": "Transaction Breakdown",
-      "payoutSummary": "Payout Summary",
-      "payouts": "payouts",
-      "totalProducts": "Total Products",
-      "inventoryValue": "Inventory Value",
-      "lowStock": "Low Stock",
-      "productPerformance": "Product Performance",
-      "product": "Product",
-      "sku": "SKU",
-      "stock": "Stock",
-      "sold": "Sold",
-      "reportError": "Error generating report",
-      "downloadSuccess": "Report downloaded successfully",
-      "downloadError": "Error downloading report"
-    },
-    "settings": {
-      "title": "Settings",
-      "description": "Manage your account and store settings",
-      "shipping": {
-        "title": "Shipping",
-        "description": "Configure your shipping methods and rates"
-      },
-      "store": {
-        "title": "Store Information",
-        "description": "Update your store details and public profile"
-      },
-      "payments": {
-        "title": "Payments",
-        "description": "Manage your payment information and preferences"
-      },
-      "notifications": {
-        "title": "Notifications",
-        "description": "Control how and when to receive notifications"
-      },
-      "security": {
-        "title": "Security",
-        "description": "Protect your account with security settings"
-      },
-      "accountInfo": {
-        "title": "Account Information",
-        "businessName": "Business Name",
-        "email": "Email",
-        "vendorId": "Vendor ID",
-        "status": "Status",
-        "active": "Active",
-        "inactive": "Inactive",
-        "notConfigured": "Not configured",
-        "memberSince": "Member Since"
-      }
-    },
-    "products": {
-      "title": "My Products",
-      "description": "Manage your product catalog",
-      "addProduct": "Add Product",
-      "noImage": "No image",
-      "stockItems": "{count} items",
-      "active": "Active",
-      "inactive": "Inactive",
-      "new": {
-        "title": "New Product",
-        "editTitle": "Edit Product"
-      },
-      "form": {
-        "selectCategory": "Select a category",
-        "dragDropImages": "Drag images here or click to select"
-      },
-      "validation": {
-        "stockPositive": "Stock must be a positive number",
-        "categoryRequired": "Select a category",
-        "imagesRequired": "Add at least one image"
-      },
-      "toast": {
-        "uploadError": "Error uploading images",
-        "createError": "Error creating product",
-        "createSuccess": "Product created successfully",
-        "updateError": "Error updating product",
-        "updateSuccess": "Product updated successfully",
-        "deleteError": "Error deleting product",
-        "deleteSuccess": "Product deleted successfully"
-      },
-      "edit": {
-        "backToProducts": "Back to products",
-        "editProduct": "Edit Product",
-        "updateProductInfo": "Update your product information",
-        "deleteButton": "Delete",
-        "deleteDialogTitle": "Are you sure?",
-        "deleteDialogDescription": "This action cannot be undone. The product will be permanently deleted.",
-        "deleteDialogCancel": "Cancel",
-        "deleteDialogConfirm": "Delete",
-        "deleting": "Deleting...",
-        "basicInfo": "Basic Information",
-        "productName": "Product Name",
-        "productNamePlaceholder": "Example: Red Rose Bouquet",
-        "description": "Description",
-        "descriptionPlaceholder": "Describe your product in detail...",
-        "category": "Category",
-        "selectCategoryPlaceholder": "Select a category",
-        "tags": "Tags (optional)",
-        "tagsPlaceholder": "roses, love, anniversary",
-        "tagsSeparator": "Separate tags with commas",
-        "priceAndInventory": "Pricing & Inventory",
-        "price": "Price (MXN)",
-        "pricePlaceholder": "299.99",
-        "stock": "Available Stock",
-        "stockPlaceholder": "50",
-        "productActive": "Active product (visible in store)",
-        "productImages": "Product Images",
-        "uploadingImages": "Uploading images...",
-        "dragDropText": "Drag images here or click to select",
-        "imageFormats": "PNG, JPG up to 5MB",
-        "mainImage": "Main",
-        "cancelButton": "Cancel",
-        "saveButton": "Save Changes",
-        "saving": "Saving...",
-        "categories": {
-          "1": "Flowers & Love",
-          "2": "Sweets & Desserts",
-          "3": "Events & Dinners",
-          "4": "Gift Shop"
-        },
-        "validation": {
-          "nameMinLength": "Name must be at least 3 characters",
-          "descriptionMinLength": "Description must be at least 10 characters",
-          "priceInvalid": "Price must be a number greater than 0",
-          "stockInvalid": "Stock must be a positive number",
-          "categoryRequired": "Select a category",
-          "imagesRequired": "Add at least one image"
-        },
-        "toast": {
-          "loadError": "Error loading product",
-          "uploadError": "Error uploading images",
-          "imagesAdded": "{count} image(s) added",
-          "updateSuccess": "Product updated successfully",
-          "updateError": "Error updating product",
-          "deleteSuccess": "Product deleted successfully",
-          "deleteError": "Error deleting product"
-        }
-      }
-    },
-    "shipping": {
-      "toast": {
-        "loadError": "Could not load shipping data",
-        "saveSuccess": "Your shipping configuration has been updated",
-        "saveError": "Could not save configuration"
-      },
-      "form": {
-        "selectState": "Select your state"
-      }
-    }
-  },
   "orders": {
     "title": "My Orders",
     "subtitle": "View the history and status of all your orders",
@@ -2714,18 +2669,25 @@
     },
     "table": {
       "order": "Order",
-      "vendor": "Store",
       "items": "Items",
       "date": "Date",
       "status": "Status",
       "total": "Total",
-      "actions": "Actions"
+      "actions": "Actions",
+      "Vendor": "Store"
     },
     "pagination": {
       "showing": "Showing",
       "of": "of",
       "previous": "Previous",
       "next": "Next"
+    },
+    "error": {
+      "loading": "Error al cargar los pedidos",
+      "retry": "Reintentar"
+    },
+    "actions": {
+      "buyAgain": "Comprar de nuevo"
     }
   },
   "orderDetail": {
@@ -2769,9 +2731,6 @@
     "customer": {
       "title": "Customer information"
     },
-    "vendor": {
-      "title": "Vendor information"
-    },
     "shipping": {
       "title": "Shipping address"
     },
@@ -2785,6 +2744,9 @@
       "buyAgain": "Buy again",
       "downloadInvoice": "Download invoice",
       "needHelp": "Need help?"
+    },
+    "Vendor": {
+      "title": "Vendor information"
     }
   }
 }

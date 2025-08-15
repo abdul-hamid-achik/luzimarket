@@ -3,7 +3,7 @@ import { VendorOrdersTable } from "@/components/vendor/orders/orders-table";
 import { getTranslations } from "next-intl/server";
 
 export default async function VendorOrdersPage() {
-  const t = await getTranslations("vendor.orders");
+  const t = await getTranslations("Vendor.orders");
 
   return (
     <div className="space-y-6">

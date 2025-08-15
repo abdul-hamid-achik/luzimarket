@@ -30,6 +30,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import LanguageSwitcher from "@/components/layout/language-switcher";
+import { CurrencySwitch } from "@/components/layout/currency-switch";
 
 interface VendorSidebarProps {
   userEmail?: string;
@@ -38,7 +39,7 @@ interface VendorSidebarProps {
 
 export function VendorSidebar({ userEmail, vendorName }: VendorSidebarProps) {
   const pathname = usePathname();
-  const t = useTranslations("vendor.layout");
+  const t = useTranslations("Vendor.layout");
   const { state, toggleSidebar } = useSidebar();
 
   const menuItems = [
@@ -140,6 +141,9 @@ export function VendorSidebar({ userEmail, vendorName }: VendorSidebarProps) {
           <div className="flex items-center gap-2 px-2">
             <Globe className="h-4 w-4 text-gray-500" />
             <LanguageSwitcher />
+          </div>
+          <div className="flex items-center gap-2 px-2">
+            <CurrencySwitch />
           </div>
           {userEmail && state !== "collapsed" && (
             <p className="text-xs text-gray-600 px-2">{userEmail}</p>

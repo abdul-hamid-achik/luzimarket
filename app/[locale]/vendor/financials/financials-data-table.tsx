@@ -6,9 +6,9 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTable, DataTableColumnHeader } from "@/components/ui/data-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-  DollarSign, 
-  TrendingUp, 
+import {
+  DollarSign,
+  TrendingUp,
   RefreshCw,
   CreditCard,
   Download,
@@ -52,7 +52,7 @@ interface FinancialsDataTableProps {
 }
 
 export function FinancialsDataTable({ transactions, payouts }: FinancialsDataTableProps) {
-  const t = useTranslations("vendor.financials");
+  const t = useTranslations("Vendor.financials");
   const tCommon = useTranslations("Common.dataTable");
   const [activeTab, setActiveTab] = useState<"transactions" | "payouts">("transactions");
 
@@ -308,7 +308,7 @@ export function FinancialsDataTable({ transactions, payouts }: FinancialsDataTab
           translations={{
             columns: tCommon("columns"),
             noResults: tCommon("noResults"),
-            rowsSelected: tCommon("rowsSelected"),
+            rowsSelected: tCommon("rowsSelected", { selected: "{selected}", total: "{total}" }),
             previous: tCommon("previous"),
             next: tCommon("next"),
           }}
@@ -323,7 +323,7 @@ export function FinancialsDataTable({ transactions, payouts }: FinancialsDataTab
           translations={{
             columns: tCommon("columns"),
             noResults: tCommon("noResults"),
-            rowsSelected: tCommon("rowsSelected"),
+            rowsSelected: tCommon("rowsSelected", { selected: "{selected}", total: "{total}" }),
             previous: tCommon("previous"),
             next: tCommon("next"),
           }}

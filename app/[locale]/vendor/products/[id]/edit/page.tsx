@@ -51,7 +51,7 @@ export default function EditProductPage() {
   const router = useRouter();
   const params = useParams();
   const productId = params.id as string;
-  const t = useTranslations("vendor.products.edit");
+  const t = useTranslations("Vendor.products.edit");
   
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);

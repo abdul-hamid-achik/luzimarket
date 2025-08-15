@@ -5,7 +5,7 @@ import { StripeOnboardingClient } from "./stripe-onboarding-client";
 import { getTranslations } from "next-intl/server";
 
 export default async function StripeOnboardingPage() {
-  const t = await getTranslations("vendor.stripeOnboarding");
+  const t = await getTranslations("Vendor.stripeOnboarding");
   
   const vendorResult = await getVendorFromSession();
   if (!vendorResult.success || !vendorResult.data) {

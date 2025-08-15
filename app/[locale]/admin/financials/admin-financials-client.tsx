@@ -52,7 +52,7 @@ export function AdminFinancialsClient({
   platformFees,
   payouts,
 }: AdminFinancialsClientProps) {
-  const t = useTranslations("admin.financials");
+  const t = useTranslations("Admin.financials");
   const tCommon = useTranslations("Common.dataTable");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -438,7 +438,7 @@ export function AdminFinancialsClient({
                 translations={{
                   columns: tCommon("columns"),
                   noResults: tCommon("noResults"),
-                  rowsSelected: tCommon("rowsSelected"),
+                  rowsSelected: tCommon("rowsSelected", { selected: "{selected}", total: "{total}" }),
                   previous: tCommon("previous"),
                   next: tCommon("next"),
                 }}
@@ -461,7 +461,7 @@ export function AdminFinancialsClient({
                 translations={{
                   columns: tCommon("columns"),
                   noResults: tCommon("noResults"),
-                  rowsSelected: tCommon("rowsSelected"),
+                  rowsSelected: tCommon("rowsSelected", { selected: "{selected}", total: "{total}" }),
                   previous: tCommon("previous"),
                   next: tCommon("next"),
                 }}
@@ -484,7 +484,7 @@ export function AdminFinancialsClient({
                 translations={{
                   columns: tCommon("columns"),
                   noResults: tCommon("noResults"),
-                  rowsSelected: tCommon("rowsSelected"),
+                  rowsSelected: tCommon("rowsSelected", { selected: "{selected}", total: "{total}" }),
                   previous: tCommon("previous"),
                   next: tCommon("next"),
                 }}

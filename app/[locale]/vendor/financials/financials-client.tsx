@@ -51,7 +51,7 @@ export function FinancialsClient({
   payouts,
   stripeAccount,
 }: FinancialsClientProps) {
-  const t = useTranslations("vendor.financials");
+  const t = useTranslations("Vendor.financials");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = async () => {

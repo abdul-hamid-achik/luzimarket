@@ -31,7 +31,7 @@ export function PayoutRequestDialog({
   availableBalance,
   onSuccess,
 }: PayoutRequestDialogProps) {
-  const t = useTranslations("vendor.payouts");
+  const t = useTranslations("Vendor.payouts");
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState("");

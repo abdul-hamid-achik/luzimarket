@@ -5,7 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { FinancialsClient } from "./financials-client";
 
 export default async function VendorFinancialsPage() {
-  const t = await getTranslations("vendor.financials");
+  const t = await getTranslations("Vendor.financials");
   
   const vendorResult = await getVendorFromSession();
   if (!vendorResult.success || !vendorResult.data) {

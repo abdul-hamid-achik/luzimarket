@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 
 export default async function VendorSecurityPage() {
   const session = await auth();
-  const t = await getTranslations("vendor.security");
+  const t = await getTranslations("Vendor.security");
   
   if (!session || session.user.role !== "vendor") {
     redirect("/login");

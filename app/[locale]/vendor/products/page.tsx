@@ -7,13 +7,14 @@ import { eq } from "drizzle-orm";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import SubmitButton from "@/components/ui/submit-button";
 import { Plus, Edit, Eye, EyeOff } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 export default async function VendorProductsPage() {
   const session = await auth();
-  const t = await getTranslations("vendor.products");
-  
+  const t = await getTranslations("Vendor.products");
+
   if (!session || session.user.role !== "vendor") {
     redirect("/login");
   }
@@ -38,13 +39,13 @@ export default async function VendorProductsPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-univers text-gray-900">{t("title")}</h1>
+          <h1 className="text-2xl font-univers text-gray-900" data-testid="vendor-products-title">{t("title")}</h1>
           <p className="text-sm text-gray-600 font-univers mt-1">
             {t("description")}
           </p>
         </div>
         <Link href="/vendor/products/new">
-          <Button className="bg-black text-white hover:bg-gray-800">
+          <Button className="bg-black text-white hover:bg-gray-800" data-testid="vendor-add-product">
             <Plus className="h-4 w-4 mr-2" />
             {t("addProduct")}
           </Button>
@@ -125,21 +126,18 @@ export default async function VendorProductsPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`text-sm font-univers ${
-                          product.stock && product.stock > 0 ? 'text-gray-900' : 'text-red-600'
-                        }`}>
+                        <span className={`text-sm font-univers ${product.stock && product.stock > 0 ? 'text-gray-900' : 'text-red-600'
+                          }`}>
                           {product.stock || 0}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-univers ${
-                          product.isActive
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          <span className={`mr-1.5 h-2 w-2 rounded-full ${
-                            product.isActive ? 'bg-green-400' : 'bg-gray-400'
-                          }`} />
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-univers ${product.isActive
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
+                          }`}>
+                          <span className={`mr-1.5 h-2 w-2 rounded-full ${product.isActive ? 'bg-green-400' : 'bg-gray-400'
+                            }`} />
                           {product.isActive ? t("active") : t("inactive")}
                         </span>
                       </td>
@@ -159,17 +157,18 @@ export default async function VendorProductsPage() {
                               .where(eq(products.id, product.id));
                             revalidatePath("/vendor/products");
                           }}>
-                            <Button
+                            <SubmitButton
                               variant="ghost"
                               size="sm"
                               type="submit"
+                              pendingChildren={product.isActive ? <EyeOff className="h-4 w-4 animate-pulse" /> : <Eye className="h-4 w-4 animate-pulse" />}
                             >
-                            {product.isActive ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                            </Button>
+                              {product.isActive ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </SubmitButton>
                           </form>
                         </div>
                       </td>

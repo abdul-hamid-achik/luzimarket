@@ -91,11 +91,11 @@
     "name": "Nombre",
     "occasion": "Ocasión",
     "priceRange": "Rango de precio",
-    "vendor": "Vendedor",
     "showFilters": "Mostrar filtros",
     "hideFilters": "Ocultar filtros",
     "noProducts": "No se encontraron productos",
-    "tryAdjustingFilters": "Intenta ajustar los filtros para ver más resultados"
+    "tryAdjustingFilters": "Intenta ajustar los filtros para ver más resultados",
+    "Vendor": "Vendedor"
   },
   "account": {
     "page": {
@@ -186,8 +186,8 @@
     "subtitle": "Inicia sesión en tu cuenta",
     "tabs": {
       "customer": "Cliente",
-      "vendor": "Vendedor",
-      "admin": "Admin"
+      "Admin": "Admin",
+      "Vendor": "Vendedor"
     },
     "fields": {
       "email": "Correo electrónico",
@@ -259,7 +259,8 @@
     "comingSoon": "PRÓXIMAMENTE",
     "comingSoonEn": "COMING SOON",
     "comingSoonFr": "BIENTÔT",
-    "comingSoonKr": "곧 출시"
+    "comingSoonKr": "곧 출시",
+    "comingSoonEs": "PRÓXIMAMENTE"
   },
   "Cart": {
     "title": "Carrito ({count})",
@@ -463,7 +464,116 @@
     "products": "Productos",
     "vendors": "Vendedores",
     "users": "Usuarios",
-    "financials": "Finanzas",
+    "financials": {
+      "title": "Gestión Financiera",
+      "description": "Supervisa las finanzas de la plataforma y los balances de vendedores",
+      "stats": {
+        "totalRevenue": "Ingresos Totales",
+        "totalRevenueDescription": "Comisiones cobradas",
+        "pendingFees": "Comisiones Pendientes",
+        "pendingFeesDescription": "Por cobrar",
+        "vendorBalances": "Balance de Vendedores",
+        "pending": "pendiente",
+        "activeVendors": "Vendedores Activos",
+        "activeVendorsDescription": "Con balance disponible"
+      },
+      "tabs": {
+        "vendorBalances": "Balances de Vendedores",
+        "platformFees": "Comisiones de Plataforma",
+        "payouts": "Pagos"
+      },
+      "vendors": {
+        "title": "Balances de Vendedores",
+        "description": "Fondos disponibles y pendientes por vendedor",
+        "available": "Disponible",
+        "pending": "Pendiente",
+        "lifetime": "Total Histórico",
+        "search": "Buscar vendedor...",
+        "Vendor": "Vendedor"
+      },
+      "fees": {
+        "title": "Comisiones de Plataforma",
+        "description": "Comisiones cobradas en cada transacción",
+        "date": "Fecha",
+        "order": "Orden",
+        "orderAmount": "Monto Orden",
+        "rate": "Tasa",
+        "platformFee": "Comisión",
+        "status": "Estado",
+        "Vendor": "Vendedor"
+      },
+      "payouts": {
+        "title": "Historial de Pagos",
+        "description": "Pagos procesados a vendedores",
+        "date": "Fecha",
+        "amount": "Monto",
+        "status": "Estado",
+        "reference": "Referencia",
+        "Vendor": "Vendedor"
+      },
+      "actions": {
+        "title": "Acciones",
+        "viewVendor": "Ver vendedor",
+        "viewTransactions": "Ver transacciones",
+        "requestPayout": "Solicitar pago",
+        "exportReport": "Exportar reporte",
+        "refresh": "Actualizar",
+        "openMenu": "Abrir menú"
+      },
+      "feeStatus": {
+        "pending": "Pendiente",
+        "collected": "Cobrado",
+        "transferred": "Transferido",
+        "failed": "Fallido"
+      },
+      "payoutStatus": {
+        "pending": "Pendiente",
+        "processing": "Procesando",
+        "paid": "Pagado",
+        "failed": "Fallido"
+      },
+      "viewOrder": "Ver orden",
+      "reports": {
+        "title": "Reportes Financieros",
+        "description": "Análisis completo del rendimiento de la plataforma",
+        "reports": "Reportes",
+        "reportsDescription": "Genera reportes detallados para analizar el rendimiento del negocio",
+        "selectDateRange": "Selecciona un rango de fechas",
+        "selectVendor": "Seleccionar vendedor",
+        "allVendors": "Todos los vendedores",
+        "download": "Descargar",
+        "platformOverview": "Vista General",
+        "salesReport": "Reporte de Ventas",
+        "payoutsReport": "Reporte de Pagos",
+        "platformRevenue": "Ingresos de Plataforma",
+        "commissionEarned": "Comisiones ganadas",
+        "totalSales": "Ventas Totales",
+        "orders": "órdenes",
+        "activeVendors": "Vendedores Activos",
+        "of": "de",
+        "total": "total",
+        "avgOrderValue": "Valor Promedio de Orden",
+        "topVendorsByRevenue": "Principales Vendedores por Ingresos",
+        "vendorPerformance": "Rendimiento de Vendedores",
+        "revenue": "Ingresos",
+        "avgOrder": "Orden Promedio",
+        "totalOrders": "Total de Órdenes",
+        "totalRevenue": "Ingresos Totales",
+        "salesOverTime": "Ventas a lo Largo del Tiempo",
+        "topProducts": "Productos Más Vendidos",
+        "soldUnits": "{count} unidades vendidas",
+        "totalPayouts": "Total de Pagos",
+        "pendingPayouts": "Pagos Pendientes",
+        "completedPayouts": "Pagos Completados",
+        "failedPayouts": "Pagos Fallidos",
+        "payoutStatusBreakdown": "Desglose por Estado",
+        "recentPayouts": "Pagos Recientes",
+        "reportError": "Error al generar el reporte",
+        "downloadSuccess": "Reporte descargado exitosamente",
+        "downloadError": "Error al descargar el reporte",
+        "Vendor": "Vendedor"
+      }
+    },
     "emails": "Correos",
     "settings": "Configuración",
     "analytics": "Análisis",
@@ -749,7 +859,6 @@
       "category": "Categoría",
       "tags": "Etiquetas",
       "vendorInfo": "Información del Vendedor",
-      "vendor": "Vendedor",
       "vendorEmail": "Correo del Vendedor",
       "vendorActive": "Activo",
       "vendorInactive": "Inactivo",
@@ -763,7 +872,8 @@
       "awaitingApproval": "Este producto está esperando aprobación de los administradores.",
       "timestamps": "Marcas de Tiempo",
       "created": "Creado",
-      "updated": "Última Actualización"
+      "updated": "Última Actualización",
+      "Vendor": "Vendedor"
     },
     "usersPage": {
       "title": "Usuarios",
@@ -786,9 +896,9 @@
         "actions": "Acciones"
       },
       "userTypes": {
-        "admin": "Admin",
-        "vendor": "Vendedor",
-        "customer": "Cliente"
+        "customer": "Cliente",
+        "Admin": "Admin",
+        "Vendor": "Vendedor"
       },
       "locked": "Bloqueada",
       "active": "Activa",
@@ -846,7 +956,6 @@
       "selectAll": "Seleccionar todos",
       "deselectAll": "Deseleccionar todos",
       "product": "Producto",
-      "vendor": "Vendedor",
       "category": "Categoría",
       "price": "Precio",
       "stock": "Stock",
@@ -864,7 +973,8 @@
       "totalProducts": "Total productos",
       "activeProducts": "Activos",
       "pendingProducts": "Pendientes",
-      "withStock": "Con stock"
+      "withStock": "Con stock",
+      "Vendor": "Vendedor"
     },
     "security": {
       "title": "Seguridad",
@@ -940,26 +1050,28 @@
   "Vendor": {
     "layout": {
       "dashboard": "Panel",
-      "products": "Productos",
+      "products": "Mis Productos",
       "orders": "Órdenes",
-      "analytics": "Análisis",
+      "analytics": "Estadísticas",
       "financials": "Finanzas",
       "payments": "Pagos",
       "settings": "Configuración",
-      "logout": "Cerrar sesión"
+      "logout": "Cerrar sesión",
+      "title": "LUZIMARKET",
+      "vendorPanel": "Panel de Vendedor"
     },
     "dashboard": {
       "welcome": "Bienvenido, {businessName}",
-      "subtitle": "Aquí está el resumen de tu negocio",
+      "subtitle": "Aquí puedes gestionar tus productos y pedidos",
       "totalProducts": "Productos Totales",
       "activeProducts": "Productos Activos",
       "totalOrders": "Órdenes Totales",
       "totalRevenue": "Ingresos Totales",
       "addProduct": "Agregar Producto",
-      "quickActions": "Acciones Rápidas",
+      "quickActions": "Acciones rápidas",
       "viewProducts": "Ver Productos",
       "viewOrders": "Ver Órdenes",
-      "analytics": "Análisis",
+      "analytics": "Estadísticas",
       "settings": "Configuración",
       "recentOrders": "Órdenes Recientes",
       "viewAll": "Ver todas",
@@ -970,18 +1082,18 @@
         "shipped": "Enviado",
         "delivered": "Entregado"
       },
-      "accountPending": "Tu cuenta está pendiente de aprobación. Podrás agregar productos una vez que sea aprobada.",
+      "accountPending": "Tu cuenta está pendiente de aprobación",
       "stripeConnect": {
         "title": "Pagos con Stripe",
-        "description": "Configura tu cuenta para recibir pagos",
+        "description": "Conecta tu cuenta para recibir pagos",
         "active": "Activo",
         "pending": "Pendiente",
-        "notConnected": "Necesitas configurar tu cuenta de Stripe para comenzar a recibir pagos.",
-        "incompleteSetup": "Tu cuenta de Stripe está pendiente de verificación. Completa la configuración para activar pagos.",
-        "fullyActive": "Tu cuenta de Stripe está activa. Puedes recibir pagos y gestionar tus finanzas.",
-        "setupPayments": "Configurar Pagos",
-        "managePayments": "Gestionar Pagos",
-        "completeSetup": "Completar Configuración"
+        "notConnected": "Aún no has conectado tu cuenta de Stripe",
+        "incompleteSetup": "La configuración de Stripe no está completa",
+        "fullyActive": "Tu cuenta de Stripe está completamente activa",
+        "setupPayments": "Configurar pagos",
+        "managePayments": "Administrar pagos",
+        "completeSetup": "Completar configuración"
       }
     },
     "myProducts": "Mis productos",
@@ -997,17 +1109,102 @@
         "processing": "Procesando",
         "shipped": "Enviado",
         "delivered": "Entregado",
-        "cancelled": "Cancelado"
+        "cancelled": "Cancelado",
+        "paid": "Pagado"
       },
       "trackingNumber": "Número de seguimiento",
       "trackingNumberPlaceholder": "Ingrese el número de seguimiento",
       "notes": "Notas",
       "notesPlaceholder": "Agregue notas sobre la actualización del estado",
-      "updateStatus": "Actualizar estado"
+      "updateStatus": "Actualizar estado",
+      "description": "Gestiona los pedidos de tus clientes",
+      "subtitle": "Gestiona los pedidos de tus clientes",
+      "loading": "Cargando órdenes...",
+      "orderNumber": "Pedido",
+      "customer": "Cliente",
+      "statusHeader": "Estado",
+      "total": "Total",
+      "date": "Fecha",
+      "pending": "Pendiente",
+      "processing": "Procesando",
+      "shipped": "Enviado",
+      "delivered": "Entregado",
+      "cancelled": "Cancelado",
+      "payment": {
+        "pending": "Pendiente",
+        "succeeded": "Exitoso",
+        "failed": "Fallido"
+      },
+      "paymentHeader": "Pago",
+      "items": "Artículos",
+      "actions": "Acciones",
+      "guest": "Invitado",
+      "noOrders": "No hay pedidos",
+      "noOrdersDescription": "Aún no has recibido pedidos"
     },
-    "analytics": "Análisis",
+    "analytics": {
+      "title": "Analíticas",
+      "description": "Estadísticas y métricas de tu negocio",
+      "subtitle": "Estadísticas de tu negocio",
+      "revenue": "Ingresos",
+      "orders": "Órdenes",
+      "products": "Productos",
+      "customers": "Clientes",
+      "totalRevenue": "Ingresos Totales",
+      "totalOrders": "Órdenes Totales",
+      "averageOrder": "Orden Promedio",
+      "uniqueCustomers": "Clientes Únicos",
+      "overview": "Vista General",
+      "recentOrders": "Órdenes Recientes",
+      "salesOverview": "Resumen de Ventas",
+      "last30Days": "Últimos 30 días",
+      "chartComingSoon": "Gráfico próximamente",
+      "topSellingProducts": "Productos Más Vendidos",
+      "unitsSold": "{count} unidades vendidas",
+      "latestSuccessfulOrders": "Últimas órdenes exitosas",
+      "items": "artículos",
+      "noProductsSold": "No hay productos vendidos aún",
+      "totalSales": "Total Sales",
+      "conversionRate": "Conversion Rate",
+      "comingSoon": "Coming Soon",
+      "analyticsComingSoon": "Advanced analytics and reporting features are coming soon. Stay tuned for detailed insights about your business performance."
+    },
     "profile": "Perfil",
-    "settings": "Configuración",
+    "settings": {
+      "title": "Configuración",
+      "description": "Administra la configuración de tu cuenta y tienda",
+      "shipping": {
+        "title": "Envío",
+        "description": "Configura tus métodos y tarifas de envío"
+      },
+      "store": {
+        "title": "Información de la tienda",
+        "description": "Actualiza los detalles de tu tienda y perfil público"
+      },
+      "payments": {
+        "title": "Pagos",
+        "description": "Administra tu información de pago y preferencias"
+      },
+      "notifications": {
+        "title": "Notificaciones",
+        "description": "Controla cómo y cuándo recibir notificaciones"
+      },
+      "security": {
+        "title": "Seguridad",
+        "description": "Protege tu cuenta con configuraciones de seguridad"
+      },
+      "accountInfo": {
+        "title": "Información de la cuenta",
+        "businessName": "Nombre del negocio",
+        "email": "Correo electrónico",
+        "vendorId": "ID de vendedor",
+        "status": "Estado",
+        "active": "Activo",
+        "inactive": "Inactivo",
+        "notConfigured": "No configurado",
+        "memberSince": "Miembro desde"
+      }
+    },
     "earnings": "Ganancias",
     "newOrder": "¡Nueva orden recibida!",
     "orderDetails": {
@@ -1153,13 +1350,40 @@
       "transactions": {
         "title": "Historial de Transacciones",
         "description": "Todas tus ventas y movimientos",
-        "empty": "No hay transacciones aún"
+        "empty": "No hay transacciones aún",
+        "type": "Type",
+        "amount": "Amount",
+        "status": "Status",
+        "date": "Date",
+        "searchPlaceholder": "Search transactions...",
+        "orderPrefix": "Order:",
+        "actions": {
+          "openMenu": "Open menu",
+          "title": "Actions",
+          "copyTransactionId": "Copy transaction ID",
+          "viewOrder": "View order",
+          "viewDetails": "View details"
+        }
       },
       "payouts": {
         "title": "Historial de Pagos",
         "description": "Depósitos a tu cuenta bancaria",
         "empty": "No hay pagos registrados",
-        "payoutTo": "Pago a {method}"
+        "payoutTo": "Pago a {method}",
+        "bankAccount": "Bank account",
+        "date": "Date",
+        "amount": "Amount",
+        "method": "Method",
+        "status": "Status",
+        "arrivalDate": "Arrival date",
+        "searchPlaceholder": "Search payouts...",
+        "actions": {
+          "openMenu": "Open menu",
+          "title": "Actions",
+          "copyPayoutId": "Copy payout ID",
+          "viewDetails": "View details",
+          "downloadReceipt": "Download receipt"
+        }
       },
       "status": {
         "completed": "Completado",
@@ -1192,6 +1416,260 @@
         "title": "Configuración incompleta",
         "description": "Completa la configuración de tu cuenta para activar pagos.",
         "action": "Completar configuración"
+      },
+      "table": {
+        "viewOrder": "Ver orden",
+        "viewDetails": "Ver detalles"
+      },
+      "subtitle": "Manage your finances and payments"
+    },
+    "orderStatusUpdater": {
+      "orderNumber": "Orden #{number}",
+      "total": "Total",
+      "date": "Fecha",
+      "customer": "Cliente",
+      "products": "Productos",
+      "quantity": "Cantidad",
+      "updateStatus": "Actualizar Estado",
+      "newStatus": "Nuevo Estado",
+      "trackingNumber": "Número de Rastreo (Opcional)",
+      "trackingNumberPlaceholder": "Ingresa el número de rastreo",
+      "additionalNotes": "Notas Adicionales (Opcional)",
+      "notesPlaceholder": "Agrega notas sobre esta actualización...",
+      "updateButton": "Actualizar Estado",
+      "updating": "Actualizando...",
+      "status": {
+        "processing": "📦 Procesando orden",
+        "shipped": "🚚 Enviado",
+        "delivered": "✅ Entregado",
+        "cancelled": "❌ Cancelado"
+      },
+      "errors": {
+        "noChanges": "No hay cambios para actualizar",
+        "updateFailed": "Error al actualizar el estado",
+        "generic": "Error"
+      },
+      "success": {
+        "statusUpdated": "✅ Estado actualizado exitosamente",
+        "statusUpdatedDescription": "La orden #{orderNumber} ha sido actualizada. El cliente será notificado automáticamente."
+      }
+    },
+    "payouts": {
+      "requestPayout": "Solicitar Pago",
+      "title": "Solicitar Pago",
+      "description": "Balance disponible: {balance}",
+      "amount": "Monto a retirar",
+      "minimumNote": "Monto mínimo: {amount}",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar",
+      "processing": "Procesando...",
+      "success": "Solicitud de pago enviada exitosamente",
+      "errors": {
+        "invalidAmount": "Por favor ingresa un monto válido",
+        "minimumAmount": "El monto mínimo es {amount}",
+        "insufficientBalance": "Balance insuficiente",
+        "requestFailed": "Error al procesar la solicitud. Por favor intenta de nuevo."
+      }
+    },
+    "reports": {
+      "title": "Reportes Financieros",
+      "description": "Analiza el rendimiento de tu negocio con reportes detallados",
+      "selectDateRange": "Selecciona un rango de fechas para generar el reporte",
+      "salesReport": "Ventas",
+      "revenueReport": "Ingresos",
+      "productsReport": "Productos",
+      "download": "Descargar",
+      "totalOrders": "Total de Órdenes",
+      "totalRevenue": "Ingresos Totales",
+      "avgOrderValue": "Valor Promedio de Orden",
+      "revenueOverTime": "Ingresos a lo Largo del Tiempo",
+      "topProducts": "Productos Más Vendidos",
+      "soldUnits": "{count} unidades vendidas",
+      "revenue": "Ingresos",
+      "availableBalance": "Balance Disponible",
+      "pendingBalance": "Balance Pendiente",
+      "reservedBalance": "Balance Reservado",
+      "transactionBreakdown": "Desglose de Transacciones",
+      "payoutSummary": "Resumen de Pagos",
+      "payouts": "pagos",
+      "totalProducts": "Total de Productos",
+      "inventoryValue": "Valor del Inventario",
+      "lowStock": "Stock Bajo",
+      "productPerformance": "Rendimiento de Productos",
+      "product": "Producto",
+      "sku": "SKU",
+      "stock": "Stock",
+      "sold": "Vendidos",
+      "reportError": "Error al generar el reporte",
+      "downloadSuccess": "Reporte descargado exitosamente",
+      "downloadError": "Error al descargar el reporte"
+    },
+    "security": {
+      "title": "Seguridad",
+      "description": "Protege tu cuenta de vendedor",
+      "password": {
+        "title": "Cambiar contraseña",
+        "description": "Mantén tu cuenta segura con una contraseña fuerte"
+      },
+      "twoFactor": {
+        "title": "Autenticación de dos factores",
+        "description": "Añade una capa extra de seguridad a tu cuenta",
+        "status": "Estado",
+        "notConfigured": "No configurado",
+        "active": "Activo",
+        "configure": "Configurar",
+        "disable": "Desactivar",
+        "enableApp": "Activar con aplicación",
+        "enableSms": "Activar autenticación por SMS",
+        "disableSms": "Desactivar autenticación por SMS",
+        "viewBackupCodes": "Ver códigos de respaldo"
+      },
+      "sessions": {
+        "title": "Dispositivos activos",
+        "description": "Dispositivos donde has iniciado sesión recientemente",
+        "currentSession": "Sesión actual",
+        "lastActive": "Última actividad",
+        "revoke": "Revocar",
+        "revokeAll": "Revocar todas",
+        "loading": "Cargando sesiones...",
+        "loadError": "Error al cargar las sesiones",
+        "sessionRevoked": "Sesión revocada exitosamente",
+        "revokeError": "Error al revocar la sesión",
+        "allSessionsRevoked": "Todas las sesiones han sido revocadas",
+        "revokeAllError": "Error al revocar las sesiones"
+      }
+    },
+    "products": {
+      "title": "Mis Productos",
+      "description": "Administra tu catálogo de productos",
+      "addProduct": "Agregar Producto",
+      "noImage": "Sin imagen",
+      "stockItems": "{count} items",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "new": {
+        "validation": {
+          "name": "El nombre debe tener al menos 3 caracteres",
+          "description": "La descripción debe tener al menos 10 caracteres",
+          "price": "El precio debe ser mayor a 0",
+          "stock": "El stock debe ser un número entero positivo",
+          "image": "Se requiere al menos una imagen",
+          "category": "Por favor selecciona una categoría"
+        },
+        "toast": {
+          "createSuccess": "Producto creado exitosamente",
+          "createError": "Error al crear el producto",
+          "uploadError": "Error al subir la imagen"
+        },
+        "placeholders": {
+          "name": "Nombre del producto",
+          "description": "Describe tu producto en detalle...",
+          "price": "0.00",
+          "stock": "0",
+          "sku": "SKU-001"
+        },
+        "title": "New Product",
+        "editTitle": "Edit Product"
+      },
+      "edit": {
+        "title": "Editar Producto",
+        "backToProducts": "Volver a productos",
+        "editProduct": "Editar Producto",
+        "updateProductInfo": "Actualiza la información de tu producto",
+        "deleteButton": "Eliminar",
+        "deleteDialogTitle": "¿Estás seguro?",
+        "deleteDialogDescription": "Esta acción no se puede deshacer. El producto será eliminado permanentemente.",
+        "deleteDialogCancel": "Cancelar",
+        "deleteDialogConfirm": "Eliminar",
+        "deleting": "Eliminando...",
+        "basicInfo": "Información Básica",
+        "productName": "Nombre del Producto",
+        "productNamePlaceholder": "Ejemplo: Ramo de Rosas Rojas",
+        "description": "Descripción",
+        "descriptionPlaceholder": "Describe tu producto en detalle...",
+        "category": "Categoría",
+        "selectCategoryPlaceholder": "Selecciona una categoría",
+        "tags": "Etiquetas (opcional)",
+        "tagsPlaceholder": "rosas, amor, aniversario",
+        "tagsSeparator": "Separa las etiquetas con comas",
+        "priceAndInventory": "Precio e Inventario",
+        "price": "Precio (MXN)",
+        "pricePlaceholder": "299.99",
+        "stock": "Stock Disponible",
+        "stockPlaceholder": "50",
+        "productActive": "Producto activo (visible en la tienda)",
+        "productImages": "Imágenes del Producto",
+        "uploadingImages": "Subiendo imágenes...",
+        "dragDropText": "Arrastra imágenes aquí o haz clic para seleccionar",
+        "imageFormats": "PNG, JPG hasta 5MB",
+        "mainImage": "Principal",
+        "cancelButton": "Cancelar",
+        "saveButton": "Guardar Cambios",
+        "saving": "Guardando...",
+        "categories": {
+          "1": "Flores & Amores",
+          "2": "Dulces & Postres",
+          "3": "Eventos & Cenas",
+          "4": "Tienda de Regalos"
+        },
+        "validation": {
+          "nameMinLength": "El nombre debe tener al menos 3 caracteres",
+          "descriptionMinLength": "La descripción debe tener al menos 10 caracteres",
+          "priceInvalid": "El precio debe ser un número mayor a 0",
+          "stockInvalid": "El stock debe ser un número positivo",
+          "categoryRequired": "Selecciona una categoría",
+          "imagesRequired": "Agrega al menos una imagen"
+        },
+        "toast": {
+          "loadError": "Error al cargar el producto",
+          "uploadError": "Error al subir las imágenes",
+          "imagesAdded": "{count} imagen(es) agregadas",
+          "updateSuccess": "Producto actualizado exitosamente",
+          "updateError": "Error al actualizar el producto",
+          "deleteSuccess": "Producto eliminado exitosamente",
+          "deleteError": "Error al eliminar el producto"
+        },
+        "placeholders": {
+          "name": "Nombre del producto",
+          "description": "Describe tu producto en detalle...",
+          "price": "0.00",
+          "stock": "0",
+          "sku": "SKU-001"
+        }
+      },
+      "form": {
+        "selectCategory": "Select a category",
+        "dragDropImages": "Drag images here or click to select"
+      },
+      "validation": {
+        "stockPositive": "Stock must be a positive number",
+        "categoryRequired": "Select a category",
+        "imagesRequired": "Add at least one image"
+      },
+      "toast": {
+        "uploadError": "Error uploading images",
+        "createError": "Error creating product",
+        "createSuccess": "Product created successfully",
+        "updateError": "Error updating product",
+        "updateSuccess": "Product updated successfully",
+        "deleteError": "Error deleting product",
+        "deleteSuccess": "Product deleted successfully"
+      }
+    },
+    "shipping": {
+      "toast": {
+        "updateSuccess": "Configuración de envío actualizada",
+        "updateError": "Error al actualizar la configuración",
+        "loadError": "Could not load shipping data",
+        "saveSuccess": "Your shipping configuration has been updated",
+        "saveError": "Could not save configuration"
+      },
+      "placeholders": {
+        "basePrice": "Precio base de envío",
+        "additionalCost": "Costo adicional por producto"
+      },
+      "form": {
+        "selectState": "Select your state"
       }
     }
   },
@@ -1208,29 +1686,12 @@
     "passwordsDontMatch": "Las contraseñas no coinciden"
   },
   "Emails": {
-    "vendor": {
-      "newOrderSubject": "Nueva orden #{orderNumber} - Luzimarket",
-      "newOrderTitle": "🎉 ¡Nueva orden recibida en Luzimarket!",
-      "newOrderGreeting": "Estimado(a) {businessName},",
-      "newOrderMessage": "Has recibido una nueva orden en tu tienda de Luzimarket:",
-      "orderDetailsTitle": "📋 Detalles de la orden:",
-      "orderNumber": "🔢 Número de orden:",
-      "orderTotal": "💰 Total:",
-      "orderDate": "📅 Fecha:",
-      "productsTitle": "🛍️ Productos ordenados:",
-      "shippingTitle": "📍 Dirección de envío:",
-      "actionRequired": "⏰ Acción requerida:",
-      "actionMessage": "Por favor, procesa esta orden dentro de las próximas 24 horas para mantener una excelente experiencia del cliente.",
-      "viewOrderButton": "📦 Ver orden completa",
-      "emailFooter": "Este correo fue enviado automáticamente por Luzimarket. Si tienes alguna pregunta, contacta a nuestro equipo de soporte."
-    },
     "customer": {
       "confirmationSubject": "Confirmación de orden #{orderNumber} - Luzimarket",
       "confirmationTitle": "🎉 ¡Gracias por tu compra en Luzimarket!",
       "confirmationGreeting": "Estimado(a) {customerName},",
       "confirmationMessage": "Tu orden ha sido confirmada exitosamente y está siendo procesada por nuestro vendedor. ¡Estamos emocionados de que hayas elegido productos únicos de México!",
       "orderSummaryTitle": "📋 Resumen de tu orden:",
-      "vendor": "🏪 Vendedor:",
       "subtotal": "💵 Subtotal:",
       "tax": "🧾 IVA (16%):",
       "shipping": "📦 Envío:",
@@ -1253,7 +1714,24 @@
       "stayInformedMessage": "Te notificaremos tan pronto como tu paquete sea entregado. Mientras tanto, puedes rastrear tu orden en tiempo real.",
       "needHelpButton": "💬 ¿Necesitas ayuda?",
       "mexicanProducts": "¡Gracias por elegir productos mexicanos únicos! 🇲🇽",
-      "connectingMessage": "Luzimarket - Conectando México con el mundo"
+      "connectingMessage": "Luzimarket - Conectando México con el mundo",
+      "Vendor": "🏪 Vendedor:"
+    },
+    "Vendor": {
+      "newOrderSubject": "Nueva orden #{orderNumber} - Luzimarket",
+      "newOrderTitle": "🎉 ¡Nueva orden recibida en Luzimarket!",
+      "newOrderGreeting": "Estimado(a) {businessName},",
+      "newOrderMessage": "Has recibido una nueva orden en tu tienda de Luzimarket:",
+      "orderDetailsTitle": "📋 Detalles de la orden:",
+      "orderNumber": "🔢 Número de orden:",
+      "orderTotal": "💰 Total:",
+      "orderDate": "📅 Fecha:",
+      "productsTitle": "🛍️ Productos ordenados:",
+      "shippingTitle": "📍 Dirección de envío:",
+      "actionRequired": "⏰ Acción requerida:",
+      "actionMessage": "Por favor, procesa esta orden dentro de las próximas 24 horas para mantener una excelente experiencia del cliente.",
+      "viewOrderButton": "📦 Ver orden completa",
+      "emailFooter": "Este correo fue enviado automáticamente por Luzimarket. Si tienes alguna pregunta, contacta a nuestro equipo de soporte."
     }
   },
   "Search": {
@@ -1319,7 +1797,6 @@
     "shippingAvailable": "Envío disponible",
     "securePayment": "Compra protegida",
     "specialPackaging": "Empaque especial disponible",
-    "vendor": "Vendedor",
     "category": "Categoría",
     "description": "Descripción",
     "specifications": "Especificaciones",
@@ -1365,7 +1842,8 @@
       "submitReview": "Enviar opinión",
       "submitting": "Enviando...",
       "submitError": "Error al enviar tu opinión. Por favor intenta de nuevo."
-    }
+    },
+    "Vendor": "Vendedor"
   },
   "Security": {
     "rateLimitAuth": "Demasiados intentos de autenticación. Intenta de nuevo en 15 minutos.",
@@ -1592,6 +2070,54 @@
         "title": "Instituto Nacional de Transparencia",
         "content": "Si consideras que tu derecho a la protección de datos personales ha sido vulnerado, puedes presentar una queja ante el Instituto Nacional de Transparencia, Acceso a la Información y Protección de Datos Personales (INAI):"
       }
+    },
+    "intro": "At Luzimarket (operated by MOMENTO ESPECIAL SAPI DE CV), we are committed to protecting your privacy and personal data in accordance with the Federal Law on Protection of Personal Data Held by Private Parties (LFPDPPP) of Mexico.",
+    "dataCollection": {
+      "title": "Information We Collect",
+      "description": "We collect the following types of personal data:",
+      "personalInfo": "Personal identification: name, email, phone number, address",
+      "paymentInfo": "Payment information: processed securely through Stripe (we do not store card details)",
+      "transactionInfo": "Transaction history: orders, shipping details, purchase preferences",
+      "communicationInfo": "Communications: messages, reviews, vendor interactions"
+    },
+    "dataUse": {
+      "title": "How We Use Your Information",
+      "description": "We use your personal data for:",
+      "orderProcessing": "Processing and fulfilling your orders",
+      "customerService": "Providing customer support and responding to inquiries",
+      "marketing": "Sending promotional communications (with your consent)",
+      "legalCompliance": "Complying with legal obligations and protecting our rights"
+    },
+    "dataProtection": {
+      "title": "Data Security",
+      "description": "We implement industry-standard security measures to protect your personal data, including SSL encryption, secure servers, and restricted access to personal information. Payment processing is handled by Stripe, which is PCI-DSS compliant."
+    },
+    "thirdParties": {
+      "title": "Third Party Sharing",
+      "description": "We share your data only with:",
+      "stripe": "Stripe: for secure payment processing (including OXXO payments)",
+      "shipping": "Shipping providers: to deliver your orders",
+      "analytics": "Analytics services: to improve our platform (anonymized data only)"
+    },
+    "userRights": {
+      "title": "Your Rights (ARCO Rights)",
+      "description": "Under Mexican law, you have the right to:",
+      "access": "Access: request information about your personal data",
+      "rectification": "Rectification: correct inaccurate or incomplete data",
+      "deletion": "Cancellation: request deletion of your data",
+      "portability": "Portability: receive your data in a structured format",
+      "opposition": "Opposition: object to certain uses of your data"
+    },
+    "cookies": {
+      "title": "Cookies and Tracking",
+      "description": "We use cookies to improve your experience, remember preferences, and analyze site usage. You can control cookie settings in your browser."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "description": "For privacy-related inquiries or to exercise your ARCO rights, contact us at:",
+      "company": "MOMENTO ESPECIAL SAPI DE CV",
+      "email": "privacy@luzimarket.shop",
+      "address": "Mexico City, CDMX, Mexico"
     }
   },
   "Terms": {
@@ -1606,18 +2132,18 @@
         "terms": {
           "platform": "\"Plataforma\"",
           "user": "\"Usuario\"",
-          "vendor": "\"Vendedor\"",
           "products": "\"Productos\"",
-          "services": "\"Servicios\""
+          "services": "\"Servicios\"",
+          "Vendor": "\"Vendedor\""
         },
         "descriptions": {
           "platform": "se refiere al sitio web luzimarket.shop y todas sus aplicaciones móviles y servicios relacionados",
           "user": "cualquier persona que acceda o utilice la Plataforma",
-          "vendor": "comerciantes independientes que ofrecen sus productos a través de nuestra Plataforma",
           "products": "artículos, regalos y mercancías ofrecidas para la venta en la Plataforma por vendedores terceros",
           "services": "todos los servicios proporcionados por Luzimarket, incluyendo la facilitación de transacciones, procesamiento de pagos y soporte al cliente",
           "marketplace": "\"Marketplace\" - plataforma digital que facilita transacciones entre compradores y vendedores independientes",
-          "platformFee": "\"Comisión de Plataforma\" - porcentaje cobrado a vendedores por cada transacción exitosa (generalmente 15% del valor de venta)"
+          "platformFee": "\"Comisión de Plataforma\" - porcentaje cobrado a vendedores por cada transacción exitosa (generalmente 15% del valor de venta)",
+          "Vendor": "comerciantes independientes que ofrecen sus productos a través de nuestra Plataforma"
         }
       },
       "acceptance": {
@@ -1746,7 +2272,8 @@
           "availability": "La disponibilidad continua de productos específicos o de la Plataforma",
           "accuracy": "La exactitud de la información proporcionada por vendedores",
           "disputes": "Disputas directas entre compradores y vendedores",
-          "platformFees": "Los vendedores son responsables del pago de comisiones de plataforma"
+          "platformFees": "Los vendedores son responsables del pago de comisiones de plataforma",
+          "thirdParty": "Actions or omissions of third parties, including vendors and shipping services"
         },
         "maxLiability": "En cualquier caso, la responsabilidad total de Luzimarket no excederá el valor de la transacción específica en cuestión."
       },
@@ -1920,6 +2447,55 @@
         "location": "Ciudad de México, México",
         "compliance": "Operamos en cumplimiento con todas las leyes mexicanas de comercio electrónico y protección al consumidor."
       }
+    },
+    "tagline": "Connecting Mexico's finest artisans with gift-givers around the world",
+    "story": {
+      "title": "Our Story",
+      "paragraph1": "Luzimarket was born from a simple belief: every gift should tell a story. In a world of mass-produced items, we saw an opportunity to connect thoughtful gift-givers with Mexico's talented artisans and unique vendors.",
+      "paragraph2": "Founded recently, we started as a small marketplace with just a handful of vendors. Today, we're proud to support hundreds of Mexican small businesses, from traditional craftspeople to innovative designers, all united by their commitment to quality and authenticity.",
+      "paragraph3": "Our name, Luzimarket, combines 'luz' (light) with 'market', reflecting our mission to shine a light on Mexico's hidden gems and bring them to a wider audience."
+    },
+    "mission": {
+      "title": "Our Mission",
+      "description": "To create a thriving marketplace that celebrates Mexican craftsmanship, supports local entrepreneurs, and makes gift-giving more meaningful by connecting people with unique, handcrafted products that carry the spirit of Mexico."
+    },
+    "values": {
+      "title": "Our Values",
+      "authenticity": {
+        "title": "Authenticity",
+        "description": "Every product tells a genuine story of Mexican craftsmanship and creativity"
+      },
+      "sustainability": {
+        "title": "Sustainability",
+        "description": "Supporting eco-friendly practices and responsible production methods"
+      },
+      "community": {
+        "title": "Community",
+        "description": "Building lasting relationships between artisans, vendors, and customers"
+      }
+    },
+    "difference": {
+      "title": "What Makes Us Different",
+      "curation": "Carefully curated selection of unique, high-quality products",
+      "directSupport": "Direct support to Mexican small businesses and artisans",
+      "transparency": "Transparent pricing and vendor information",
+      "experience": "Personalized shopping experience with gift recommendations"
+    },
+    "commitment": {
+      "title": "Our Commitment",
+      "description": "We're committed to maintaining the highest standards of service, ensuring secure transactions, and fostering a marketplace built on trust and quality. Every purchase on Luzimarket directly supports Mexican entrepreneurs and helps preserve traditional crafts for future generations."
+    },
+    "join": {
+      "title": "Join Our Community",
+      "description": "Whether you're looking for the perfect gift or you're a vendor ready to share your creations with the world, Luzimarket is here for you.",
+      "vendorButton": "Become a Vendor",
+      "shopButton": "Start Shopping"
+    },
+    "legal": {
+      "title": "Company Information",
+      "company": "MOMENTO ESPECIAL SAPI DE CV",
+      "rfc": "RFC: MES240315XX0",
+      "address": "Mexico City, CDMX, Mexico"
     }
   },
   "Contact": {
@@ -1959,7 +2535,15 @@
       "message": "Mensaje",
       "messagePlaceholder": "Escribe tu mensaje aquí...",
       "submit": "Enviar Mensaje",
-      "sending": "Enviando..."
+      "sending": "Enviando...",
+      "subjectOptions": {
+        "select": "Select a subject",
+        "order": "Order inquiry",
+        "product": "Product question",
+        "technical": "Technical support",
+        "other": "Other",
+        "Vendor": "Vendor inquiry"
+      }
     },
     "successMessage": "¡Mensaje enviado exitosamente! Te responderemos pronto.",
     "errorMessage": "Error al enviar el mensaje. Por favor, intenta de nuevo.",
@@ -1968,6 +2552,26 @@
       "description": "Si eres un vendedor interesado en unirte a nuestra plataforma o quieres conocer más sobre Luzimarket, visita las siguientes secciones.",
       "becomeVendor": "Conviértete en Vendedor",
       "aboutUs": "Acerca de Nosotros"
+    },
+    "info": {
+      "title": "Get in Touch",
+      "customerService": "Customer Service",
+      "email": "support@luzimarket.shop",
+      "phone": "+52 55 1234 5678",
+      "hours": "Monday - Friday: 9:00 AM - 6:00 PM CST",
+      "vendorSupport": "Vendor Support",
+      "vendorEmail": "vendors@luzimarket.shop",
+      "headquarters": "Headquarters",
+      "companyName": "MOMENTO ESPECIAL SAPI DE CV",
+      "address1": "Mexico City, CDMX",
+      "address2": "Mexico",
+      "businessInfo": "Business Information",
+      "rfc": "RFC: MES240315XX0"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "description": "Find answers to common questions in our FAQ section.",
+      "link": "Visit FAQ"
     }
   },
   "Success": {
@@ -2019,490 +2623,6 @@
     "needHelp": "¿Necesitas ayuda?",
     "contactSupport": "Contactar Soporte"
   },
-  "admin": {
-    "financials": {
-      "title": "Gestión Financiera",
-      "description": "Supervisa las finanzas de la plataforma y los balances de vendedores",
-      "stats": {
-        "totalRevenue": "Ingresos Totales",
-        "totalRevenueDescription": "Comisiones cobradas",
-        "pendingFees": "Comisiones Pendientes",
-        "pendingFeesDescription": "Por cobrar",
-        "vendorBalances": "Balance de Vendedores",
-        "pending": "pendiente",
-        "activeVendors": "Vendedores Activos",
-        "activeVendorsDescription": "Con balance disponible"
-      },
-      "tabs": {
-        "vendorBalances": "Balances de Vendedores",
-        "platformFees": "Comisiones de Plataforma",
-        "payouts": "Pagos"
-      },
-      "vendors": {
-        "title": "Balances de Vendedores",
-        "description": "Fondos disponibles y pendientes por vendedor",
-        "vendor": "Vendedor",
-        "available": "Disponible",
-        "pending": "Pendiente",
-        "lifetime": "Total Histórico",
-        "search": "Buscar vendedor..."
-      },
-      "fees": {
-        "title": "Comisiones de Plataforma",
-        "description": "Comisiones cobradas en cada transacción",
-        "date": "Fecha",
-        "vendor": "Vendedor",
-        "order": "Orden",
-        "orderAmount": "Monto Orden",
-        "rate": "Tasa",
-        "platformFee": "Comisión",
-        "status": "Estado"
-      },
-      "payouts": {
-        "title": "Historial de Pagos",
-        "description": "Pagos procesados a vendedores",
-        "date": "Fecha",
-        "vendor": "Vendedor",
-        "amount": "Monto",
-        "status": "Estado",
-        "reference": "Referencia"
-      },
-      "actions": {
-        "title": "Acciones",
-        "viewVendor": "Ver vendedor",
-        "viewTransactions": "Ver transacciones",
-        "requestPayout": "Solicitar pago",
-        "exportReport": "Exportar reporte",
-        "refresh": "Actualizar",
-        "openMenu": "Abrir menú"
-      },
-      "feeStatus": {
-        "pending": "Pendiente",
-        "collected": "Cobrado",
-        "transferred": "Transferido",
-        "failed": "Fallido"
-      },
-      "payoutStatus": {
-        "pending": "Pendiente",
-        "processing": "Procesando",
-        "paid": "Pagado",
-        "failed": "Fallido"
-      },
-      "viewOrder": "Ver orden",
-      "reports": {
-        "title": "Reportes Financieros",
-        "description": "Análisis completo del rendimiento de la plataforma",
-        "reports": "Reportes",
-        "reportsDescription": "Genera reportes detallados para analizar el rendimiento del negocio",
-        "selectDateRange": "Selecciona un rango de fechas",
-        "selectVendor": "Seleccionar vendedor",
-        "allVendors": "Todos los vendedores",
-        "download": "Descargar",
-        "platformOverview": "Vista General",
-        "salesReport": "Reporte de Ventas",
-        "payoutsReport": "Reporte de Pagos",
-        "platformRevenue": "Ingresos de Plataforma",
-        "commissionEarned": "Comisiones ganadas",
-        "totalSales": "Ventas Totales",
-        "orders": "órdenes",
-        "activeVendors": "Vendedores Activos",
-        "of": "de",
-        "total": "total",
-        "avgOrderValue": "Valor Promedio de Orden",
-        "topVendorsByRevenue": "Principales Vendedores por Ingresos",
-        "vendorPerformance": "Rendimiento de Vendedores",
-        "vendor": "Vendedor",
-        "revenue": "Ingresos",
-        "avgOrder": "Orden Promedio",
-        "totalOrders": "Total de Órdenes",
-        "totalRevenue": "Ingresos Totales",
-        "salesOverTime": "Ventas a lo Largo del Tiempo",
-        "topProducts": "Productos Más Vendidos",
-        "soldUnits": "{count} unidades vendidas",
-        "totalPayouts": "Total de Pagos",
-        "pendingPayouts": "Pagos Pendientes",
-        "completedPayouts": "Pagos Completados",
-        "failedPayouts": "Pagos Fallidos",
-        "payoutStatusBreakdown": "Desglose por Estado",
-        "recentPayouts": "Pagos Recientes",
-        "reportError": "Error al generar el reporte",
-        "downloadSuccess": "Reporte descargado exitosamente",
-        "downloadError": "Error al descargar el reporte"
-      }
-    }
-  },
-  "vendor": {
-    "layout": {
-      "title": "LUZIMARKET",
-      "vendorPanel": "Panel de Vendedor",
-      "dashboard": "Panel",
-      "products": "Mis Productos",
-      "orders": "Órdenes",
-      "analytics": "Estadísticas",
-      "financials": "Finanzas",
-      "payments": "Pagos",
-      "settings": "Configuración",
-      "logout": "Cerrar sesión"
-    },
-    "orderStatusUpdater": {
-      "orderNumber": "Orden #{number}",
-      "total": "Total",
-      "date": "Fecha",
-      "customer": "Cliente",
-      "products": "Productos",
-      "quantity": "Cantidad",
-      "updateStatus": "Actualizar Estado",
-      "newStatus": "Nuevo Estado",
-      "trackingNumber": "Número de Rastreo (Opcional)",
-      "trackingNumberPlaceholder": "Ingresa el número de rastreo",
-      "additionalNotes": "Notas Adicionales (Opcional)",
-      "notesPlaceholder": "Agrega notas sobre esta actualización...",
-      "updateButton": "Actualizar Estado",
-      "updating": "Actualizando...",
-      "status": {
-        "processing": "📦 Procesando orden",
-        "shipped": "🚚 Enviado",
-        "delivered": "✅ Entregado",
-        "cancelled": "❌ Cancelado"
-      },
-      "errors": {
-        "noChanges": "No hay cambios para actualizar",
-        "updateFailed": "Error al actualizar el estado",
-        "generic": "Error"
-      },
-      "success": {
-        "statusUpdated": "✅ Estado actualizado exitosamente",
-        "statusUpdatedDescription": "La orden #{orderNumber} ha sido actualizada. El cliente será notificado automáticamente."
-      }
-    },
-    "dashboard": {
-      "welcome": "Bienvenido, {businessName}",
-      "subtitle": "Aquí puedes gestionar tus productos y pedidos",
-      "totalProducts": "Productos Totales",
-      "activeProducts": "Productos Activos",
-      "totalOrders": "Órdenes Totales",
-      "totalRevenue": "Ingresos Totales",
-      "addProduct": "Agregar Producto",
-      "quickActions": "Acciones rápidas",
-      "viewProducts": "Ver Productos",
-      "viewOrders": "Ver Órdenes",
-      "analytics": "Estadísticas",
-      "settings": "Configuración",
-      "recentOrders": "Órdenes Recientes",
-      "viewAll": "Ver todas",
-      "noRecentOrders": "No hay órdenes recientes",
-      "orderStatus": {
-        "pending": "Pendiente",
-        "paid": "Pagado",
-        "shipped": "Enviado",
-        "delivered": "Entregado"
-      },
-      "accountPending": "Tu cuenta está pendiente de aprobación",
-      "stripeConnect": {
-        "title": "Pagos con Stripe",
-        "description": "Conecta tu cuenta para recibir pagos",
-        "active": "Activo",
-        "pending": "Pendiente",
-        "notConnected": "Aún no has conectado tu cuenta de Stripe",
-        "incompleteSetup": "La configuración de Stripe no está completa",
-        "fullyActive": "Tu cuenta de Stripe está completamente activa",
-        "setupPayments": "Configurar pagos",
-        "managePayments": "Administrar pagos",
-        "completeSetup": "Completar configuración"
-      }
-    },
-    "payouts": {
-      "requestPayout": "Solicitar Pago",
-      "title": "Solicitar Pago",
-      "description": "Balance disponible: {balance}",
-      "amount": "Monto a retirar",
-      "minimumNote": "Monto mínimo: {amount}",
-      "cancel": "Cancelar",
-      "confirm": "Confirmar",
-      "processing": "Procesando...",
-      "success": "Solicitud de pago enviada exitosamente",
-      "errors": {
-        "invalidAmount": "Por favor ingresa un monto válido",
-        "minimumAmount": "El monto mínimo es {amount}",
-        "insufficientBalance": "Balance insuficiente",
-        "requestFailed": "Error al procesar la solicitud. Por favor intenta de nuevo."
-      }
-    },
-    "reports": {
-      "title": "Reportes Financieros",
-      "description": "Analiza el rendimiento de tu negocio con reportes detallados",
-      "selectDateRange": "Selecciona un rango de fechas para generar el reporte",
-      "salesReport": "Ventas",
-      "revenueReport": "Ingresos",
-      "productsReport": "Productos",
-      "download": "Descargar",
-      "totalOrders": "Total de Órdenes",
-      "totalRevenue": "Ingresos Totales",
-      "avgOrderValue": "Valor Promedio de Orden",
-      "revenueOverTime": "Ingresos a lo Largo del Tiempo",
-      "topProducts": "Productos Más Vendidos",
-      "soldUnits": "{count} unidades vendidas",
-      "revenue": "Ingresos",
-      "availableBalance": "Balance Disponible",
-      "pendingBalance": "Balance Pendiente",
-      "reservedBalance": "Balance Reservado",
-      "transactionBreakdown": "Desglose de Transacciones",
-      "payoutSummary": "Resumen de Pagos",
-      "payouts": "pagos",
-      "totalProducts": "Total de Productos",
-      "inventoryValue": "Valor del Inventario",
-      "lowStock": "Stock Bajo",
-      "productPerformance": "Rendimiento de Productos",
-      "product": "Producto",
-      "sku": "SKU",
-      "stock": "Stock",
-      "sold": "Vendidos",
-      "reportError": "Error al generar el reporte",
-      "downloadSuccess": "Reporte descargado exitosamente",
-      "downloadError": "Error al descargar el reporte"
-    },
-    "settings": {
-      "title": "Configuración",
-      "description": "Administra la configuración de tu cuenta y tienda",
-      "shipping": {
-        "title": "Envío",
-        "description": "Configura tus métodos y tarifas de envío"
-      },
-      "store": {
-        "title": "Información de la tienda",
-        "description": "Actualiza los detalles de tu tienda y perfil público"
-      },
-      "payments": {
-        "title": "Pagos",
-        "description": "Administra tu información de pago y preferencias"
-      },
-      "notifications": {
-        "title": "Notificaciones",
-        "description": "Controla cómo y cuándo recibir notificaciones"
-      },
-      "security": {
-        "title": "Seguridad",
-        "description": "Protege tu cuenta con configuraciones de seguridad"
-      },
-      "accountInfo": {
-        "title": "Información de la cuenta",
-        "businessName": "Nombre del negocio",
-        "email": "Correo electrónico",
-        "vendorId": "ID de vendedor",
-        "status": "Estado",
-        "active": "Activo",
-        "inactive": "Inactivo",
-        "notConfigured": "No configurado",
-        "memberSince": "Miembro desde"
-      }
-    },
-    "security": {
-      "title": "Seguridad",
-      "description": "Protege tu cuenta de vendedor",
-      "password": {
-        "title": "Cambiar contraseña",
-        "description": "Mantén tu cuenta segura con una contraseña fuerte"
-      },
-      "twoFactor": {
-        "title": "Autenticación de dos factores",
-        "description": "Añade una capa extra de seguridad a tu cuenta",
-        "status": "Estado",
-        "notConfigured": "No configurado",
-        "active": "Activo",
-        "configure": "Configurar",
-        "disable": "Desactivar",
-        "enableApp": "Activar con aplicación",
-        "enableSms": "Activar autenticación por SMS",
-        "disableSms": "Desactivar autenticación por SMS",
-        "viewBackupCodes": "Ver códigos de respaldo"
-      },
-      "sessions": {
-        "title": "Dispositivos activos",
-        "description": "Dispositivos donde has iniciado sesión recientemente",
-        "currentSession": "Sesión actual",
-        "lastActive": "Última actividad",
-        "revoke": "Revocar",
-        "revokeAll": "Revocar todas",
-        "loading": "Cargando sesiones...",
-        "loadError": "Error al cargar las sesiones",
-        "sessionRevoked": "Sesión revocada exitosamente",
-        "revokeError": "Error al revocar la sesión",
-        "allSessionsRevoked": "Todas las sesiones han sido revocadas",
-        "revokeAllError": "Error al revocar las sesiones"
-      }
-    },
-    "products": {
-      "title": "Mis Productos",
-      "description": "Administra tu catálogo de productos",
-      "addProduct": "Agregar Producto",
-      "noImage": "Sin imagen",
-      "stockItems": "{count} items",
-      "active": "Activo",
-      "inactive": "Inactivo",
-      "new": {
-        "validation": {
-          "name": "El nombre debe tener al menos 3 caracteres",
-          "description": "La descripción debe tener al menos 10 caracteres",
-          "price": "El precio debe ser mayor a 0",
-          "stock": "El stock debe ser un número entero positivo",
-          "image": "Se requiere al menos una imagen",
-          "category": "Por favor selecciona una categoría"
-        },
-        "toast": {
-          "createSuccess": "Producto creado exitosamente",
-          "createError": "Error al crear el producto",
-          "uploadError": "Error al subir la imagen"
-        },
-        "placeholders": {
-          "name": "Nombre del producto",
-          "description": "Describe tu producto en detalle...",
-          "price": "0.00",
-          "stock": "0",
-          "sku": "SKU-001"
-        }
-      },
-      "edit": {
-        "title": "Editar Producto",
-        "backToProducts": "Volver a productos",
-        "editProduct": "Editar Producto",
-        "updateProductInfo": "Actualiza la información de tu producto",
-        "deleteButton": "Eliminar",
-        "deleteDialogTitle": "¿Estás seguro?",
-        "deleteDialogDescription": "Esta acción no se puede deshacer. El producto será eliminado permanentemente.",
-        "deleteDialogCancel": "Cancelar",
-        "deleteDialogConfirm": "Eliminar",
-        "deleting": "Eliminando...",
-        "basicInfo": "Información Básica",
-        "productName": "Nombre del Producto",
-        "productNamePlaceholder": "Ejemplo: Ramo de Rosas Rojas",
-        "description": "Descripción",
-        "descriptionPlaceholder": "Describe tu producto en detalle...",
-        "category": "Categoría",
-        "selectCategoryPlaceholder": "Selecciona una categoría",
-        "tags": "Etiquetas (opcional)",
-        "tagsPlaceholder": "rosas, amor, aniversario",
-        "tagsSeparator": "Separa las etiquetas con comas",
-        "priceAndInventory": "Precio e Inventario",
-        "price": "Precio (MXN)",
-        "pricePlaceholder": "299.99",
-        "stock": "Stock Disponible",
-        "stockPlaceholder": "50",
-        "productActive": "Producto activo (visible en la tienda)",
-        "productImages": "Imágenes del Producto",
-        "uploadingImages": "Subiendo imágenes...",
-        "dragDropText": "Arrastra imágenes aquí o haz clic para seleccionar",
-        "imageFormats": "PNG, JPG hasta 5MB",
-        "mainImage": "Principal",
-        "cancelButton": "Cancelar",
-        "saveButton": "Guardar Cambios",
-        "saving": "Guardando...",
-        "categories": {
-          "1": "Flores & Amores",
-          "2": "Dulces & Postres",
-          "3": "Eventos & Cenas",
-          "4": "Tienda de Regalos"
-        },
-        "validation": {
-          "nameMinLength": "El nombre debe tener al menos 3 caracteres",
-          "descriptionMinLength": "La descripción debe tener al menos 10 caracteres",
-          "priceInvalid": "El precio debe ser un número mayor a 0",
-          "stockInvalid": "El stock debe ser un número positivo",
-          "categoryRequired": "Selecciona una categoría",
-          "imagesRequired": "Agrega al menos una imagen"
-        },
-        "toast": {
-          "loadError": "Error al cargar el producto",
-          "uploadError": "Error al subir las imágenes",
-          "imagesAdded": "{count} imagen(es) agregadas",
-          "updateSuccess": "Producto actualizado exitosamente",
-          "updateError": "Error al actualizar el producto",
-          "deleteSuccess": "Producto eliminado exitosamente",
-          "deleteError": "Error al eliminar el producto"
-        },
-        "placeholders": {
-          "name": "Nombre del producto",
-          "description": "Describe tu producto en detalle...",
-          "price": "0.00",
-          "stock": "0",
-          "sku": "SKU-001"
-        }
-      }
-    },
-    "financials": {
-      "table": {
-        "viewOrder": "Ver orden",
-        "viewDetails": "Ver detalles"
-      }
-    },
-    "shipping": {
-      "toast": {
-        "updateSuccess": "Configuración de envío actualizada",
-        "updateError": "Error al actualizar la configuración"
-      },
-      "placeholders": {
-        "basePrice": "Precio base de envío",
-        "additionalCost": "Costo adicional por producto"
-      }
-    },
-    "analytics": {
-      "title": "Analíticas",
-      "description": "Estadísticas y métricas de tu negocio",
-      "subtitle": "Estadísticas de tu negocio",
-      "revenue": "Ingresos",
-      "orders": "Órdenes",
-      "products": "Productos",
-      "customers": "Clientes",
-      "totalRevenue": "Ingresos Totales",
-      "totalOrders": "Órdenes Totales",
-      "averageOrder": "Orden Promedio",
-      "uniqueCustomers": "Clientes Únicos",
-      "overview": "Vista General",
-      "recentOrders": "Órdenes Recientes",
-      "salesOverview": "Resumen de Ventas",
-      "last30Days": "Últimos 30 días",
-      "chartComingSoon": "Gráfico próximamente",
-      "topSellingProducts": "Productos Más Vendidos",
-      "unitsSold": "{count} unidades vendidas",
-      "latestSuccessfulOrders": "Últimas órdenes exitosas",
-      "items": "artículos",
-      "noProductsSold": "No hay productos vendidos aún"
-    },
-    "orders": {
-      "title": "Órdenes",
-      "description": "Gestiona los pedidos de tus clientes",
-      "subtitle": "Gestiona los pedidos de tus clientes",
-      "loading": "Cargando órdenes...",
-      "orderNumber": "Pedido",
-      "customer": "Cliente",
-      "status": {
-        "pending": "Pendiente",
-        "paid": "Pagado",
-        "processing": "Procesando",
-        "shipped": "Enviado",
-        "delivered": "Entregado",
-        "cancelled": "Cancelado"
-      },
-      "statusHeader": "Estado",
-      "total": "Total",
-      "date": "Fecha",
-      "pending": "Pendiente",
-      "processing": "Procesando",
-      "shipped": "Enviado",
-      "delivered": "Entregado",
-      "cancelled": "Cancelado",
-      "payment": {
-        "pending": "Pendiente",
-        "succeeded": "Exitoso",
-        "failed": "Fallido"
-      },
-      "paymentHeader": "Pago",
-      "items": "Artículos",
-      "actions": "Acciones",
-      "guest": "Invitado",
-      "noOrders": "No hay pedidos",
-      "noOrdersDescription": "Aún no has recibido pedidos"
-    }
-  },
   "orders": {
     "title": "Mis Pedidos",
     "subtitle": "Consulta el historial y estado de todos tus pedidos",
@@ -2549,12 +2669,12 @@
     },
     "table": {
       "order": "Pedido",
-      "vendor": "Tienda",
       "items": "Artículos",
       "date": "Fecha",
       "status": "Estado",
       "total": "Total",
-      "actions": "Acciones"
+      "actions": "Acciones",
+      "Vendor": "Tienda"
     },
     "pagination": {
       "showing": "Mostrando",
@@ -2611,9 +2731,6 @@
     "customer": {
       "title": "Información del cliente"
     },
-    "vendor": {
-      "title": "Información del vendedor"
-    },
     "shipping": {
       "title": "Dirección de envío"
     },
@@ -2627,6 +2744,9 @@
       "buyAgain": "Comprar de nuevo",
       "downloadInvoice": "Descargar factura",
       "needHelp": "¿Necesitas ayuda?"
+    },
+    "Vendor": {
+      "title": "Información del vendedor"
     }
   }
 }

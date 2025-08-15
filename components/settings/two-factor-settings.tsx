@@ -119,7 +119,7 @@ const disable2FA = async (password: string) => {
 };
 
 export function TwoFactorSettings() {
-  const t = useTranslations("vendor.security.twoFactor");
+  const t = useTranslations("Vendor.security.twoFactor");
   const queryClient = useQueryClient();
   
   // UI State management

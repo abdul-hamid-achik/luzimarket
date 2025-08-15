@@ -19,7 +19,7 @@ interface Order {
 }
 
 export async function VendorOrdersTable() {
-  const t = await getTranslations("vendor.orders");
+  const t = await getTranslations("Vendor.orders");
   const locale = await getLocale();
   const rawOrders = await getCurrentVendorOrders();
   const orders: Order[] = rawOrders.map((o: any) => ({
@@ -71,10 +71,10 @@ export async function VendorOrdersTable() {
                 {t("total")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
-                {t("status")}
+                {t("statusHeader")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
-                {t("payment")}
+                {t("paymentHeader")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
                 {t("date")}

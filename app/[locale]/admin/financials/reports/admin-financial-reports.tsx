@@ -52,7 +52,7 @@ ChartJS.register(
 );
 
 export function AdminFinancialReports() {
-  const t = useTranslations("admin.financials.reports");
+  const t = useTranslations("Admin.financials.reports");
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(new Date().setDate(new Date().getDate() - 30)),
     to: new Date(),

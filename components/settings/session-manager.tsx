@@ -21,7 +21,7 @@ interface Session {
 }
 
 export function SessionManager() {
-  const t = useTranslations("vendor.security.sessions");
+  const t = useTranslations("Vendor.security.sessions");
   const locale = useLocale();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [isLoading, setIsLoading] = useState(true);

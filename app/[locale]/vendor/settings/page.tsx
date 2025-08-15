@@ -10,7 +10,7 @@ import { eq } from "drizzle-orm";
 
 export default async function VendorSettingsPage() {
   const session = await auth();
-  const t = await getTranslations("vendor.settings");
+  const t = await getTranslations("Vendor.settings");
   
   if (!session || session.user.role !== "vendor") {
     redirect("/login");

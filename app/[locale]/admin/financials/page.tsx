@@ -1,19 +1,19 @@
 import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { vendors, vendorBalances, platformFees, transactions, payouts } from "@/db/schema";
-import { desc, sum, eq, and, gte, lte } from "drizzle-orm";
+import { desc, sum, eq, and, gte, lte, inArray } from "drizzle-orm";
 import { AdminFinancialsClient } from "./admin-financials-client";
 
 export default async function AdminFinancialsPage() {
-  const t = await getTranslations("admin.financials");
+  const t = await getTranslations("Admin.financials");
 
   // Get platform statistics
   const [totalRevenue] = await db
-    .select({ 
-      total: sum(platformFees.feeAmount) 
+    .select({
+      total: sum(platformFees.feeAmount),
     })
     .from(platformFees)
-    .where(eq(platformFees.status, "collected"));
+    .where(inArray(platformFees.status, ["collected", "transferred"]));
 
   const [pendingFees] = await db
     .select({ 

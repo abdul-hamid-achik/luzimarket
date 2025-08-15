@@ -10,7 +10,7 @@ export default async function AdminFinancialReportsPage() {
     redirect("/login");
   }
 
-  const t = await getTranslations("admin.financials.reports");
+  const t = await getTranslations("Admin.financials.reports");
 
   return (
     <div className="space-y-6">

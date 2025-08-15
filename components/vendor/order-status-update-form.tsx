@@ -45,7 +45,7 @@ export function OrderStatusUpdateForm({
   currentStatus,
   onSuccess 
 }: OrderStatusUpdateFormProps) {
-  const t = useTranslations("vendor.orders");
+  const t = useTranslations("Vendor.orders");
   const queryClient = useQueryClient();
   
   const form = useForm<OrderStatusFormValues>({

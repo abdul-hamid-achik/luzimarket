@@ -39,7 +39,7 @@ interface OrderStatusUpdaterProps {
 }
 
 export function OrderStatusUpdater({ order, onStatusUpdate }: OrderStatusUpdaterProps) {
-  const t = useTranslations("vendor.orderStatusUpdater");
+  const t = useTranslations("Vendor.orderStatusUpdater");
   const [selectedStatus, setSelectedStatus] = useState(order.status);
   const [notes, setNotes] = useState("");
   const [trackingNumber, setTrackingNumber] = useState("");

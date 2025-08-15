@@ -13,7 +13,7 @@ export default async function VendorLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
-  const t = await getTranslations("vendor.layout");
+  const t = await getTranslations("Vendor.layout");
 
   // Skip auth check for registration page - will be handled by parallel route
   if (!session || !session.user || session.user.role !== "vendor") {
