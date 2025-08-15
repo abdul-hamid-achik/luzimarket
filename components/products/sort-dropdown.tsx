@@ -30,7 +30,7 @@ export function SortDropdown() {
   };
 
   return (
-    <div className="flex items-center gap-4" data-testid="sort-dropdown">
+    <div className="flex items-center gap-4 self-end" data-testid="sort-dropdown">
       <span className="text-sm font-univers text-gray-600">{t('sortBy')}</span>
       <Select value={currentSort} onValueChange={handleSortChange}>
         <SelectTrigger className="w-48">

@@ -3,7 +3,7 @@
 
 import { db } from "@/db";
 import { products, categories, vendors } from "@/db/schema";
-import { eq, and, gte, lte, inArray, sql, desc, asc } from "drizzle-orm";
+import { eq, and, gte, lte, inArray, sql, desc, asc, or } from "drizzle-orm";
 
 export interface ProductFilters {
   categoryIds?: string[];
@@ -78,6 +78,13 @@ export async function getFilteredProducts(filters: ProductFilters = {}) {
 
     if (maxPrice !== undefined) {
       conditions.push(lte(products.price, maxPrice.toString()));
+    }
+
+    if (tags.length > 0) {
+      // Match any of the provided tags in the product tags JSON array
+      // Uses Postgres jsonb key existence operator (?) per tag and combines with OR
+      const tagConds = tags.map((tag) => sql`(${products.tags}::jsonb) ? ${tag}`);
+      conditions.push(or(...tagConds));
     }
 
     // Build order by
@@ -160,8 +167,36 @@ export async function getFilteredProducts(filters: ProductFilters = {}) {
   }
 }
 
-export async function getProductFilterOptions() {
+export async function getProductFilterOptions(baseFilters: ProductFilters = {}) {
   try {
+    const {
+      categoryIds = [],
+      vendorIds = [],
+      productIds = [],
+      minPrice,
+      maxPrice,
+      tags = [],
+    } = baseFilters;
+
+    // Helper: build conditions applied to products for facet queries
+    const buildProductConditions = (opts: {
+      includeCategoryFilter?: boolean;
+      includeVendorFilter?: boolean;
+    }) => {
+      const conds: any[] = [eq(products.isActive, true)];
+      if (productIds.length > 0) conds.push(inArray(products.id, productIds));
+      if (opts.includeCategoryFilter && categoryIds.length > 0) {
+        conds.push(inArray(products.categoryId, categoryIds.map((id) => parseInt(id))));
+      }
+      if (opts.includeVendorFilter && vendorIds.length > 0) {
+        conds.push(inArray(products.vendorId, vendorIds));
+      }
+      if (minPrice !== undefined) conds.push(gte(products.price, minPrice.toString()));
+      if (maxPrice !== undefined) conds.push(lte(products.price, maxPrice.toString()));
+      // Note: tag-based faceting omitted in counts for simplicity
+      return conds;
+    };
+
     // Get all active categories with product counts
     const categoriesWithCounts = await db
       .select({
@@ -171,10 +206,13 @@ export async function getProductFilterOptions() {
         count: sql<number>`count(${products.id})`,
       })
       .from(categories)
-      .leftJoin(products, and(
-        eq(products.categoryId, categories.id),
-        eq(products.isActive, true)
-      ))
+      .leftJoin(
+        products,
+        and(
+          eq(products.categoryId, categories.id),
+          ...buildProductConditions({ includeCategoryFilter: false, includeVendorFilter: true })
+        )
+      )
       .where(eq(categories.isActive, true))
       .groupBy(categories.id)
       .orderBy(categories.displayOrder);
@@ -187,10 +225,13 @@ export async function getProductFilterOptions() {
         count: sql<number>`count(${products.id})`,
       })
       .from(vendors)
-      .leftJoin(products, and(
-        eq(products.vendorId, vendors.id),
-        eq(products.isActive, true)
-      ))
+      .leftJoin(
+        products,
+        and(
+          eq(products.vendorId, vendors.id),
+          ...buildProductConditions({ includeCategoryFilter: true, includeVendorFilter: false })
+        )
+      )
       .where(eq(vendors.isActive, true))
       .groupBy(vendors.id)
       .orderBy(vendors.businessName);
@@ -202,7 +243,7 @@ export async function getProductFilterOptions() {
         max: sql<number>`max(cast(${products.price} as decimal))`,
       })
       .from(products)
-      .where(eq(products.isActive, true));
+      .where(and(...buildProductConditions({ includeCategoryFilter: true, includeVendorFilter: true })));
 
     // Get all unique tags
     const allProducts = await db

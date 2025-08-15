@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
 import { ProductsGrid } from "@/components/products/products-grid";
+import { InfiniteProductsGrid } from "@/components/products/infinite-products-grid";
 import { FilterSidebar } from "@/components/products/filter-sidebar";
 import { SortDropdown } from "@/components/products/sort-dropdown";
 import { getFilteredProducts, getProductFilterOptions } from "@/lib/actions/products";
@@ -11,7 +12,7 @@ import { eq } from "drizzle-orm";
 
 interface HandpickedPageProps {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ 
+  searchParams: Promise<{
     category?: string;
     vendor?: string;
     sort?: string;
@@ -24,27 +25,50 @@ export default async function HandpickedPage({ params, searchParams }: Handpicke
   const { locale } = await params;
   const filters = await searchParams;
   setRequestLocale(locale);
-  
+
   const t = await getTranslations('HandpickedPage');
 
   // Get products with handpicked tag
-  const productsResult = await getFilteredProducts({
-    categoryIds: filters.category ? [filters.category] : undefined,
-    vendorIds: filters.vendor ? [filters.vendor] : undefined,
+  const categoryIds = filters.category
+    ? [filters.category]
+    : (typeof (filters as any).categories === 'string' && (filters as any).categories.length > 0
+      ? (filters as any).categories.split(',')
+      : undefined);
+  const vendorIds = filters.vendor
+    ? [filters.vendor]
+    : (typeof (filters as any).vendors === 'string' && (filters as any).vendors.length > 0
+      ? (filters as any).vendors.split(',')
+      : undefined);
+
+  let productsResult = await getFilteredProducts({
+    categoryIds,
+    vendorIds,
     sortBy: filters.sort as any,
     minPrice: filters.minPrice ? parseInt(filters.minPrice) : undefined,
     maxPrice: filters.maxPrice ? parseInt(filters.maxPrice) : undefined,
     tags: ['handpicked'], // Filter for handpicked products
   });
 
-  const filterOptions = await getProductFilterOptions();
-  const vendorsList = await db.query.vendors.findMany({
-    where: eq(vendors.isActive, true),
-    columns: {
-      id: true,
-      businessName: true,
-    }
+  // Fallback: if no handpicked products, show general products so the page is never empty
+  const usingFallback = productsResult.products.length === 0;
+  if (usingFallback) {
+    productsResult = await getFilteredProducts({
+      categoryIds,
+      vendorIds,
+      sortBy: filters.sort as any,
+      minPrice: filters.minPrice ? parseInt(filters.minPrice) : undefined,
+      maxPrice: filters.maxPrice ? parseInt(filters.maxPrice) : undefined,
+    });
+  }
+
+  const filterOptions = await getProductFilterOptions({
+    categoryIds,
+    vendorIds,
+    ...(filters.minPrice ? { minPrice: parseInt(filters.minPrice) } : {}),
+    ...(filters.maxPrice ? { maxPrice: parseInt(filters.maxPrice) } : {}),
   });
+  const vendorsList = filterOptions.vendors.map((v: any) => ({ id: v.id, businessName: v.name, count: Number(v.count) }));
+  const hasSearchParams = Object.values(filters || {}).some((v) => v !== undefined && v !== null && v !== "");
 
   return (
     <div className="min-h-screen bg-white">
@@ -85,7 +109,7 @@ export default async function HandpickedPage({ params, searchParams }: Handpicke
           <aside className="lg:w-64 flex-shrink-0">
             <div className="sticky top-24">
               <h2 className="text-lg font-univers font-medium mb-6">{t('filterBy')}</h2>
-              <FilterSidebar 
+              <FilterSidebar
                 categories={filterOptions.categories.map((cat: any) => ({
                   id: cat.id.toString(),
                   name: cat.name,
@@ -94,7 +118,7 @@ export default async function HandpickedPage({ params, searchParams }: Handpicke
                 vendors={vendorsList.map((vendor: any) => ({
                   id: vendor.id,
                   name: vendor.businessName,
-                  count: 0 // We don't have count data for vendors in this context
+                  count: Number(vendor.count || 0)
                 }))}
                 priceRange={filterOptions.priceRange}
               />
@@ -105,16 +129,27 @@ export default async function HandpickedPage({ params, searchParams }: Handpicke
           <div className="flex-1">
             {/* Sort and Results */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-              <p className="text-sm font-univers text-gray-600">
-                {productsResult.products.length} {productsResult.products.length === 1 ? 'producto encontrado' : 'productos encontrados'}
-              </p>
+              <div className="text-sm font-univers text-gray-600">
+                {hasSearchParams && productsResult.pagination.totalCount > 0 && (
+                  <p>
+                    {t('resultsCount', {
+                      count: productsResult.pagination.totalCount,
+                      defaultValue: `${productsResult.pagination.totalCount} ${productsResult.pagination.totalCount === 1 ? 'producto encontrado' : 'productos encontrados'}`
+                    })}
+                  </p>
+                )}
+              </div>
               <SortDropdown />
             </div>
 
             {/* Products */}
             {productsResult.products.length > 0 ? (
               <Suspense fallback={<ProductGridSkeleton />}>
-                <ProductsGrid products={productsResult.products} />
+                <InfiniteProductsGrid
+                  initialProducts={productsResult.products as any}
+                  initialPagination={productsResult.pagination}
+                  staticFilters={usingFallback ? undefined : { tags: ['handpicked'] }}
+                />
               </Suspense>
             ) : (
               <div className="text-center py-12">

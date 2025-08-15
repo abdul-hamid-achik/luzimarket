@@ -1187,6 +1187,7 @@
     "priceRange": "Price range",
     "showFilters": "Show filters",
     "sortBy": "Sort by",
+    "resultsCount": "{count, plural, =1 {# product found} other {# products found}}",
     "subtitle": "Gifts carefully selected by our experts",
     "title": "Handpicked Selection",
     "tryAdjustingFilters": "Try adjusting filters to see more results",

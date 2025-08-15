@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { products, vendors, categories } from "@/db/schema";
 import { ilike, or, and, eq, gte, lte, sql, inArray } from "drizzle-orm";
 import { ProductsGrid } from "@/components/products/products-grid";
+import { InfiniteProductsGrid } from "@/components/products/infinite-products-grid";
 import { FilterSidebar } from "@/components/products/filter-sidebar";
 import { SortDropdown } from "@/components/products/sort-dropdown";
 import { Search, X } from "lucide-react";
@@ -13,7 +14,7 @@ import { getFilteredProducts, getProductFilterOptions } from "@/lib/actions/prod
 
 interface SearchPageProps {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ 
+  searchParams: Promise<{
     q?: string;
     category?: string;
     vendor?: string;
@@ -25,7 +26,7 @@ interface SearchPageProps {
 
 async function searchProducts(query: string, filters: any) {
   if (!query) {
-    return { products: [], pagination: { page: 1, limit: 12, totalCount: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false } };
+    return { products: [], pagination: { page: 1, limit: 12, totalCount: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false }, allProductIds: [] };
   }
 
   // Use the same filtering function but add search logic
@@ -46,13 +47,13 @@ async function searchProducts(query: string, filters: any) {
     .where(and(...searchConditions));
 
   const searchProductIds = searchResults.map(r => r.id);
-  
+
   if (searchProductIds.length === 0) {
-    return { products: [], pagination: { page: 1, limit: 12, totalCount: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false } };
+    return { products: [], pagination: { page: 1, limit: 12, totalCount: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false }, allProductIds: [] };
   }
 
   // Now use getFilteredProducts with the search results
-  return await getFilteredProducts({
+  const filtered = await getFilteredProducts({
     productIds: searchProductIds,
     categoryIds: filters.category ? [filters.category] : undefined,
     vendorIds: filters.vendor ? [filters.vendor] : undefined,
@@ -60,16 +61,18 @@ async function searchProducts(query: string, filters: any) {
     minPrice: filters.minPrice ? parseInt(filters.minPrice) : undefined,
     maxPrice: filters.maxPrice ? parseInt(filters.maxPrice) : undefined,
   });
+
+  return { ...filtered, allProductIds: searchProductIds };
 }
 
 export default async function SearchPage({ params, searchParams }: SearchPageProps) {
   const { locale } = await params;
   const { q: query, ...filters } = await searchParams;
   setRequestLocale(locale);
-  
+
   const t = await getTranslations('Search');
-  const searchResults = query ? await searchProducts(query, filters) : { products: [], pagination: { page: 1, limit: 12, totalCount: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false } };
-  
+  const searchResults = query ? await searchProducts(query, filters) : { products: [], pagination: { page: 1, limit: 12, totalCount: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false }, allProductIds: [] };
+
   // Get filter options using the same function as other pages
   const filterOptions = await getProductFilterOptions();
   const vendorsList = await db.query.vendors.findMany({
@@ -90,7 +93,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
               <Search className="h-6 w-6 text-gray-600" />
               <h1 className="text-2xl font-times-now">Resultados de búsqueda</h1>
             </div>
-            
+
             {query && (
               <div className="flex items-center justify-center gap-2 mb-4">
                 <p className="text-gray-600 font-univers">
@@ -149,7 +152,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
                 No se encontraron resultados
               </h2>
               <p className="text-gray-600 font-univers mb-8 max-w-md mx-auto">
-                No pudimos encontrar productos que coincidan con tu búsqueda. 
+                No pudimos encontrar productos que coincidan con tu búsqueda.
                 Intenta con diferentes términos o explora nuestras categorías.
               </p>
               <div className="space-y-4">
@@ -165,7 +168,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
                     </Button>
                   </Link>
                 </div>
-                
+
                 <div className="pt-8">
                   <p className="text-sm font-univers text-gray-500 mb-3">Sugerencias:</p>
                   <ul className="text-sm text-gray-600 font-univers space-y-1 max-w-sm mx-auto">
@@ -182,7 +185,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
             <div className="flex gap-8">
               {/* Filters Sidebar */}
               <aside className="w-64 hidden lg:block">
-                <FilterSidebar 
+                <FilterSidebar
                   categories={filterOptions.categories.map((cat: any) => ({
                     id: cat.id.toString(),
                     name: cat.name,
@@ -208,20 +211,15 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
                       {searchResults.products.length} producto{searchResults.products.length !== 1 ? 's' : ''} encontrado{searchResults.products.length !== 1 ? 's' : ''}
                     </p>
                   </div>
-                  
+
                   <SortDropdown />
                 </div>
-                
-                <ProductsGrid products={searchResults.products} />
 
-                {/* Load more or pagination could go here */}
-                {searchResults.products.length >= 20 && (
-                  <div className="text-center mt-12">
-                    <Button variant="outline" className="font-univers">
-                      Cargar más resultados
-                    </Button>
-                  </div>
-                )}
+                <InfiniteProductsGrid
+                  initialProducts={searchResults.products as any}
+                  initialPagination={searchResults.pagination}
+                  staticFilters={{ productIds: searchResults.allProductIds }}
+                />
               </div>
             </div>
           )}

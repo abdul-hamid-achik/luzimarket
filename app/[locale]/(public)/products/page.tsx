@@ -1,13 +1,14 @@
 import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
 import { ProductsGrid } from "@/components/products/products-grid";
+import { InfiniteProductsGrid } from "@/components/products/infinite-products-grid";
 import { FilterSidebar } from "@/components/products/filter-sidebar";
 import { SortDropdown } from "@/components/products/sort-dropdown";
 import { getFilteredProducts, getProductFilterOptions } from "@/lib/actions/products";
 
 interface ProductsPageProps {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ 
+  searchParams: Promise<{
     category?: string;
     vendor?: string;
     sort?: string;
@@ -22,19 +23,37 @@ export default async function ProductsPage({ params, searchParams }: ProductsPag
   const { locale } = await params;
   const filters = await searchParams;
   setRequestLocale(locale);
-  
+
   const t = await getTranslations('Products');
-  
+
   // Get products using the same filtering logic as handpicked page
+  const categoryIds = filters.category
+    ? [filters.category]
+    : (typeof (filters as any).categories === 'string' && (filters as any).categories.length > 0
+      ? (filters as any).categories.split(',')
+      : undefined);
+  const vendorIds = filters.vendor
+    ? [filters.vendor]
+    : (typeof (filters as any).vendors === 'string' && (filters as any).vendors.length > 0
+      ? (filters as any).vendors.split(',')
+      : undefined);
+
   const productsResult = await getFilteredProducts({
-    categoryIds: filters.category && !isNaN(parseInt(filters.category)) ? [filters.category] : undefined,
-    vendorIds: filters.vendor ? [filters.vendor] : undefined,
+    categoryIds,
+    vendorIds,
     sortBy: filters.sort as any,
     minPrice: filters.minPrice && !isNaN(parseInt(filters.minPrice)) ? parseInt(filters.minPrice) : undefined,
     maxPrice: filters.maxPrice && !isNaN(parseInt(filters.maxPrice)) ? parseInt(filters.maxPrice) : undefined,
   });
 
-  const filterOptions = await getProductFilterOptions();
+  const filterOptions = await getProductFilterOptions({
+    categoryIds,
+    vendorIds,
+    minPrice: productsResult.pagination ? undefined : undefined,
+    // Note: price facet already constrained below by min/max from URL if provided
+    ...(filters.minPrice && !isNaN(parseInt(filters.minPrice)) ? { minPrice: parseInt(filters.minPrice) } : {}),
+    ...(filters.maxPrice && !isNaN(parseInt(filters.maxPrice)) ? { maxPrice: parseInt(filters.maxPrice) } : {}),
+  });
 
   return (
     <main className="min-h-screen">
@@ -52,7 +71,7 @@ export default async function ProductsPage({ params, searchParams }: ProductsPag
               </div>
             </div>
           </div>
-          
+
           {/* Right side - dark background with pattern */}
           <div className="relative bg-black">
             <div className="absolute inset-0 opacity-20">
@@ -68,7 +87,7 @@ export default async function ProductsPage({ params, searchParams }: ProductsPag
           <div className="flex gap-8">
             {/* Filters Sidebar */}
             <aside className="w-64 hidden lg:block">
-              <FilterSidebar 
+              <FilterSidebar
                 categories={filterOptions.categories.map((cat: any) => ({
                   id: cat.id.toString(),
                   name: cat.name,
@@ -91,12 +110,15 @@ export default async function ProductsPage({ params, searchParams }: ProductsPag
                     {productsResult.products.length} {t('productsFound')}
                   </p>
                 </div>
-                
+
                 {/* Sort Dropdown */}
                 <SortDropdown />
               </div>
-              
-              <ProductsGrid products={productsResult.products} />
+
+              <InfiniteProductsGrid
+                initialProducts={productsResult.products as any}
+                initialPagination={productsResult.pagination}
+              />
             </div>
           </div>
         </div>

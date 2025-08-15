@@ -1187,6 +1187,7 @@
     "priceRange": "Rango de precio",
     "showFilters": "Mostrar filtros",
     "sortBy": "Ordenar por",
+    "resultsCount": "{count, plural, =1 {# producto encontrado} other {# productos encontrados}}",
     "subtitle": "Regalos cuidadosamente seleccionados por nuestros expertos",
     "title": "Selección Especial",
     "tryAdjustingFilters": "Intenta ajustar los filtros para ver más resultados",
