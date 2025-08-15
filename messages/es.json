@@ -575,7 +575,76 @@
       "saving": "Guardando...",
       "loadError": "Error al cargar la plantilla",
       "saveSuccess": "Plantilla guardada exitosamente",
-      "saveError": "Error al guardar la plantilla"
+      "saveError": "Error al guardar la plantilla",
+      "noTemplatesYet": "No hay plantillas de email aún",
+      "created": "Creado",
+      "infoHeader": "Plantillas de Email: Bienvenida, Confirmación de Orden, Notificación de Envío, Solicitud de Reseña",
+      "recommendedTemplates": "Plantillas Recomendadas",
+      "recommendedDescription": "Estas son las plantillas de email más comunes que tu tienda debería tener:",
+      "orderConfirmationName": "Confirmación de Orden",
+      "orderConfirmationDesc": "Se envía cuando un cliente completa una compra",
+      "shippingNotificationName": "Notificación de Envío",
+      "shippingNotificationDesc": "Se envía cuando el pedido es enviado",
+      "welcomeName": "Bienvenida",
+      "welcomeDesc": "Se envía cuando un nuevo usuario se registra",
+      "reviewRequestName": "Solicitud de Reseña",
+      "reviewRequestDesc": "Se envía días después de recibir el producto",
+      "new": {
+        "validation": {
+          "name": "El nombre debe tener al menos 3 caracteres",
+          "type": "Selecciona un tipo de plantilla",
+          "subject": "El asunto debe tener al menos 5 caracteres",
+          "htmlContent": "El contenido HTML es requerido"
+        },
+        "toast": {
+          "createError": "Error al crear la plantilla",
+          "createSuccess": "Plantilla creada exitosamente"
+        },
+        "labels": {
+          "backToTemplates": "Volver a plantillas",
+          "newTemplate": "Nueva Plantilla de Email",
+          "createDescription": "Crea una nueva plantilla de correo electrónico",
+          "basicInfo": "Información Básica",
+          "templateName": "Nombre de la Plantilla",
+          "templateType": "Tipo de Plantilla",
+          "selectType": "Selecciona un tipo",
+          "emailSubject": "Asunto del Email",
+          "description": "Descripción (opcional)",
+          "descriptionPlaceholder": "Describe el propósito de esta plantilla...",
+          "activeTemplate": "Plantilla Activa",
+          "inactiveTemplatesNote": "Las plantillas inactivas no se usarán",
+          "availableVariables": "Variables Disponibles",
+          "clickToInsert": "Haz clic para insertar en el editor",
+          "html": "HTML",
+          "plainText": "Texto Plano",
+          "preview": "Vista Previa",
+          "desktop": "Desktop",
+          "mobile": "Mobile",
+          "plainTextVersion": "Versión en texto plano del email...",
+          "uploadingImages": "Subiendo imágenes...",
+          "dragImages": "Arrastra imágenes aquí o haz clic para seleccionar",
+          "imageFormats": "PNG, JPG hasta 5MB",
+          "principal": "Principal",
+          "cancel": "Cancelar",
+          "save": "Guardar Plantilla",
+          "saving": "Guardando...",
+          "creating": "Creando..."
+        },
+        "placeholders": {
+          "templateName": "Ej: Confirmación de Orden",
+          "subjectWithVariables": "Ej: Tu orden #{{order_number}} ha sido confirmada",
+          "variableUsage": "Puedes usar variables como"
+        },
+        "templateTypes": {
+          "orderConfirmation": "Confirmación de Orden",
+          "welcome": "Bienvenida",
+          "passwordReset": "Restablecer Contraseña",
+          "shippingNotification": "Notificación de Envío",
+          "reviewRequest": "Solicitud de Reseña",
+          "promotional": "Promocional",
+          "abandonedCart": "Carrito Abandonado"
+        }
+      }
     },
     "imageModeration": {
       "title": "Moderación de Imágenes",
@@ -696,117 +765,6 @@
       "created": "Creado",
       "updated": "Última Actualización"
     },
-    "emailTemplates": {
-      "title": "Plantillas de correo",
-      "subtitle": "Administra las plantillas de correo electrónico",
-      "template": "Plantilla",
-      "type": "Tipo",
-      "subject": "Asunto",
-      "lastModified": "Última modificación",
-      "actions": "Acciones",
-      "preview": "Vista previa",
-      "edit": "Editar",
-      "createNew": "Crear nueva plantilla",
-      "templateTypes": {
-        "orderConfirmation": "Confirmación de orden",
-        "orderShipped": "Orden enviada",
-        "vendorNewOrder": "Nueva orden (vendedor)",
-        "accountLocked": "Cuenta bloqueada",
-        "passwordReset": "Restablecer contraseña",
-        "welcome": "Bienvenida",
-        "reviewRequest": "Solicitud de reseña",
-        "promotional": "Promocional",
-        "abandonedCart": "Carrito abandonado"
-      },
-      "active": "Activa",
-      "inactive": "Inactiva",
-      "editTemplate": "Editar plantilla",
-      "previewTemplate": "Vista previa de plantilla",
-      "templateName": "Nombre de la plantilla",
-      "templateSubject": "Asunto del correo",
-      "templateContent": "Contenido",
-      "variables": "Variables disponibles",
-      "saveChanges": "Guardar cambios",
-      "cancel": "Cancelar",
-      "testEmail": "Enviar correo de prueba",
-      "testEmailAddress": "Correo de prueba",
-      "sendTest": "Enviar prueba",
-      "backToTemplates": "Volver a plantillas",
-      "loading": "Cargando...",
-      "notFound": "Plantilla no encontrada",
-      "editTitle": "Editar plantilla",
-      "emailSubject": "Asunto del correo",
-      "subjectPlaceholder": "Ingresa el asunto del correo...",
-      "noTemplatesYet": "No hay plantillas de email aún",
-      "created": "Creado",
-      "infoHeader": "Plantillas de Email: Bienvenida, Confirmación de Orden, Notificación de Envío, Solicitud de Reseña",
-      "recommendedTemplates": "Plantillas Recomendadas",
-      "recommendedDescription": "Estas son las plantillas de email más comunes que tu tienda debería tener:",
-      "orderConfirmationName": "Confirmación de Orden",
-      "orderConfirmationDesc": "Se envía cuando un cliente completa una compra",
-      "shippingNotificationName": "Notificación de Envío",
-      "shippingNotificationDesc": "Se envía cuando el pedido es enviado",
-      "welcomeName": "Bienvenida",
-      "welcomeDesc": "Se envía cuando un nuevo usuario se registra",
-      "reviewRequestName": "Solicitud de Reseña",
-      "reviewRequestDesc": "Se envía días después de recibir el producto",
-      "new": {
-        "validation": {
-          "name": "El nombre debe tener al menos 3 caracteres",
-          "type": "Selecciona un tipo de plantilla",
-          "subject": "El asunto debe tener al menos 5 caracteres",
-          "htmlContent": "El contenido HTML es requerido"
-        },
-        "toast": {
-          "createError": "Error al crear la plantilla",
-          "createSuccess": "Plantilla creada exitosamente"
-        },
-        "labels": {
-          "backToTemplates": "Volver a plantillas",
-          "newTemplate": "Nueva Plantilla de Email",
-          "createDescription": "Crea una nueva plantilla de correo electrónico",
-          "basicInfo": "Información Básica",
-          "templateName": "Nombre de la Plantilla",
-          "templateType": "Tipo de Plantilla",
-          "selectType": "Selecciona un tipo",
-          "emailSubject": "Asunto del Email",
-          "description": "Descripción (opcional)",
-          "descriptionPlaceholder": "Describe el propósito de esta plantilla...",
-          "activeTemplate": "Plantilla Activa",
-          "inactiveTemplatesNote": "Las plantillas inactivas no se usarán",
-          "availableVariables": "Variables Disponibles",
-          "clickToInsert": "Haz clic para insertar en el editor",
-          "html": "HTML",
-          "plainText": "Texto Plano",
-          "preview": "Vista Previa",
-          "desktop": "Desktop",
-          "mobile": "Mobile",
-          "plainTextVersion": "Versión en texto plano del email...",
-          "uploadingImages": "Subiendo imágenes...",
-          "dragImages": "Arrastra imágenes aquí o haz clic para seleccionar",
-          "imageFormats": "PNG, JPG hasta 5MB",
-          "principal": "Principal",
-          "cancel": "Cancelar",
-          "save": "Guardar Plantilla",
-          "saving": "Guardando...",
-          "creating": "Creando..."
-        },
-        "placeholders": {
-          "templateName": "Ej: Confirmación de Orden",
-          "subjectWithVariables": "Ej: Tu orden #{{order_number}} ha sido confirmada",
-          "variableUsage": "Puedes usar variables como"
-        },
-        "templateTypes": {
-          "orderConfirmation": "Confirmación de Orden",
-          "welcome": "Bienvenida",
-          "passwordReset": "Restablecer Contraseña",
-          "shippingNotification": "Notificación de Envío",
-          "reviewRequest": "Solicitud de Reseña",
-          "promotional": "Promocional",
-          "abandonedCart": "Carrito Abandonado"
-        }
-      }
-    },
     "usersPage": {
       "title": "Usuarios",
       "subtitle": "Administra todos los usuarios de la plataforma",
@@ -821,6 +779,7 @@
         "user": "Usuario",
         "email": "Email",
         "type": "Tipo",
+        "status": "Estado",
         "orders": "Órdenes",
         "totalSpent": "Total gastado",
         "registered": "Registro",
@@ -831,6 +790,10 @@
         "vendor": "Vendedor",
         "customer": "Cliente"
       },
+      "locked": "Bloqueada",
+      "active": "Activa",
+      "lock": "Bloquear",
+      "unlock": "Desbloquear",
       "noName": "Sin nombre",
       "viewDetails": "Ver detalles",
       "loading": "Cargando..."
@@ -841,13 +804,34 @@
       "categoryName": "Nombre",
       "slug": "Slug",
       "products": "Productos",
+      "image": "Imagen",
+      "order": "Orden",
+      "description": "Descripción",
+      "imageUrl": "URL de imagen",
       "status": "Estado",
       "actions": "Acciones",
       "edit": "Editar",
       "delete": "Eliminar",
       "createNew": "Crear categoría",
+      "create": "Crear",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "editCategory": "Editar categoría",
+      "createDescription": "Crea una nueva categoría de productos",
+      "editDescription": "Actualiza los detalles de la categoría",
+      "saving": "Guardando...",
       "active": "Activa",
-      "inactive": "Inactiva"
+      "inactive": "Inactiva",
+      "createSuccess": "Categoría creada exitosamente",
+      "createError": "Error al crear la categoría",
+      "updateSuccess": "Categoría actualizada exitosamente",
+      "updateError": "Error al actualizar la categoría",
+      "deleteTitle": "¿Eliminar categoría?",
+      "deleteDescription": "Esta acción no se puede deshacer. La categoría \"{name}\" será eliminada permanentemente.",
+      "deleting": "Eliminando...",
+      "deleteSuccess": "Categoría eliminada exitosamente",
+      "deleteError": "Error al eliminar la categoría",
+      "error": "Error"
     },
     "productsPage": {
       "title": "Productos",
@@ -964,104 +948,6 @@
       "settings": "Configuración",
       "logout": "Cerrar sesión"
     },
-    "dashboard": "Panel de vendedor",
-    "myProducts": "Mis productos",
-    "addProduct": "Agregar producto",
-    "orders": {
-      "title": "Órdenes",
-      "statusUpdated": "Estado de orden actualizado exitosamente",
-      "updateError": "Error al actualizar el estado de la orden",
-      "status": {
-        "label": "Estado de la orden",
-        "select": "Seleccionar estado",
-        "pending": "Pendiente",
-        "processing": "Procesando",
-        "shipped": "Enviado",
-        "delivered": "Entregado",
-        "cancelled": "Cancelado"
-      },
-      "trackingNumber": "Número de seguimiento",
-      "trackingNumberPlaceholder": "Ingrese el número de seguimiento",
-      "notes": "Notas",
-      "notesPlaceholder": "Agregue notas sobre la actualización del estado",
-      "updateStatus": "Actualizar estado"
-    },
-    "analytics": "Análisis",
-    "profile": "Perfil",
-    "settings": "Configuración",
-    "earnings": "Ganancias",
-    "newOrder": "¡Nueva orden recibida!",
-    "orderDetails": "Detalles de la orden",
-    "customerInfo": "Información del cliente",
-    "shippingAddress": "Dirección de envío",
-    "productsSold": "Productos vendidos",
-    "viewFullOrder": "Ver orden completa",
-    "orderDetails": {
-      "orderNumber": "Orden",
-      "orderInvoice": "Factura de Orden",
-      "date": "Fecha",
-      "status": "Estado",
-      "customer": "Cliente",
-      "guest": "Invitado",
-      "shippingAddress": "Dirección de envío",
-      "orderItems": "Artículos de la orden",
-      "product": "Producto",
-      "quantity": "Cantidad",
-      "price": "Precio",
-      "total": "Total",
-      "subtotal": "Subtotal",
-      "tax": "IVA (16%)",
-      "shipping": "Envío",
-      "print": "Imprimir",
-      "downloadInvoice": "Descargar factura",
-      "shippingActions": "Acciones de envío",
-      "paymentInfo": "Información de pago",
-      "method": "Método",
-      "paid": "Pagado",
-      "pending": "Pendiente",
-      "transactionId": "ID de transacción",
-      "notes": "Notas",
-      "copiedToClipboard": "Copiado al portapapeles",
-      "orderNumberCopied": "Número de orden copiado",
-      "status": {
-        "pending": "Pendiente",
-        "processing": "Procesando",
-        "shipped": "Enviado",
-        "delivered": "Entregado",
-        "cancelled": "Cancelado"
-      },
-      "payment": {
-        "pending": "Pendiente",
-        "succeeded": "Completado",
-        "failed": "Fallido"
-      }
-    },
-    "orderManagement": {
-      "updateStatus": "Actualizar Estado",
-      "orderNumber": "Orden #",
-      "total": "Total",
-      "date": "Fecha",
-      "customer": "Cliente",
-      "products": "Productos",
-      "quantity": "Cantidad",
-      "newStatus": "Nuevo Estado",
-      "trackingNumber": "Número de Rastreo (Opcional)",
-      "trackingPlaceholder": "Ingresa el número de rastreo",
-      "additionalNotes": "Notas Adicionales (Opcional)",
-      "notesPlaceholder": "Agrega notas sobre esta actualización...",
-      "updateButton": "Actualizar Estado",
-      "updating": "Actualizando...",
-      "noChanges": "No hay cambios para actualizar",
-      "updateSuccess": "✅ Estado actualizado exitosamente",
-      "updateSuccessDescription": "La orden #{orderNumber} ha sido actualizada. El cliente será notificado automáticamente.",
-      "updateError": "Error al actualizar el estado",
-      "statusOptions": {
-        "processing": "📦 Procesando orden",
-        "shipped": "🚚 Enviado",
-        "delivered": "✅ Entregado",
-        "cancelled": "❌ Cancelado"
-      }
-    },
     "dashboard": {
       "welcome": "Bienvenido, {businessName}",
       "subtitle": "Aquí está el resumen de tu negocio",
@@ -1096,6 +982,101 @@
         "setupPayments": "Configurar Pagos",
         "managePayments": "Gestionar Pagos",
         "completeSetup": "Completar Configuración"
+      }
+    },
+    "myProducts": "Mis productos",
+    "addProduct": "Agregar producto",
+    "orders": {
+      "title": "Órdenes",
+      "statusUpdated": "Estado de orden actualizado exitosamente",
+      "updateError": "Error al actualizar el estado de la orden",
+      "status": {
+        "label": "Estado de la orden",
+        "select": "Seleccionar estado",
+        "pending": "Pendiente",
+        "processing": "Procesando",
+        "shipped": "Enviado",
+        "delivered": "Entregado",
+        "cancelled": "Cancelado"
+      },
+      "trackingNumber": "Número de seguimiento",
+      "trackingNumberPlaceholder": "Ingrese el número de seguimiento",
+      "notes": "Notas",
+      "notesPlaceholder": "Agregue notas sobre la actualización del estado",
+      "updateStatus": "Actualizar estado"
+    },
+    "analytics": "Análisis",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "earnings": "Ganancias",
+    "newOrder": "¡Nueva orden recibida!",
+    "orderDetails": {
+      "orderNumber": "Orden",
+      "orderInvoice": "Factura de Orden",
+      "date": "Fecha",
+      "status": {
+        "pending": "Pendiente",
+        "processing": "Procesando",
+        "shipped": "Enviado",
+        "delivered": "Entregado",
+        "cancelled": "Cancelado"
+      },
+      "customer": "Cliente",
+      "guest": "Invitado",
+      "shippingAddress": "Dirección de envío",
+      "orderItems": "Artículos de la orden",
+      "product": "Producto",
+      "quantity": "Cantidad",
+      "price": "Precio",
+      "total": "Total",
+      "subtotal": "Subtotal",
+      "tax": "IVA (16%)",
+      "shipping": "Envío",
+      "print": "Imprimir",
+      "downloadInvoice": "Descargar factura",
+      "shippingActions": "Acciones de envío",
+      "paymentInfo": "Información de pago",
+      "method": "Método",
+      "paid": "Pagado",
+      "pending": "Pendiente",
+      "transactionId": "ID de transacción",
+      "notes": "Notas",
+      "copiedToClipboard": "Copiado al portapapeles",
+      "orderNumberCopied": "Número de orden copiado",
+      "payment": {
+        "pending": "Pendiente",
+        "succeeded": "Completado",
+        "failed": "Fallido"
+      }
+    },
+    "customerInfo": "Información del cliente",
+    "shippingAddress": "Dirección de envío",
+    "productsSold": "Productos vendidos",
+    "viewFullOrder": "Ver orden completa",
+    "orderManagement": {
+      "updateStatus": "Actualizar Estado",
+      "orderNumber": "Orden #",
+      "total": "Total",
+      "date": "Fecha",
+      "customer": "Cliente",
+      "products": "Productos",
+      "quantity": "Cantidad",
+      "newStatus": "Nuevo Estado",
+      "trackingNumber": "Número de Rastreo (Opcional)",
+      "trackingPlaceholder": "Ingresa el número de rastreo",
+      "additionalNotes": "Notas Adicionales (Opcional)",
+      "notesPlaceholder": "Agrega notas sobre esta actualización...",
+      "updateButton": "Actualizar Estado",
+      "updating": "Actualizando...",
+      "noChanges": "No hay cambios para actualizar",
+      "updateSuccess": "✅ Estado actualizado exitosamente",
+      "updateSuccessDescription": "La orden #{orderNumber} ha sido actualizada. El cliente será notificado automáticamente.",
+      "updateError": "Error al actualizar el estado",
+      "statusOptions": {
+        "processing": "📦 Procesando orden",
+        "shipped": "🚚 Enviado",
+        "delivered": "✅ Entregado",
+        "cancelled": "❌ Cancelado"
       }
     },
     "stripeOnboarding": {
@@ -1399,7 +1380,7 @@
     "noOrders": "No tienes pedidos todavía",
     "startShopping": "Comienza a comprar",
     "orderNumber": "Orden #{number}",
-    "orderDate": "Fecha del pedido",
+    "orderDate": "Pedido realizado el {date}",
     "orderTotal": "Total",
     "orderStatus": "Estado",
     "viewDetails": "Ver detalles",
@@ -1443,7 +1424,6 @@
     "deliveryAddress": "Dirección de Entrega",
     "orderItems": "Artículos del Pedido",
     "vendorInformation": "Información del Vendedor",
-    "orderDate": "Pedido realizado el {date}",
     "quantity": "Cantidad",
     "total": "Total",
     "details": {
@@ -2155,10 +2135,10 @@
     "layout": {
       "title": "LUZIMARKET",
       "vendorPanel": "Panel de Vendedor",
-      "dashboard": "Dashboard",
+      "dashboard": "Panel",
       "products": "Mis Productos",
       "orders": "Órdenes",
-      "analytics": "Análisis",
+      "analytics": "Estadísticas",
       "financials": "Finanzas",
       "payments": "Pagos",
       "settings": "Configuración",
@@ -2197,16 +2177,16 @@
     },
     "dashboard": {
       "welcome": "Bienvenido, {businessName}",
-      "subtitle": "Aquí está el resumen de tu negocio",
+      "subtitle": "Aquí puedes gestionar tus productos y pedidos",
       "totalProducts": "Productos Totales",
       "activeProducts": "Productos Activos",
       "totalOrders": "Órdenes Totales",
       "totalRevenue": "Ingresos Totales",
       "addProduct": "Agregar Producto",
-      "quickActions": "Acciones Rápidas",
+      "quickActions": "Acciones rápidas",
       "viewProducts": "Ver Productos",
       "viewOrders": "Ver Órdenes",
-      "analytics": "Análisis",
+      "analytics": "Estadísticas",
       "settings": "Configuración",
       "recentOrders": "Órdenes Recientes",
       "viewAll": "Ver todas",
@@ -2217,18 +2197,18 @@
         "shipped": "Enviado",
         "delivered": "Entregado"
       },
-      "accountPending": "Tu cuenta está pendiente de aprobación. Podrás agregar productos una vez que sea aprobada.",
+      "accountPending": "Tu cuenta está pendiente de aprobación",
       "stripeConnect": {
         "title": "Pagos con Stripe",
-        "description": "Configura tu cuenta para recibir pagos",
+        "description": "Conecta tu cuenta para recibir pagos",
         "active": "Activo",
         "pending": "Pendiente",
-        "notConnected": "Necesitas configurar tu cuenta de Stripe para comenzar a recibir pagos.",
-        "incompleteSetup": "Tu cuenta de Stripe está pendiente de verificación. Completa la configuración para activar pagos.",
-        "fullyActive": "Tu cuenta de Stripe está activa. Puedes recibir pagos y gestionar tus finanzas.",
-        "setupPayments": "Configurar Pagos",
-        "managePayments": "Gestionar Pagos",
-        "completeSetup": "Completar Configuración"
+        "notConnected": "Aún no has conectado tu cuenta de Stripe",
+        "incompleteSetup": "La configuración de Stripe no está completa",
+        "fullyActive": "Tu cuenta de Stripe está completamente activa",
+        "setupPayments": "Configurar pagos",
+        "managePayments": "Administrar pagos",
+        "completeSetup": "Completar configuración"
       }
     },
     "payouts": {
@@ -2449,52 +2429,9 @@
       }
     },
     "financials": {
-      "tabs": {
-        "transactions": "Transacciones",
-        "payouts": "Pagos"
-      },
-      "status": {
-        "completed": "Completado",
-        "pending": "Pendiente",
-        "failed": "Fallido",
-        "processing": "Procesando",
-        "paid": "Pagado",
-        "inTransit": "En tránsito"
-      },
-      "transactions": {
-        "type": "Tipo",
-        "description": "Descripción",
-        "amount": "Monto",
-        "status": "Estado",
-        "date": "Fecha",
-        "searchPlaceholder": "Buscar transacciones...",
-        "order": "Orden",
-        "actions": {
-          "openMenu": "Abrir menú",
-          "title": "Acciones",
-          "copyTransactionId": "Copiar ID de transacción",
-          "viewOrder": "Ver orden",
-          "viewDetails": "Ver detalles"
-        }
-      },
-      "payouts": {
-        "date": "Fecha",
-        "amount": "Monto",
-        "method": "Método",
-        "status": "Estado",
-        "arrivalDate": "Fecha de llegada",
-        "bankAccount": "Cuenta bancaria",
-        "searchPlaceholder": "Buscar pagos...",
-        "actions": {
-          "openMenu": "Abrir menú",
-          "title": "Acciones",
-          "copyPayoutId": "Copiar ID de pago",
-          "viewDetails": "Ver detalles",
-          "downloadReceipt": "Descargar recibo"
-        }
-      },
-      "actions": {
-        "export": "Exportar"
+      "table": {
+        "viewOrder": "Ver orden",
+        "viewDetails": "Ver detalles"
       }
     },
     "shipping": {
@@ -2505,12 +2442,6 @@
       "placeholders": {
         "basePrice": "Precio base de envío",
         "additionalCost": "Costo adicional por producto"
-      }
-    },
-    "financials": {
-      "table": {
-        "viewOrder": "Ver orden",
-        "viewDetails": "Ver detalles"
       }
     },
     "analytics": {
@@ -2533,23 +2464,16 @@
       "topSellingProducts": "Productos Más Vendidos",
       "unitsSold": "{count} unidades vendidas",
       "latestSuccessfulOrders": "Últimas órdenes exitosas",
-      "items": "artículos"
+      "items": "artículos",
+      "noProductsSold": "No hay productos vendidos aún"
     },
     "orders": {
       "title": "Órdenes",
       "description": "Gestiona los pedidos de tus clientes",
       "subtitle": "Gestiona los pedidos de tus clientes",
       "loading": "Cargando órdenes...",
-      "orderNumber": "Número de orden",
+      "orderNumber": "Pedido",
       "customer": "Cliente",
-      "status": "Estado",
-      "total": "Total",
-      "date": "Fecha",
-      "pending": "Pendiente",
-      "processing": "Procesando",
-      "shipped": "Enviado",
-      "delivered": "Entregado",
-      "cancelled": "Cancelado",
       "status": {
         "pending": "Pendiente",
         "paid": "Pagado",
@@ -2558,11 +2482,25 @@
         "delivered": "Entregado",
         "cancelled": "Cancelado"
       },
+      "statusHeader": "Estado",
+      "total": "Total",
+      "date": "Fecha",
+      "pending": "Pendiente",
+      "processing": "Procesando",
+      "shipped": "Enviado",
+      "delivered": "Entregado",
+      "cancelled": "Cancelado",
       "payment": {
-        "pending": "Pago Pendiente",
-        "succeeded": "Pago Exitoso",
-        "failed": "Pago Fallido"
-      }
+        "pending": "Pendiente",
+        "succeeded": "Exitoso",
+        "failed": "Fallido"
+      },
+      "paymentHeader": "Pago",
+      "items": "Artículos",
+      "actions": "Acciones",
+      "guest": "Invitado",
+      "noOrders": "No hay pedidos",
+      "noOrdersDescription": "Aún no has recibido pedidos"
     }
   },
   "orders": {

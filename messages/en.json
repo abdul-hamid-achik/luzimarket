@@ -588,7 +588,63 @@
       "welcomeName": "Welcome",
       "welcomeDesc": "Sent when a new user registers",
       "reviewRequestName": "Review Request",
-      "reviewRequestDesc": "Sent days after receiving the product"
+      "reviewRequestDesc": "Sent days after receiving the product",
+      "new": {
+        "validation": {
+          "name": "Name must be at least 3 characters",
+          "type": "Please select a template type",
+          "subject": "Subject must be at least 5 characters",
+          "htmlContent": "HTML content is required"
+        },
+        "toast": {
+          "createError": "Error creating template",
+          "createSuccess": "Template created successfully"
+        },
+        "labels": {
+          "backToTemplates": "Back to templates",
+          "newTemplate": "New Email Template",
+          "createDescription": "Create a new email template",
+          "basicInfo": "Basic Information",
+          "templateName": "Template Name",
+          "templateType": "Template Type",
+          "selectType": "Select a type",
+          "emailSubject": "Email Subject",
+          "description": "Description (optional)",
+          "descriptionPlaceholder": "Describe the purpose of this template...",
+          "activeTemplate": "Active Template",
+          "inactiveTemplatesNote": "Inactive templates won't be used",
+          "availableVariables": "Available Variables",
+          "clickToInsert": "Click to insert into editor",
+          "html": "HTML",
+          "plainText": "Plain Text",
+          "preview": "Preview",
+          "desktop": "Desktop",
+          "mobile": "Mobile",
+          "plainTextVersion": "Plain text version of the email...",
+          "uploadingImages": "Uploading images...",
+          "dragImages": "Drag images here or click to select",
+          "imageFormats": "PNG, JPG up to 5MB",
+          "principal": "Main",
+          "cancel": "Cancel",
+          "save": "Save Template",
+          "saving": "Saving...",
+          "creating": "Creating..."
+        },
+        "placeholders": {
+          "templateName": "E.g: Order Confirmation",
+          "subjectWithVariables": "E.g: Your order #{{order_number}} has been confirmed",
+          "variableUsage": "You can use variables like"
+        },
+        "templateTypes": {
+          "orderConfirmation": "Order Confirmation",
+          "welcome": "Welcome",
+          "passwordReset": "Password Reset",
+          "shippingNotification": "Shipping Notification",
+          "reviewRequest": "Review Request",
+          "promotional": "Promotional",
+          "abandonedCart": "Abandoned Cart"
+        }
+      }
     },
     "imageModeration": {
       "title": "Image Moderation",
@@ -723,6 +779,7 @@
         "user": "User",
         "email": "Email",
         "type": "Type",
+        "status": "Status",
         "orders": "Orders",
         "totalSpent": "Total Spent",
         "registered": "Registered",
@@ -733,6 +790,10 @@
         "vendor": "Vendor",
         "customer": "Customer"
       },
+      "locked": "Locked",
+      "active": "Active",
+      "lock": "Lock",
+      "unlock": "Unlock",
       "noName": "No name",
       "viewDetails": "View details",
       "loading": "Loading..."
@@ -743,13 +804,34 @@
       "categoryName": "Name",
       "slug": "Slug",
       "products": "Products",
+      "image": "Image",
+      "order": "Order",
+      "description": "Description",
+      "imageUrl": "Image URL",
       "status": "Status",
       "actions": "Actions",
       "edit": "Edit",
       "delete": "Delete",
       "createNew": "Create Category",
+      "create": "Create",
+      "save": "Save",
+      "cancel": "Cancel",
+      "editCategory": "Edit Category",
+      "createDescription": "Create a new product category",
+      "editDescription": "Update the category details",
+      "saving": "Saving...",
       "active": "Active",
-      "inactive": "Inactive"
+      "inactive": "Inactive",
+      "createSuccess": "Category created successfully",
+      "createError": "Error creating category",
+      "updateSuccess": "Category updated successfully",
+      "updateError": "Error updating category",
+      "deleteTitle": "Delete category?",
+      "deleteDescription": "This action cannot be undone. The category \"{name}\" will be permanently deleted.",
+      "deleting": "Deleting...",
+      "deleteSuccess": "Category deleted successfully",
+      "deleteError": "Error deleting category",
+      "error": "Error"
     },
     "productsPage": {
       "title": "Products",
@@ -853,64 +935,6 @@
       "mxn": "MXN - Mexican Peso",
       "usd": "USD - US Dollar",
       "saveChanges": "Save changes"
-    },
-    "emailTemplates": {
-      "new": {
-        "validation": {
-          "name": "Name must be at least 3 characters",
-          "type": "Please select a template type",
-          "subject": "Subject must be at least 5 characters",
-          "htmlContent": "HTML content is required"
-        },
-        "toast": {
-          "createError": "Error creating template",
-          "createSuccess": "Template created successfully"
-        },
-        "labels": {
-          "backToTemplates": "Back to templates",
-          "newTemplate": "New Email Template",
-          "createDescription": "Create a new email template",
-          "basicInfo": "Basic Information",
-          "templateName": "Template Name",
-          "templateType": "Template Type",
-          "selectType": "Select a type",
-          "emailSubject": "Email Subject",
-          "description": "Description (optional)",
-          "descriptionPlaceholder": "Describe the purpose of this template...",
-          "activeTemplate": "Active Template",
-          "inactiveTemplatesNote": "Inactive templates won't be used",
-          "availableVariables": "Available Variables",
-          "clickToInsert": "Click to insert into editor",
-          "html": "HTML",
-          "plainText": "Plain Text",
-          "preview": "Preview",
-          "desktop": "Desktop",
-          "mobile": "Mobile",
-          "plainTextVersion": "Plain text version of the email...",
-          "uploadingImages": "Uploading images...",
-          "dragImages": "Drag images here or click to select",
-          "imageFormats": "PNG, JPG up to 5MB",
-          "principal": "Main",
-          "cancel": "Cancel",
-          "save": "Save Template",
-          "saving": "Saving...",
-          "creating": "Creating..."
-        },
-        "placeholders": {
-          "templateName": "E.g: Order Confirmation",
-          "subjectWithVariables": "E.g: Your order #{{order_number}} has been confirmed",
-          "variableUsage": "You can use variables like"
-        },
-        "templateTypes": {
-          "orderConfirmation": "Order Confirmation",
-          "welcome": "Welcome",
-          "passwordReset": "Password Reset",
-          "shippingNotification": "Shipping Notification",
-          "reviewRequest": "Review Request",
-          "promotional": "Promotional",
-          "abandonedCart": "Abandoned Cart"
-        }
-      }
     }
   },
   "Vendor": {
@@ -923,104 +947,6 @@
       "payments": "Payments",
       "settings": "Settings",
       "logout": "Logout"
-    },
-    "dashboard": "Vendor Dashboard",
-    "myProducts": "My Products",
-    "addProduct": "Add Product",
-    "orders": {
-      "title": "Orders",
-      "statusUpdated": "Order status updated successfully",
-      "updateError": "Error updating order status",
-      "status": {
-        "label": "Order status",
-        "select": "Select status",
-        "pending": "Pending",
-        "processing": "Processing",
-        "shipped": "Shipped",
-        "delivered": "Delivered",
-        "cancelled": "Cancelled"
-      },
-      "trackingNumber": "Tracking number",
-      "trackingNumberPlaceholder": "Enter tracking number",
-      "notes": "Notes",
-      "notesPlaceholder": "Add notes about the status update",
-      "updateStatus": "Update status"
-    },
-    "analytics": "Analytics",
-    "profile": "Profile",
-    "settings": "Settings",
-    "earnings": "Earnings",
-    "newOrder": "New order received!",
-    "orderDetails": "Order details",
-    "customerInfo": "Customer information",
-    "shippingAddress": "Shipping address",
-    "productsSold": "Products sold",
-    "viewFullOrder": "View full order",
-    "orderDetails": {
-      "orderNumber": "Order",
-      "orderInvoice": "Order Invoice",
-      "date": "Date",
-      "status": "Status",
-      "customer": "Customer",
-      "guest": "Guest",
-      "shippingAddress": "Shipping address",
-      "orderItems": "Order items",
-      "product": "Product",
-      "quantity": "Quantity",
-      "price": "Price",
-      "total": "Total",
-      "subtotal": "Subtotal",
-      "tax": "Tax (16%)",
-      "shipping": "Shipping",
-      "print": "Print",
-      "downloadInvoice": "Download invoice",
-      "shippingActions": "Shipping actions",
-      "paymentInfo": "Payment information",
-      "method": "Method",
-      "paid": "Paid",
-      "pending": "Pending",
-      "transactionId": "Transaction ID",
-      "notes": "Notes",
-      "copiedToClipboard": "Copied to clipboard",
-      "orderNumberCopied": "Order number copied",
-      "status": {
-        "pending": "Pending",
-        "processing": "Processing",
-        "shipped": "Shipped",
-        "delivered": "Delivered",
-        "cancelled": "Cancelled"
-      },
-      "payment": {
-        "pending": "Pending",
-        "succeeded": "Completed",
-        "failed": "Failed"
-      }
-    },
-    "orderManagement": {
-      "updateStatus": "Update Status",
-      "orderNumber": "Order #",
-      "total": "Total",
-      "date": "Date",
-      "customer": "Customer",
-      "products": "Products",
-      "quantity": "Quantity",
-      "newStatus": "New Status",
-      "trackingNumber": "Tracking Number (Optional)",
-      "trackingPlaceholder": "Enter tracking number",
-      "additionalNotes": "Additional Notes (Optional)",
-      "notesPlaceholder": "Add notes about this update...",
-      "updateButton": "Update Status",
-      "updating": "Updating...",
-      "noChanges": "No changes to update",
-      "updateSuccess": "✅ Status updated successfully",
-      "updateSuccessDescription": "Order #{orderNumber} has been updated. The customer will be notified automatically.",
-      "updateError": "Error updating status",
-      "statusOptions": {
-        "processing": "📦 Processing order",
-        "shipped": "🚚 Shipped",
-        "delivered": "✅ Delivered",
-        "cancelled": "❌ Cancelled"
-      }
     },
     "dashboard": {
       "welcome": "Welcome, {businessName}",
@@ -1056,6 +982,110 @@
         "setupPayments": "Set Up Payments",
         "managePayments": "Manage Payments",
         "completeSetup": "Complete Setup"
+      }
+    },
+    "myProducts": "My Products",
+    "addProduct": "Add Product",
+    "orders": {
+      "title": "Orders",
+      "statusUpdated": "Order status updated successfully",
+      "updateError": "Error updating order status",
+      "status": {
+        "label": "Order status",
+        "select": "Select status",
+        "pending": "Pending",
+        "processing": "Processing",
+        "shipped": "Shipped",
+        "delivered": "Delivered",
+        "cancelled": "Cancelled"
+      },
+      "trackingNumber": "Tracking number",
+      "trackingNumberPlaceholder": "Enter tracking number",
+      "notes": "Notes",
+      "notesPlaceholder": "Add notes about the status update",
+      "updateStatus": "Update status"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "description": "Track your business performance and growth",
+      "totalSales": "Total Sales",
+      "totalOrders": "Total Orders",
+      "averageOrder": "Average Order Value",
+      "conversionRate": "Conversion Rate",
+      "comingSoon": "Coming Soon",
+      "analyticsComingSoon": "Advanced analytics and reporting features are coming soon. Stay tuned for detailed insights about your business performance."
+    },
+    "profile": "Profile",
+    "settings": "Settings",
+    "earnings": "Earnings",
+    "newOrder": "New order received!",
+    "orderDetails": {
+      "orderNumber": "Order",
+      "orderInvoice": "Order Invoice",
+      "date": "Date",
+      "status": {
+        "pending": "Pending",
+        "processing": "Processing",
+        "shipped": "Shipped",
+        "delivered": "Delivered",
+        "cancelled": "Cancelled"
+      },
+      "customer": "Customer",
+      "guest": "Guest",
+      "shippingAddress": "Shipping address",
+      "orderItems": "Order items",
+      "product": "Product",
+      "quantity": "Quantity",
+      "price": "Price",
+      "total": "Total",
+      "subtotal": "Subtotal",
+      "tax": "Tax (16%)",
+      "shipping": "Shipping",
+      "print": "Print",
+      "downloadInvoice": "Download invoice",
+      "shippingActions": "Shipping actions",
+      "paymentInfo": "Payment information",
+      "method": "Method",
+      "paid": "Paid",
+      "pending": "Pending",
+      "transactionId": "Transaction ID",
+      "notes": "Notes",
+      "copiedToClipboard": "Copied to clipboard",
+      "orderNumberCopied": "Order number copied",
+      "payment": {
+        "pending": "Pending",
+        "succeeded": "Completed",
+        "failed": "Failed"
+      }
+    },
+    "customerInfo": "Customer information",
+    "shippingAddress": "Shipping address",
+    "productsSold": "Products sold",
+    "viewFullOrder": "View full order",
+    "orderManagement": {
+      "updateStatus": "Update Status",
+      "orderNumber": "Order #",
+      "total": "Total",
+      "date": "Date",
+      "customer": "Customer",
+      "products": "Products",
+      "quantity": "Quantity",
+      "newStatus": "New Status",
+      "trackingNumber": "Tracking Number (Optional)",
+      "trackingPlaceholder": "Enter tracking number",
+      "additionalNotes": "Additional Notes (Optional)",
+      "notesPlaceholder": "Add notes about this update...",
+      "updateButton": "Update Status",
+      "updating": "Updating...",
+      "noChanges": "No changes to update",
+      "updateSuccess": "✅ Status updated successfully",
+      "updateSuccessDescription": "Order #{orderNumber} has been updated. The customer will be notified automatically.",
+      "updateError": "Error updating status",
+      "statusOptions": {
+        "processing": "📦 Processing order",
+        "shipped": "🚚 Shipped",
+        "delivered": "✅ Delivered",
+        "cancelled": "❌ Cancelled"
       }
     },
     "stripeOnboarding": {
@@ -1172,16 +1202,6 @@
         "description": "Complete your account setup to enable payments.",
         "action": "Complete setup"
       }
-    },
-    "analytics": {
-      "title": "Analytics",
-      "description": "Track your business performance and growth",
-      "totalSales": "Total Sales",
-      "totalOrders": "Total Orders",
-      "averageOrder": "Average Order Value",
-      "conversionRate": "Conversion Rate",
-      "comingSoon": "Coming Soon",
-      "analyticsComingSoon": "Advanced analytics and reporting features are coming soon. Stay tuned for detailed insights about your business performance."
     },
     "security": {
       "title": "Security",
@@ -1454,7 +1474,7 @@
     "noOrders": "You don't have any orders yet",
     "startShopping": "Start shopping",
     "orderNumber": "Order #{number}",
-    "orderDate": "Order date",
+    "orderDate": "Order placed on {date}",
     "orderTotal": "Total",
     "orderStatus": "Status",
     "viewDetails": "View details",
@@ -1498,7 +1518,6 @@
     "deliveryAddress": "Delivery Address",
     "orderItems": "Order Items",
     "vendorInformation": "Vendor Information",
-    "orderDate": "Order placed on {date}",
     "quantity": "Quantity",
     "total": "Total",
     "details": {
@@ -1560,7 +1579,7 @@
     "metaTitle": "Privacy Policy - Luzimarket",
     "metaDescription": "Learn how Luzimarket protects your personal data and privacy when shopping on our platform.",
     "title": "Privacy Policy",
-    "lastUpdated": "Last updated: {date}",
+    "lastUpdated": "Last updated: January 2025",
     "introduction": "At MOMENTO ESPECIAL SAPI DE CV (\"Luzimarket\"), we are committed to protecting the privacy and personal data of our users. This Privacy Policy describes how we collect, use, store, and protect your personal information in accordance with the Federal Law for the Protection of Personal Data Held by Private Parties (LFPDPPP) and its Regulations.",
     "sections": {
       "dataController": {
@@ -1667,6 +1686,54 @@
         "title": "National Institute of Transparency",
         "content": "If you believe that your right to personal data protection has been violated, you may file a complaint with the National Institute of Transparency, Access to Information and Protection of Personal Data (INAI):"
       }
+    },
+    "intro": "At Luzimarket (operated by MOMENTO ESPECIAL SAPI DE CV), we are committed to protecting your privacy and personal data in accordance with the Federal Law on Protection of Personal Data Held by Private Parties (LFPDPPP) of Mexico.",
+    "dataCollection": {
+      "title": "Information We Collect",
+      "description": "We collect the following types of personal data:",
+      "personalInfo": "Personal identification: name, email, phone number, address",
+      "paymentInfo": "Payment information: processed securely through Stripe (we do not store card details)",
+      "transactionInfo": "Transaction history: orders, shipping details, purchase preferences",
+      "communicationInfo": "Communications: messages, reviews, vendor interactions"
+    },
+    "dataUse": {
+      "title": "How We Use Your Information",
+      "description": "We use your personal data for:",
+      "orderProcessing": "Processing and fulfilling your orders",
+      "customerService": "Providing customer support and responding to inquiries",
+      "marketing": "Sending promotional communications (with your consent)",
+      "legalCompliance": "Complying with legal obligations and protecting our rights"
+    },
+    "dataProtection": {
+      "title": "Data Security",
+      "description": "We implement industry-standard security measures to protect your personal data, including SSL encryption, secure servers, and restricted access to personal information. Payment processing is handled by Stripe, which is PCI-DSS compliant."
+    },
+    "thirdParties": {
+      "title": "Third Party Sharing",
+      "description": "We share your data only with:",
+      "stripe": "Stripe: for secure payment processing (including OXXO payments)",
+      "shipping": "Shipping providers: to deliver your orders",
+      "analytics": "Analytics services: to improve our platform (anonymized data only)"
+    },
+    "userRights": {
+      "title": "Your Rights (ARCO Rights)",
+      "description": "Under Mexican law, you have the right to:",
+      "access": "Access: request information about your personal data",
+      "rectification": "Rectification: correct inaccurate or incomplete data",
+      "deletion": "Cancellation: request deletion of your data",
+      "portability": "Portability: receive your data in a structured format",
+      "opposition": "Opposition: object to certain uses of your data"
+    },
+    "cookies": {
+      "title": "Cookies and Tracking",
+      "description": "We use cookies to improve your experience, remember preferences, and analyze site usage. You can control cookie settings in your browser."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "description": "For privacy-related inquiries or to exercise your ARCO rights, contact us at:",
+      "company": "MOMENTO ESPECIAL SAPI DE CV",
+      "email": "privacy@luzimarket.shop",
+      "address": "Mexico City, CDMX, Mexico"
     }
   },
   "Terms": {
@@ -1991,6 +2058,55 @@
         "location": "Mexico City, Mexico",
         "compliance": "We operate in compliance with all Mexican e-commerce and consumer protection laws."
       }
+    },
+    "tagline": "Connecting Mexico's finest artisans with gift-givers around the world",
+    "story": {
+      "title": "Our Story",
+      "paragraph1": "Luzimarket was born from a simple belief: every gift should tell a story. In a world of mass-produced items, we saw an opportunity to connect thoughtful gift-givers with Mexico's talented artisans and unique vendors.",
+      "paragraph2": "Founded recently, we started as a small marketplace with just a handful of vendors. Today, we're proud to support hundreds of Mexican small businesses, from traditional craftspeople to innovative designers, all united by their commitment to quality and authenticity.",
+      "paragraph3": "Our name, Luzimarket, combines 'luz' (light) with 'market', reflecting our mission to shine a light on Mexico's hidden gems and bring them to a wider audience."
+    },
+    "mission": {
+      "title": "Our Mission",
+      "description": "To create a thriving marketplace that celebrates Mexican craftsmanship, supports local entrepreneurs, and makes gift-giving more meaningful by connecting people with unique, handcrafted products that carry the spirit of Mexico."
+    },
+    "values": {
+      "title": "Our Values",
+      "authenticity": {
+        "title": "Authenticity",
+        "description": "Every product tells a genuine story of Mexican craftsmanship and creativity"
+      },
+      "sustainability": {
+        "title": "Sustainability",
+        "description": "Supporting eco-friendly practices and responsible production methods"
+      },
+      "community": {
+        "title": "Community",
+        "description": "Building lasting relationships between artisans, vendors, and customers"
+      }
+    },
+    "difference": {
+      "title": "What Makes Us Different",
+      "curation": "Carefully curated selection of unique, high-quality products",
+      "directSupport": "Direct support to Mexican small businesses and artisans",
+      "transparency": "Transparent pricing and vendor information",
+      "experience": "Personalized shopping experience with gift recommendations"
+    },
+    "commitment": {
+      "title": "Our Commitment",
+      "description": "We're committed to maintaining the highest standards of service, ensuring secure transactions, and fostering a marketplace built on trust and quality. Every purchase on Luzimarket directly supports Mexican entrepreneurs and helps preserve traditional crafts for future generations."
+    },
+    "join": {
+      "title": "Join Our Community",
+      "description": "Whether you're looking for the perfect gift or you're a vendor ready to share your creations with the world, Luzimarket is here for you.",
+      "vendorButton": "Become a Vendor",
+      "shopButton": "Start Shopping"
+    },
+    "legal": {
+      "title": "Company Information",
+      "company": "MOMENTO ESPECIAL SAPI DE CV",
+      "rfc": "RFC: MES240315XX0",
+      "address": "Mexico City, CDMX, Mexico"
     }
   },
   "Contact": {
@@ -2019,9 +2135,9 @@
       "shipping": "Shipping Information"
     },
     "form": {
-      "title": "Send Us a Message",
+      "title": "Send us a Message",
       "description": "Fill out the form and we'll get back to you soon",
-      "name": "Full Name",
+      "name": "Name",
       "namePlaceholder": "Your name",
       "email": "Email",
       "emailPlaceholder": "your@email.com",
@@ -2030,7 +2146,15 @@
       "message": "Message",
       "messagePlaceholder": "Write your message here...",
       "submit": "Send Message",
-      "sending": "Sending..."
+      "sending": "Sending...",
+      "subjectOptions": {
+        "select": "Select a subject",
+        "order": "Order inquiry",
+        "product": "Product question",
+        "vendor": "Vendor inquiry",
+        "technical": "Technical support",
+        "other": "Other"
+      }
     },
     "successMessage": "Message sent successfully! We'll respond soon.",
     "errorMessage": "Error sending message. Please try again.",
@@ -2054,22 +2178,6 @@
       "address2": "Mexico",
       "businessInfo": "Business Information",
       "rfc": "RFC: MES240315XX0"
-    },
-    "form": {
-      "title": "Send us a Message",
-      "name": "Name",
-      "email": "Email",
-      "subject": "Subject",
-      "message": "Message",
-      "submit": "Send Message",
-      "subjectOptions": {
-        "select": "Select a subject",
-        "order": "Order inquiry",
-        "product": "Product question",
-        "vendor": "Vendor inquiry",
-        "technical": "Technical support",
-        "other": "Other"
-      }
     },
     "faq": {
       "title": "Frequently Asked Questions",
@@ -2125,110 +2233,6 @@
     "continueShopping": "Continue Shopping",
     "needHelp": "Need help?",
     "contactSupport": "Contact Support"
-  },
-  "Privacy": {
-    "title": "Privacy Policy",
-    "lastUpdated": "Last updated: January 2025",
-    "intro": "At Luzimarket (operated by MOMENTO ESPECIAL SAPI DE CV), we are committed to protecting your privacy and personal data in accordance with the Federal Law on Protection of Personal Data Held by Private Parties (LFPDPPP) of Mexico.",
-    "dataCollection": {
-      "title": "Information We Collect",
-      "description": "We collect the following types of personal data:",
-      "personalInfo": "Personal identification: name, email, phone number, address",
-      "paymentInfo": "Payment information: processed securely through Stripe (we do not store card details)",
-      "transactionInfo": "Transaction history: orders, shipping details, purchase preferences",
-      "communicationInfo": "Communications: messages, reviews, vendor interactions"
-    },
-    "dataUse": {
-      "title": "How We Use Your Information",
-      "description": "We use your personal data for:",
-      "orderProcessing": "Processing and fulfilling your orders",
-      "customerService": "Providing customer support and responding to inquiries",
-      "marketing": "Sending promotional communications (with your consent)",
-      "legalCompliance": "Complying with legal obligations and protecting our rights"
-    },
-    "dataProtection": {
-      "title": "Data Security",
-      "description": "We implement industry-standard security measures to protect your personal data, including SSL encryption, secure servers, and restricted access to personal information. Payment processing is handled by Stripe, which is PCI-DSS compliant."
-    },
-    "thirdParties": {
-      "title": "Third Party Sharing",
-      "description": "We share your data only with:",
-      "stripe": "Stripe: for secure payment processing (including OXXO payments)",
-      "shipping": "Shipping providers: to deliver your orders",
-      "analytics": "Analytics services: to improve our platform (anonymized data only)"
-    },
-    "userRights": {
-      "title": "Your Rights (ARCO Rights)",
-      "description": "Under Mexican law, you have the right to:",
-      "access": "Access: request information about your personal data",
-      "rectification": "Rectification: correct inaccurate or incomplete data",
-      "deletion": "Cancellation: request deletion of your data",
-      "portability": "Portability: receive your data in a structured format",
-      "opposition": "Opposition: object to certain uses of your data"
-    },
-    "cookies": {
-      "title": "Cookies and Tracking",
-      "description": "We use cookies to improve your experience, remember preferences, and analyze site usage. You can control cookie settings in your browser."
-    },
-    "contact": {
-      "title": "Contact Us",
-      "description": "For privacy-related inquiries or to exercise your ARCO rights, contact us at:",
-      "company": "MOMENTO ESPECIAL SAPI DE CV",
-      "email": "privacy@luzimarket.shop",
-      "address": "Mexico City, CDMX, Mexico"
-    }
-  },
-  "About": {
-    "title": "About Luzimarket",
-    "tagline": "Connecting Mexico's finest artisans with gift-givers around the world",
-    "story": {
-      "title": "Our Story",
-      "paragraph1": "Luzimarket was born from a simple belief: every gift should tell a story. In a world of mass-produced items, we saw an opportunity to connect thoughtful gift-givers with Mexico's talented artisans and unique vendors.",
-      "paragraph2": "Founded recently, we started as a small marketplace with just a handful of vendors. Today, we're proud to support hundreds of Mexican small businesses, from traditional craftspeople to innovative designers, all united by their commitment to quality and authenticity.",
-      "paragraph3": "Our name, Luzimarket, combines 'luz' (light) with 'market', reflecting our mission to shine a light on Mexico's hidden gems and bring them to a wider audience."
-    },
-    "mission": {
-      "title": "Our Mission",
-      "description": "To create a thriving marketplace that celebrates Mexican craftsmanship, supports local entrepreneurs, and makes gift-giving more meaningful by connecting people with unique, handcrafted products that carry the spirit of Mexico."
-    },
-    "values": {
-      "title": "Our Values",
-      "authenticity": {
-        "title": "Authenticity",
-        "description": "Every product tells a genuine story of Mexican craftsmanship and creativity"
-      },
-      "sustainability": {
-        "title": "Sustainability",
-        "description": "Supporting eco-friendly practices and responsible production methods"
-      },
-      "community": {
-        "title": "Community",
-        "description": "Building lasting relationships between artisans, vendors, and customers"
-      }
-    },
-    "difference": {
-      "title": "What Makes Us Different",
-      "curation": "Carefully curated selection of unique, high-quality products",
-      "directSupport": "Direct support to Mexican small businesses and artisans",
-      "transparency": "Transparent pricing and vendor information",
-      "experience": "Personalized shopping experience with gift recommendations"
-    },
-    "commitment": {
-      "title": "Our Commitment",
-      "description": "We're committed to maintaining the highest standards of service, ensuring secure transactions, and fostering a marketplace built on trust and quality. Every purchase on Luzimarket directly supports Mexican entrepreneurs and helps preserve traditional crafts for future generations."
-    },
-    "join": {
-      "title": "Join Our Community",
-      "description": "Whether you're looking for the perfect gift or you're a vendor ready to share your creations with the world, Luzimarket is here for you.",
-      "vendorButton": "Become a Vendor",
-      "shopButton": "Start Shopping"
-    },
-    "legal": {
-      "title": "Company Information",
-      "company": "MOMENTO ESPECIAL SAPI DE CV",
-      "rfc": "RFC: MES240315XX0",
-      "address": "Mexico City, CDMX, Mexico"
-    }
   },
   "admin": {
     "financials": {
@@ -2428,10 +2432,9 @@
       },
       "transactions": {
         "title": "Transaction history",
-        "description": "All sales, refunds, and account movements",
+        "description": "Description",
         "empty": "No transactions yet",
         "type": "Type",
-        "description": "Description",
         "amount": "Amount",
         "status": "Status",
         "date": "Date",
@@ -2474,6 +2477,10 @@
         "enabled": "Active",
         "disabled": "Inactive",
         "manageAccount": "Manage account"
+      },
+      "table": {
+        "viewOrder": "View order",
+        "viewDetails": "View details"
       }
     },
     "payouts": {
@@ -2658,12 +2665,6 @@
       },
       "form": {
         "selectState": "Select your state"
-      }
-    },
-    "financials": {
-      "table": {
-        "viewOrder": "View order",
-        "viewDetails": "View details"
       }
     }
   },
