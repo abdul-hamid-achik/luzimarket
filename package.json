@@ -25,7 +25,7 @@
     "test:llm": "dotenv -e .env.local -- sh -c 'PLAYWRIGHT_JSON_OUTPUT_NAME=tmp/test-results.json PLAYWRIGHT_JUNIT_OUTPUT_NAME=tmp/junit-results.xml PLAYWRIGHT_JUNIT_STRIP_ANSI=true playwright test --reporter=json,junit,list'",
     "test:failed": "dotenv -e .env.local -- playwright test --last-failed",
     "test:failed:json": "dotenv -e .env.local -- sh -c 'PLAYWRIGHT_JSON_OUTPUT_NAME=tmp/failed-results.json playwright test --last-failed --reporter=json'",
-    "i18n:check": "node scripts/i18n-check.js",
+    "i18n:check": "node lib/i18n-check.js",
     "release": "semantic-release",
     "release:dry": "semantic-release --dry-run",
     "deploy": "vercel --yes --prod",
