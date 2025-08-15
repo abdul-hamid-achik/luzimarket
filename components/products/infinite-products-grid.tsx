@@ -59,6 +59,7 @@ export function InfiniteProductsGrid({
     const [hasNextPage, setHasNextPage] = useState<boolean>(initialPagination.hasNextPage);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const sentinelRef = useRef<HTMLDivElement | null>(null);
+    const seenIdsRef = useRef<Set<string>>(new Set(initialProducts.map((p) => p.id)));
 
     // Build base query string from current URL params
     const baseQuery = useMemo(() => {
@@ -79,6 +80,7 @@ export function InfiniteProductsGrid({
         setProducts(initialProducts);
         setPage(initialPagination.page);
         setHasNextPage(initialPagination.hasNextPage);
+        seenIdsRef.current = new Set(initialProducts.map((p) => p.id));
     }, [initialProducts, initialPagination.page, initialPagination.hasNextPage, baseQuery.toString()]);
 
     useEffect(() => {
@@ -113,7 +115,12 @@ export function InfiniteProductsGrid({
             if (!res.ok) throw new Error("Failed to fetch more products");
             const data: { products: InfiniteProductItem[]; pagination: PaginationInfo } = await res.json();
 
-            setProducts((prev) => [...prev, ...data.products]);
+            // Deduplicate by id to avoid duplicate React keys and duplicate cards
+            const uniqueNew = data.products.filter((p) => !seenIdsRef.current.has(p.id));
+            uniqueNew.forEach((p) => seenIdsRef.current.add(p.id));
+            if (uniqueNew.length > 0) {
+                setProducts((prev) => [...prev, ...uniqueNew]);
+            }
             setPage(data.pagination.page);
             setHasNextPage(data.pagination.hasNextPage);
         } catch (err) {

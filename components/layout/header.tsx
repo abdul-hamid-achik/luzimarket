@@ -228,6 +228,16 @@ export function Header() {
                       {t('trackOrder')}
                     </NextLink>
                   </DropdownMenuItem>
+                  {session.user?.role !== 'customer' && (
+                    <DropdownMenuItem asChild>
+                      <NextLink
+                        href={session.user?.role === 'vendor' ? '/vendor/dashboard' : '/admin'}
+                        className="cursor-pointer"
+                      >
+                        {t('dashboard')}
+                      </NextLink>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600">
                     <LogOut className="mr-2 h-4 w-4" />
