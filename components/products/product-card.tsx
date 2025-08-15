@@ -60,7 +60,7 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
         price: parseFloat(product.price),
         image: product.images[0] || "/images/links/pia-riverola.webp",
         vendorId: product.vendor?.id || "",
-        vendorName: product.vendor?.businessName || t('vendor'),
+        vendorName: product.vendor?.businessName || t('Vendor'),
       });
       toast.success(t('addedToWishlist'));
     }
@@ -137,7 +137,7 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
                 price: parseFloat(product.price),
                 image: product.images[0] || "/images/links/pia-riverola.webp",
                 vendorId: product.vendor?.id || "",
-                vendorName: product.vendor?.businessName || t('vendor'),
+                vendorName: product.vendor?.businessName || t('Vendor'),
               }}
               className={cn(
                 "h-10 text-sm",

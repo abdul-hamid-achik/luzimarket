@@ -4,24 +4,19 @@ import path from 'path';
 async function globalSetup(config: FullConfig) {
   console.log('🌱 Setting up test environment...');
 
-  // Setup test database with minimal required data
-  if (process.env.SETUP_TEST_DB !== 'false') {
-    console.log('📦 Ensuring test database is properly configured...');
-    try {
-      const { setupTestDatabase } = await import('./setup/test-database');
-      await setupTestDatabase();
-    } catch (error) {
-      console.error('❌ Failed to setup test database:', error);
-      console.log('💡 You can skip database setup by setting SETUP_TEST_DB=false');
-      console.log('💡 Or run manually: npx tsx e2e/setup/test-database.ts');
-    }
-  } else {
-    console.log('⏭️  Skipping database setup (SETUP_TEST_DB=false)');
+  // Always setup test database with minimal required data
+  console.log('📦 Ensuring test database is properly configured...');
+  try {
+    const { setupTestDatabase } = await import('./setup/test-database');
+    await setupTestDatabase();
+  } catch (error) {
+    console.error('❌ Failed to setup test database:', error);
+    console.log('💡 Or run manually: npx tsx e2e/setup/test-database.ts');
   }
 
   // Save authentication states for different user types
   const { baseURL } = config.projects[0].use;
-  
+
   // You can enable this block to pre-authenticate users and save their state
   // This speeds up tests by avoiding login in each test
   if (process.env.PREAUTH === '1') {

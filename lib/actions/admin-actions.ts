@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { categories, products } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -20,7 +20,7 @@ const categorySchema = z.object({
 export async function createCategory(data: z.infer<typeof categorySchema>) {
   try {
     const validated = categorySchema.parse(data);
-    
+
     // Check if slug already exists
     const existing = await db.query.categories.findFirst({
       where: eq(categories.slug, validated.slug),
@@ -31,7 +31,7 @@ export async function createCategory(data: z.infer<typeof categorySchema>) {
     }
 
     await db.insert(categories).values(validated);
-    
+
     revalidatePath("/admin/categories");
     return { success: true };
   } catch (error) {
@@ -43,7 +43,7 @@ export async function createCategory(data: z.infer<typeof categorySchema>) {
 export async function updateCategory(id: number, data: z.infer<typeof categorySchema>) {
   try {
     const validated = categorySchema.parse(data);
-    
+
     // Check if slug already exists (excluding current category)
     const existing = await db.query.categories.findFirst({
       where: sql`${categories.slug} = ${validated.slug} AND ${categories.id} != ${id}`,
@@ -56,7 +56,7 @@ export async function updateCategory(id: number, data: z.infer<typeof categorySc
     await db.update(categories)
       .set(validated)
       .where(eq(categories.id, id));
-    
+
     revalidatePath("/admin/categories");
     return { success: true };
   } catch (error) {
@@ -74,14 +74,14 @@ export async function deleteCategory(id: number) {
       .where(eq(products.categoryId, id));
 
     if (productCount[0]?.count > 0) {
-      return { 
-        success: false, 
-        error: "Cannot delete category with products. Please reassign or delete products first." 
+      return {
+        success: false,
+        error: "Cannot delete category with products. Please reassign or delete products first."
       };
     }
 
     await db.delete(categories).where(eq(categories.id, id));
-    
+
     revalidatePath("/admin/categories");
     return { success: true };
   } catch (error) {
@@ -98,11 +98,11 @@ export async function toggleProductStatus(productId: string, currentStatus: bool
       .set({ isActive: !currentStatus })
       .where(eq(products.id, productId))
       .returning();
-    
+
     if (result.length === 0) {
       throw new Error("Product not found");
     }
-    
+
     // Revalidate all possible paths
     revalidatePath("/admin/products");
     revalidatePath("/es/admin/products");
@@ -110,7 +110,7 @@ export async function toggleProductStatus(productId: string, currentStatus: bool
     revalidatePath(`/admin/products/${productId}`);
     revalidatePath(`/es/admin/products/${productId}`);
     revalidatePath(`/en/admin/products/${productId}`);
-    
+
     return { success: true };
   } catch (error) {
     console.error("Error toggling product status:", error);
@@ -119,7 +119,7 @@ export async function toggleProductStatus(productId: string, currentStatus: bool
 }
 
 export async function bulkUpdateProductStatus(
-  productIds: string[], 
+  productIds: string[],
   action: 'approve' | 'reject' | 'delete'
 ) {
   try {
@@ -141,16 +141,16 @@ export async function bulkUpdateProductStatus(
         break;
       case 'delete':
         // For delete action, we'll use a delete query instead
-        await db.delete(products).where(sql`${products.id} IN ${sql.raw(`(${productIds.map(id => `'${id}'`).join(', ')})`)})`);
-        
+        await db.delete(products).where(inArray(products.id, productIds));
+
         // Revalidate paths
         revalidatePath("/admin/products");
         revalidatePath("/es/admin/products");
         revalidatePath("/en/admin/products");
-        
-        return { 
-          success: true, 
-          message: `Successfully deleted ${productIds.length} product(s)` 
+
+        return {
+          success: true,
+          message: `Successfully deleted ${productIds.length} product(s)`
         };
       default:
         return { success: false, error: "Invalid action" };
@@ -158,23 +158,23 @@ export async function bulkUpdateProductStatus(
 
     // For approve/reject actions, update the products
     // if (action !== 'delete') { // This check is unnecessary since delete returns early
-      await db
-        .update(products)
-        .set(updateData)
-        .where(sql`${products.id} IN ${sql.raw(`(${productIds.map(id => `'${id}'`).join(', ')})`)})`);
+    await db
+      .update(products)
+      .set(updateData)
+      .where(inArray(products.id, productIds));
     // }
-    
+
     // Revalidate paths
     revalidatePath("/admin/products");
     revalidatePath("/es/admin/products");
     revalidatePath("/en/admin/products");
-    
+
     return { success: true, message };
   } catch (error) {
     console.error("Error bulk updating products:", error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : "Failed to update products" 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to update products"
     };
   }
 }

@@ -44,7 +44,7 @@ export default function VendorRegistrationForm() {
     setIsSubmitting(true);
     try {
       const result = await registerVendor(data);
-      
+
       if (result.success) {
         setIsSuccess(true);
       } else {
@@ -73,7 +73,7 @@ export default function VendorRegistrationForm() {
         </div>
 
         <h2 className="text-6xl font-times-now mb-8">{t("thankYou")}</h2>
-        
+
         <p className="text-lg font-univers text-gray-600 max-w-lg mx-auto">
           {t("confirmationMessage")}
         </p>
@@ -89,7 +89,7 @@ export default function VendorRegistrationForm() {
           <h3 className="text-lg font-univers flex items-center gap-2">
             <span className="text-xl">+</span> {t("businessInfoSection")}
           </h3>
-          
+
           <div className="grid md:grid-cols-2 gap-6">
             <FormField
               control={form.control}
@@ -98,8 +98,9 @@ export default function VendorRegistrationForm() {
                 <FormItem>
                   <FormLabel>{t("businessNameLabel")}</FormLabel>
                   <FormControl>
-                    <InputWithValidation 
-                      placeholder={t("businessNamePlaceholder")} 
+                    <InputWithValidation
+                      data-testid="vendor-businessName"
+                      placeholder={t("businessNamePlaceholder")}
                       {...field}
                       showValidation={form.formState.dirtyFields.businessName}
                       isValid={form.formState.dirtyFields.businessName && !form.formState.errors.businessName}
@@ -118,7 +119,7 @@ export default function VendorRegistrationForm() {
                 <FormItem>
                   <FormLabel>{t("contactNameLabel")}</FormLabel>
                   <FormControl>
-                    <InputWithValidation placeholder={t("contactNamePlaceholder")} {...field} />
+                    <InputWithValidation data-testid="vendor-contactName" placeholder={t("contactNamePlaceholder")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -132,7 +133,7 @@ export default function VendorRegistrationForm() {
                 <FormItem>
                   <FormLabel>{t("emailLabel")}</FormLabel>
                   <FormControl>
-                    <InputWithValidation type="email" placeholder={t("email")} {...field} />
+                    <InputWithValidation data-testid="vendor-email" type="email" placeholder={t("email")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -146,7 +147,7 @@ export default function VendorRegistrationForm() {
                 <FormItem>
                   <FormLabel>{t("passwordLabel")}</FormLabel>
                   <FormControl>
-                    <InputWithValidation type="password" placeholder={t("passwordPlaceholder")} {...field} />
+                    <InputWithValidation data-testid="vendor-password" type="password" placeholder={t("passwordPlaceholder")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -160,7 +161,7 @@ export default function VendorRegistrationForm() {
                 <FormItem>
                   <FormLabel>{t("whatsappLabel")}</FormLabel>
                   <FormControl>
-                    <InputWithValidation placeholder={t("phonePlaceholder")} {...field} />
+                    <InputWithValidation data-testid="vendor-whatsapp" placeholder={t("phonePlaceholder")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -174,7 +175,7 @@ export default function VendorRegistrationForm() {
                 <FormItem>
                   <FormLabel>{t("businessPhoneLabel")}</FormLabel>
                   <FormControl>
-                    <InputWithValidation placeholder={t("businessPhonePlaceholder")} {...field} />
+                    <InputWithValidation data-testid="vendor-businessPhone" placeholder={t("businessPhonePlaceholder")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -188,7 +189,7 @@ export default function VendorRegistrationForm() {
                 <FormItem>
                   <FormLabel>{t("businessHoursLabel")}</FormLabel>
                   <FormControl>
-                    <InputWithValidation placeholder={t("businessHoursPlaceholder")} {...field} />
+                    <InputWithValidation data-testid="vendor-businessHours" placeholder={t("businessHoursPlaceholder")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -202,7 +203,7 @@ export default function VendorRegistrationForm() {
                 <FormItem>
                   <FormLabel>{t("streetLabel")}</FormLabel>
                   <FormControl>
-                    <InputWithValidation placeholder={t("streetPlaceholder")} {...field} />
+                    <InputWithValidation data-testid="vendor-street" placeholder={t("streetPlaceholder")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -217,7 +218,7 @@ export default function VendorRegistrationForm() {
                   <FormItem>
                     <FormLabel>{t("cityLabel")}</FormLabel>
                     <FormControl>
-                      <InputWithValidation placeholder={t("cityPlaceholder")} {...field} />
+                      <InputWithValidation data-testid="vendor-city" placeholder={t("cityPlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -231,7 +232,7 @@ export default function VendorRegistrationForm() {
                   <FormItem>
                     <FormLabel>{t("stateLabel")}</FormLabel>
                     <FormControl>
-                      <InputWithValidation placeholder={t("statePlaceholder")} {...field} />
+                      <InputWithValidation data-testid="vendor-state" placeholder={t("statePlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -245,7 +246,7 @@ export default function VendorRegistrationForm() {
                   <FormItem>
                     <FormLabel>{t("countryLabel")}</FormLabel>
                     <FormControl>
-                      <InputWithValidation placeholder={t("countryPlaceholder")} {...field} />
+                      <InputWithValidation data-testid="vendor-country" placeholder={t("countryPlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -261,7 +262,7 @@ export default function VendorRegistrationForm() {
               <FormItem>
                 <FormLabel>{t("websiteLabel")}</FormLabel>
                 <FormControl>
-                  <InputWithValidation placeholder={t("websitePlaceholder")} {...field} />
+                  <InputWithValidation data-testid="vendor-websiteUrl" placeholder={t("websitePlaceholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -276,6 +277,7 @@ export default function VendorRegistrationForm() {
                 <FormLabel>{t("descriptionLabel")}</FormLabel>
                 <FormControl>
                   <Textarea
+                    data-testid="vendor-description"
                     placeholder={t("descriptionPlaceholder")}
                     rows={4}
                     {...field}
@@ -292,10 +294,10 @@ export default function VendorRegistrationForm() {
           <h3 className="text-lg font-univers flex items-center gap-2">
             <span className="text-xl">+</span> {t("deliverySection")}
           </h3>
-          
+
           <div className="space-y-4">
             <p className="text-sm font-univers text-gray-600">{t("hasDelivery")}</p>
-            
+
             <FormField
               control={form.control}
               name="hasDelivery"
@@ -311,6 +313,7 @@ export default function VendorRegistrationForm() {
                           role="checkbox"
                           aria-checked={field.value === true}
                           aria-label={`${t("deliveryQuestion")} - ${t("yes")}`}
+                          data-testid="vendor-hasDelivery-yes"
                         >
                           {field.value ? (
                             <CheckCircle2 className="h-5 w-5 text-green-600" />
@@ -320,7 +323,7 @@ export default function VendorRegistrationForm() {
                         </button>
                         <span className="font-univers">{t("yes")}</span>
                       </label>
-                      
+
                       <label className="flex items-center gap-2 cursor-pointer">
                         <button
                           type="button"
@@ -329,6 +332,7 @@ export default function VendorRegistrationForm() {
                           role="checkbox"
                           aria-checked={field.value === false}
                           aria-label={`${t("deliveryQuestion")} - ${t("no")}`}
+                          data-testid="vendor-hasDelivery-no"
                         >
                           {!field.value ? (
                             <CheckCircle2 className="h-5 w-5 text-red-600" />
@@ -363,7 +367,7 @@ export default function VendorRegistrationForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <InputWithValidation placeholder={t("deliveryServicePlaceholder")} {...field} />
+                    <InputWithValidation data-testid="vendor-deliveryService" placeholder={t("deliveryServicePlaceholder")} {...field} />
                   </FormControl>
                 </FormItem>
               )}
@@ -376,7 +380,7 @@ export default function VendorRegistrationForm() {
           <h3 className="text-lg font-univers flex items-center gap-2">
             <span className="text-xl">+</span> {t("socialMediaSection")}
           </h3>
-          
+
           <div className="grid md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
@@ -384,7 +388,7 @@ export default function VendorRegistrationForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <InputWithValidation placeholder={t("instagram")} {...field} />
+                    <InputWithValidation data-testid="vendor-instagramUrl" placeholder={t("instagram")} {...field} />
                   </FormControl>
                 </FormItem>
               )}
@@ -396,7 +400,7 @@ export default function VendorRegistrationForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <InputWithValidation placeholder={t("facebook")} {...field} />
+                    <InputWithValidation data-testid="vendor-facebookUrl" placeholder={t("facebook")} {...field} />
                   </FormControl>
                 </FormItem>
               )}
@@ -408,7 +412,7 @@ export default function VendorRegistrationForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <InputWithValidation placeholder={t("tiktok")} {...field} />
+                    <InputWithValidation data-testid="vendor-tiktokUrl" placeholder={t("tiktok")} {...field} />
                   </FormControl>
                 </FormItem>
               )}
@@ -420,7 +424,7 @@ export default function VendorRegistrationForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <InputWithValidation placeholder={t("twitter")} {...field} />
+                    <InputWithValidation data-testid="vendor-twitterUrl" placeholder={t("twitter")} {...field} />
                   </FormControl>
                 </FormItem>
               )}
@@ -433,6 +437,7 @@ export default function VendorRegistrationForm() {
             type="submit"
             disabled={isSubmitting}
             className="bg-black text-white px-16 py-6 font-univers text-base tracking-wider hover:bg-gray-900 rounded-none"
+            data-testid="vendor-submit"
           >
             {isSubmitting ? t("submitting") : t("ready")}
           </Button>

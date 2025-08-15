@@ -29,11 +29,7 @@ The tests require specific data to pass. We have a test setup script that ensure
 
 ### Automatic Setup
 
-Tests will automatically run the database setup on first run. To skip:
-
-```bash
-SETUP_TEST_DB=false npm test
-```
+Tests will automatically run the database setup on first run
 
 ### Manual Setup
 
@@ -306,7 +302,6 @@ Add to your GitHub Actions workflow:
 Tests use the same `.env.local` file as the application. For CI/CD, set:
 - `CI=true` - Enables retries and disables test.only
 - `NEXT_PUBLIC_APP_URL` - Base URL for tests
-- `SETUP_TEST_DB=false` - Skip automatic database setup in CI
 
 ## Troubleshooting
 

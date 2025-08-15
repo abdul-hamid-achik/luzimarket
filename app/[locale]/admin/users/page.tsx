@@ -5,8 +5,9 @@ import { User, Mail, Calendar, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getAdminUsers } from "@/lib/actions/admin/users";
+import { lockUserAccount, unlockUserAccount } from "@/lib/actions/auth";
 
 type UserData = {
   id: string;
@@ -16,6 +17,7 @@ type UserData = {
   orderCount: number;
   totalSpent: number;
   userType: string;
+  lockedUntil?: Date | null;
 };
 
 export default function AdminUsersPage() {
@@ -27,6 +29,9 @@ export default function AdminUsersPage() {
     queryFn: getAdminUsers,
     staleTime: 60 * 1000,
   });
+
+  const [lockingId, setLockingId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   const filteredUsers = activeFilter === "all"
     ? userList
@@ -74,8 +79,8 @@ export default function AdminUsersPage() {
               role="tab"
               onClick={() => setActiveFilter(tab.id)}
               className={`px-4 py-2 rounded-lg text-sm font-univers transition-colors ${activeFilter === tab.id
-                  ? "bg-blue-100 text-blue-700 border border-blue-200"
-                  : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                ? "bg-blue-100 text-blue-700 border border-blue-200"
+                : "bg-gray-50 text-gray-600 hover:bg-gray-100"
                 }`}
             >
               {tab.label} ({tab.count})
@@ -120,6 +125,9 @@ export default function AdminUsersPage() {
                   {t("tableHeaders.type")}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
+                  {t("tableHeaders.status", { default: "Status" })}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
                   {t("tableHeaders.orders")}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase tracking-wider">
@@ -158,13 +166,24 @@ export default function AdminUsersPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-univers ${user.userType === 'admin' ? 'bg-red-100 text-red-800' :
-                        user.userType === 'vendor' ? 'bg-purple-100 text-purple-800' :
-                          'bg-blue-100 text-blue-800'
+                      user.userType === 'vendor' ? 'bg-purple-100 text-purple-800' :
+                        'bg-blue-100 text-blue-800'
                       }`}>
                       {user.userType === 'admin' ? t("userTypes.admin") :
                         user.userType === 'vendor' ? t("userTypes.vendor") :
                           t("userTypes.customer")}
                     </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {user.lockedUntil && new Date(user.lockedUntil) > new Date() ? (
+                      <span className="text-xs font-univers px-2 py-1 rounded bg-red-100 text-red-800">
+                        {t("locked", { default: "Locked" })}
+                      </span>
+                    ) : (
+                      <span className="text-xs font-univers px-2 py-1 rounded bg-green-100 text-green-800">
+                        {t("active", { default: "Active" })}
+                      </span>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center text-sm text-gray-900 font-univers">
@@ -190,6 +209,41 @@ export default function AdminUsersPage() {
                           {t("viewDetails")}
                         </Button>
                       </Link>
+                      {user.lockedUntil && new Date(user.lockedUntil) > new Date() ? (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          disabled={lockingId === user.id}
+                          onClick={async () => {
+                            setLockingId(user.id);
+                            try {
+                              await unlockUserAccount(user.id, user.userType as any);
+                              await queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+                            } finally {
+                              setLockingId(null);
+                            }
+                          }}
+                        >
+                          {t("unlock", { default: "Unlock" })}
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          disabled={lockingId === user.id}
+                          onClick={async () => {
+                            setLockingId(user.id);
+                            try {
+                              await lockUserAccount(user.id, user.userType as any);
+                              await queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+                            } finally {
+                              setLockingId(null);
+                            }
+                          }}
+                        >
+                          {t("lock", { default: "Lock" })}
+                        </Button>
+                      )}
                     </div>
                   </td>
                 </tr>

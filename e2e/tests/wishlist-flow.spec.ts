@@ -15,10 +15,11 @@ test.describe('Wishlist Complete Flow', () => {
     await page.waitForLoadState('networkidle');
 
     // Try to add to wishlist from product card (requires auth) or detail page
-    const wishlistButton = page.locator('[data-testid^="wishlist-button-"]').first().or(
-      page.locator('button:has(svg.lucide-heart)')
+    const productCard = page.getByTestId('product-card').first();
+    const wishlistButton = productCard.locator('[data-testid^="wishlist-button-"]').first().or(
+      productCard.locator('button:has(svg.lucide-heart)')
     );
-    await expect(wishlistButton).toBeVisible();
+    await expect(wishlistButton).toBeVisible({ timeout: 5000 });
     await wishlistButton.click();
 
     // Should redirect to login
@@ -54,10 +55,7 @@ test.describe('Wishlist Complete Flow', () => {
     const productCards = page.getByTestId('product-card');
     const productCount = await productCards.count();
 
-    console.log(`Found ${productCount} products on the page`);
-
     if (productCount < 2) {
-      console.log('Not enough products for full test, will test with single product');
       // Test with just one product
       const product1 = productCards.first();
       await product1.scrollIntoViewIfNeeded();
@@ -88,14 +86,13 @@ test.describe('Wishlist Complete Flow', () => {
 
     // For now, just test with single product due to DOM interaction issues in test environment
     const secondProductAdded = false;
-    console.log('Testing with single product due to test environment limitations');
 
     // Go to wishlist page
     await page.goto(routes.wishlist);
     await page.waitForLoadState('networkidle');
 
     // Verify single product is in wishlist
-    await expect(page.getByText(/Mis Favoritos \(\d+\)/)).toBeVisible();
+    await expect(page.getByTestId('wishlist-title')).toBeVisible();
     await expect(page.getByTestId('product-card').first()).toBeVisible();
 
     // Test basic wishlist functionality - verify we can see the product
@@ -172,7 +169,7 @@ test.describe('Wishlist Complete Flow', () => {
       await expect(page.getByText(/lista.*vacía|wishlist.*empty/i)).toBeVisible();
     } else {
       // If no clear button, just verify the products are there
-      console.log('Clear button not found, wishlist functionality verified');
+      expect.fail('Clear button not found, wishlist functionality not complete');
     }
   });
 

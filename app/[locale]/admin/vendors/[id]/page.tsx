@@ -4,6 +4,7 @@ import { eq, sql } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
+import SubmitButton from "@/components/ui/submit-button";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Globe, Instagram, Facebook, Twitter } from "lucide-react";
@@ -11,12 +12,12 @@ import { revalidatePath } from "next/cache";
 
 async function toggleVendorStatus(vendorId: string, currentStatus: boolean) {
   "use server";
-  
+
   await db
     .update(vendors)
     .set({ isActive: !currentStatus })
     .where(eq(vendors.id, vendorId));
-  
+
   revalidatePath(`/admin/vendors/${vendorId}`);
 }
 
@@ -88,24 +89,23 @@ export default async function AdminVendorDetailPage({
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-              vendorData.isActive 
-                ? 'bg-green-100 text-green-800' 
+            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${vendorData.isActive
+                ? 'bg-green-100 text-green-800'
                 : 'bg-red-100 text-red-800'
-            }`}>
-              <span className={`mr-1.5 h-2 w-2 rounded-full ${
-                vendorData.isActive ? 'bg-green-400' : 'bg-red-400'
-              }`} />
+              }`}>
+              <span className={`mr-1.5 h-2 w-2 rounded-full ${vendorData.isActive ? 'bg-green-400' : 'bg-red-400'
+                }`} />
               {vendorData.isActive ? t("vendorStatus.active") : t("vendorStatus.inactive")}
             </span>
           </div>
           <form action={toggleVendorStatus.bind(null, vendorData.id, vendorData.isActive || false)}>
-            <Button
+            <SubmitButton
               type="submit"
               variant={vendorData.isActive ? "destructive" : "default"}
+              pendingText={vendorData.isActive ? t("deactivate") : t("activate")}
             >
               {vendorData.isActive ? t("deactivate") : t("activate")}
-            </Button>
+            </SubmitButton>
           </form>
         </div>
       </div>
@@ -139,9 +139,9 @@ export default async function AdminVendorDetailPage({
           {vendorData.websiteUrl && (
             <div>
               <p className="text-sm font-medium text-gray-500">{t("website")}</p>
-              <a 
-                href={vendorData.websiteUrl} 
-                target="_blank" 
+              <a
+                href={vendorData.websiteUrl}
+                target="_blank"
                 rel="noopener noreferrer"
                 className="mt-1 text-sm text-blue-600 hover:text-blue-500 flex items-center"
               >
@@ -181,7 +181,7 @@ export default async function AdminVendorDetailPage({
           <h2 className="text-lg font-medium text-gray-900 mb-4">{t("socialMedia")}</h2>
           <div className="flex space-x-4">
             {vendorData.instagramUrl && (
-              <a 
+              <a
                 href={vendorData.instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -191,7 +191,7 @@ export default async function AdminVendorDetailPage({
               </a>
             )}
             {vendorData.facebookUrl && (
-              <a 
+              <a
                 href={vendorData.facebookUrl}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -201,7 +201,7 @@ export default async function AdminVendorDetailPage({
               </a>
             )}
             {vendorData.twitterUrl && (
-              <a 
+              <a
                 href={vendorData.twitterUrl}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -211,14 +211,14 @@ export default async function AdminVendorDetailPage({
               </a>
             )}
             {vendorData.tiktokUrl && (
-              <a 
+              <a
                 href={vendorData.tiktokUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-gray-500"
               >
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
                 </svg>
               </a>
             )}

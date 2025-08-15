@@ -66,12 +66,12 @@ function applySecurityHeaders(response: NextResponse): NextResponse {
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
-  
+
   // Track session activity for authenticated users (non-blocking)
-  const sessionToken = request.headers.get('authorization')?.replace('Bearer ', '') || 
-                      request.cookies.get('next-auth.session-token')?.value ||
-                      request.cookies.get('__Secure-next-auth.session-token')?.value;
-                      
+  const sessionToken = request.headers.get('authorization')?.replace('Bearer ', '') ||
+    request.cookies.get('next-auth.session-token')?.value ||
+    request.cookies.get('__Secure-next-auth.session-token')?.value;
+
   if (sessionToken && !pathname.startsWith('/_next') && !pathname.startsWith('/api/')) {
     // Update session activity in background
     updateSessionActivity(sessionToken).catch(() => {
@@ -95,9 +95,10 @@ export async function middleware(request: NextRequest) {
     } else if (process.env.NODE_ENV === 'development') {
       // In development, be more permissive but only log warning for non-null origins
       // Skip warning during tests to reduce noise
-      if (origin !== null && process.env.PLAYWRIGHT_TEST !== 'true') {
+      if (origin !== null) {
         console.warn(`CORS request from unauthorized origin: ${origin}`)
       }
+
       response.headers.set('Access-Control-Allow-Origin', origin || '*')
     }
 

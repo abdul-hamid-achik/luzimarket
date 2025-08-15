@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { Check, X, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SubmitButton from "@/components/ui/submit-button";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { approveVendor as approveVendorAction, rejectVendor as rejectVendorAction } from "@/lib/actions/admin/vendor";
@@ -105,25 +106,27 @@ export default async function AdminVendorsPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <form action={approveVendor.bind(null, vendor.id)}>
-                            <Button
+                            <SubmitButton
                               type="submit"
                               size="sm"
                               className="bg-green-600 hover:bg-green-700 text-white"
+                              pendingText={t("activate")}
                             >
                               <Check className="h-4 w-4 mr-1" />
                               {t("activate")}
-                            </Button>
+                            </SubmitButton>
                           </form>
                           <form action={rejectVendor.bind(null, vendor.id)}>
-                            <Button
+                            <SubmitButton
                               type="submit"
                               size="sm"
                               variant="outline"
                               className="border-red-300 text-red-600 hover:bg-red-50"
+                              pendingText={t("deactivate")}
                             >
                               <X className="h-4 w-4 mr-1" />
                               {t("deactivate")}
-                            </Button>
+                            </SubmitButton>
                           </form>
                           <Link href={`/admin/vendors/${vendor.id}`}>
                             <Button size="sm" variant="ghost">
@@ -208,14 +211,15 @@ export default async function AdminVendorsPage() {
                           </Button>
                         </Link>
                         <form action={rejectVendor.bind(null, vendor.id)}>
-                          <Button
+                          <SubmitButton
                             type="submit"
                             size="sm"
                             variant="ghost"
                             className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            pendingChildren={<X className="h-4 w-4 animate-pulse" />}
                           >
                             <X className="h-4 w-4" />
-                          </Button>
+                          </SubmitButton>
                         </form>
                       </div>
                     </td>

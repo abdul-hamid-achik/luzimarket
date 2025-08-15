@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Truck, Store, CreditCard, Bell, Shield, ChevronRight } from "lucide-react";
 import { db } from "@/db";
@@ -11,16 +11,17 @@ import { eq } from "drizzle-orm";
 export default async function VendorSettingsPage() {
   const session = await auth();
   const t = await getTranslations("Vendor.settings");
-  
+
   if (!session || session.user.role !== "vendor") {
     redirect("/login");
   }
 
   // Get vendor info
+  const vendorId = session.user.vendor?.id || session.user.id;
   const [vendor] = await db
     .select()
     .from(vendors)
-    .where(eq(vendors.id, session.user.id))
+    .where(eq(vendors.id, vendorId))
     .limit(1);
 
   const settingsSections = [
@@ -44,7 +45,7 @@ export default async function VendorSettingsPage() {
       title: t("payments.title"),
       description: t("payments.description"),
       icon: CreditCard,
-      href: "/vendor/settings/payments",
+      href: "/vendor/stripe-onboarding",
       color: "text-purple-600",
       bgColor: "bg-purple-50",
     },
@@ -78,7 +79,7 @@ export default async function VendorSettingsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {settingsSections.map((section) => {
           const Icon = section.icon;
-          
+
           return (
             <Link key={section.href} href={section.href}>
               <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer">
@@ -120,11 +121,10 @@ export default async function VendorSettingsPage() {
             <div className="flex justify-between">
               <dt className="text-sm font-univers text-gray-600">{t("accountInfo.status")}:</dt>
               <dd className="text-sm font-medium">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-univers ${
-                  vendor?.isActive 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-gray-100 text-gray-800'
-                }`}>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-univers ${vendor?.isActive
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-gray-100 text-gray-800'
+                  }`}>
                   {vendor?.isActive ? t("accountInfo.active") : t("accountInfo.inactive")}
                 </span>
               </dd>
@@ -132,12 +132,12 @@ export default async function VendorSettingsPage() {
             <div className="flex justify-between">
               <dt className="text-sm font-univers text-gray-600">{t("accountInfo.memberSince")}:</dt>
               <dd className="text-sm font-medium">
-                {vendor?.createdAt 
-                  ? new Date(vendor.createdAt).toLocaleDateString('es-MX', { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })
+                {vendor?.createdAt
+                  ? new Date(vendor.createdAt).toLocaleDateString('es-MX', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })
                   : '-'
                 }
               </dd>

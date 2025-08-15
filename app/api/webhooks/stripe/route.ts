@@ -31,10 +31,10 @@ export async function POST(req: NextRequest) {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
-        
+
         // Handle multiple orders from metadata
         const orderIds = session.metadata?.orderIds?.split(',') || [];
-        
+
         if (orderIds.length > 0) {
           // Update all orders to processing status
           for (const orderId of orderIds) {
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
 
               if (vendorBalance) {
                 const newAvailableBalance = parseFloat(vendorBalance.availableBalance) + parseFloat(platformFee.vendorEarnings);
-                
+
                 await db
                   .update(vendorBalances)
                   .set({
@@ -138,7 +138,7 @@ export async function POST(req: NextRequest) {
             try {
               const customerEmail = order.guestEmail || session.customer_details?.email;
               const customerName = order.guestName || session.customer_details?.name || 'Cliente';
-              
+
               if (customerEmail) {
                 // Send customer confirmation
                 await sendOrderConfirmation({
@@ -179,17 +179,17 @@ export async function POST(req: NextRequest) {
           }
 
           console.log("Orders paid:", orderIds.join(', '));
-          
+
           // Handle Stripe Connect transfers for multi-vendor orders
           if (session.metadata?.useStripeConnect === 'true' && session.metadata?.vendorSplits) {
             try {
               const vendorSplits = JSON.parse(session.metadata.vendorSplits);
               const paymentIntentId = session.payment_intent as string;
-              
+
               // Retrieve the payment intent to get the charge ID
               const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
               const chargeId = paymentIntent.latest_charge as string;
-              
+
               // Create transfers to each vendor
               for (const split of vendorSplits) {
                 try {
@@ -204,9 +204,9 @@ export async function POST(req: NextRequest) {
                       vendorId: split.vendorId,
                     },
                   });
-                  
+
                   console.log(`Transfer created for vendor ${split.vendorId}: ${transfer.id}`);
-                  
+
                   // Update platform fee status to transferred
                   await db
                     .update(platformFees)
@@ -216,7 +216,7 @@ export async function POST(req: NextRequest) {
                       transferredAt: new Date(),
                     })
                     .where(eq(platformFees.orderId, split.orderId));
-                    
+
                 } catch (transferError) {
                   console.error(`Failed to create transfer for vendor ${split.vendorId}:`, transferError);
                   // Continue with other transfers even if one fails
@@ -264,13 +264,13 @@ export async function POST(req: NextRequest) {
 
       case "payment_intent.succeeded": {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        console.log("Payment succeeded:", paymentIntent.id);
+        // Optional: persist minimal audit log if needed in the future
         break;
       }
 
       case "payment_intent.payment_failed": {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        
+
         // Update order status to failed
         const order = await db.query.orders.findFirst({
           where: eq(orders.paymentIntentId, paymentIntent.id),
@@ -298,7 +298,7 @@ export async function POST(req: NextRequest) {
       case "customer.subscription.created":
       case "customer.subscription.updated": {
         const subscription = event.data.object as Stripe.Subscription;
-        
+
         // Handle subscription updates
         const user = await db.query.users.findFirst({
           where: eq(users.stripeCustomerId, subscription.customer as string),
@@ -313,7 +313,7 @@ export async function POST(req: NextRequest) {
 
       case "customer.subscription.deleted": {
         const subscription = event.data.object as Stripe.Subscription;
-        
+
         // Handle subscription cancellation
         const user = await db.query.users.findFirst({
           where: eq(users.stripeCustomerId, subscription.customer as string),
@@ -328,20 +328,19 @@ export async function POST(req: NextRequest) {
 
       case "invoice.payment_succeeded": {
         const invoice = event.data.object as Stripe.Invoice;
-        
+
         // Handle successful invoice payment
         if ((invoice as any).subscription && (invoice as any).billing_reason === "subscription_cycle") {
-          console.log("Subscription invoice paid:", invoice.id);
+          // Optional: update any subscription bookkeeping
         }
         break;
       }
 
       case "invoice.payment_failed": {
         const invoice = event.data.object as Stripe.Invoice;
-        
+
         // Handle failed invoice payment
         if ((invoice as any).subscription) {
-          console.log("Subscription invoice payment failed:", invoice.id);
           // TODO: Send payment failed email
         }
         break;
@@ -350,7 +349,7 @@ export async function POST(req: NextRequest) {
       // Stripe Connect specific events
       case "account.updated": {
         const account = event.data.object as Stripe.Account;
-        
+
         // Update vendor Stripe account status
         const vendorAccount = await db.query.vendorStripeAccounts.findFirst({
           where: eq(vendorStripeAccounts.stripeAccountId, account.id),
@@ -378,14 +377,13 @@ export async function POST(req: NextRequest) {
 
       case "application_fee.created": {
         const fee = event.data.object as Stripe.ApplicationFee;
-        console.log("Application fee created:", fee.id, "Amount:", fee.amount);
+        // No-op for now
         break;
       }
 
       case "transfer.created": {
         const transfer = event.data.object as Stripe.Transfer;
-        console.log("Transfer created:", transfer.id, "Amount:", transfer.amount);
-        
+
         // Update transaction record with transfer details
         if (transfer.metadata?.orderId && transfer.metadata?.vendorId) {
           // Create or update transaction record for the transfer
@@ -406,14 +404,14 @@ export async function POST(req: NextRequest) {
         }
         break;
       }
-      
+
       case "transfer.updated": {
         const transfer = event.data.object as Stripe.Transfer;
-        
+
         // Update transaction status based on transfer status
         if (transfer.metadata?.orderId) {
           const status = transfer.reversed ? "reversed" : "completed";
-          
+
           await db
             .update(transactions)
             .set({
@@ -428,30 +426,62 @@ export async function POST(req: NextRequest) {
       case "payout.created":
       case "payout.updated": {
         const payout = event.data.object as Stripe.Payout;
-        
+
         // Handle payout status updates
-        console.log(`Payout ${payout.id} status: ${payout.status}`);
+        // No-op for now
         break;
       }
 
       case "payout.paid": {
         const payout = event.data.object as Stripe.Payout;
-        
+
         // Mark payout as completed
-        console.log(`Payout ${payout.id} paid successfully`);
+        // No-op for now
         break;
       }
 
       case "payout.failed": {
         const payout = event.data.object as Stripe.Payout;
-        
+
         // Handle failed payout
-        console.log(`Payout ${payout.id} failed: ${payout.failure_message}`);
+        // No-op for now
+        break;
+      }
+
+      // Add minimal handling for frequent Stripe Connect events to avoid noisy logs
+      case "account.application.authorized": {
+        // No action needed; authorization granted for the Connect application
+        break;
+      }
+
+      case "capability.updated": {
+        const capability = event.data.object as Stripe.Capability;
+        // When capabilities update, fetch the account and sync high-level fields
+        try {
+          const accountId = capability.account as string;
+          const account = await stripe.accounts.retrieve(accountId);
+          const vendorAccount = await db.query.vendorStripeAccounts.findFirst({
+            where: eq(vendorStripeAccounts.stripeAccountId, account.id),
+          });
+          if (vendorAccount) {
+            await db
+              .update(vendorStripeAccounts)
+              .set({
+                chargesEnabled: account.charges_enabled || false,
+                payoutsEnabled: account.payouts_enabled || false,
+                capabilities: account.capabilities as any,
+                updatedAt: new Date(),
+              })
+              .where(eq(vendorStripeAccounts.stripeAccountId, account.id));
+          }
+        } catch (e) {
+          // Swallow to avoid webhook failure
+        }
         break;
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+      // Ignore unhandled events silently to keep logs clean
     }
 
     return NextResponse.json({ received: true });

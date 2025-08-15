@@ -203,7 +203,7 @@ export function Header() {
             ) : session ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" aria-label={t('userAccount')}>
+                  <Button variant="ghost" size="icon" aria-label={t('userAccount')} data-testid="user-menu">
                     <User className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -214,7 +214,7 @@ export function Header() {
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <NextLink href="/account" className="cursor-pointer">
+                    <NextLink href="/account" className="cursor-pointer" data-testid="account-link">
                       {t('myAccount')}
                     </NextLink>
                   </DropdownMenuItem>

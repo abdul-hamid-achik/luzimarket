@@ -1,12 +1,7 @@
-import { config } from "dotenv";
 import bcrypt from "bcryptjs";
 import { db } from "../../db";
 import * as schema from "../../db/schema";
 import { eq } from "drizzle-orm";
-import slugify from "slugify";
-
-// Load environment variables
-config({ path: ".env.local" });
 
 /**
  * Setup test database with minimal data required for tests to pass
@@ -27,7 +22,7 @@ const TEST_CATEGORIES = [
   },
   {
     name: "Dulces & Postres",
-    slug: "dulces-postres", 
+    slug: "dulces-postres",
     description: "Deliciosos dulces y postres gourmet",
     displayOrder: 2
   },
@@ -51,7 +46,9 @@ async function setupTestDatabase() {
   try {
     // 1. Ensure test categories exist
     console.log("📁 Ensuring test categories...");
-    for (const categoryData of TEST_CATEGORIES) {
+    for (let idx = 0; idx < TEST_CATEGORIES.length; idx++) {
+      const categoryData = TEST_CATEGORIES[idx];
+
       const existing = await db
         .select()
         .from(schema.categories)
@@ -60,10 +57,21 @@ async function setupTestDatabase() {
 
       if (existing.length === 0) {
         await db.insert(schema.categories).values({
-          ...categoryData,
-          imageUrl: `/placeholder-${categoryData.slug}.jpg` // Use placeholder images
+          name: categoryData.name,
+          slug: categoryData.slug,
+          description: categoryData.description,
+          displayOrder: categoryData.displayOrder,
+          imageUrl: `/placeholder-${categoryData.slug}.jpg`
+        }).onConflictDoUpdate({
+          target: schema.categories.slug,
+          set: {
+            name: categoryData.name,
+            description: categoryData.description,
+            displayOrder: categoryData.displayOrder,
+            imageUrl: `/placeholder-${categoryData.slug}.jpg`
+          }
         });
-        console.log(`✅ Created category: ${categoryData.name}`);
+        console.log(`✅ Ensured category: ${categoryData.name}`);
       } else {
         // Update name to match UI if different
         if (existing[0].name !== categoryData.name) {
@@ -79,7 +87,7 @@ async function setupTestDatabase() {
     // 2. Ensure test users exist with proper verification
     console.log("👤 Ensuring test users...");
     const userPassword = await bcrypt.hash("password123", 10);
-    
+
     const testUsers = [
       {
         email: "customer1@example.com",
@@ -91,7 +99,7 @@ async function setupTestDatabase() {
         emailVerifiedAt: new Date()
       },
       {
-        email: "customer2@example.com", 
+        email: "customer2@example.com",
         name: "Test Customer 2",
         passwordHash: userPassword,
         stripeCustomerId: `cus_test_customer2`,
@@ -115,7 +123,7 @@ async function setupTestDatabase() {
         // Update existing user to be verified
         await db
           .update(schema.users)
-          .set({ 
+          .set({
             emailVerified: true,
             emailVerifiedAt: new Date(),
             passwordHash: userPassword
@@ -128,7 +136,7 @@ async function setupTestDatabase() {
     // 3. Ensure test vendor exists
     console.log("🏪 Ensuring test vendor...");
     const vendorPassword = await bcrypt.hash("password123", 10);
-    
+
     const testVendor = {
       businessName: "Test Vendor Shop",
       slug: "test-vendor-shop",
@@ -171,7 +179,7 @@ async function setupTestDatabase() {
     // 4. Ensure admin user exists
     console.log("👮 Ensuring admin user...");
     const adminPassword = await bcrypt.hash("admin123", 10);
-    
+
     const adminUser = {
       email: "admin@luzimarket.shop",
       name: "Administrador Principal",
@@ -193,7 +201,7 @@ async function setupTestDatabase() {
       // Update password in case it changed
       await db
         .update(schema.adminUsers)
-        .set({ 
+        .set({
           passwordHash: adminPassword,
           isActive: true
         })
@@ -213,8 +221,9 @@ async function setupTestDatabase() {
   }
 }
 
-// Run setup if called directly
-if (require.main === module) {
+// Run setup if called directly (Node ESM-safe)
+const isDirectRun = typeof process !== 'undefined' && Array.isArray(process.argv) && process.argv[1] && process.argv[1].includes('test-database');
+if (isDirectRun) {
   setupTestDatabase().then(() => process.exit(0));
 }
 

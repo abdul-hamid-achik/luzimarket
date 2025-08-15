@@ -17,7 +17,7 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getFormatter } from "next-intl/server";
 
 async function getVendorStats(vendorId: string) {
   const [
@@ -80,7 +80,8 @@ async function getVendorStats(vendorId: string) {
 
 export default async function VendorDashboard() {
   const session = await auth();
-  const t = await getTranslations("vendor");
+  const t = await getTranslations("Vendor");
+  const f = await getFormatter();
 
   if (!session || !session.user?.vendor?.id) {
     redirect({ href: "/login", locale: 'es' });
@@ -130,7 +131,12 @@ export default async function VendorDashboard() {
     },
     {
       title: t("dashboard.totalRevenue"),
-      value: `$${stats.totalRevenue.toLocaleString('es-MX')}`,
+      value: f.number(Number(stats.totalRevenue), {
+        style: 'currency',
+        currency: 'MXN',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+      }),
       icon: DollarSign,
       color: "text-orange-600",
       bgColor: "bg-orange-50"
@@ -150,7 +156,7 @@ export default async function VendorDashboard() {
           </p>
         </div>
         <Link href="/vendor/products/new">
-          <Button className="bg-black text-white hover:bg-gray-800">
+          <Button className="bg-black text-white hover:bg-gray-800" data-testid="vendor-add-product">
             <Plus className="h-4 w-4 mr-2" />
             {t("dashboard.addProduct")}
           </Button>
@@ -158,7 +164,7 @@ export default async function VendorDashboard() {
       </div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" data-testid="vendor-stats">
         {statsCards.map((stat) => {
           const Icon = stat.icon;
 
@@ -241,7 +247,12 @@ export default async function VendorDashboard() {
                             t("dashboard.orderStatus.pending")}
                     </span>
                     <p className="text-sm font-univers font-medium text-gray-900">
-                      ${Number(order.total).toLocaleString('es-MX')}
+                      {f.number(Number(order.total), {
+                        style: 'currency',
+                        currency: 'MXN',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 2
+                      })}
                     </p>
                   </div>
                 </div>

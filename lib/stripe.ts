@@ -13,16 +13,7 @@ if (!stripeSecretKey.startsWith('sk_')) {
   throw new Error('Invalid STRIPE_SECRET_KEY format');
 }
 
-// Log key info for debugging (without exposing the actual key)
-if (process.env.NODE_ENV === 'development') {
-  console.log('Stripe key validation:', {
-    length: stripeSecretKey.length,
-    prefix: stripeSecretKey.substring(0, 7),
-    suffix: '...',
-    hasWhitespace: stripeSecretKey !== stripeSecretKey.trim(),
-    hasNewlines: stripeSecretKey.includes('\n') || stripeSecretKey.includes('\r'),
-  });
-}
+// Intentionally no console logging of key metadata to keep logs clean
 
 export const stripe = new Stripe(stripeSecretKey, {
   apiVersion: '2025-05-28.basil' as const,
@@ -191,7 +182,7 @@ export async function getBalance(connectedAccountId?: string) {
     const options = connectedAccountId
       ? { stripeAccount: connectedAccountId }
       : undefined;
-    
+
     const balance = await stripe.balance.retrieve(options as any);
     return balance;
   } catch (error) {

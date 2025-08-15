@@ -4,15 +4,16 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { 
-  Check, 
-  X, 
-  Eye, 
-  CheckSquare, 
+import {
+  Check,
+  X,
+  Eye,
+  CheckSquare,
   Square,
   Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SubmitButton from "@/components/ui/submit-button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -225,9 +226,8 @@ export function AdminProductsClient({ products, translations: t }: AdminProducts
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`text-sm font-univers ${
-                        product.stock && product.stock > 0 ? 'text-gray-900' : 'text-red-600'
-                      }`}>
+                      <span className={`text-sm font-univers ${product.stock && product.stock > 0 ? 'text-gray-900' : 'text-red-600'
+                        }`}>
                         {product.stock || 0}
                       </span>
                     </td>
@@ -242,14 +242,15 @@ export function AdminProductsClient({ products, translations: t }: AdminProducts
                           await bulkUpdateProductStatus([product.id], product.isActive ? 'reject' : 'approve');
                           router.refresh();
                         }}>
-                          <Button
+                          <SubmitButton
                             type="submit"
                             size="sm"
                             variant={product.isActive ? "ghost" : "default"}
                             className={!product.isActive ? "bg-green-600 hover:bg-green-700" : "text-red-600 hover:text-red-700"}
+                            pendingChildren={product.isActive ? <X className="h-4 w-4 animate-pulse" /> : <Check className="h-4 w-4 animate-pulse" />}
                           >
                             {product.isActive ? <X className="h-4 w-4" /> : <Check className="h-4 w-4" />}
-                          </Button>
+                          </SubmitButton>
                         </form>
                         <Link href={`/admin/products/${product.id}`}>
                           <Button size="sm" variant="ghost">

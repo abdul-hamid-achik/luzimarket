@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import type { ReporterDescription } from '@playwright/test';
 
 /**
  * Read environment variables from file.
@@ -6,9 +7,11 @@ import { defineConfig, devices } from '@playwright/test';
  */
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 
 // Read from ".env.local" file.
 dotenv.config({ path: path.resolve(__dirname, '.env.local') });
+
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -16,6 +19,23 @@ dotenv.config({ path: path.resolve(__dirname, '.env.local') });
 const isCi = !!process.env.CI;
 const includeAdditionalBrowsers = isCi ? process.env.CI_ALL_BROWSERS === '1' : false;
 const workersCount = isCi ? Number(process.env.PW_WORKERS || '2') : undefined;
+
+// Always enable JSON and JUnit reporters with defaults under tmp/
+const tmpDir = path.resolve(__dirname, 'tmp');
+try {
+  fs.mkdirSync(tmpDir, { recursive: true });
+} catch {
+  // best-effort
+}
+const jsonOutput = process.env.PLAYWRIGHT_JSON_OUTPUT_NAME || path.join(tmpDir, 'test-results.json');
+const junitOutput = process.env.PLAYWRIGHT_JUNIT_OUTPUT_NAME || path.join(tmpDir, 'junit-results.xml');
+const junitStripAnsi = String(process.env.PLAYWRIGHT_JUNIT_STRIP_ANSI ?? 'true').toLowerCase() === 'true';
+
+const reporters: ReporterDescription[] = [
+  ['list'],
+  ['json', { outputFile: jsonOutput }],
+  ['junit', { outputFile: junitOutput, stripANSI: junitStripAnsi }],
+];
 
 export default defineConfig({
   testDir: './e2e',
@@ -27,14 +47,15 @@ export default defineConfig({
   retries: isCi ? 2 : 0,
   /* Control workers in CI via PW_WORKERS (default 2). */
   workers: workersCount,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  /* Reporter to use. Avoid HTML by default so tests don't open a report server */
+  reporter: reporters,
   /* Run global setup to prepare DB/test data */
   globalSetup: './e2e/global.setup.ts',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     // Force localhost for tests to avoid hitting production/staging URLs by mistake
+    // Keep in sync with webServer.url below to avoid navigation to wrong port
     baseURL: `http://localhost:${process.env.PORT || '3000'}`,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
@@ -46,7 +67,7 @@ export default defineConfig({
     /* Increase timeouts for slower operations */
     navigationTimeout: 60000,
     actionTimeout: 30000,
-    
+
     /* Browser context options */
     contextOptions: {
       // Grant permissions that tests might need
@@ -113,14 +134,16 @@ export default defineConfig({
    */
 
   webServer: {
-    command: 'npm run dev',
+    command: 'sh -c "npm run build && npm run start"',
     url: `http://localhost:${process.env.PORT || '3000'}`,
     reuseExistingServer: !process.env.CI,
     timeout: 180 * 1000,
     env: {
-      PLAYWRIGHT_TEST: 'true',
-      // Ensure app URL resolves to localhost inside tests
       NEXT_PUBLIC_APP_URL: `http://localhost:${process.env.PORT || '3000'}`,
+      NEXTAUTH_URL: `http://localhost:${process.env.PORT || '3000'}`,
+      NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || 'test_e2e_secret',
+      AUTH_URL: `http://localhost:${process.env.PORT || '3000'}`,
+      AUTH_TRUST_HOST: 'true',
     },
   },
 });

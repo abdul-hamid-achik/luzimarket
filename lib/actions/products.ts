@@ -54,28 +54,28 @@ export async function getFilteredProducts(filters: ProductFilters = {}) {
 
     // Build where conditions
     const conditions = [];
-    
+
     // Only show active products (temporarily allow non-approved images for development)
     conditions.push(eq(products.isActive, true));
     // TODO: Re-enable after fixing image approval workflow
     // conditions.push(eq(products.imagesApproved, true));
-    
+
     if (productIds.length > 0) {
       conditions.push(inArray(products.id, productIds));
     }
-    
+
     if (categoryIds.length > 0) {
       conditions.push(inArray(products.categoryId, categoryIds.map(id => parseInt(id))));
     }
-    
+
     if (vendorIds.length > 0) {
       conditions.push(inArray(products.vendorId, vendorIds));
     }
-    
+
     if (minPrice !== undefined) {
       conditions.push(gte(products.price, minPrice.toString()));
     }
-    
+
     if (maxPrice !== undefined) {
       conditions.push(lte(products.price, maxPrice.toString()));
     }
@@ -344,6 +344,14 @@ export async function createVendorProduct(data: {
   const session = await auth();
   if (!session || session.user.role !== "vendor" || !session.user.vendor?.id) {
     throw new Error("Unauthorized");
+  }
+
+  // Ensure category exists to avoid FK violations and provide a clear error
+  const existingCategory = await db.query.categories.findFirst({
+    where: eq(categories.id, data.categoryId),
+  });
+  if (!existingCategory) {
+    throw new Error("Category not found");
   }
 
   // Basic slugging: name + random suffix

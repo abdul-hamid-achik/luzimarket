@@ -87,10 +87,10 @@ export async function authenticateUser(
     if (!isValidPassword) {
       // Handle failed login attempt
       await handleFailedLoginAttempt(email, userType, user, locale);
-      
+
       const t = await getTranslations({ locale, namespace: "Auth" });
       const remainingAttempts = Math.max(0, LOCKOUT_THRESHOLD - ((user.failedLoginAttempts || 0) + 1));
-      
+
       if (remainingAttempts === 0) {
         return {
           success: false,
@@ -98,7 +98,7 @@ export async function authenticateUser(
           isLocked: true,
         };
       }
-      
+
       return {
         success: false,
         error: t("invalidCredentials"),
@@ -335,5 +335,47 @@ export async function getLockedAccounts() {
       vendors: [],
       admins: [],
     };
+  }
+}
+
+export async function lockUserAccount(
+  userId: string,
+  userType: "customer" | "vendor" | "admin",
+  durationMinutes?: number
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    let table;
+    switch (userType) {
+      case "customer":
+        table = users;
+        break;
+      case "vendor":
+        table = vendors;
+        break;
+      case "admin":
+        table = adminUsers;
+        break;
+    }
+
+    const now = new Date();
+    const minutes = typeof durationMinutes === "number" && durationMinutes > 0
+      ? durationMinutes
+      : LOCKOUT_DURATION_MINUTES;
+
+    const lockedUntil = new Date(now.getTime() + minutes * 60 * 1000);
+
+    await db
+      .update(table)
+      .set({
+        lockedUntil,
+        lastFailedLoginAt: now,
+        failedLoginAttempts: LOCKOUT_THRESHOLD,
+      })
+      .where(eq(table.id, userId));
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error locking account:", error);
+    return { success: false, error: "Failed to lock account" };
   }
 }

@@ -24,7 +24,7 @@ export default async function OrdersPage({ params, searchParams }: OrdersPagePro
   setRequestLocale(locale);
 
   const session = await auth();
-  const t = await getTranslations('orders');
+  const t = await getTranslations('Orders');
 
   if (!session || !session.user) {
     redirect("/login");

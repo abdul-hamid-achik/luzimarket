@@ -75,7 +75,7 @@ export async function calculateShipping(input: ShippingCalculationInput) {
     let totalWeight = 0;
     let totalVolume = 0;
     let subtotal = 0;
-    
+
     for (const item of input.items) {
       const product = await db.query.products.findFirst({
         where: eq(products.id, item.productId),
@@ -103,10 +103,10 @@ export async function calculateShipping(input: ShippingCalculationInput) {
     }
 
     // Check if free shipping applies
-    const freeShippingThreshold = vendor.freeShippingThreshold 
-      ? parseFloat(vendor.freeShippingThreshold) 
+    const freeShippingThreshold = vendor.freeShippingThreshold
+      ? parseFloat(vendor.freeShippingThreshold)
       : null;
-    
+
     if (freeShippingThreshold && subtotal >= freeShippingThreshold) {
       return {
         success: true,
@@ -158,7 +158,7 @@ export async function calculateShipping(input: ShippingCalculationInput) {
     shippingOptions.push({
       id: 'express',
       carrier: 'dhl',
-      service: 'express', 
+      service: 'express',
       name: 'Envío Express (1-2 días)',
       cost: expressCost,
       estimatedDays: '1-2 días hábiles',
@@ -193,7 +193,7 @@ export async function calculateShipping(input: ShippingCalculationInput) {
       freeShipping: false,
       freeShippingThreshold,
       subtotal,
-      remainingForFreeShipping: freeShippingThreshold 
+      remainingForFreeShipping: freeShippingThreshold
         ? Math.max(0, freeShippingThreshold - subtotal)
         : null,
       options: shippingOptions,
@@ -204,7 +204,7 @@ export async function calculateShipping(input: ShippingCalculationInput) {
       },
       weight: {
         actual: totalWeight,
-        formatted: totalWeight >= 1000 
+        formatted: totalWeight >= 1000
           ? `${(totalWeight / 1000).toFixed(1)} kg`
           : `${totalWeight} g`
       }
@@ -384,9 +384,9 @@ export async function initializeShippingData() {
 
     await db.insert(shippingMethods).values(methods);
 
-    return { 
-      success: true, 
-      message: 'Shipping zones and methods initialized successfully' 
+    return {
+      success: true,
+      message: 'Shipping zones and methods initialized successfully'
     };
   } catch (error) {
     console.error('Error initializing shipping data:', error);
@@ -440,8 +440,46 @@ export async function getShippingMethods() {
 // Update vendor shipping settings
 export async function updateVendorShippingSettings(vendorId: string, settings: any) {
   try {
-    // This would update vendor-specific shipping settings
-    // For now, return success
+    const fieldsToUpdate: Partial<typeof vendors.$inferInsert> = {};
+
+    if (typeof settings?.shippingOriginState === 'string') {
+      (fieldsToUpdate as any).shippingOriginState = settings.shippingOriginState;
+    }
+
+    if (typeof settings?.freeShippingThreshold === 'number') {
+      (fieldsToUpdate as any).freeShippingThreshold = settings.freeShippingThreshold;
+    }
+
+    if (typeof settings?.defaultShippingMethodId === 'number') {
+      (fieldsToUpdate as any).defaultShippingMethodId = settings.defaultShippingMethodId;
+    }
+
+    // Optionally merge JSON settings
+    if (settings?.shippingSettings && typeof settings.shippingSettings === 'object') {
+      // Read current settings to merge
+      const current = await db.query.vendors.findFirst({
+        where: eq(vendors.id, vendorId),
+        columns: { shippingSettings: true }
+      });
+
+      const merged = {
+        ...(current?.shippingSettings || {}),
+        ...settings.shippingSettings,
+      } as any;
+
+      (fieldsToUpdate as any).shippingSettings = merged;
+    }
+
+    if (Object.keys(fieldsToUpdate).length > 0) {
+      await db
+        .update(vendors)
+        .set({
+          ...(fieldsToUpdate as any),
+          updatedAt: new Date(),
+        })
+        .where(eq(vendors.id, vendorId));
+    }
+
     return {
       success: true,
       message: 'Shipping settings updated successfully'
@@ -481,5 +519,40 @@ export async function saveVendorShippingRates(vendorId: string, rates: any[]) {
       success: false,
       error: 'Failed to save shipping rates'
     };
+  }
+}
+
+// Fetch vendor shipping settings (simple helper)
+export async function getVendorShippingSettings(vendorId: string) {
+  try {
+    const vendor = await db.query.vendors.findFirst({
+      where: eq(vendors.id, vendorId),
+      columns: {
+        shippingOriginState: true,
+        freeShippingThreshold: true,
+        defaultShippingMethodId: true,
+        shippingSettings: true,
+      },
+    });
+
+    return { success: true, vendor };
+  } catch (error) {
+    console.error('Error fetching vendor shipping settings:', error);
+    return { success: false, error: 'Failed to fetch vendor shipping settings' };
+  }
+}
+
+// Fetch vendor shipping rates
+export async function getVendorShippingRates(vendorId: string) {
+  try {
+    const rates = await db.query.vendorShippingRates.findMany({
+      where: eq(vendorShippingRates.vendorId, vendorId),
+      orderBy: (t, { asc }) => [asc(t.zoneId), asc(t.shippingMethodId), asc(t.minWeight)],
+    });
+
+    return { success: true, rates };
+  } catch (error) {
+    console.error('Error fetching vendor shipping rates:', error);
+    return { success: false, error: 'Failed to fetch vendor shipping rates' };
   }
 }

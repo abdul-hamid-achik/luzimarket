@@ -77,6 +77,22 @@ export const routing = defineRouting({
       es: '/vendedor/configuracion',
       en: '/vendor/settings'
     },
+    '/vendor/settings/shipping': {
+      es: '/vendedor/configuracion/envio',
+      en: '/vendor/settings/shipping'
+    },
+    '/vendor/settings/store': {
+      es: '/vendedor/configuracion/tienda',
+      en: '/vendor/settings/store'
+    },
+    '/vendor/settings/notifications': {
+      es: '/vendedor/configuracion/notificaciones',
+      en: '/vendor/settings/notifications'
+    },
+    '/vendor/settings/payments': {
+      es: '/vendedor/configuracion/pagos',
+      en: '/vendor/settings/payments'
+    },
     '/vendor/stripe-onboarding': {
       es: '/vendedor/pagos',
       en: '/vendor/stripe-onboarding'

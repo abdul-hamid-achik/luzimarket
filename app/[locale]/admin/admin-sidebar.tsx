@@ -35,6 +35,7 @@ import { Button } from "@/components/ui/button";
 import { LogoutButton } from "@/components/admin/logout-button";
 import { useTranslations } from "next-intl";
 import LanguageSwitcher from "@/components/layout/language-switcher";
+import { CurrencySwitch } from "@/components/layout/currency-switch";
 
 interface AdminSidebarProps {
   userEmail?: string;
@@ -161,6 +162,9 @@ export function AdminSidebar({ userEmail }: AdminSidebarProps) {
         <div className="p-2 space-y-2">
           <div className="flex items-center gap-2 px-2">
             <LanguageSwitcher />
+          </div>
+          <div className="flex items-center gap-2 px-2">
+            <CurrencySwitch />
           </div>
           {userEmail && state !== "collapsed" && (
             <p className="text-xs text-gray-600 px-2">{userEmail}</p>

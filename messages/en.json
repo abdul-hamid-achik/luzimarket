@@ -68,7 +68,8 @@
     "facebook": "Facebook",
     "twitter": "Twitter",
     "tiktok": "TikTok",
-    "whatsapp": "WhatsApp"
+    "whatsapp": "WhatsApp",
+    "products": "Products"
   },
   "HomePage": {
     "title": "Handpicked extraordinary gifts",
@@ -137,11 +138,13 @@
       "twoFactor": {
         "title": "Two-factor authentication",
         "description": "Add an extra layer of security to your account",
+        "status": "Status",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "recommendation": "We recommend enabling two-factor authentication to better protect your account.",
         "authenticatorApp": "Authenticator app",
         "authenticatorDescription": "Use an app like Google Authenticator",
-        "emailBackup": "Email backup",
-        "emailDescription": "Receive verification codes via email",
-        "viewBackupCodes": "View backup codes"
+        "viewRecoveryCodes": "View recovery codes"
       },
       "sessions": {
         "title": "Where you're signed in",
@@ -455,7 +458,15 @@
       "reason": "This may be due to various factors, including alignment with our current product curation.",
       "invitation": "We invite you to reapply in the future when you've updated your catalog or when we open new categories.",
       "questions": "If you have questions about this decision, please don't hesitate to contact us.",
-      "thanks2": "Thank you for your understanding."
+      "thanks2": "Thank you for your understanding.",
+      "message": "We appreciate your time and effort in applying to Luzimarket.",
+      "accessInfo": "If you applied with an account, you can still access your dashboard:",
+      "email": "Email",
+      "password": "Password",
+      "passwordInfo": "The one you registered during application",
+      "accessPanel": "Access your panel here",
+      "panelLink": "Vendor Panel",
+      "welcome": "We hope to collaborate in the future."
     }
   },
   "Admin": {
@@ -1177,10 +1188,28 @@
         "title": "Shipping",
         "description": "Configure your shipping methods and rates"
       },
-      "store": {
-        "title": "Store Information",
-        "description": "Update your store details and public profile"
+    "store": {
+      "title": "Store Information",
+      "description": "Update your store details and public profile",
+      "profile": {
+        "title": "Store Profile",
+        "description": "Basic data, address and links"
       },
+      "fields": {
+        "businessName": "Business Name",
+        "phone": "Phone",
+        "whatsapp": "WhatsApp",
+        "businessPhone": "Business Phone",
+        "businessHours": "Business Hours",
+        "street": "Street",
+        "city": "City",
+        "state": "State",
+        "country": "Country",
+        "postalCode": "Postal code",
+        "description": "Description"
+      },
+      "save": "Save"
+    },
       "payments": {
         "title": "Payments",
         "description": "Manage your payment information and preferences"
@@ -1191,7 +1220,11 @@
       },
       "security": {
         "title": "Security",
-        "description": "Protect your account with security settings"
+        "description": "Protect your account with security settings",
+        "changePassword": {
+          "title": "Change password",
+          "description": "Update your password regularly to keep your account secure"
+        }
       },
       "accountInfo": {
         "title": "Account Information",
@@ -1429,6 +1462,16 @@
       "password": {
         "title": "Change password",
         "description": "Keep your account secure with a strong password"
+      },
+      "changePassword": {
+        "error": "Failed to change password",
+        "success": "Password updated successfully",
+        "currentPassword": "Current password",
+        "newPassword": "New password",
+        "confirmPassword": "Confirm new password",
+        "requirements": "Your password must be at least 8 characters and include uppercase, lowercase and a number.",
+        "updating": "Updating...",
+        "update": "Update password"
       },
       "twoFactor": {
         "title": "Two-factor authentication",
@@ -1856,7 +1899,7 @@
   "Orders": {
     "title": "My Orders",
     "noOrders": "You don't have any orders yet",
-    "startShopping": "Start shopping",
+    "startShopping": "Start Shopping",
     "orderNumber": "Order #{number}",
     "orderDate": "Order placed on {date}",
     "orderTotal": "Total",
@@ -1930,7 +1973,57 @@
       "lastYear": "Last year",
       "filterByStatus": "Filter by status",
       "filterByDate": "Filter by date",
-      "searchOrders": "Search orders..."
+      "searchOrders": "Search orders...",
+      "searchPlaceholder": "Search by order number...",
+      "statusPlaceholder": "Filter by status",
+      "allStatuses": "All statuses",
+      "fromDate": "From date",
+      "toDate": "To date"
+    },
+    "subtitle": "View the history and status of all your orders",
+    "backToAccount": "Back to Account",
+    "exportOrders": "Export Orders",
+    "view": "View",
+    "track": "Track",
+    "paid": "Paid",
+    "pending": "Pending",
+    "item": "item",
+    "items": "items",
+    "moreItems": "more",
+    "unknownVendor": "Unknown vendor",
+    "noResults": {
+      "title": "No orders found",
+      "description": "Try adjusting your search filters to find what you're looking for.",
+      "clearFilters": "Clear Filters"
+    },
+    "statuses": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "table": {
+      "order": "Order",
+      "items": "Items",
+      "date": "Date",
+      "status": "Status",
+      "total": "Total",
+      "actions": "Actions",
+      "Vendor": "Store"
+    },
+    "pagination": {
+      "showing": "Showing",
+      "of": "of",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "error": {
+      "loading": "Error al cargar los pedidos",
+      "retry": "Reintentar"
+    },
+    "actions": {
+      "buyAgain": "Comprar de nuevo"
     }
   },
   "Footer": {
@@ -2622,73 +2715,6 @@
     "continueShopping": "Continue Shopping",
     "needHelp": "Need help?",
     "contactSupport": "Contact Support"
-  },
-  "orders": {
-    "title": "My Orders",
-    "subtitle": "View the history and status of all your orders",
-    "backToAccount": "Back to Account",
-    "exportOrders": "Export Orders",
-    "orderNumber": "Order #{number}",
-    "viewDetails": "View details",
-    "view": "View",
-    "track": "Track",
-    "paid": "Paid",
-    "pending": "Pending",
-    "item": "item",
-    "items": "items",
-    "moreItems": "more",
-    "noOrders": "You don't have any orders yet",
-    "startShopping": "Start Shopping",
-    "unknownVendor": "Unknown vendor",
-    "status": {
-      "pending": "Pending",
-      "paid": "Paid",
-      "processing": "Processing",
-      "shipped": "Shipped",
-      "delivered": "Delivered",
-      "cancelled": "Cancelled"
-    },
-    "noResults": {
-      "title": "No orders found",
-      "description": "Try adjusting your search filters to find what you're looking for.",
-      "clearFilters": "Clear Filters"
-    },
-    "statuses": {
-      "pending": "Pending",
-      "paid": "Paid",
-      "shipped": "Shipped",
-      "delivered": "Delivered",
-      "cancelled": "Cancelled"
-    },
-    "filters": {
-      "searchPlaceholder": "Search by order number...",
-      "statusPlaceholder": "Filter by status",
-      "allStatuses": "All statuses",
-      "fromDate": "From date",
-      "toDate": "To date"
-    },
-    "table": {
-      "order": "Order",
-      "items": "Items",
-      "date": "Date",
-      "status": "Status",
-      "total": "Total",
-      "actions": "Actions",
-      "Vendor": "Store"
-    },
-    "pagination": {
-      "showing": "Showing",
-      "of": "of",
-      "previous": "Previous",
-      "next": "Next"
-    },
-    "error": {
-      "loading": "Error al cargar los pedidos",
-      "retry": "Reintentar"
-    },
-    "actions": {
-      "buyAgain": "Comprar de nuevo"
-    }
   },
   "orderDetail": {
     "orderTitle": "Order #",

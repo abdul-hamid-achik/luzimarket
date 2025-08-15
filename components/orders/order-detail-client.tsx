@@ -432,7 +432,7 @@ export function OrderDetailClient({ orderNumber, locale }: OrderDetailClientProp
             {/* Vendor Information */}
             <Card>
               <CardHeader>
-                <CardTitle className="font-times-now">{t('vendor.title')}</CardTitle>
+              <CardTitle className="font-times-now">{t('Vendor.title')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>

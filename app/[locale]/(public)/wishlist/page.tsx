@@ -64,7 +64,7 @@ export default function WishlistPage() {
     <div className="min-h-screen">
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-times-now">Mis Favoritos ({state.items.length})</h1>
+          <h1 className="text-3xl font-times-now" data-testid="wishlist-title">Mis Favoritos ({state.items.length})</h1>
           <Button
             variant="outline"
             onClick={clearWishlist}

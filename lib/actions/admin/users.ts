@@ -13,6 +13,7 @@ export type AdminUserRow = {
   orderCount: number;
   totalSpent: number;
   userType: "customer" | "vendor" | "admin";
+  lockedUntil?: Date | null;
 };
 
 export async function getAdminUsers(): Promise<AdminUserRow[]> {
@@ -28,6 +29,7 @@ export async function getAdminUsers(): Promise<AdminUserRow[]> {
       name: users.name,
       email: users.email,
       createdAt: users.createdAt,
+      lockedUntil: users.lockedUntil,
       orderCount: sql<number>`(
         SELECT COUNT(*) FROM ${orders}
         WHERE ${orders.userId} = ${users.id}
@@ -48,6 +50,7 @@ export async function getAdminUsers(): Promise<AdminUserRow[]> {
       name: vendors.contactName,
       email: vendors.email,
       createdAt: vendors.createdAt,
+      lockedUntil: vendors.lockedUntil,
     })
     .from(vendors)
     .orderBy(desc(vendors.createdAt));
@@ -59,6 +62,7 @@ export async function getAdminUsers(): Promise<AdminUserRow[]> {
       name: adminUsers.name,
       email: adminUsers.email,
       createdAt: adminUsers.createdAt,
+      lockedUntil: adminUsers.lockedUntil,
     })
     .from(adminUsers)
     .orderBy(desc(adminUsers.createdAt));

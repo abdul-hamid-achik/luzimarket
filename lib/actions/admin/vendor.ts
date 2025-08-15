@@ -31,7 +31,7 @@ export async function approveVendor(vendorId: string) {
     // Update vendor status
     await db
       .update(vendors)
-      .set({ 
+      .set({
         isActive: true,
         updatedAt: new Date()
       })
@@ -58,14 +58,16 @@ export async function approveVendor(vendorId: string) {
 
     // Create Stripe Connect account for the vendor
     try {
-      await createVendorStripeAccount({
+      const res = await createVendorStripeAccount({
         vendorId: vendorId,
         email: vendorData.email,
         businessName: vendorData.businessName,
         country: "MX",
         type: "express",
       });
-      console.log("Stripe Connect account created for vendor:", vendorId);
+      if (!res.success) {
+        console.error("Stripe account creation returned error:", res.error);
+      }
     } catch (stripeError) {
       // Log the error but don't fail the approval
       console.error("Error creating Stripe account for vendor:", stripeError);
@@ -76,7 +78,7 @@ export async function approveVendor(vendorId: string) {
       try {
         const t = await getTranslations('VendorRegistration.approval');
         const tCommon = await getTranslations('VendorRegistration');
-        
+
         const emailHtml = `
           <h1>${t('title')}</h1>
           <p>${t('greeting', { name: vendorData.contactName })}</p>
@@ -133,7 +135,7 @@ export async function rejectVendor(vendorId: string) {
     // Update vendor status
     await db
       .update(vendors)
-      .set({ 
+      .set({
         isActive: false,
         updatedAt: new Date()
       })
@@ -143,7 +145,7 @@ export async function rejectVendor(vendorId: string) {
     if (process.env.NODE_ENV === 'production' || process.env.SEND_EMAILS === 'true') {
       try {
         const t = await getTranslations('VendorRegistration.rejection');
-        
+
         const emailHtml = `
           <h1>${t('title')}</h1>
           <p>${t('greeting', { name: vendorData.contactName })}</p>

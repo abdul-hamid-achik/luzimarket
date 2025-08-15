@@ -21,7 +21,7 @@ interface OrdersListProps {
 }
 
 export function OrdersList({ searchParams = {} }: OrdersListProps) {
-  const t = useTranslations('orders');
+  const t = useTranslations('Orders');
   
   const { data, isLoading, error } = useOrders({
     search: searchParams.search,

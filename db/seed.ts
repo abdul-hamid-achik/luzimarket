@@ -15,19 +15,42 @@ import { db } from "./index";
 
 type ImageMode = 'ai' | 'placeholders' | 'none';
 
+// Simple CLI arg helpers (no deps)
+function hasFlag(name: string): boolean {
+  return process.argv.includes(name);
+}
+
+function getFlagValue(name: string): string | undefined {
+  const idx = process.argv.indexOf(name);
+  if (idx !== -1 && idx + 1 < process.argv.length) {
+    const val = process.argv[idx + 1];
+    if (!val.startsWith('--')) return val;
+  }
+  return undefined;
+}
+
 function resolveImageMode(): ImageMode {
-  // CLI flags take precedence
-  if (process.argv.includes('--no-images')) return 'none';
-  if (process.argv.includes('--placeholders')) return 'placeholders';
-  if (process.argv.includes('--ai')) return 'ai';
+  // Unified flag: --images [none|placeholders|ai]
+  const imagesArg = (getFlagValue('--images') || '').toLowerCase();
+  if (imagesArg === 'none') return 'none';
+  if (imagesArg === 'placeholders') return 'placeholders';
+  if (imagesArg === 'ai') return 'ai';
 
-  // Env override
-  const envMode = (process.env.SEED_IMAGE_MODE || '').toLowerCase();
-  if (envMode === 'none') return 'none';
-  if (envMode === 'placeholders') return 'placeholders';
-  if (envMode === 'ai') return 'ai';
+  // Backward compatible aliases
+  if (hasFlag('--no-images')) return 'none';
+  if (hasFlag('--placeholders')) return 'placeholders';
+  if (hasFlag('--ai')) return 'ai';
 
-  // Default behavior: placeholders in dev/test, AI in prod if key exists
+  // Deprecated env override
+  if (process.env.SEED_IMAGE_MODE) {
+    const envMode = (process.env.SEED_IMAGE_MODE || '').toLowerCase();
+    console.warn("⚠️  SEED_IMAGE_MODE is deprecated. Use --images [none|placeholders|ai] instead.");
+    if (envMode === 'none') return 'none';
+    if (envMode === 'placeholders') return 'placeholders';
+    if (envMode === 'ai') return 'ai';
+  }
+
+  // Default behavior: placeholders in dev, AI in prod if key exists
   const isProd = process.env.NODE_ENV === 'production';
   if (isProd && process.env.OPENAI_SECRET_KEY) return 'ai';
   return 'placeholders';
@@ -315,19 +338,30 @@ async function main() {
   // --fast: Limit image generation to 10 items for testing
   // --placeholders: Force placeholder images instead of AI
   // --ai: Force AI images (if key is present)
+  // --images [none|placeholders|ai]: Unified image mode flag (preferred)
+  // --images-limit <n>: Limit number of products to image (preferred over --fast)
+  // --allow-prod: Allow running in production-like environments (replaces SEED_ALLOW_PROD)
+  // --financials [auto|force|skip]: Control platform fees/transactions/payouts generation
 
   // Safety guard to avoid seeding production accidentally
-  if (isProbablyProdEnvironment() && process.env.SEED_ALLOW_PROD !== '1') {
+  const allowProd = hasFlag('--allow-prod') || process.env.SEED_ALLOW_PROD === '1';
+  if (isProbablyProdEnvironment() && !allowProd) {
     console.error("❌ Refusing to run seed in production-like environment. Set SEED_ALLOW_PROD=1 to override.");
     process.exit(1);
+  }
+
+  if (hasFlag('--help')) {
+    console.log(`\nUsage: tsx db/seed.ts [options]\n\nOptions:\n  --no-reset                 Skip database reset\n  --images [mode]            Image mode: none | placeholders | ai\n  --images-limit <n>         Limit number of products to generate images for\n  --force-images             Force regenerate images even if present\n  --fast                     Alias for --images-limit 10\n  --financials [auto|force|skip]  Control financials seeding\n  --allow-prod               Allow running in production-like environment\n  --help                     Show this help\n`);
+    process.exit(0);
   }
 
   // Check command line flags
   const shouldReset = !process.argv.includes('--no-reset');
   const imageMode = resolveImageMode();
-  const shouldGenerateAIImages = imageMode === 'ai' && !!process.env.OPENAI_SECRET_KEY && !process.argv.includes('--no-images');
-  const forceRegenerateImages = process.argv.includes('--force-images'); // Force regenerate existing images
-  const imageBatchSize = process.argv.includes('--fast') ? 10 : 100; // Limit images in fast mode
+  const shouldGenerateAIImages = imageMode === 'ai' && !!process.env.OPENAI_SECRET_KEY && !hasFlag('--no-images');
+  const forceRegenerateImages = hasFlag('--force-images'); // Force regenerate existing images
+  const imagesLimitArg = getFlagValue('--images-limit');
+  const imageBatchSize = imagesLimitArg ? Math.max(0, parseInt(imagesLimitArg, 10) || 0) : (hasFlag('--fast') ? 10 : 100);
 
   try {
     // Reset database if needed
@@ -340,9 +374,19 @@ async function main() {
         const { drizzle } = await import('drizzle-orm/node-postgres');
         const { Client } = await import('pg');
 
+        // Determine reset connection string (single-DB strategy)
+        if (process.env.SEED_USE_TEST_DB || process.env.DATABASE_URL_TEST) {
+          console.warn('⚠️  SEED_USE_TEST_DB and DATABASE_URL_TEST are deprecated. Using DATABASE_URL only.');
+        }
+        const databaseUrl = process.env.DATABASE_URL;
+
+        if (!databaseUrl) {
+          throw new Error('DATABASE_URL is not set for reset');
+        }
+
         // Create a temporary connection with node-postgres for reset
         const client = new Client({
-          connectionString: process.env.DATABASE_URL,
+          connectionString: databaseUrl,
         });
 
         await client.connect();
@@ -365,10 +409,14 @@ async function main() {
 
     console.log("📦 Seeding database...");
 
-    // 1. Seed Categories
+    // 1. Seed Categories (idempotent)
     console.log("🏷️  Creating categories...");
-    const categories = await db.insert(schema.categories).values(CATEGORIES).returning();
-    console.log(`✅ Created ${categories.length} categories`);
+    await db
+      .insert(schema.categories)
+      .values(CATEGORIES)
+      .onConflictDoNothing({ target: schema.categories.slug });
+    const categories = await db.select().from(schema.categories);
+    console.log(`✅ Ensured ${categories.length} categories`);
 
     // 2. Seed Admin Users
     console.log("👤 Creating admin users...");
@@ -429,9 +477,9 @@ async function main() {
     }
     console.log(`✅ Ensured ${adminUsers.length} admin users exist`);
 
-    // 3. Seed Email Templates
+    // 3. Seed Email Templates (idempotent)
     console.log("📧 Creating email templates...");
-    const emailTemplates = await db.insert(schema.emailTemplates).values([
+    const EMAIL_TEMPLATES = [
       {
         name: "welcome",
         subject: "¡Bienvenido a Luzimarket!",
@@ -464,8 +512,24 @@ async function main() {
         variables: ["name", "email", "businessName"],
         isActive: true
       }
-    ]).returning();
-    console.log(`✅ Created ${emailTemplates.length} email templates`);
+    ];
+    for (const tpl of EMAIL_TEMPLATES) {
+      await db
+        .insert(schema.emailTemplates)
+        .values(tpl)
+        .onConflictDoUpdate({
+          target: schema.emailTemplates.name,
+          set: {
+            subject: sql`excluded.subject`,
+            htmlTemplate: sql`excluded.html_template`,
+            textTemplate: sql`excluded.text_template`,
+            variables: sql`excluded.variables`,
+            isActive: sql`excluded.is_active`,
+          },
+        });
+    }
+    const emailTemplates = await db.select().from(schema.emailTemplates);
+    console.log(`✅ Ensured ${emailTemplates.length} email templates`);
 
     // 4. Seed Vendors
     console.log("🏪 Creating vendors...");
@@ -492,14 +556,14 @@ async function main() {
         state: faker.helpers.arrayElement(STATES),
         country: "México",
         postalCode: faker.location.zipCode("#####"),
-        websiteUrl: faker.datatype.boolean(0.7) ? faker.internet.url() : "",
+        websiteUrl: faker.datatype.boolean({ probability: 0.7 }) ? faker.internet.url() : "",
         description: faker.lorem.sentences(2),
-        hasDelivery: faker.datatype.boolean(0.8),
+        hasDelivery: faker.datatype.boolean({ probability: 0.8 }),
         deliveryService: faker.helpers.arrayElement(["own", "external", "both"]),
-        instagramUrl: faker.datatype.boolean(0.6) ? `@${faker.internet.username()}` : "",
-        facebookUrl: faker.datatype.boolean(0.6) ? faker.internet.username() : "",
-        tiktokUrl: faker.datatype.boolean(0.4) ? `@${faker.internet.username()}` : "",
-        isActive: faker.datatype.boolean(0.9),
+        instagramUrl: faker.datatype.boolean({ probability: 0.6 }) ? `@${faker.internet.username()}` : "",
+        facebookUrl: faker.datatype.boolean({ probability: 0.6 }) ? faker.internet.username() : "",
+        tiktokUrl: faker.datatype.boolean({ probability: 0.4 }) ? `@${faker.internet.username()}` : "",
+        isActive: faker.datatype.boolean({ probability: 0.9 }),
         shippingOriginState: faker.helpers.arrayElement(STATES),
         freeShippingThreshold: faker.helpers.arrayElement([null, "500", "1000", "1500", "2000"])
       });
@@ -533,12 +597,16 @@ async function main() {
       freeShippingThreshold: "1000"
     });
 
-    const vendors = await db.insert(schema.vendors).values(vendorData).returning();
-    console.log(`✅ Created ${vendors.length} vendors`);
+    await db
+      .insert(schema.vendors)
+      .values(vendorData)
+      .onConflictDoNothing({ target: schema.vendors.slug });
+    const vendors = await db.select().from(schema.vendors);
+    console.log(`✅ Ensured ${vendors.length} vendors`);
 
     // 5. Seed Products
     console.log("📦 Creating products...");
-    const productData = [];
+    const productData: Array<typeof schema.products.$inferInsert> = [];
 
     // Group product names by category
     const CATEGORY_PRODUCT_NAMES: Record<string, string[]> = {
@@ -556,12 +624,12 @@ async function main() {
       // Use modulo to cycle through categories deterministically
       const categoryIndex = i % categories.length;
       const category = categories[categoryIndex];
-      
+
       const categoryProducts = CATEGORY_PRODUCT_NAMES[category.slug] || PRODUCT_NAMES;
       // Use modulo to cycle through product names
       const productNameIndex = Math.floor(i / categories.length) % categoryProducts.length;
       const baseName = categoryProducts[productNameIndex];
-      
+
       const adjectives = [
         "Premium", "Deluxe", "Exclusivo", "Artesanal", "Elegante",
         "Clásico", "Moderno", "Vintage", "Lujoso", "Especial"
@@ -569,7 +637,7 @@ async function main() {
       // Use modulo to cycle through adjectives
       const adjectiveIndex = i % adjectives.length;
       const adjective = adjectives[adjectiveIndex];
-      
+
       const name = `${baseName} ${adjective}`;
       const priceRange = CATEGORY_PRICE_RANGES[category.slug] || { min: 299, max: 1999 };
       const price = faker.number.int({ min: priceRange.min, max: priceRange.max });
@@ -591,7 +659,9 @@ async function main() {
       const vendor = vendors[vendorIndex];
       // Create deterministic slug based on product index only (since everything else is now deterministic)
       const deterministicSlug = slugify(`${baseName}-${adjective}-${i}`, { lower: true, strict: true });
-      
+
+      const tagOptions = ["nuevo", "popular", "oferta", "exclusivo", "limitado", "artesanal", "eco-friendly", "premium"];
+      const tagCount = faker.number.int({ min: 1, max: 4 });
       productData.push({
         name,
         slug: deterministicSlug,
@@ -600,14 +670,14 @@ async function main() {
         vendorId: vendor.id,
         price: String(Math.round(price / 50) * 50), // Round to nearest 50
         images: [], // Will be generated later (AI or placeholders)
-        tags: faker.helpers.arrayElements(["nuevo", "popular", "oferta", "exclusivo", "limitado", "artesanal", "eco-friendly", "premium"], { min: 1, max: 4 }),
+        tags: faker.helpers.arrayElements(tagOptions, tagCount),
         stock: faker.helpers.weightedArrayElement([
           { value: faker.number.int({ min: 1, max: 10 }), weight: 2 }, // Low stock
           { value: faker.number.int({ min: 11, max: 50 }), weight: 5 }, // Normal stock
           { value: faker.number.int({ min: 51, max: 100 }), weight: 3 }, // High stock
           { value: 0, weight: 1 } // Out of stock
         ]),
-        isActive: faker.datatype.boolean(0.95),
+        isActive: faker.datatype.boolean({ probability: 0.95 }),
         // Shipping fields based on category
         weight: (() => {
           if (category.slug === "flores-arreglos") return faker.number.int({ min: 500, max: 3000 }); // 0.5-3kg
@@ -623,8 +693,12 @@ async function main() {
         shippingClass: faker.helpers.arrayElement(["standard", "fragile", "oversize"])
       });
     }
-    const products = await db.insert(schema.products).values(productData).returning();
-    console.log(`✅ Created ${products.length} products`);
+    await db
+      .insert(schema.products)
+      .values(productData)
+      .onConflictDoNothing({ target: schema.products.slug });
+    const products = await db.select().from(schema.products);
+    console.log(`✅ Ensured ${products.length} products`);
 
     // IMAGE HANDLING PHASE
     // 5.1 Assign images via placeholders or AI, respecting existing images and flags
@@ -738,7 +812,7 @@ async function main() {
         let rejectionCategory: string | null = null;
 
         if (imageMode === 'ai') {
-          const r = Math.random();
+          const r = faker.number.float({ min: 0, max: 1 });
           if (r < 0.7) {
             status = 'approved';
           } else if (r < 0.9) {
@@ -916,16 +990,45 @@ async function main() {
     }
 
     if (variantData.length > 0) {
-      await db.insert(schema.productVariants).values(variantData);
-      console.log(`✅ Created ${variantData.length} product variants`);
+      for (const v of variantData) {
+        await db.insert(schema.productVariants).values(v).onConflictDoUpdate({
+          target: schema.productVariants.sku,
+          set: {
+            name: sql`excluded.name`,
+            variantType: sql`excluded.variant_type`,
+            price: sql`excluded.price`,
+            stock: sql`excluded.stock`,
+            attributes: sql`excluded.attributes`,
+            isActive: sql`excluded.is_active`,
+          },
+        });
+      }
+      console.log(`✅ Ensured ${variantData.length} product variants`);
     }
 
     // 6. Seed Users (Customers)
     console.log("👥 Creating users...");
     const userPassword = await bcrypt.hash("password123", 10);
-    const userData = [];
-    
-    // Add specific test users first
+    const userData: Array<typeof schema.users.$inferInsert> = [];
+
+    // Add specific test users first (predictable logins)
+    userData.push({
+      email: "client@luzimarket.shop",
+      name: "Test Customer",
+      passwordHash: userPassword,
+      stripeCustomerId: `cus_client_main`,
+      isActive: true
+    });
+
+    userData.push({
+      email: "client_2@luzimarket.shop",
+      name: "Test Customer 2 (Alt)",
+      passwordHash: userPassword,
+      stripeCustomerId: `cus_client_alt`,
+      isActive: true
+    });
+
+    // Keep legacy test users used by some E2E specs
     userData.push({
       email: "customer1@example.com",
       name: "Test Customer",
@@ -933,7 +1036,6 @@ async function main() {
       stripeCustomerId: `cus_test_customer1`,
       isActive: true
     });
-    
     userData.push({
       email: "customer2@example.com",
       name: "Test Customer 2",
@@ -941,7 +1043,7 @@ async function main() {
       stripeCustomerId: `cus_test_customer2`,
       isActive: true
     });
-    
+
     // Add random users
     for (let i = 0; i < 48; i++) {
       userData.push({
@@ -949,23 +1051,25 @@ async function main() {
         name: faker.person.fullName(),
         passwordHash: userPassword,
         stripeCustomerId: `cus_${faker.string.alphanumeric(14)}`,
-        isActive: faker.datatype.boolean(0.95)
+        isActive: faker.datatype.boolean({ probability: 0.95 })
       });
     }
-    const users = await db.insert(schema.users).values(userData).returning();
-    console.log(`✅ Created ${users.length} users`);
+    await db.insert(schema.users).values(userData).onConflictDoNothing({ target: schema.users.email });
+    const users = await db.select().from(schema.users);
+    console.log(`✅ Ensured ${users.length} users`);
 
     // 7. Seed Newsletter Subscriptions
     console.log("📰 Creating newsletter subscriptions...");
-    const subscriptionData = [];
+    const subscriptionData: Array<typeof schema.subscriptions.$inferInsert> = [];
     for (let i = 0; i < 100; i++) {
       subscriptionData.push({
         email: faker.internet.email(),
-        isActive: faker.datatype.boolean(0.9)
+        isActive: faker.datatype.boolean({ probability: 0.9 })
       });
     }
-    await db.insert(schema.subscriptions).values(subscriptionData);
-    console.log(`✅ Created ${subscriptionData.length} subscriptions`);
+    await db.insert(schema.subscriptions).values(subscriptionData).onConflictDoNothing({ target: schema.subscriptions.email });
+    const subsCount = await db.select({ c: sql<number>`COUNT(*)` }).from(schema.subscriptions);
+    console.log(`✅ Ensured ${subsCount[0].c} subscriptions`);
 
     // 8. Seed Orders
     console.log("🛒 Creating orders...");
@@ -1112,13 +1216,14 @@ async function main() {
           postalCode: faker.location.zipCode("#####"),
           country: "México"
         },
-        notes: faker.datatype.boolean(0.3) ? faker.lorem.sentence() : null,
+        notes: faker.datatype.boolean({ probability: 0.3 }) ? faker.lorem.sentence() : null,
         createdAt: orderCreatedAt,
         ...trackingData
       });
     }
-    const orders = await db.insert(schema.orders).values(orderData).returning();
-    console.log(`✅ Created ${orders.length} orders`);
+    await db.insert(schema.orders).values(orderData).onConflictDoNothing({ target: schema.orders.orderNumber });
+    const orders = await db.select().from(schema.orders);
+    console.log(`✅ Ensured ${orders.length} orders`);
 
     // 9. Seed Order Items
     console.log("📋 Creating order items...");
@@ -1163,7 +1268,7 @@ async function main() {
       for (let i = 0; i < reviewCount; i++) {
         const user = faker.helpers.arrayElement(users);
         // Check if user has ordered this product
-        const hasOrdered = faker.datatype.boolean(0.8);
+        const hasOrdered = faker.datatype.boolean({ probability: 0.8 });
 
         reviewData.push({
           productId: product.id,
@@ -1185,6 +1290,174 @@ async function main() {
     await db.insert(schema.reviews).values(reviewData);
     console.log(`✅ Created ${reviewData.length} reviews`);
 
+    // 12. Seed Financial Data (balances, fees, transactions, payouts)
+    console.log("💸 Seeding financial data...");
+    const financialsMode = (getFlagValue('--financials') || 'auto').toLowerCase();
+    const forceFinancials = financialsMode === 'force' || process.argv.includes('--force-financials');
+    const skipFinancials = financialsMode === 'skip';
+
+    // Ensure vendor Stripe accounts (by vendorId)
+    for (const v of vendors) {
+      const accountId = `acct_${faker.string.alphanumeric(16).toLowerCase()}`;
+      await db.insert(schema.vendorStripeAccounts).values({
+        vendorId: v.id,
+        stripeAccountId: accountId,
+        accountType: 'express',
+        onboardingStatus: 'completed',
+        chargesEnabled: true,
+        payoutsEnabled: true,
+        detailsSubmitted: true,
+        commissionRate: String(faker.number.int({ min: 10, max: 20 })),
+      }).onConflictDoNothing({ target: schema.vendorStripeAccounts.vendorId });
+    }
+
+    // Ensure vendor balances
+    for (const v of vendors) {
+      await db.insert(schema.vendorBalances).values({
+        vendorId: v.id,
+        availableBalance: '0',
+        pendingBalance: '0',
+        reservedBalance: '0',
+        currency: 'MXN',
+        lifetimeVolume: '0',
+      }).onConflictDoNothing({ target: schema.vendorBalances.vendorId });
+    }
+
+    const existingFeesCount = await db.select({ c: sql<number>`COUNT(*)` }).from(schema.platformFees);
+    const shouldCreateFees = forceFinancials || (existingFeesCount[0].c === 0);
+
+    const vendorIdToCommission = new Map<string, number>();
+    const accounts = await db.select({ vendorId: schema.vendorStripeAccounts.vendorId, commissionRate: schema.vendorStripeAccounts.commissionRate }).from(schema.vendorStripeAccounts);
+    for (const a of accounts) vendorIdToCommission.set(a.vendorId, Number(a.commissionRate));
+
+    if (!skipFinancials && shouldCreateFees) {
+      console.log("🧾 Creating platform fees and transactions...");
+      const feeRows: Array<typeof schema.platformFees.$inferInsert> = [];
+      const transactionRows: Array<typeof schema.transactions.$inferInsert> = [];
+
+      for (const o of orders) {
+        if (o.paymentStatus !== 'succeeded') continue;
+        const orderAmount = Number(o.total);
+        const commission = vendorIdToCommission.get(o.vendorId) ?? 15;
+        const feeAmount = Math.round((orderAmount * commission) / 100);
+        const vendorEarnings = orderAmount - feeAmount - Number(o.shipping || 0);
+
+        feeRows.push({
+          orderId: o.id,
+          vendorId: o.vendorId,
+          orderAmount: String(orderAmount),
+          feePercentage: String(commission),
+          feeAmount: String(feeAmount),
+          vendorEarnings: String(vendorEarnings),
+          currency: 'MXN',
+          status: 'collected',
+        });
+
+        transactionRows.push({
+          vendorId: o.vendorId,
+          orderId: o.id,
+          type: 'sale',
+          amount: String(orderAmount),
+          currency: 'MXN',
+          status: 'completed',
+          description: `Sale for order ${o.orderNumber}`,
+          metadata: {},
+        });
+
+        transactionRows.push({
+          vendorId: o.vendorId,
+          orderId: o.id,
+          type: 'fee',
+          amount: String(feeAmount),
+          currency: 'MXN',
+          status: 'completed',
+          description: `Platform fee for order ${o.orderNumber}`,
+          metadata: { commission },
+        });
+      }
+
+      if (feeRows.length > 0) {
+        await db.insert(schema.platformFees).values(feeRows);
+        await db.insert(schema.transactions).values(transactionRows);
+        console.log(`✅ Created ${feeRows.length} platform fees and ${transactionRows.length} transactions`);
+      } else {
+        console.log('ℹ️  No eligible orders for platform fees');
+      }
+    } else if (!skipFinancials) {
+      console.log('ℹ️  Platform fees already exist, skipping (use --financials force to regenerate)');
+    }
+
+    console.log('🧮 Updating vendor balances...');
+    const vendorEarningsByStatus = new Map<string, { available: number; pending: number; lifetime: number }>();
+    for (const v of vendors) vendorEarningsByStatus.set(v.id, { available: 0, pending: 0, lifetime: 0 });
+
+    for (const o of orders) {
+      if (o.paymentStatus !== 'succeeded') continue;
+      const orderAmount = Number(o.total);
+      const commission = vendorIdToCommission.get(o.vendorId) ?? 15;
+      const feeAmount = Math.round((orderAmount * commission) / 100);
+      const vendorEarnings = orderAmount - feeAmount - Number(o.shipping || 0);
+      const agg = vendorEarningsByStatus.get(o.vendorId)!;
+      agg.lifetime += vendorEarnings;
+      if (o.status === 'delivered') agg.available += vendorEarnings; else agg.pending += vendorEarnings;
+    }
+
+    for (const [vendorId, sums] of vendorEarningsByStatus.entries()) {
+      await db.update(schema.vendorBalances)
+        .set({
+          availableBalance: String(Math.max(0, Math.round(sums.available))),
+          pendingBalance: String(Math.max(0, Math.round(sums.pending))),
+          lifetimeVolume: String(Math.max(0, Math.round(sums.lifetime))),
+          lastUpdated: new Date(),
+        })
+        .where(eq(schema.vendorBalances.vendorId, vendorId));
+    }
+    console.log('✅ Vendor balances updated');
+
+    const existingPayoutsCount = await db.select({ c: sql<number>`COUNT(*)` }).from(schema.payouts);
+    const shouldCreatePayouts = forceFinancials || (existingPayoutsCount[0].c === 0);
+    if (!skipFinancials && shouldCreatePayouts) {
+      console.log('🏦 Creating bank accounts and payouts...');
+      for (const v of vendors.slice(0, Math.min(15, vendors.length))) {
+        const bank = await db.insert(schema.vendorBankAccounts).values({
+          vendorId: v.id,
+          accountHolderName: v.businessName,
+          accountHolderType: 'company',
+          bankName: faker.helpers.arrayElement(['BBVA', 'Santander', 'Banorte', 'HSBC', 'Scotiabank']),
+          last4: faker.string.numeric(4),
+          currency: 'MXN',
+          country: 'MX',
+          isDefault: true,
+        }).onConflictDoNothing({ target: schema.vendorBankAccounts.vendorId }).returning();
+
+        const [balance] = await db.select().from(schema.vendorBalances).where(eq(schema.vendorBalances.vendorId, v.id));
+        const available = balance ? Number(balance.availableBalance) : 0;
+        if (available < 200) continue;
+
+        const payoutAmount = Math.round(available * faker.number.float({ min: 0.3, max: 0.8 }));
+        await db.insert(schema.payouts).values({
+          vendorId: v.id,
+          amount: String(payoutAmount),
+          currency: 'MXN',
+          status: 'paid',
+          method: 'bank_transfer',
+          bankAccountId: (bank[0] && (bank[0] as any).id) || null,
+          processedAt: faker.date.recent({ days: 15 }),
+          paidAt: faker.date.recent({ days: 10 }),
+        });
+
+        await db.update(schema.vendorBalances)
+          .set({
+            availableBalance: String(available - payoutAmount),
+            lastUpdated: new Date(),
+          })
+          .where(eq(schema.vendorBalances.vendorId, v.id));
+      }
+      console.log('✅ Payouts created where applicable');
+    } else if (!skipFinancials) {
+      console.log('ℹ️  Payouts already exist, skipping');
+    }
+
     // 11. Initialize shipping data
     console.log("🚚 Initializing shipping zones and methods...");
     const shippingResult = await initializeShippingData();
@@ -1192,106 +1465,6 @@ async function main() {
       console.log(`✅ ${shippingResult.message}`);
     } else {
       console.log(`⚠️  Shipping data initialization failed: ${shippingResult.error}`);
-    }
-
-    // Generate AI images if enabled
-    if (shouldGenerateAIImages) {
-      console.log("\n🎨 Generating AI images for products and categories...");
-
-      // Create uploads directory for local development
-      if (process.env.NODE_ENV === 'development' && !process.env.BLOB_READ_WRITE_TOKEN) {
-        const fs = await import('fs/promises');
-        const path = await import('path');
-        const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'ai-generated');
-        await fs.mkdir(uploadsDir, { recursive: true });
-        console.log('📁 Created local uploads directory\n');
-      }
-
-      // Generate category images (only for categories without images, unless forced)
-      console.log('🖼️  Generating category images...');
-      const categoriesToImage = forceRegenerateImages ? categories : categories.filter(c => !c.imageUrl || c.imageUrl === null);
-      console.log(`📊 Found ${categoriesToImage.length} categories ${forceRegenerateImages ? '(forced regeneration)' : 'without images'}`);
-
-      for (const category of categoriesToImage) {
-        try {
-          console.log(`🖼️  Generating image for category: ${category.name}`);
-
-          const prompt = generateCategoryImagePrompt({
-            name: category.name,
-            description: category.description || '',
-          });
-
-          const imageUrl = await generateAndUploadImage(
-            prompt,
-            `category-${category.slug}.png`,
-            {
-              size: '1792x1024',
-              quality: 'hd',
-              style: 'natural',
-            }
-          );
-
-          await db.update(schema.categories)
-            .set({ imageUrl })
-            .where(eq(schema.categories.id, category.id));
-
-          console.log(`✅ Generated image for ${category.name}`);
-
-          // Add delay to respect rate limits
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        } catch (error) {
-          console.error(`❌ Error generating image for ${category.name}:`, error);
-        }
-      }
-
-      // Generate product images (only for products without images, unless forced)
-      console.log('\n🖼️  Generating product images...');
-      const productsNeedingImages = forceRegenerateImages ? products : products.filter(p => !p.images || (Array.isArray(p.images) && p.images.length === 0));
-      const productsToImage = productsNeedingImages.slice(0, imageBatchSize);
-      console.log(`📊 Found ${productsNeedingImages.length} products ${forceRegenerateImages ? '(forced regeneration)' : 'without images'}, generating for ${productsToImage.length}`);
-
-      for (const product of productsToImage) {
-        try {
-          console.log(`🖼️  Generating image for product: ${product.name}`);
-
-          const prompt = generateProductImagePrompt({
-            name: product.name,
-            description: product.description || '',
-            tags: product.tags as string[],
-          });
-
-          const imageUrl = await generateAndUploadImage(
-            prompt,
-            `product-${product.slug}.png`,
-            {
-              size: '1024x1024',
-              quality: 'standard',
-              style: 'natural',
-            }
-          );
-
-          await db.update(schema.products)
-            .set({
-              images: [imageUrl]
-            })
-            .where(eq(schema.products.id, product.id));
-
-          console.log(`✅ Generated image for ${product.name}`);
-
-          // Add delay to respect rate limits
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        } catch (error) {
-          console.error(`❌ Error generating image for ${product.name}:`, error);
-        }
-      }
-
-      console.log('\n✨ AI image generation completed!');
-    } else {
-      if (process.argv.includes('--no-images')) {
-        console.log("\n⏭️  Skipping AI image generation (--no-images flag)");
-      } else {
-        console.log("\n⚠️  Skipping AI image generation (OPENAI_SECRET_KEY not found)");
-      }
     }
 
     // Print summary

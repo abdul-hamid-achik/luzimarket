@@ -102,13 +102,13 @@ test.describe('Accessibility Tests', () => {
     const formAccessibility = await page.evaluate(() => {
       const inputs = Array.from(document.querySelectorAll('input, select, textarea'));
       const buttonCheckboxes = Array.from(document.querySelectorAll('button[role="checkbox"]'));
-      
+
       // Filter out hidden Radix UI implementation elements
       const visibleInputs = inputs.filter(input => {
         const ariaHidden = input.getAttribute('aria-hidden');
         return ariaHidden !== 'true';
       });
-      
+
       const allElements = [...visibleInputs, ...buttonCheckboxes];
 
       return allElements.map((input, index) => {
@@ -144,41 +144,15 @@ test.describe('Accessibility Tests', () => {
       });
     });
 
-    // All form inputs should have accessible names
-    console.log('Total inputs found:', formAccessibility.length);
-    formAccessibility.forEach((input, index) => {
-      console.log(`Field ${index}:`, {
-        type: input.type,
-        name: input.name,
-        hasLabel: input.hasLabel,
-        hasAriaLabel: input.hasAriaLabel,
-        hasAriaLabelledBy: input.hasAriaLabelledBy,
-        hasAccessibleName: input.hasAccessibleName
-      });
-      if (!input.hasAccessibleName) {
-        console.log(`❌ Field ${index} missing accessible name:`, input);
-      } else {
-        console.log(`✅ Field ${index} has accessible name`);
-      }
-    });
-    
-    // Only fail on the first missing accessible name for debugging
-    const firstMissingField = formAccessibility.find(input => !input.hasAccessibleName);
-    if (firstMissingField) {
-      const index = formAccessibility.indexOf(firstMissingField);
-      console.log(`First failing field at index ${index}:`, firstMissingField);
-    }
-    
     // Filter out the problematic checkbox temporarily while we investigate
     const accessibleInputs = formAccessibility.filter(input => {
       // Skip the problematic checkbox that has no id, name, or class
       if (input.inputType === 'checkbox' && input.id === 'no-id' && input.name === 'no-name' && input.className === 'no-class') {
-        console.log('⚠️ Skipping problematic checkbox for now:', input);
         return false;
       }
       return true;
     });
-    
+
     accessibleInputs.forEach((input, index) => {
       expect(input.hasAccessibleName).toBeTruthy();
     });

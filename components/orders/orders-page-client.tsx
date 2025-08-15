@@ -53,7 +53,7 @@ interface OrdersPageClientProps {
 }
 
 export function OrdersPageClient({ locale }: OrdersPageClientProps) {
-  const t = useTranslations('orders');
+  const t = useTranslations('Orders');
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -247,7 +247,7 @@ export function OrdersPageClient({ locale }: OrdersPageClientProps) {
                     >
                       <FormControl>
                         <SelectTrigger className="font-univers">
-                          <SelectValue placeholder={t('filters.statusPlaceholder')} />
+                           <SelectValue placeholder={t('filters.statusPlaceholder')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -521,7 +521,7 @@ function OrdersContent({
           <TableHeader>
             <TableRow>
               <TableHead className="font-univers">{t('table.order')}</TableHead>
-              <TableHead className="font-univers">{t('table.vendor')}</TableHead>
+              <TableHead className="font-univers">{t('table.Vendor')}</TableHead>
               <TableHead className="font-univers">{t('table.items')}</TableHead>
               <TableHead className="font-univers">{t('table.date')}</TableHead>
               <TableHead className="font-univers">{t('table.status')}</TableHead>

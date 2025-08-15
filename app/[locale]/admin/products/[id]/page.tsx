@@ -6,16 +6,17 @@ import { eq } from "drizzle-orm";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import SubmitButton from "@/components/ui/submit-button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  ArrowLeft, 
-  Check, 
-  X, 
-  Edit, 
-  Package, 
-  DollarSign, 
-  Tag, 
+import {
+  ArrowLeft,
+  Check,
+  X,
+  Edit,
+  Package,
+  DollarSign,
+  Tag,
   Store,
   AlertCircle,
   ExternalLink
@@ -72,13 +73,13 @@ export default async function ProductDetailPage({
   const session = await auth();
   const { id, locale } = await params;
   const t = await getTranslations("Admin.productDetail");
-  
+
   if (!session || (session.user.role !== "admin" && session.user.role !== "vendor")) {
     redirect("/login");
   }
 
   const product = await getProduct(id);
-  
+
   if (!product) {
     notFound();
   }
@@ -109,21 +110,22 @@ export default async function ProductDetailPage({
             </p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-2">
           <Badge className={product.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}>
             {product.isActive ? t("active") : t("inactive")}
           </Badge>
-          
+
           {isAdmin && (
             <form action={async () => {
-                "use server";
-                await toggleProductStatus(product.id, product.isActive || false);
-              }}>
-              <Button
+              "use server";
+              await toggleProductStatus(product.id, product.isActive || false);
+            }}>
+              <SubmitButton
                 type="submit"
                 variant={product.isActive ? "destructive" : "default"}
                 className={!product.isActive ? "bg-green-600 hover:bg-green-700" : ""}
+                pendingText={product.isActive ? t("deactivate") : t("approve")}
               >
                 {product.isActive ? (
                   <>
@@ -136,10 +138,10 @@ export default async function ProductDetailPage({
                     {t("approve")}
                   </>
                 )}
-              </Button>
+              </SubmitButton>
             </form>
           )}
-          
+
           {session.user.role === "vendor" && (
             <Link href={`/vendor/products/${product.id}/edit`}>
               <Button>
@@ -234,7 +236,7 @@ export default async function ProductDetailPage({
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 <Package className="h-5 w-5 text-gray-400" />
                 <div>
@@ -244,7 +246,7 @@ export default async function ProductDetailPage({
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 <Tag className="h-5 w-5 text-gray-400" />
                 <div>
@@ -279,7 +281,7 @@ export default async function ProductDetailPage({
                   <Store className="h-5 w-5 text-gray-400" />
                   <div className="flex-1">
                     <p className="text-sm text-gray-600">{t("vendor")}</p>
-                    <Link 
+                    <Link
                       href={`/admin/vendors/${product.vendor.id}`}
                       className="font-univers text-blue-600 hover:underline"
                     >
@@ -287,12 +289,12 @@ export default async function ProductDetailPage({
                     </Link>
                   </div>
                 </div>
-                
+
                 <div>
                   <p className="text-sm text-gray-600">{t("vendorEmail")}</p>
                   <p className="font-univers text-sm">{product.vendor.email}</p>
                 </div>
-                
+
                 <Badge className={product.vendor.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
                   {product.vendor.isActive ? t("vendorActive") : t("vendorInactive")}
                 </Badge>
@@ -314,7 +316,7 @@ export default async function ProductDetailPage({
                   </Button>
                 </Link>
               )}
-              
+
               {!product.isActive && (
                 <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <div className="flex items-start gap-2">

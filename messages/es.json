@@ -68,7 +68,8 @@
     "facebook": "Facebook",
     "twitter": "Twitter",
     "tiktok": "TikTok",
-    "whatsapp": "WhatsApp"
+    "whatsapp": "WhatsApp",
+    "products": "Productos"
   },
   "HomePage": {
     "title": "Regalos extraordinarios curados",
@@ -137,11 +138,13 @@
       "twoFactor": {
         "title": "Autenticación de dos factores",
         "description": "Añade una capa extra de seguridad a tu cuenta",
+        "status": "Estado",
+        "enabled": "Activada",
+        "disabled": "Desactivada",
+        "recommendation": "Recomendamos activar la autenticación de dos factores para proteger mejor tu cuenta.",
         "authenticatorApp": "Aplicación de autenticación",
         "authenticatorDescription": "Usa una app como Google Authenticator",
-        "emailBackup": "Email de respaldo",
-        "emailDescription": "Recibe códigos de verificación por email",
-        "viewBackupCodes": "Ver códigos de respaldo"
+        "viewRecoveryCodes": "Ver códigos de recuperación"
       },
       "sessions": {
         "title": "Dispositivos donde has iniciado sesión",
@@ -455,7 +458,15 @@
       "reason": "Esto puede deberse a varios factores, incluyendo la alineación con nuestra curación actual de productos.",
       "invitation": "Te invitamos a volver a aplicar en el futuro cuando hayas actualizado tu catálogo o cuando abramos nuevas categorías.",
       "questions": "Si tienes preguntas sobre esta decisión, no dudes en contactarnos.",
-      "thanks2": "Gracias por tu comprensión."
+      "thanks2": "Gracias por tu comprensión.",
+      "message": "Agradecemos tu tiempo y esfuerzo al aplicar a Luzimarket.",
+      "accessInfo": "Si registraste una cuenta, aún puedes acceder a tu panel:",
+      "email": "Email",
+      "password": "Contraseña",
+      "passwordInfo": "La que registraste durante la aplicación",
+      "accessPanel": "Accede a tu panel aquí",
+      "panelLink": "Panel de Vendedor",
+      "welcome": "Esperamos colaborar en el futuro."
     }
   },
   "Admin": {
@@ -1179,7 +1190,25 @@
       },
       "store": {
         "title": "Información de la tienda",
-        "description": "Actualiza los detalles de tu tienda y perfil público"
+        "description": "Actualiza los detalles de tu tienda y perfil público",
+        "profile": {
+          "title": "Perfil de la tienda",
+          "description": "Datos básicos, dirección y enlaces"
+        },
+        "fields": {
+          "businessName": "Nombre del negocio",
+          "phone": "Teléfono",
+          "whatsapp": "WhatsApp",
+          "businessPhone": "Teléfono del negocio",
+          "businessHours": "Horarios del negocio",
+          "street": "Calle y número",
+          "city": "Ciudad",
+          "state": "Estado",
+          "country": "País",
+          "postalCode": "Código postal",
+          "description": "Descripción"
+        },
+        "save": "Guardar"
       },
       "payments": {
         "title": "Pagos",
@@ -1191,7 +1220,11 @@
       },
       "security": {
         "title": "Seguridad",
-        "description": "Protege tu cuenta con configuraciones de seguridad"
+        "description": "Protege tu cuenta con configuraciones de seguridad",
+        "changePassword": {
+          "title": "Cambiar contraseña",
+          "description": "Actualiza tu contraseña regularmente para mantener tu cuenta segura"
+        }
       },
       "accountInfo": {
         "title": "Información de la cuenta",
@@ -1510,6 +1543,16 @@
       "password": {
         "title": "Cambiar contraseña",
         "description": "Mantén tu cuenta segura con una contraseña fuerte"
+      },
+      "changePassword": {
+        "error": "No se pudo cambiar la contraseña",
+        "success": "Contraseña actualizada exitosamente",
+        "currentPassword": "Contraseña actual",
+        "newPassword": "Nueva contraseña",
+        "confirmPassword": "Confirmar nueva contraseña",
+        "requirements": "Tu contraseña debe tener al menos 8 caracteres e incluir mayúsculas, minúsculas y un número.",
+        "updating": "Actualizando...",
+        "update": "Actualizar contraseña"
       },
       "twoFactor": {
         "title": "Autenticación de dos factores",
@@ -1854,10 +1897,10 @@
     "rateLimitGeneral": "Demasiadas solicitudes. Intenta de nuevo en un minuto."
   },
   "Orders": {
-    "title": "Mis pedidos",
-    "noOrders": "No tienes pedidos todavía",
-    "startShopping": "Comienza a comprar",
-    "orderNumber": "Orden #{number}",
+    "title": "Mis Pedidos",
+    "noOrders": "Aún no tienes pedidos",
+    "startShopping": "Comenzar a Comprar",
+    "orderNumber": "Pedido #{number}",
     "orderDate": "Pedido realizado el {date}",
     "orderTotal": "Total",
     "orderStatus": "Estado",
@@ -1930,7 +1973,57 @@
       "lastYear": "Último año",
       "filterByStatus": "Filtrar por estado",
       "filterByDate": "Filtrar por fecha",
-      "searchOrders": "Buscar pedidos..."
+      "searchOrders": "Buscar pedidos...",
+      "searchPlaceholder": "Buscar por número de pedido...",
+      "statusPlaceholder": "Filtrar por estado",
+      "allStatuses": "Todos los estados",
+      "fromDate": "Fecha desde",
+      "toDate": "Fecha hasta"
+    },
+    "subtitle": "Consulta el historial y estado de todos tus pedidos",
+    "backToAccount": "Volver a Mi Cuenta",
+    "exportOrders": "Exportar Pedidos",
+    "view": "Ver",
+    "track": "Rastrear",
+    "paid": "Pagado",
+    "pending": "Pendiente",
+    "item": "artículo",
+    "items": "artículos",
+    "moreItems": "más",
+    "unknownVendor": "Vendedor desconocido",
+    "noResults": {
+      "title": "No se encontraron pedidos",
+      "description": "Intenta ajustar tus filtros de búsqueda para encontrar lo que buscas.",
+      "clearFilters": "Limpiar Filtros"
+    },
+    "statuses": {
+      "pending": "Pendiente",
+      "paid": "Pagado",
+      "shipped": "Enviado",
+      "delivered": "Entregado",
+      "cancelled": "Cancelado"
+    },
+    "table": {
+      "order": "Pedido",
+      "items": "Artículos",
+      "date": "Fecha",
+      "status": "Estado",
+      "total": "Total",
+      "actions": "Acciones",
+      "Vendor": "Tienda"
+    },
+    "pagination": {
+      "showing": "Mostrando",
+      "of": "de",
+      "previous": "Anterior",
+      "next": "Siguiente"
+    },
+    "error": {
+      "loading": "Error al cargar los pedidos",
+      "retry": "Reintentar"
+    },
+    "actions": {
+      "buyAgain": "Comprar de nuevo"
     }
   },
   "Footer": {
@@ -2622,73 +2715,6 @@
     "continueShopping": "Continuar Comprando",
     "needHelp": "¿Necesitas ayuda?",
     "contactSupport": "Contactar Soporte"
-  },
-  "orders": {
-    "title": "Mis Pedidos",
-    "subtitle": "Consulta el historial y estado de todos tus pedidos",
-    "backToAccount": "Volver a Mi Cuenta",
-    "exportOrders": "Exportar Pedidos",
-    "orderNumber": "Pedido #{number}",
-    "viewDetails": "Ver detalles",
-    "view": "Ver",
-    "track": "Rastrear",
-    "paid": "Pagado",
-    "pending": "Pendiente",
-    "item": "artículo",
-    "items": "artículos",
-    "moreItems": "más",
-    "noOrders": "Aún no tienes pedidos",
-    "startShopping": "Comenzar a Comprar",
-    "unknownVendor": "Vendedor desconocido",
-    "status": {
-      "pending": "Pendiente",
-      "paid": "Pagado",
-      "processing": "Procesando",
-      "shipped": "Enviado",
-      "delivered": "Entregado",
-      "cancelled": "Cancelado"
-    },
-    "noResults": {
-      "title": "No se encontraron pedidos",
-      "description": "Intenta ajustar tus filtros de búsqueda para encontrar lo que buscas.",
-      "clearFilters": "Limpiar Filtros"
-    },
-    "statuses": {
-      "pending": "Pendiente",
-      "paid": "Pagado",
-      "shipped": "Enviado",
-      "delivered": "Entregado",
-      "cancelled": "Cancelado"
-    },
-    "filters": {
-      "searchPlaceholder": "Buscar por número de pedido...",
-      "statusPlaceholder": "Filtrar por estado",
-      "allStatuses": "Todos los estados",
-      "fromDate": "Fecha desde",
-      "toDate": "Fecha hasta"
-    },
-    "table": {
-      "order": "Pedido",
-      "items": "Artículos",
-      "date": "Fecha",
-      "status": "Estado",
-      "total": "Total",
-      "actions": "Acciones",
-      "Vendor": "Tienda"
-    },
-    "pagination": {
-      "showing": "Mostrando",
-      "of": "de",
-      "previous": "Anterior",
-      "next": "Siguiente"
-    },
-    "error": {
-      "loading": "Error al cargar los pedidos",
-      "retry": "Reintentar"
-    },
-    "actions": {
-      "buyAgain": "Comprar de nuevo"
-    }
   },
   "orderDetail": {
     "orderTitle": "Pedido #",

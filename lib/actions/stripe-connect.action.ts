@@ -6,9 +6,9 @@ import { eq, and, desc, gte, lte, sql } from "drizzle-orm";
 import { createConnectedAccount, createAccountLink, retrieveAccount, getBalance, createPayout, getAccountLoginLink } from "@/lib/stripe";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { 
-  stripeRequirementsSchema, 
-  stripeCapabilitiesSchema, 
+import {
+  stripeRequirementsSchema,
+  stripeCapabilitiesSchema,
   stripeBusinessProfileSchema,
   type ApiResponse
 } from "@/lib/types/api";
@@ -44,7 +44,7 @@ const createPayoutSchema = z.object({
 export async function createVendorStripeAccount(input: z.infer<typeof createStripeAccountSchema>) {
   try {
     const validatedInput = createStripeAccountSchema.parse(input);
-    
+
     // Check if vendor already has a Stripe account
     const existingAccount = await db.query.vendorStripeAccounts.findFirst({
       where: eq(vendorStripeAccounts.vendorId, validatedInput.vendorId),
@@ -75,10 +75,20 @@ export async function createVendorStripeAccount(input: z.infer<typeof createStri
     await db.transaction(async (tx) => {
       // Parse and validate Stripe data with schemas
       const requirements = stripeRequirementsSchema.parse(stripeAccount.requirements || {});
-      
+
       const capabilities = stripeCapabilitiesSchema.parse(stripeAccount.capabilities || {});
-      
-      const businessProfile = stripeBusinessProfileSchema.parse(stripeAccount.business_profile || {});
+
+      const rawBusinessProfile: any = stripeAccount.business_profile || {};
+      const normalizedBusinessProfile = {
+        ...rawBusinessProfile,
+        mcc: rawBusinessProfile.mcc ?? undefined,
+        name: rawBusinessProfile.name ?? undefined,
+        url: rawBusinessProfile.url ?? undefined,
+        // Accept either snake_case from Stripe or camelCase if present
+        supportEmail: rawBusinessProfile.support_email ?? rawBusinessProfile.supportEmail ?? undefined,
+        supportPhone: rawBusinessProfile.support_phone ?? rawBusinessProfile.supportPhone ?? undefined,
+      };
+      const businessProfile = stripeBusinessProfileSchema.parse(normalizedBusinessProfile);
 
       // Create vendor Stripe account record
       await tx.insert(vendorStripeAccounts).values({
@@ -125,7 +135,7 @@ export async function createVendorStripeAccount(input: z.infer<typeof createStri
 export async function createVendorOnboardingLink(input: z.infer<typeof createAccountLinkSchema>) {
   try {
     const validatedInput = createAccountLinkSchema.parse(input);
-    
+
     // Get vendor's Stripe account
     const vendorAccount = await db.query.vendorStripeAccounts.findFirst({
       where: eq(vendorStripeAccounts.vendorId, validatedInput.vendorId),
@@ -174,7 +184,7 @@ export async function createVendorOnboardingLink(input: z.infer<typeof createAcc
 export async function updateVendorStripeAccountStatus(input: z.infer<typeof updateAccountStatusSchema>) {
   try {
     const validatedInput = updateAccountStatusSchema.parse(input);
-    
+
     // Get vendor's Stripe account
     const vendorAccount = await db.query.vendorStripeAccounts.findFirst({
       where: eq(vendorStripeAccounts.vendorId, validatedInput.vendorId),
@@ -192,10 +202,19 @@ export async function updateVendorStripeAccountStatus(input: z.infer<typeof upda
 
     // Parse and validate Stripe data with schemas
     const requirements = stripeRequirementsSchema.parse(stripeAccount.requirements || {});
-    
+
     const capabilities = stripeCapabilitiesSchema.parse(stripeAccount.capabilities || {});
-    
-    const businessProfile = stripeBusinessProfileSchema.parse(stripeAccount.business_profile || {});
+
+    const rawBusinessProfile: any = stripeAccount.business_profile || {};
+    const normalizedBusinessProfile = {
+      ...rawBusinessProfile,
+      mcc: rawBusinessProfile.mcc ?? undefined,
+      name: rawBusinessProfile.name ?? undefined,
+      url: rawBusinessProfile.url ?? undefined,
+      supportEmail: rawBusinessProfile.support_email ?? rawBusinessProfile.supportEmail ?? undefined,
+      supportPhone: rawBusinessProfile.support_phone ?? rawBusinessProfile.supportPhone ?? undefined,
+    };
+    const businessProfile = stripeBusinessProfileSchema.parse(normalizedBusinessProfile);
 
     // Update account status in database
     await db
@@ -398,7 +417,7 @@ export async function getVendorPayouts(
 export async function createManualPayout(input: z.infer<typeof createPayoutSchema>) {
   try {
     const validatedInput = createPayoutSchema.parse(input);
-    
+
     // Get vendor's Stripe account and balance
     const [vendorAccount, balance] = await Promise.all([
       db.query.vendorStripeAccounts.findFirst({

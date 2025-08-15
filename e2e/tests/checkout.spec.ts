@@ -13,12 +13,12 @@ test.describe('Checkout Flow', () => {
     await page.waitForTimeout(2000);
 
     // Try to find enabled add to cart button on product listing
-    const enabledListingButton = page.locator('button').filter({ 
-      hasText: /add to cart|agregar al carrito/i 
+    const enabledListingButton = page.locator('button').filter({
+      hasText: /add to cart|agregar al carrito/i
     }).filter({ hasNot: page.locator(':disabled') }).first();
-    
+
     let addedToCart = false;
-    
+
     if (await enabledListingButton.isVisible()) {
       // Click add to cart on listing page
       await enabledListingButton.click();
@@ -28,28 +28,28 @@ test.describe('Checkout Flow', () => {
       // Navigate to product detail page
       const firstProductLink = page.locator('a[href*="/products/"], a[href*="/productos/"]').first();
       await firstProductLink.click();
-      
+
       // Wait for product detail page to load
       await page.waitForURL(/\/(products|productos)\/[^\/]+$/);
       await page.waitForLoadState('networkidle');
-      
+
       // Wait for stock verification to complete on detail page
       await page.waitForFunction(() => {
         const buttons = Array.from(document.querySelectorAll('button'));
-        return buttons.some(btn => 
-          (btn.textContent?.toLowerCase().includes('agregar al carrito') || 
-           btn.textContent?.toLowerCase().includes('add to cart')) &&
+        return buttons.some(btn =>
+          (btn.textContent?.toLowerCase().includes('agregar al carrito') ||
+            btn.textContent?.toLowerCase().includes('add to cart')) &&
           !btn.disabled &&
           !btn.textContent?.toLowerCase().includes('checking') &&
           !btn.textContent?.toLowerCase().includes('verificando')
         );
       }, { timeout: 15000 });
-      
+
       // Find and click add to cart button on detail page
-      const detailAddButton = page.locator('button').filter({ 
-        hasText: /add to cart|agregar al carrito/i 
+      const detailAddButton = page.locator('button').filter({
+        hasText: /add to cart|agregar al carrito/i
       }).filter({ hasNot: page.locator(':disabled') }).first();
-      
+
       await detailAddButton.click();
       await page.waitForTimeout(1500);
       addedToCart = true;
@@ -63,12 +63,12 @@ test.describe('Checkout Flow', () => {
         const cartItems = cart ? JSON.parse(cart) : [];
         return cartItems.length > 0;
       }, { timeout: 10000 });
-      
+
       const cartItems = await page.evaluate(() => {
         const cart = localStorage.getItem('luzimarket-cart');
         return cart ? JSON.parse(cart) : [];
       });
-      
+
       if (cartItems.length === 0) {
         throw new Error('Failed to add item to cart in beforeEach');
       }
@@ -161,7 +161,6 @@ test.describe('Checkout Flow', () => {
         await xButton.click();
       } else {
         // Skip test if no remove functionality is available
-        console.log('No remove button found in cart - skipping test');
         return;
       }
     } else {
@@ -336,8 +335,6 @@ test.describe('Checkout Flow', () => {
       return cart ? JSON.parse(cart) : [];
     });
 
-    console.log('Cart items:', cartItems.length);
-
     // If no items in cart, add one
     if (cartItems.length === 0) {
       // Go to products page
@@ -363,8 +360,6 @@ test.describe('Checkout Flow', () => {
     // Debug: Check what's on the page
     const pageTitle = await page.title();
     const pageUrl = page.url();
-    console.log('Page title:', pageTitle);
-    console.log('Page URL:', pageUrl);
 
     // Check if we have the checkout form (not empty cart page)
     const checkoutForm = page.locator('form.space-y-8'); // The main checkout form has this class
@@ -388,7 +383,7 @@ test.describe('Checkout Flow', () => {
     await page.fill('input[id="city"]', 'Ciudad de México');
     await page.fill('input[id="state"]', 'CDMX');
     await page.fill('input[id="postalCode"]', '06500');
-    
+
     // Fill country field if it exists
     const countryInput = page.locator('input[id="country"]');
     if (await countryInput.isVisible()) {
@@ -405,42 +400,35 @@ test.describe('Checkout Flow', () => {
 
     // Wait a bit more for React to render
     await page.waitForTimeout(2000);
-    
+
     // Debug: Check if there are any validation errors
     const errorMessages = page.locator('.text-red-600, .text-red-500');
     const errorCount = await errorMessages.count();
     if (errorCount > 0) {
-      console.log('Found validation errors:');
       for (let i = 0; i < errorCount; i++) {
         const errorText = await errorMessages.nth(i).textContent();
-        console.log(`Error ${i + 1}: ${errorText}`);
       }
     }
-    
+
     // Debug: Check what buttons are actually on the page
     const allButtons = page.locator('button');
     const buttonCount = await allButtons.count();
-    console.log(`Found ${buttonCount} buttons on the page`);
     for (let i = 0; i < Math.min(buttonCount, 10); i++) {
       const buttonText = await allButtons.nth(i).textContent();
       const buttonTestId = await allButtons.nth(i).getAttribute('data-testid');
-      console.log(`Button ${i + 1}: "${buttonText}" (testid: ${buttonTestId})`);
     }
-    
+
     // Debug: Check if the form is present
     const forms = page.locator('form');
     const formCount = await forms.count();
-    console.log(`Found ${formCount} forms on the page`);
 
     // Find the submit button using its data-testid
     const submitButton = page.locator('[data-testid="checkout-submit-button"]');
-    
+
     // If not found, try alternative selectors
     if (!(await submitButton.isVisible())) {
-      console.log('Submit button with data-testid not found, trying alternative selectors...');
       const altSubmitButton = page.locator('button[type="submit"]').first();
       if (await altSubmitButton.isVisible()) {
-        console.log('Found submit button using type="submit"');
         const altSubmitButton2 = altSubmitButton;
         await expect(altSubmitButton2).toBeVisible({ timeout: 5000 });
         await expect(altSubmitButton2).toBeEnabled();
