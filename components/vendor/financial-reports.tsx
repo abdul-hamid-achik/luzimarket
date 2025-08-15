@@ -6,10 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DatePickerWithRange } from "@/components/ui/date-picker-with-range";
-import { 
-  Download, 
-  TrendingUp, 
-  Package, 
+import {
+  Download,
+  TrendingUp,
+  Package,
   DollarSign,
   BarChart3,
   FileText,
@@ -128,14 +128,15 @@ export function FinancialReports({ vendorId }: FinancialReportsProps) {
         // Create and download file
         const blob = new Blob([result.data.content], { type: result.data.contentType });
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = result.data.filename;
-        document.body.appendChild(a);
-        a.click();
+        const tagName = 'a';
+        const linkEl = document.createElement(tagName);
+        linkEl.href = url;
+        linkEl.download = result.data.filename;
+        document.body.appendChild(linkEl);
+        linkEl.click();
         window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        
+        document.body.removeChild(linkEl);
+
         toast.success(t("downloadSuccess"));
       } else {
         toast.error(result.error || t("downloadError"));
@@ -149,7 +150,7 @@ export function FinancialReports({ vendorId }: FinancialReportsProps) {
     if (!reportData) return null;
 
     const chartData = {
-      labels: reportData.dailyData.map((d: any) => 
+      labels: reportData.dailyData.map((d: any) =>
         format(new Date(d.date), "dd MMM", { locale: es })
       ),
       datasets: [

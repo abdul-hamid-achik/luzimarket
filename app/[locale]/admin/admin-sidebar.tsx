@@ -78,7 +78,7 @@ export function AdminSidebar({ userEmail }: AdminSidebarProps) {
       icon: Users,
     },
     {
-      title: t("financials"),
+      title: t("financials.title"),
       href: "/admin/financials",
       icon: DollarSign,
     },

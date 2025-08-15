@@ -79,7 +79,7 @@ export function AdminFinancialsClient({
       id: "vendorName",
       accessorFn: (row) => row.vendor?.businessName || "",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("vendors.vendor")} />
+        <DataTableColumnHeader column={column} title={t("vendors.Vendor")} />
       ),
       cell: ({ row }) => {
         const vendor = row.original.vendor as any;
@@ -176,7 +176,7 @@ export function AdminFinancialsClient({
     {
       accessorKey: "vendor.businessName",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("fees.vendor")} />
+        <DataTableColumnHeader column={column} title={t("fees.Vendor")} />
       ),
       cell: ({ row }) => {
         const vendor = row.original.vendor as any;
@@ -270,7 +270,7 @@ export function AdminFinancialsClient({
     {
       accessorKey: "vendor.businessName",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("payouts.vendor")} />
+        <DataTableColumnHeader column={column} title={t("payouts.Vendor")} />
       ),
       cell: ({ row }) => {
         const vendor = row.original.vendor as any;

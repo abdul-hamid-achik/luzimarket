@@ -280,7 +280,7 @@ export default async function ProductDetailPage({
                 <div className="flex items-center gap-3">
                   <Store className="h-5 w-5 text-gray-400" />
                   <div className="flex-1">
-                    <p className="text-sm text-gray-600">{t("vendor")}</p>
+                    <p className="text-sm text-gray-600">{t("Vendor")}</p>
                     <Link
                       href={`/admin/vendors/${product.vendor.id}`}
                       className="font-univers text-blue-600 hover:underline"

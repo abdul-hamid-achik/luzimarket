@@ -73,7 +73,7 @@ export function InfiniteProductsGrid({
             params.set("productIds", staticFilters.productIds.join(","));
         }
         return params;
-    }, [searchParams, staticFilters?.tags?.join(","), staticFilters?.productIds?.join(",")]);
+    }, [searchParams, staticFilters?.tags, staticFilters?.productIds]);
 
     // Reset list when server-provided results or filters change
     useEffect(() => {
@@ -81,7 +81,7 @@ export function InfiniteProductsGrid({
         setPage(initialPagination.page);
         setHasNextPage(initialPagination.hasNextPage);
         seenIdsRef.current = new Set(initialProducts.map((p) => p.id));
-    }, [initialProducts, initialPagination.page, initialPagination.hasNextPage, baseQuery.toString()]);
+    }, [initialProducts, initialPagination.page, initialPagination.hasNextPage, baseQuery]);
 
     useEffect(() => {
         // IntersectionObserver to trigger loading next page

@@ -589,8 +589,11 @@
       "deactivate": "Desactivar",
       "description": "Descripción",
       "dimensions": "Dimensiones",
+      "edit": "Editar",
       "images": "Imágenes",
       "inactive": "Inactivo",
+      "noDescription": "Sin descripción",
+      "noImages": "Sin imágenes",
       "pendingApproval": "Este producto está pendiente de aprobación y no es visible para los clientes.",
       "price": "Precio",
       "productInfo": "Información del Producto",
@@ -969,6 +972,7 @@
     "currencyLocale": "MXN",
     "currencyMXN": "MXN",
     "currencyUSD": "USD",
+    "dashboard": "Panel",
     "dataTable": {
       "columns": "Columnas",
       "next": "Siguiente",
@@ -1185,9 +1189,9 @@
     "priceAsc": "Precio: Menor a Mayor",
     "priceDesc": "Precio: Mayor a Menor",
     "priceRange": "Rango de precio",
+    "resultsCount": "{count, plural, =1 {# producto encontrado} other {# productos encontrados}}",
     "showFilters": "Mostrar filtros",
     "sortBy": "Ordenar por",
-    "resultsCount": "{count, plural, =1 {# producto encontrado} other {# productos encontrados}}",
     "subtitle": "Regalos cuidadosamente seleccionados por nuestros expertos",
     "title": "Selección Especial",
     "tryAdjustingFilters": "Intenta ajustar los filtros para ver más resultados",
@@ -1311,6 +1315,7 @@
       "buyAgain": "Comprar de nuevo"
     },
     "backToAccount": "Volver a Mi Cuenta",
+    "carrier": "Transportista",
     "deliveryAddress": "Dirección de Entrega",
     "deliveryInformation": "Información de Entrega",
     "details": {
@@ -1335,6 +1340,7 @@
       "loading": "Error al cargar los pedidos",
       "retry": "Reintentar"
     },
+    "estimatedDelivery": "Entrega estimada",
     "exportOrders": "Exportar Pedidos",
     "filters": {
       "all": "Todos",
@@ -1351,15 +1357,21 @@
       "statusPlaceholder": "Filtrar por estado",
       "toDate": "Fecha hasta"
     },
+    "from": "Desde",
     "item": "artículo",
     "items": "artículos",
+    "loadingMap": "Cargando mapa...",
     "mapLabels": {
       "deliveryAddress": "Dirección de Entrega",
       "loadingMap": "Cargando mapa...",
       "vendorLocation": "Ubicación del Vendedor"
     },
     "moreItems": "más",
-    "noOrders": "Aún no tienes pedidos",
+    "noOrders": {
+      "description": "Intenta ajustar tus filtros para encontrar lo que buscas.",
+      "startShopping": "Comenzar a Comprar",
+      "title": "No se encontraron pedidos"
+    },
     "noResults": {
       "clearFilters": "Limpiar Filtros",
       "description": "Intenta ajustar tus filtros de búsqueda para encontrar lo que buscas.",
@@ -1370,6 +1382,7 @@
     "orderNumber": "Pedido #{number}",
     "orderStatus": "Estado",
     "orderTotal": "Total",
+    "page": "Página",
     "pagination": {
       "next": "Siguiente",
       "of": "de",
@@ -1379,15 +1392,9 @@
     "paid": "Pagado",
     "pending": "Pendiente",
     "quantity": "Cantidad",
+    "search": "Buscar",
     "startShopping": "Comenzar a Comprar",
-    "status": {
-      "cancelled": "Cancelado",
-      "delivered": "Entregado",
-      "paid": "Pagado",
-      "pending": "Pendiente",
-      "processing": "Procesando",
-      "shipped": "Enviado"
-    },
+    "status": "Estado",
     "statuses": {
       "cancelled": "Cancelado",
       "delivered": "Entregado",
@@ -1406,6 +1413,7 @@
       "Vendor": "Tienda"
     },
     "title": "Mis Pedidos",
+    "to": "Hasta",
     "total": "Total",
     "track": "Rastrear",
     "tracking": {
@@ -1428,6 +1436,7 @@
       "trackingNumber": "Número de rastreo"
     },
     "trackingMap": "Ubicación del Envío",
+    "trackingNumber": "Número de rastreo",
     "trackingTimeline": "Línea de Tiempo del Envío",
     "trackingTitle": "Rastreo de Orden #{orderNumber}",
     "trackOrder": "Rastrear pedido",
@@ -1666,10 +1675,11 @@
     "shipping": "Envío",
     "shippingAvailable": "Envío disponible",
     "shippingContent": "Enviamos a todo México. Los tiempos de entrega varían según tu ubicación. Envío gratis en compras mayores a $1,000 MXN.",
+    "sort": "Ordenar",
     "sortBy": "Ordenar por",
     "sortOptions": {
-      "featured": "Nuestra selección",
-      "newest": "Más reciente",
+      "featured": "Destacados",
+      "newest": "Más nuevos",
       "priceAsc": "Precio: menor a mayor",
       "priceDesc": "Precio: mayor a menor"
     },
@@ -2031,10 +2041,12 @@
       "comingSoon": "Coming Soon",
       "conversionRate": "Conversion Rate",
       "customers": "Clientes",
+      "deletedProduct": "Producto eliminado",
       "description": "Estadísticas y métricas de tu negocio",
       "items": "artículos",
       "last30Days": "Últimos 30 días",
       "latestSuccessfulOrders": "Últimas órdenes exitosas",
+      "noOrders": "No hay órdenes",
       "noProductsSold": "No hay productos vendidos aún",
       "orders": "Órdenes",
       "overview": "Vista General",
@@ -2180,6 +2192,7 @@
         "date": "Date",
         "description": "Todas tus ventas y movimientos",
         "empty": "No hay transacciones aún",
+        "order": "Pedido",
         "orderPrefix": "Order:",
         "searchPlaceholder": "Search transactions...",
         "status": "Status",
@@ -2201,6 +2214,21 @@
     },
     "myProducts": "Mis productos",
     "newOrder": "¡Nueva orden recibida!",
+    "notifications": {
+      "description": "Controla cómo y cuándo recibir notificaciones",
+      "orderUpdates": "Actualizaciones de pedidos",
+      "orderUpdatesDescription": "Notificaciones sobre el estado de tus pedidos",
+      "preferences": {
+        "description": "Actualiza tus preferencias de notificación",
+        "title": "Preferencias"
+      },
+      "promotionalDescription": "Ofertas y novedades",
+      "promotionalEmails": "Correos promocionales",
+      "save": "Guardar",
+      "securityAlerts": "Alertas de seguridad",
+      "securityDescription": "Avisos importantes de cuenta",
+      "title": "Notificaciones"
+    },
     "orderDetails": {
       "copiedToClipboard": "Copiado al portapapeles",
       "customer": "Cliente",
@@ -2228,18 +2256,25 @@
       "shipping": "Envío",
       "shippingActions": "Acciones de envío",
       "shippingAddress": "Dirección de envío",
-      "status": {
+      "status": "Estado",
+      "statuses": {
         "cancelled": "Cancelado",
         "delivered": "Entregado",
         "pending": "Pendiente",
         "processing": "Procesando",
         "shipped": "Enviado"
       },
+      "statusLabel": "Estado",
       "subtotal": "Subtotal",
       "tax": "IVA (16%)",
       "total": "Total",
       "transactionId": "ID de transacción"
     },
+    "orderDetails.status.cancelled": "Cancelado",
+    "orderDetails.status.delivered": "Entregado",
+    "orderDetails.status.pending": "Pendiente",
+    "orderDetails.status.processing": "Procesando",
+    "orderDetails.status.shipped": "Enviado",
     "orderManagement": {
       "additionalNotes": "Notas Adicionales (Opcional)",
       "customer": "Cliente",
@@ -2514,10 +2549,12 @@
       "changePassword": {
         "confirmPassword": "Confirmar nueva contraseña",
         "currentPassword": "Contraseña actual",
+        "description": "Actualiza tu contraseña regularmente para mantener tu cuenta segura.",
         "error": "No se pudo cambiar la contraseña",
         "newPassword": "Nueva contraseña",
         "requirements": "Tu contraseña debe tener al menos 8 caracteres e incluir mayúsculas, minúsculas y un número.",
         "success": "Contraseña actualizada exitosamente",
+        "title": "Cambiar contraseña",
         "update": "Actualizar contraseña",
         "updating": "Actualizando..."
       },
@@ -2525,6 +2562,15 @@
       "password": {
         "description": "Mantén tu cuenta segura con una contraseña fuerte",
         "title": "Cambiar contraseña"
+      },
+      "recommendations": {
+        "description": "Sigue estas buenas prácticas para proteger tu cuenta:",
+        "enableTwoFactor": "Activa la autenticación de dos factores",
+        "phishingAware": "Cuidado con correos y enlaces de phishing",
+        "regularReview": "Revisa la actividad de tu cuenta con regularidad",
+        "strongPassword": "Usa una contraseña fuerte y única",
+        "title": "Recomendaciones de seguridad",
+        "uniquePassword": "No reutilices contraseñas en diferentes sitios"
       },
       "sessions": {
         "allSessionsRevoked": "Todas las sesiones han sido revocadas",
@@ -2543,16 +2589,22 @@
       "title": "Seguridad",
       "twoFactor": {
         "active": "Activo",
+        "authenticatorApp": "Aplicación de autenticación",
+        "authenticatorDescription": "Usa una app como Google Authenticator",
         "configure": "Configurar",
         "description": "Añade una capa extra de seguridad a tu cuenta",
         "disable": "Desactivar",
+        "disabled": "Desactivada",
         "disableSms": "Desactivar autenticación por SMS",
         "enableApp": "Activar con aplicación",
+        "enabled": "Activada",
         "enableSms": "Activar autenticación por SMS",
         "notConfigured": "No configurado",
+        "recommendation": "Recomendamos activar la autenticación de dos factores para proteger mejor tu cuenta.",
         "status": "Estado",
         "title": "Autenticación de dos factores",
-        "viewBackupCodes": "Ver códigos de respaldo"
+        "viewBackupCodes": "Ver códigos de respaldo",
+        "viewRecoveryCodes": "Ver códigos de recuperación"
       }
     },
     "settings": {
@@ -2629,6 +2681,24 @@
       }
     },
     "shippingAddress": "Dirección de envío",
+    "store": {
+      "businessHours": "Horarios del negocio",
+      "businessName": "Nombre del negocio",
+      "businessPhone": "Teléfono del negocio",
+      "city": "Ciudad",
+      "country": "País",
+      "description": "Descripción",
+      "facebookUrl": "Facebook",
+      "instagramUrl": "Instagram",
+      "phone": "Teléfono",
+      "postalCode": "Código postal",
+      "state": "Estado",
+      "street": "Calle",
+      "tiktokUrl": "TikTok",
+      "twitterUrl": "Twitter",
+      "websiteUrl": "Sitio web",
+      "whatsapp": "WhatsApp"
+    },
     "stripeOnboarding": {
       "accountCreated": "Cuenta creada exitosamente",
       "accountCreationFailed": "Error al crear la cuenta",
@@ -2698,28 +2768,37 @@
     },
     "backToHome": "Volver al inicio",
     "businessHours": "Horario de atención",
+    "businessHoursLabel": "Horario del negocio",
     "businessHoursPlaceholder": "Horarios de la tienda / negocio",
     "businessInfo": "Información del negocio",
     "businessInfoSection": "Información de la marca",
     "businessName": "Nombre del negocio",
+    "businessNameLabel": "Nombre del negocio",
     "businessNamePlaceholder": "Nombre de la marca / tienda / negocio",
     "businessPhone": "Teléfono del negocio",
+    "businessPhoneLabel": "Teléfono del negocio",
     "businessPhonePlaceholder": "Teléfono de la tienda / negocio",
     "city": "Ciudad",
+    "cityLabel": "Ciudad",
     "cityPlaceholder": "Ciudad",
     "confirmationMessage": "Pronto recibirás una confirmación y respuesta de parte de LUZIMARKET® para dar seguimiento a tu aplicación a nuestra plataforma.",
     "contactName": "Nombre de contacto",
+    "contactNameLabel": "Nombre de contacto",
     "contactNamePlaceholder": "Nombre del responsable / contacto",
     "country": "País",
+    "countryLabel": "País",
     "countryPlaceholder": "País",
     "deliveryOptions": "Opciones de entrega",
+    "deliveryQuestion": "¿Ofreces servicio de entrega?",
     "deliverySection": "Servicio a domicilio",
     "deliveryService": "Servicio de entrega",
     "deliveryServicePlaceholder": "¿Qué servicio usas?",
     "description": "Descripción del negocio",
+    "descriptionLabel": "Descripción",
     "descriptionPlaceholder": "Describe brevemente el giro o enfoque de tu marca / negocio",
     "email": "Correo electrónico",
     "emailExists": "Este correo electrónico ya está registrado",
+    "emailLabel": "Correo electrónico",
     "error": "Error al registrar vendedor",
     "external": "Servicio Externo",
     "facebook": "Facebook",
@@ -2728,6 +2807,7 @@
     "no": "No",
     "own": "Propio",
     "password": "Contraseña",
+    "passwordLabel": "Contraseña",
     "passwordPlaceholder": "Contraseña (mínimo 6 caracteres)",
     "phone": "Teléfono",
     "phonePlaceholder": "Celular / Whatsapp",
@@ -2755,8 +2835,10 @@
     "socialMedia": "Redes sociales",
     "socialMediaSection": "Social Media",
     "state": "Estado",
+    "stateLabel": "Estado",
     "statePlaceholder": "Estado",
     "street": "Calle",
+    "streetLabel": "Calle",
     "streetPlaceholder": "Calle",
     "submit": "Enviar solicitud",
     "submitting": "Enviando...",
@@ -2768,12 +2850,14 @@
     "title": "Registro de vendedor",
     "tryAgain": "Error al registrar vendedor. Por favor intenta de nuevo.",
     "twitter": "Twitter",
+    "websiteLabel": "Sitio web",
     "websitePlaceholder": "URL / Página web",
     "websiteUrl": "Sitio web",
     "welcomeDescription": "LUZIMARKET® revisa minuciosamente cada aplicación para seleccionar los regalos handpicked que ofrecerá nuestra plataforma.",
     "welcomeSubtitle": "Llena el formulario para conocer acerca de tu marca y productos.",
     "welcomeTitle": "Bienvenidx, Family!",
     "whatsapp": "WhatsApp",
+    "whatsappLabel": "WhatsApp",
     "yes": "Sí"
   }
 }

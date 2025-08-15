@@ -589,8 +589,11 @@
       "deactivate": "Deactivate",
       "description": "Description",
       "dimensions": "Dimensions",
+      "edit": "Edit",
       "images": "Images",
       "inactive": "Inactive",
+      "noDescription": "No description",
+      "noImages": "No images",
       "pendingApproval": "This product is pending approval and not visible to customers.",
       "price": "Price",
       "productInfo": "Product Information",
@@ -969,6 +972,7 @@
     "currencyLocale": "MXN",
     "currencyMXN": "MXN",
     "currencyUSD": "USD",
+    "dashboard": "Dashboard",
     "dataTable": {
       "columns": "Columns",
       "next": "Next",
@@ -1185,9 +1189,9 @@
     "priceAsc": "Price: Low to High",
     "priceDesc": "Price: High to Low",
     "priceRange": "Price range",
+    "resultsCount": "{count, plural, =1 {# product found} other {# products found}}",
     "showFilters": "Show filters",
     "sortBy": "Sort by",
-    "resultsCount": "{count, plural, =1 {# product found} other {# products found}}",
     "subtitle": "Gifts carefully selected by our experts",
     "title": "Handpicked Selection",
     "tryAdjustingFilters": "Try adjusting filters to see more results",
@@ -1311,6 +1315,7 @@
       "buyAgain": "Comprar de nuevo"
     },
     "backToAccount": "Back to Account",
+    "carrier": "Carrier",
     "deliveryAddress": "Delivery Address",
     "deliveryInformation": "Delivery Information",
     "details": {
@@ -1335,6 +1340,7 @@
       "loading": "Error al cargar los pedidos",
       "retry": "Reintentar"
     },
+    "estimatedDelivery": "Estimated delivery",
     "exportOrders": "Export Orders",
     "filters": {
       "all": "All",
@@ -1351,15 +1357,21 @@
       "statusPlaceholder": "Filter by status",
       "toDate": "To date"
     },
+    "from": "From",
     "item": "item",
     "items": "items",
+    "loadingMap": "Loading map...",
     "mapLabels": {
       "deliveryAddress": "Delivery Address",
       "loadingMap": "Loading map...",
       "vendorLocation": "Vendor Location"
     },
     "moreItems": "more",
-    "noOrders": "You don't have any orders yet",
+    "noOrders": {
+      "description": "Try adjusting your filters to find what you are looking for.",
+      "startShopping": "Start Shopping",
+      "title": "No orders found"
+    },
     "noResults": {
       "clearFilters": "Clear Filters",
       "description": "Try adjusting your search filters to find what you're looking for.",
@@ -1370,6 +1382,7 @@
     "orderNumber": "Order #{number}",
     "orderStatus": "Status",
     "orderTotal": "Total",
+    "page": "Page",
     "pagination": {
       "next": "Next",
       "of": "of",
@@ -1379,15 +1392,9 @@
     "paid": "Paid",
     "pending": "Pending",
     "quantity": "Quantity",
+    "search": "Search",
     "startShopping": "Start Shopping",
-    "status": {
-      "cancelled": "Cancelled",
-      "delivered": "Delivered",
-      "paid": "Paid",
-      "pending": "Pending",
-      "processing": "Processing",
-      "shipped": "Shipped"
-    },
+    "status": "Status",
     "statuses": {
       "cancelled": "Cancelled",
       "delivered": "Delivered",
@@ -1406,6 +1413,7 @@
       "Vendor": "Store"
     },
     "title": "My Orders",
+    "to": "To",
     "total": "Total",
     "track": "Track",
     "tracking": {
@@ -1428,6 +1436,7 @@
       "trackingNumber": "Tracking number"
     },
     "trackingMap": "Shipment Location",
+    "trackingNumber": "Tracking number",
     "trackingTimeline": "Shipping Timeline",
     "trackingTitle": "Order #{orderNumber} Tracking",
     "trackOrder": "Track order",
@@ -1666,9 +1675,10 @@
     "shipping": "Shipping",
     "shippingAvailable": "Shipping available",
     "shippingContent": "We ship throughout Mexico. Delivery times vary by location. Free shipping on orders over $1,000 MXN.",
+    "sort": "Sort",
     "sortBy": "Sort by",
     "sortOptions": {
-      "featured": "Our selection",
+      "featured": "Featured",
       "newest": "Newest",
       "priceAsc": "Price: Low to High",
       "priceDesc": "Price: High to Low"
@@ -2031,10 +2041,12 @@
       "comingSoon": "Coming Soon",
       "conversionRate": "Conversion Rate",
       "customers": "Clientes",
+      "deletedProduct": "Deleted product",
       "description": "Track your business performance and growth",
       "items": "artículos",
       "last30Days": "Últimos 30 días",
       "latestSuccessfulOrders": "Últimas órdenes exitosas",
+      "noOrders": "No orders",
       "noProductsSold": "No hay productos vendidos aún",
       "orders": "Órdenes",
       "overview": "Vista General",
@@ -2180,6 +2192,7 @@
         "date": "Date",
         "description": "Description",
         "empty": "No transactions yet",
+        "order": "Order",
         "orderPrefix": "Order:",
         "searchPlaceholder": "Search transactions...",
         "status": "Status",
@@ -2201,6 +2214,21 @@
     },
     "myProducts": "My Products",
     "newOrder": "New order received!",
+    "notifications": {
+      "description": "Control how and when to receive notifications",
+      "orderUpdates": "Order updates",
+      "orderUpdatesDescription": "Notifications about your order status",
+      "preferences": {
+        "description": "Update your notification preferences",
+        "title": "Preferences"
+      },
+      "promotionalDescription": "Offers and news",
+      "promotionalEmails": "Promotional emails",
+      "save": "Save",
+      "securityAlerts": "Security alerts",
+      "securityDescription": "Important account notices",
+      "title": "Notifications"
+    },
     "orderDetails": {
       "copiedToClipboard": "Copied to clipboard",
       "customer": "Customer",
@@ -2228,18 +2256,25 @@
       "shipping": "Shipping",
       "shippingActions": "Shipping actions",
       "shippingAddress": "Shipping address",
-      "status": {
+      "status": "Status",
+      "statuses": {
         "cancelled": "Cancelled",
         "delivered": "Delivered",
         "pending": "Pending",
         "processing": "Processing",
         "shipped": "Shipped"
       },
+      "statusLabel": "Status",
       "subtotal": "Subtotal",
       "tax": "Tax (16%)",
       "total": "Total",
       "transactionId": "Transaction ID"
     },
+    "orderDetails.status.cancelled": "Cancelled",
+    "orderDetails.status.delivered": "Delivered",
+    "orderDetails.status.pending": "Pending",
+    "orderDetails.status.processing": "Processing",
+    "orderDetails.status.shipped": "Shipped",
     "orderManagement": {
       "additionalNotes": "Additional Notes (Optional)",
       "customer": "Customer",
@@ -2514,10 +2549,12 @@
       "changePassword": {
         "confirmPassword": "Confirm new password",
         "currentPassword": "Current password",
+        "description": "Update your password regularly to keep your account secure.",
         "error": "Failed to change password",
         "newPassword": "New password",
         "requirements": "Your password must be at least 8 characters and include uppercase, lowercase and a number.",
         "success": "Password updated successfully",
+        "title": "Change password",
         "update": "Update password",
         "updating": "Updating..."
       },
@@ -2525,6 +2562,15 @@
       "password": {
         "description": "Keep your account secure with a strong password",
         "title": "Change password"
+      },
+      "recommendations": {
+        "description": "Follow these best practices to protect your account:",
+        "enableTwoFactor": "Enable two-factor authentication",
+        "phishingAware": "Beware of phishing emails and links",
+        "regularReview": "Review account activity regularly",
+        "strongPassword": "Use a strong, unique password",
+        "title": "Security recommendations",
+        "uniquePassword": "Do not reuse passwords across sites"
       },
       "sessions": {
         "allSessionsRevoked": "All sessions have been revoked",
@@ -2543,16 +2589,22 @@
       "title": "Security",
       "twoFactor": {
         "active": "Active",
+        "authenticatorApp": "Authenticator app",
+        "authenticatorDescription": "Use an app like Google Authenticator",
         "configure": "Configure",
         "description": "Add an extra layer of security to your account",
         "disable": "Disable",
+        "disabled": "Disabled",
         "disableSms": "Disable SMS authentication",
         "enableApp": "Enable with app",
+        "enabled": "Enabled",
         "enableSms": "Enable SMS authentication",
         "notConfigured": "Not configured",
+        "recommendation": "We recommend enabling two-factor authentication to better protect your account.",
         "status": "Status",
         "title": "Two-factor authentication",
-        "viewBackupCodes": "View backup codes"
+        "viewBackupCodes": "View backup codes",
+        "viewRecoveryCodes": "View recovery codes"
       }
     },
     "settings": {
@@ -2629,6 +2681,24 @@
       }
     },
     "shippingAddress": "Shipping address",
+    "store": {
+      "businessHours": "Business hours",
+      "businessName": "Business name",
+      "businessPhone": "Business phone",
+      "city": "City",
+      "country": "Country",
+      "description": "Description",
+      "facebookUrl": "Facebook URL",
+      "instagramUrl": "Instagram URL",
+      "phone": "Phone",
+      "postalCode": "Postal code",
+      "state": "State",
+      "street": "Street",
+      "tiktokUrl": "TikTok URL",
+      "twitterUrl": "Twitter URL",
+      "websiteUrl": "Website URL",
+      "whatsapp": "WhatsApp"
+    },
     "stripeOnboarding": {
       "accountCreated": "Account created successfully",
       "accountCreationFailed": "Failed to create account",
@@ -2698,28 +2768,37 @@
     },
     "backToHome": "Back to home",
     "businessHours": "Business hours",
+    "businessHoursLabel": "Business hours",
     "businessHoursPlaceholder": "Business hours",
     "businessInfo": "Business Information",
     "businessInfoSection": "Brand Information",
     "businessName": "Business name",
+    "businessNameLabel": "Business name",
     "businessNamePlaceholder": "Brand / store / business name",
     "businessPhone": "Business phone",
+    "businessPhoneLabel": "Business phone",
     "businessPhonePlaceholder": "Business phone",
     "city": "City",
+    "cityLabel": "City",
     "cityPlaceholder": "City",
     "confirmationMessage": "You will soon receive a confirmation and response from LUZIMARKET® to follow up on your platform application.",
     "contactName": "Contact name",
+    "contactNameLabel": "Contact name",
     "contactNamePlaceholder": "Contact person name",
     "country": "Country",
+    "countryLabel": "Country",
     "countryPlaceholder": "Country",
     "deliveryOptions": "Delivery Options",
+    "deliveryQuestion": "Do you offer delivery service?",
     "deliverySection": "Delivery Service",
     "deliveryService": "Delivery service",
     "deliveryServicePlaceholder": "What service do you use?",
     "description": "Business description",
+    "descriptionLabel": "Description",
     "descriptionPlaceholder": "Briefly describe your brand/business focus",
     "email": "Email",
     "emailExists": "This email is already registered",
+    "emailLabel": "Email",
     "error": "Error registering vendor",
     "external": "External Service",
     "facebook": "Facebook",
@@ -2728,6 +2807,7 @@
     "no": "No",
     "own": "Own",
     "password": "Password",
+    "passwordLabel": "Password",
     "passwordPlaceholder": "Password (minimum 6 characters)",
     "phone": "Phone",
     "phonePlaceholder": "Phone / WhatsApp",
@@ -2755,8 +2835,10 @@
     "socialMedia": "Social Media",
     "socialMediaSection": "Social Media",
     "state": "State",
+    "stateLabel": "State",
     "statePlaceholder": "State",
     "street": "Street",
+    "streetLabel": "Street",
     "streetPlaceholder": "Street",
     "submit": "Submit application",
     "submitting": "Submitting...",
@@ -2768,12 +2850,14 @@
     "title": "Vendor Registration",
     "tryAgain": "Error registering vendor. Please try again.",
     "twitter": "Twitter",
+    "websiteLabel": "Website",
     "websitePlaceholder": "URL / Website",
     "websiteUrl": "Website",
     "welcomeDescription": "LUZIMARKET® carefully reviews each application to select the handpicked gifts that our platform will offer.",
     "welcomeSubtitle": "Fill out the form to tell us about your brand and products.",
     "welcomeTitle": "Welcome, Family!",
     "whatsapp": "WhatsApp",
+    "whatsappLabel": "WhatsApp",
     "yes": "Yes"
   }
 }

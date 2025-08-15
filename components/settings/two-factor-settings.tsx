@@ -121,7 +121,7 @@ const disable2FA = async (password: string) => {
 export function TwoFactorSettings() {
   const t = useTranslations("Vendor.security.twoFactor");
   const queryClient = useQueryClient();
-  
+
   // UI State management
   const [showSetupModal, setShowSetupModal] = useState(false);
   const [showBackupCodes, setShowBackupCodes] = useState(false);
@@ -130,10 +130,10 @@ export function TwoFactorSettings() {
   const [verificationCode, setVerificationCode] = useState("");
   const [setupStep, setSetupStep] = useState<'qr' | 'verify'>('qr');
   const [showSecret, setShowSecret] = useState(false);
-  
+
   // Check if WebAuthn is configured (hide 2FA if not available)
   const [webAuthnAvailable] = useState(true); // Simplified for now
-  
+
   // React Query hooks for data fetching
   const {
     data: statusData,
@@ -144,7 +144,7 @@ export function TwoFactorSettings() {
     queryFn: fetch2FAStatus,
     staleTime: 30000, // Consider data fresh for 30 seconds
   });
-  
+
   const {
     data: backupCodesData,
     refetch: refetchBackupCodes
@@ -153,7 +153,7 @@ export function TwoFactorSettings() {
     queryFn: fetchBackupCodes,
     enabled: false, // Only fetch when explicitly requested
   });
-  
+
   // Mutations for 2FA operations
   const enable2FAMutation = useMutation({
     mutationFn: enable2FA,
@@ -168,7 +168,7 @@ export function TwoFactorSettings() {
       toast.error(error.message);
     },
   });
-  
+
   const verify2FAMutation = useMutation({
     mutationFn: verify2FA,
     onSuccess: () => {
@@ -182,7 +182,7 @@ export function TwoFactorSettings() {
       toast.error(error.message);
     },
   });
-  
+
   const disable2FAMutation = useMutation({
     mutationFn: disable2FA,
     onSuccess: () => {
@@ -194,11 +194,11 @@ export function TwoFactorSettings() {
       toast.error(error.message);
     },
   });
-  
+
   const isEnabled = statusData?.enabled || false;
-  const isLoading = statusLoading || enable2FAMutation.isPending || 
-                   verify2FAMutation.isPending || disable2FAMutation.isPending;
-  
+  const isLoading = statusLoading || enable2FAMutation.isPending ||
+    verify2FAMutation.isPending || disable2FAMutation.isPending;
+
   const handleToggle = async (checked: boolean) => {
     if (checked) {
       // Enable 2FA - start setup process
@@ -211,16 +211,16 @@ export function TwoFactorSettings() {
       }
     }
   };
-  
+
   const verifyAndEnable = async () => {
     if (!verificationCode.trim()) {
       toast.error('Please enter a verification code');
       return;
     }
-    
+
     verify2FAMutation.mutate(verificationCode);
   };
-  
+
   const loadBackupCodes = async () => {
     try {
       const result = await refetchBackupCodes();
@@ -231,12 +231,12 @@ export function TwoFactorSettings() {
       toast.error('Failed to load backup codes');
     }
   };
-  
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success('Copied to clipboard');
   };
-  
+
   // Hide 2FA if WebAuthn is not available (as requested by user)
   if (!webAuthnAvailable) {
     return (
@@ -250,7 +250,7 @@ export function TwoFactorSettings() {
       </div>
     );
   }
-  
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -290,38 +290,38 @@ export function TwoFactorSettings() {
           </Button>
         </div>
       )}
-      
+
       {/* 2FA Setup Modal */}
       <Dialog open={showSetupModal} onOpenChange={setShowSetupModal}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Set up Two-Factor Authentication</DialogTitle>
             <DialogDescription>
-              {setupStep === 'qr' 
+              {setupStep === 'qr'
                 ? 'Scan the QR code with your authenticator app'
                 : 'Enter the verification code from your authenticator app'
               }
             </DialogDescription>
           </DialogHeader>
-          
+
           {setupStep === 'qr' && (
             <div className="space-y-4">
               {qrCode && (
                 <div className="flex justify-center">
-                  <Image 
-                    src={qrCode} 
-                    alt="2FA QR Code" 
-                    width={200} 
-                    height={200} 
-                    className="border rounded" 
+                  <Image
+                    src={qrCode}
+                    alt="2FA QR Code"
+                    width={200}
+                    height={200}
+                    className="border rounded"
                   />
                 </div>
               )}
-              
+
               <div className="space-y-2">
                 <Label>Manual Entry Key</Label>
                 <div className="flex items-center gap-2">
-                  <Input 
+                  <Input
                     value={showSecret ? secret : '••••••••••••••••'}
                     readOnly
                     className="font-mono text-sm"
@@ -342,8 +342,8 @@ export function TwoFactorSettings() {
                   </Button>
                 </div>
               </div>
-              
-              <Button 
+
+              <Button
                 onClick={() => setSetupStep('verify')}
                 className="w-full"
               >
@@ -351,7 +351,7 @@ export function TwoFactorSettings() {
               </Button>
             </div>
           )}
-          
+
           {setupStep === 'verify' && (
             <div className="space-y-4">
               <div className="space-y-2">
@@ -364,16 +364,16 @@ export function TwoFactorSettings() {
                   className="text-center font-mono text-lg"
                 />
               </div>
-              
+
               <div className="flex gap-2">
-                <Button 
+                <Button
                   variant="outline"
                   onClick={() => setSetupStep('qr')}
                   className="flex-1"
                 >
                   Back
                 </Button>
-                <Button 
+                <Button
                   onClick={verifyAndEnable}
                   disabled={isLoading || verificationCode.length !== 6}
                   className="flex-1"
@@ -385,7 +385,7 @@ export function TwoFactorSettings() {
           )}
         </DialogContent>
       </Dialog>
-      
+
       {/* Backup Codes Modal */}
       <Dialog open={showBackupCodes} onOpenChange={setShowBackupCodes}>
         <DialogContent>
@@ -395,7 +395,7 @@ export function TwoFactorSettings() {
               Save these codes in a secure location. Each code can only be used once.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="grid grid-cols-2 gap-2 font-mono text-sm">
             {(backupCodesData?.backupCodes || []).map((code: string, index: number) => (
               <div key={index} className="p-2 bg-gray-100 rounded text-center">
@@ -403,9 +403,9 @@ export function TwoFactorSettings() {
               </div>
             ))}
           </div>
-          
+
           <div className="flex gap-2">
-            <Button 
+            <Button
               variant="outline"
               onClick={() => copyToClipboard((backupCodesData?.backupCodes || []).join('\n'))}
               className="flex-1"
@@ -413,16 +413,16 @@ export function TwoFactorSettings() {
               <Copy className="h-4 w-4 mr-2" />
               Copy All
             </Button>
-            <Button 
+            <Button
               variant="outline"
               onClick={() => {
                 const codes = backupCodesData?.backupCodes || [];
                 const blob = new Blob([codes.join('\n')], { type: 'text/plain' });
                 const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'luzimarket-backup-codes.txt';
-                a.click();
+                const linkEl = document.createElement(String('a'));
+                linkEl.href = url;
+                linkEl.download = 'luzimarket-backup-codes.txt';
+                linkEl.click();
                 URL.revokeObjectURL(url);
               }}
               className="flex-1"

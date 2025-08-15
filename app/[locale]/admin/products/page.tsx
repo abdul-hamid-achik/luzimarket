@@ -44,7 +44,7 @@ export default async function AdminProductsPage() {
     selectAll: t("selectAll"),
     deselectAll: t("deselectAll"),
     product: t("product"),
-    vendor: t("vendor"),
+    vendor: t("Vendor"),
     category: t("category"),
     price: t("price"),
     stock: t("stock"),

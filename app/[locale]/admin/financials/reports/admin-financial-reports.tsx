@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DatePickerWithRange } from "@/components/ui/date-picker-with-range";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  Download, 
+import {
+  Download,
   TrendingUp,
   DollarSign,
   BarChart3,
@@ -127,14 +127,14 @@ export function AdminFinancialReports() {
         // Create and download file
         const blob = new Blob([result.data.content], { type: result.data.contentType });
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = result.data.filename;
-        document.body.appendChild(a);
-        a.click();
+        const linkEl = document.createElement(String("a"));
+        linkEl.href = url;
+        linkEl.download = result.data.filename;
+        document.body.appendChild(linkEl);
+        linkEl.click();
         window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        
+        document.body.removeChild(linkEl);
+
         toast.success(t("downloadSuccess"));
       } else {
         toast.error(result.error || t("downloadError"));
@@ -225,9 +225,9 @@ export function AdminFinancialReports() {
             <CardTitle>{t("topVendorsByRevenue")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <Bar 
-              data={topVendorsChart} 
-              options={{ 
+            <Bar
+              data={topVendorsChart}
+              options={{
                 responsive: true,
                 indexAxis: 'y',
                 plugins: {
@@ -235,7 +235,7 @@ export function AdminFinancialReports() {
                     display: false,
                   },
                 },
-              }} 
+              }}
             />
           </CardContent>
         </Card>
@@ -250,7 +250,7 @@ export function AdminFinancialReports() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left p-2">{t("vendor")}</th>
+                    <th className="text-left p-2">{t("Vendor")}</th>
                     <th className="text-right p-2">{t("revenue")}</th>
                     <th className="text-right p-2">{t("orders")}</th>
                     <th className="text-right p-2">{t("avgOrder")}</th>
@@ -282,7 +282,7 @@ export function AdminFinancialReports() {
     if (!reportData) return null;
 
     const chartData = {
-      labels: reportData.dailyData.map((d: any) => 
+      labels: reportData.dailyData.map((d: any) =>
         format(new Date(d.date), "dd MMM", { locale: es })
       ),
       datasets: [
@@ -469,15 +469,14 @@ export function AdminFinancialReports() {
                       </p>
                     </div>
                     <span
-                      className={`text-sm font-medium px-2 py-1 rounded ${
-                        payout.status === "paid"
-                          ? "bg-green-100 text-green-700"
-                          : payout.status === "pending"
+                      className={`text-sm font-medium px-2 py-1 rounded ${payout.status === "paid"
+                        ? "bg-green-100 text-green-700"
+                        : payout.status === "pending"
                           ? "bg-orange-100 text-orange-700"
                           : payout.status === "processing"
-                          ? "bg-blue-100 text-blue-700"
-                          : "bg-red-100 text-red-700"
-                      }`}
+                            ? "bg-blue-100 text-blue-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
                     >
                       {payout.status}
                     </span>

@@ -8,11 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  DollarSign, 
-  TrendingUp, 
-  Clock, 
-  CreditCard, 
+import {
+  DollarSign,
+  TrendingUp,
+  Clock,
+  CreditCard,
   AlertCircle,
   RefreshCw,
   CheckCircle,
@@ -62,7 +62,7 @@ export function FinancialsClient({
 
   const handleExportTransactions = () => {
     if (!transactions?.transactions?.length) return;
-    
+
     const columns = [
       { key: 'createdAt', header: 'Fecha', formatter: formatDateExport },
       { key: 'description', header: 'Descripción' },
@@ -71,14 +71,15 @@ export function FinancialsClient({
       { key: 'status', header: 'Estado' },
       { key: 'orderId', header: 'ID de Orden' },
     ];
-    
-    const filename = `transacciones_${vendor.businessName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
+
+    const datePart = new Date().toISOString().slice(0, 10);
+    const filename = `transacciones_${vendor.businessName.replace(/\s+/g, '_')}_${datePart}.csv`;
     exportToCSV(transactions.transactions, columns, filename);
   };
 
   const handleExportPayouts = () => {
     if (!payouts?.payouts?.length) return;
-    
+
     const columns = [
       { key: 'createdAt', header: 'Fecha', formatter: formatDateExport },
       { key: 'amount', header: 'Monto', formatter: (value: string) => formatCurrency(value) },
@@ -87,8 +88,9 @@ export function FinancialsClient({
       { key: 'arrivalDate', header: 'Fecha de llegada', formatter: formatDateExport },
       { key: 'reference', header: 'Referencia' },
     ];
-    
-    const filename = `pagos_${vendor.businessName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
+
+    const datePart = new Date().toISOString().slice(0, 10);
+    const filename = `pagos_${vendor.businessName.replace(/\s+/g, '_')}_${datePart}.csv`;
     exportToCSV(payouts.payouts, columns, filename);
   };
 
@@ -263,9 +265,9 @@ export function FinancialsClient({
                 </p>
               </div>
             ) : (
-              <FinancialsDataTable 
-                transactions={transactions || []} 
-                payouts={payouts || []} 
+              <FinancialsDataTable
+                transactions={transactions || []}
+                payouts={payouts || []}
               />
             )}
           </CardContent>
