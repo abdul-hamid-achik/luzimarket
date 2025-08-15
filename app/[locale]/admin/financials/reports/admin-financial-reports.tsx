@@ -127,7 +127,7 @@ export function AdminFinancialReports() {
         // Create and download file
         const blob = new Blob([result.data.content], { type: result.data.contentType });
         const url = window.URL.createObjectURL(blob);
-        const linkEl = document.createElement(String("a"));
+        const linkEl = document.createElement('a') as HTMLAnchorElement;
         linkEl.href = url;
         linkEl.download = result.data.filename;
         document.body.appendChild(linkEl);
