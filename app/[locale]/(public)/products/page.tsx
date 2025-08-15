@@ -1,8 +1,5 @@
 import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
-import { db } from "@/db";
-import { vendors } from "@/db/schema";
-import { eq } from "drizzle-orm";
 import { ProductsGrid } from "@/components/products/products-grid";
 import { FilterSidebar } from "@/components/products/filter-sidebar";
 import { SortDropdown } from "@/components/products/sort-dropdown";
@@ -38,13 +35,6 @@ export default async function ProductsPage({ params, searchParams }: ProductsPag
   });
 
   const filterOptions = await getProductFilterOptions();
-  const vendorsList = await db.query.vendors.findMany({
-    where: eq(vendors.isActive, true),
-    columns: {
-      id: true,
-      businessName: true,
-    }
-  });
 
   return (
     <main className="min-h-screen">
@@ -84,10 +74,10 @@ export default async function ProductsPage({ params, searchParams }: ProductsPag
                   name: cat.name,
                   count: Number(cat.count)
                 }))}
-                vendors={vendorsList.map((vendor: any) => ({
+                vendors={filterOptions.vendors.map((vendor: any) => ({
                   id: vendor.id,
-                  name: vendor.businessName,
-                  count: 0 // We don't have count data for vendors in this context
+                  name: vendor.name,
+                  count: Number(vendor.count)
                 }))}
                 priceRange={filterOptions.priceRange}
               />

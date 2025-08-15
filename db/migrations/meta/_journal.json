@@ -141,6 +141,13 @@
       "when": 1753643511123,
       "tag": "0019_chief_valkyrie",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1755228384805,
+      "tag": "0020_illegal_rhino",
+      "breakpoints": true
     }
   ]
 }

@@ -18,7 +18,22 @@ function getDatabase(): PostgresJsDatabase<typeof schema> {
       throw new Error('DATABASE_URL is not set');
     }
 
-    const client = postgres(databaseUrl);
+    // Allow self-signed certs for Neon Local / localhost when explicitly indicated
+    let client;
+    try {
+      const url = new URL(databaseUrl);
+      const isLocalHost = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+      const allowSelfSigned = process.env.PGSSLMODE === 'no-verify' || process.env.NEON_LOCAL === '1' || isLocalHost;
+      client = allowSelfSigned
+        ? postgres(databaseUrl, { ssl: { rejectUnauthorized: false } as any })
+        : postgres(databaseUrl);
+    } catch {
+      // Fallback without URL parse
+      const allowSelfSigned = process.env.PGSSLMODE === 'no-verify' || process.env.NEON_LOCAL === '1';
+      client = allowSelfSigned
+        ? postgres(databaseUrl, { ssl: { rejectUnauthorized: false } as any })
+        : postgres(databaseUrl);
+    }
     _db = drizzle(client, { schema });
   }
   return _db;

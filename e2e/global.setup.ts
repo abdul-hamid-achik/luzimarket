@@ -1,17 +1,23 @@
 import { chromium, type FullConfig } from '@playwright/test';
 import path from 'path';
+import { execFileSync } from 'child_process';
 
 async function globalSetup(config: FullConfig) {
   console.log('🌱 Setting up test environment...');
 
-  // Always setup test database with minimal required data
-  console.log('📦 Ensuring test database is properly configured...');
+  // Seed the single database via main seed script
+  console.log('📦 Seeding database via db/seed.ts...');
   try {
-    const { setupTestDatabase } = await import('./setup/test-database');
-    await setupTestDatabase();
+    const projectRoot = path.resolve(__dirname, '..');
+    execFileSync('npx', ['tsx', 'db/seed.ts', '--images', 'placeholders'], {
+      cwd: projectRoot,
+      stdio: 'inherit',
+      env: { ...process.env, NEON_LOCAL: '1', PGSSLMODE: 'no-verify' },
+    });
+    console.log('✅ Seeding completed');
   } catch (error) {
-    console.error('❌ Failed to setup test database:', error);
-    console.log('💡 Or run manually: npx tsx e2e/setup/test-database.ts');
+    console.error('❌ Failed to seed database:', error);
+    throw error;
   }
 
   // Save authentication states for different user types

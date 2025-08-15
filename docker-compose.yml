@@ -7,9 +7,9 @@ services:
     environment:
       NEON_API_KEY: ${NEON_API_KEY}
       NEON_PROJECT_ID: ${NEON_PROJECT_ID}
-      DRIVER: serverless
       BRANCH_ID: ${NEON_BRANCH_ID}
-    # Optional: Add volumes only if you want to persist data between restarts
+    # Optional: Persist a Neon branch per Git branch and across restarts
+    # See: https://neon.com/docs/local/neon-local
     # volumes:
     #   - ./.neon_local/:/tmp/.neon_local
     #   - ./.git/HEAD:/tmp/.git/HEAD:ro,consistent

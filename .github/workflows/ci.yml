@@ -11,16 +11,13 @@ jobs:
     runs-on: ubuntu-latest
     
     services:
-      postgres:
-        image: postgres:15
+      neon:
+        image: neondatabase/neon_local:latest
         env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: luzimarket_test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          NEON_PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
+          DRIVER: serverless
+          BRANCH_ID: ${{ vars.NEON_BRANCH_ID }}
         ports:
           - 5432:5432
 
@@ -36,6 +33,15 @@ jobs:
     - name: Install dependencies
       run: npm ci
     
+    - name: Wait for Neon Local to be ready
+      run: |
+        for i in {1..60}; do
+          nc -z localhost 5432 && echo "Neon Local is ready" && exit 0
+          sleep 1
+        done
+        echo "Neon Local did not become ready in time" >&2
+        exit 1
+    
     - name: i18n parity check
       run: npm run i18n:check
     
@@ -48,14 +54,19 @@ jobs:
     # - name: Run unit tests
     #   run: npm run test:unit
     #   env:
-    #     DATABASE_URL: postgresql://postgres:postgres@localhost:5432/luzimarket_test
+    #     DATABASE_URL: postgresql://neon:npg@localhost:5432/neondb
     
     - name: Install Playwright browsers
       run: npx playwright install --with-deps
     
+    - name: Apply database migrations
+      run: npm run db:migrate
+      env:
+        DATABASE_URL: postgresql://neon:npg@localhost:5432/neondb
+
     - name: Run E2E tests (LLM)
       env:
-        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/luzimarket_test
+        DATABASE_URL: postgresql://neon:npg@localhost:5432/neondb
         CI: true
         NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
         AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
@@ -92,8 +103,8 @@ jobs:
     - name: Install dependencies
       run: npm ci
     
-    - name: i18n parity check
-      run: npm run i18n:check
+    - name: Run linter
+      run: npm run lint
     
     - name: Build application
       run: npm run build

@@ -1,17 +1,60 @@
 import { config } from "dotenv";
-import { reset } from "drizzle-seed";
+import { reset, seed as drizzleSeed } from "drizzle-seed";
 import { fakerES_MX as faker } from "@faker-js/faker";
-import * as schema from "./schema";
-import { generateAndUploadImage, generateProductImagePrompt, generateCategoryImagePrompt } from "../lib/openai";
+import * as schema from "../schema";
+import { generateAndUploadImage, generateProductImagePrompt, generateCategoryImagePrompt } from "../../lib/openai";
 import { eq, sql } from "drizzle-orm";
 import slugify from "slugify";
 import bcrypt from "bcryptjs";
-import { initializeShippingData } from "../lib/actions/shipping";
+import { initializeShippingData } from "../../lib/actions/shipping";
 
 // Load environment variables before importing db
 config({ path: ".env.local" });
 
-import { db } from "./index";
+import { db } from "../index";
+
+// Progress bar helpers (lazy-loaded to avoid breaking CI/non-TTY)
+type ProgressControls = { start: (total: number, label: string) => any; tick: (inc?: number) => void; stop: () => void; enabled: boolean };
+async function createProgressControls(): Promise<ProgressControls> {
+  const progressEnabled = process.stdout.isTTY && !process.env.CI && !process.argv.includes('--no-progress');
+  if (!progressEnabled) {
+    return {
+      enabled: false,
+      start: () => null,
+      tick: () => {},
+      stop: () => {},
+    };
+  }
+  try {
+    const cli = await import('cli-progress');
+    let bar: any = null;
+    return {
+      enabled: true,
+      start: (total: number, label: string) => {
+        bar = new (cli as any).SingleBar({
+          format: `${label} [{bar}] {value}/{total}`,
+          hideCursor: true,
+        }, (cli as any).Presets.rect);
+        bar.start(total, 0);
+        return bar;
+      },
+      tick: (inc: number = 1) => {
+        bar && bar.increment(inc);
+      },
+      stop: () => {
+        bar && bar.stop();
+        bar = null;
+      }
+    };
+  } catch {
+    return {
+      enabled: false,
+      start: () => null,
+      tick: () => {},
+      stop: () => {},
+    };
+  }
+}
 
 type ImageMode = 'ai' | 'placeholders' | 'none';
 
@@ -134,27 +177,7 @@ const CATEGORIES = [
     imageUrl: null, // Will be generated with AI
     displayOrder: 6
   },
-  {
-    name: "Joyería y Accesorios",
-    slug: "joyeria-accesorios",
-    description: "Joyería fina y accesorios de moda",
-    imageUrl: null, // Will be generated with AI
-    displayOrder: 7
-  },
-  {
-    name: "Gourmet y Delicatessen",
-    slug: "gourmet-delicatessen",
-    description: "Productos gourmet, vinos y delicatessen",
-    imageUrl: null, // Will be generated with AI
-    displayOrder: 8
-  },
-  {
-    name: "Eventos y Cenas",
-    slug: "eventos-cenas",
-    description: "Servicios y productos para eventos especiales, cenas románticas y celebraciones",
-    imageUrl: null, // Will be generated with AI
-    displayOrder: 9
-  }
+  
 ];
 
 const PRODUCT_NAMES = [
@@ -315,8 +338,28 @@ const BUSINESS_HOURS = [
   "Mar-Dom: 10:00-18:00"
 ];
 
-const CITIES = ["Ciudad de México", "Guadalajara", "Monterrey", "Puebla", "Querétaro"];
-const STATES = ["CDMX", "Jalisco", "Nuevo León", "Puebla", "Querétaro"];
+const STATES = [
+  "Aguascalientes", "Baja California", "Baja California Sur", "Campeche", "Chiapas",
+  "Chihuahua", "Ciudad de México", "Coahuila", "Colima", "Durango", "Estado de México",
+  "Guanajuato", "Guerrero", "Hidalgo", "Jalisco", "Michoacán", "Morelos", "Nayarit",
+  "Nuevo León", "Oaxaca", "Puebla", "Querétaro", "Quintana Roo", "San Luis Potosí",
+  "Sinaloa", "Sonora", "Tabasco", "Tamaulipas", "Tlaxcala", "Veracruz", "Yucatán", "Zacatecas"
+];
+
+const CITIES = [
+  "Ciudad de México", "Guadalajara", "Monterrey", "Puebla", "Querétaro", "Tijuana", "León",
+  "Cancún", "Mérida", "Toluca", "Chihuahua", "Aguascalientes", "San Luis Potosí", "Saltillo",
+  "Hermosillo", "Culiacán", "Morelia", "Cuernavaca", "Durango", "Veracruz", "Xalapa",
+  "Villahermosa", "Tuxtla Gutiérrez", "Oaxaca", "Acapulco", "Tampico", "Mazatlán", "Ensenada",
+  "Mexicali", "La Paz", "Playa del Carmen", "Tepic", "Colima", "Zacatecas", "Pachuca", "Irapuato"
+];
+
+function generateMxPhone(): string {
+  const area = faker.number.int({ min: 10, max: 99 }).toString().padStart(2, '0');
+  const part1 = faker.string.numeric(4);
+  const part2 = faker.string.numeric(4);
+  return `+52 ${area} ${part1} ${part2}`;
+}
 
 const VENDOR_PREFIXES = [
   "Boutique", "Casa", "Tienda", "Atelier", "Estudio", "Galería", "Rincón",
@@ -340,23 +383,24 @@ async function main() {
   // --ai: Force AI images (if key is present)
   // --images [none|placeholders|ai]: Unified image mode flag (preferred)
   // --images-limit <n>: Limit number of products to image (preferred over --fast)
-  // --allow-prod: Allow running in production-like environments (replaces SEED_ALLOW_PROD)
+  // --allow-prod: Allow running in production-like environments 
   // --financials [auto|force|skip]: Control platform fees/transactions/payouts generation
 
   // Safety guard to avoid seeding production accidentally
-  const allowProd = hasFlag('--allow-prod') || process.env.SEED_ALLOW_PROD === '1';
+  const allowProd = hasFlag('--allow-prod')
   if (isProbablyProdEnvironment() && !allowProd) {
     console.error("❌ Refusing to run seed in production-like environment. Set SEED_ALLOW_PROD=1 to override.");
     process.exit(1);
   }
 
   if (hasFlag('--help')) {
-    console.log(`\nUsage: tsx db/seed.ts [options]\n\nOptions:\n  --no-reset                 Skip database reset\n  --images [mode]            Image mode: none | placeholders | ai\n  --images-limit <n>         Limit number of products to generate images for\n  --force-images             Force regenerate images even if present\n  --fast                     Alias for --images-limit 10\n  --financials [auto|force|skip]  Control financials seeding\n  --allow-prod               Allow running in production-like environment\n  --help                     Show this help\n`);
+    console.log(`\nUsage: tsx db/seed.ts [options]\n\nOptions:\n  --no-reset                 Skip database reset\n  --images [mode]            Image mode: none | placeholders | ai\n  --images-limit <n>         Limit number of products to generate images for\n  --force-images             Force regenerate images even if present\n  --fast                     Alias for --images-limit 10\n  --financials [auto|force|skip]  Control financials seeding\n  --allow-prod               Allow running in production-like environment\n  --drizzle-seed | --auto    Use drizzle-seed automatic generators\n  --count <n>                Count for drizzle-seed auto mode\n  --seed <n>                 Seed value for deterministic generation\n  --no-progress              Disable progress bar output\n  --help                     Show this help\n`);
     process.exit(0);
   }
 
   // Check command line flags
   const shouldReset = !process.argv.includes('--no-reset');
+  const useDrizzleSeed = hasFlag('--drizzle-seed') || hasFlag('--auto');
   const imageMode = resolveImageMode();
   const shouldGenerateAIImages = imageMode === 'ai' && !!process.env.OPENAI_SECRET_KEY && !hasFlag('--no-images');
   const forceRegenerateImages = hasFlag('--force-images'); // Force regenerate existing images
@@ -374,10 +418,6 @@ async function main() {
         const { drizzle } = await import('drizzle-orm/node-postgres');
         const { Client } = await import('pg');
 
-        // Determine reset connection string (single-DB strategy)
-        if (process.env.SEED_USE_TEST_DB || process.env.DATABASE_URL_TEST) {
-          console.warn('⚠️  SEED_USE_TEST_DB and DATABASE_URL_TEST are deprecated. Using DATABASE_URL only.');
-        }
         const databaseUrl = process.env.DATABASE_URL;
 
         if (!databaseUrl) {
@@ -385,8 +425,11 @@ async function main() {
         }
 
         // Create a temporary connection with node-postgres for reset
+        // Accept self-signed certs in Neon Local / localhost
+        const allowSelfSigned = process.env.PGSSLMODE === 'no-verify' || process.env.NEON_LOCAL === '1';
         const client = new Client({
           connectionString: databaseUrl,
+          ssl: allowSelfSigned ? { rejectUnauthorized: false } : undefined,
         });
 
         await client.connect();
@@ -408,6 +451,148 @@ async function main() {
     }
 
     console.log("📦 Seeding database...");
+    // Optional: drizzle-seed automatic mode for quick bootstrapping
+    if (useDrizzleSeed) {
+      const countVal = parseInt(getFlagValue('--count') || '', 10);
+      const seedVal = parseInt(getFlagValue('--seed') || '', 10);
+      console.log(`🌾 Using drizzle-seed auto mode${Number.isFinite(countVal) ? ` (count=${countVal})` : ''}${Number.isFinite(seedVal) ? ` (seed=${seedVal})` : ''}...`);
+      // Use node-postgres driver for drizzle-seed compatibility
+      const { drizzle } = await import('drizzle-orm/node-postgres');
+      const { Client } = await import('pg');
+      const databaseUrl = process.env.DATABASE_URL;
+      if (!databaseUrl) throw new Error('DATABASE_URL is not set for drizzle-seed');
+      const allowSelfSigned = process.env.PGSSLMODE === 'no-verify' || process.env.NEON_LOCAL === '1';
+      const client = new Client({
+        connectionString: databaseUrl,
+        ssl: allowSelfSigned ? { rejectUnauthorized: false } : undefined,
+      });
+      await client.connect();
+      try {
+        const pgDb = drizzle(client, { schema });
+        
+        // 0) Initialize shipping data FIRST to avoid foreign key issues
+        console.log("🚚 Initializing shipping zones and methods...");
+        const shippingResult = await initializeShippingData();
+        if (shippingResult.success) {
+          console.log(`✅ ${shippingResult.message}`);
+        } else {
+          console.log(`⚠️  Shipping data initialization failed: ${shippingResult.error}`);
+        }
+        
+        // 1) Ensure our 6 fixed categories exist
+        await pgDb.insert(schema.categories).values(CATEGORIES as any).onConflictDoNothing({ target: schema.categories.slug });
+        const categories = await pgDb.select().from(schema.categories);
+
+        // 2) Get shipping methods for foreign key references
+        const shippingMethodsList = await pgDb.select().from(schema.shippingMethods);
+        const defaultShippingMethodId = shippingMethodsList.length > 0 ? shippingMethodsList[0].id : null;
+        
+        // 3) Seed a realistic number of vendors with proper shipping method reference
+        const vendorTarget = 12;
+        await drizzleSeed(pgDb as any, { 
+          vendors: schema.vendors,
+          shippingMethods: schema.shippingMethods 
+        } as any, {
+          count: vendorTarget,
+          ...(Number.isFinite(seedVal) ? { seed: seedVal } : {}),
+          version: '2',
+        } as any);
+        // Normalize vendors to MX profile and set default shipping method
+        const vendors = await pgDb.select().from(schema.vendors);
+        for (const v of vendors) {
+          await pgDb.update(schema.vendors)
+            .set({
+              country: 'México',
+              city: CITIES[faker.number.int({ min: 0, max: CITIES.length - 1 })],
+              state: STATES[faker.number.int({ min: 0, max: STATES.length - 1 })],
+              phone: generateMxPhone(),
+              whatsapp: generateMxPhone(),
+              businessPhone: generateMxPhone(),
+              isActive: true,
+              defaultShippingMethodId: defaultShippingMethodId,
+            })
+            .where(eq(schema.vendors.id, (v as any).id));
+        }
+
+        // 4) Seed products with controlled counts per category
+        const productCounts: Record<string, number> = {
+          'flores-arreglos': 13,
+          'chocolates-dulces': 10,
+          'velas-aromas': 11,
+          'regalos-personalizados': 11,
+          'cajas-regalo': 11,
+          'decoracion-hogar': 10,
+        };
+
+        let vendorCursor = 0;
+        for (const cat of categories.filter((c: any) => productCounts[c.slug as string])) {
+          const count = productCounts[cat.slug as string]!;
+          const namesByCat: Record<string, string[]> = {
+            'flores-arreglos': PRODUCT_NAMES.slice(0, 15),
+            'chocolates-dulces': PRODUCT_NAMES.slice(15, 30),
+            'velas-aromas': PRODUCT_NAMES.slice(30, 45),
+            'regalos-personalizados': PRODUCT_NAMES.slice(45, 60),
+            'cajas-regalo': PRODUCT_NAMES.slice(60, 75),
+            'decoracion-hogar': PRODUCT_NAMES.slice(75, 90),
+          };
+          const baseNames = namesByCat[cat.slug as string] ?? PRODUCT_NAMES;
+          let localIdx = 0;
+          const adjectives = ["Premium", "Deluxe", "Exclusivo", "Artesanal", "Elegante", "Clásico", "Moderno", "Vintage", "Lujoso", "Especial"];
+
+          // Create products manually with controlled ranges
+          const toInsert: Array<typeof schema.products.$inferInsert> = [];
+          for (let j = 0; j < count; j++) {
+            const base = baseNames[localIdx % baseNames.length]!;
+            const adj = adjectives[(vendorCursor + localIdx) % adjectives.length]!;
+            const name = `${base} ${adj}`;
+            const range = CATEGORY_PRICE_RANGES[cat.slug as string] ?? { min: 299, max: 1999 };
+            const p = faker.number.int({ min: range.min, max: range.max });
+            const vendorId = vendors[vendorCursor % vendors.length]!.id as string;
+            vendorCursor++;
+            localIdx++;
+            toInsert.push({
+              name,
+              slug: slugify(`${cat.slug}-${vendorCursor}-${localIdx}`, { lower: true, strict: true }),
+              description: '',
+              categoryId: (cat as any).id,
+              vendorId,
+              price: String(Math.round(p / 50) * 50),
+              images: [],
+              tags: faker.helpers.arrayElements(["nuevo", "popular", "oferta", "exclusivo", "artesanal"], faker.number.int({ min: 1, max: 3 })),
+              stock: faker.number.int({ min: 5, max: 40 }),
+              isActive: true,
+              weight: cat.slug === 'flores-arreglos' ? faker.number.int({ min: 500, max: 3000 }) : cat.slug === 'chocolates-dulces' ? faker.number.int({ min: 100, max: 1000 }) : cat.slug === 'velas-aromas' ? faker.number.int({ min: 200, max: 800 }) : faker.number.int({ min: 200, max: 1500 }),
+              length: faker.number.int({ min: 10, max: 50 }),
+              width: faker.number.int({ min: 10, max: 40 }),
+              height: faker.number.int({ min: 5, max: 30 }),
+              shippingClass: faker.helpers.arrayElement(["standard", "fragile"]),
+            });
+          }
+          if (toInsert.length > 0) {
+            await pgDb.insert(schema.products).values(toInsert as any).onConflictDoNothing({ target: schema.products.slug });
+          }
+        }
+
+        // 5) Users & subscriptions with restrained counts
+        await drizzleSeed(pgDb as any, { users: schema.users } as any, {
+          count: 40,
+          ...(Number.isFinite(seedVal) ? { seed: seedVal } : {}),
+          version: '2',
+        } as any);
+        await drizzleSeed(pgDb as any, { subscriptions: schema.subscriptions } as any, {
+          count: 80,
+          ...(Number.isFinite(seedVal) ? { seed: seedVal } : {}),
+          version: '2',
+        } as any);
+      } finally {
+        await client.end();
+      }
+      console.log('✅ drizzle-seed auto seeding complete');
+      console.log("\n✅ Database seeded successfully!");
+      return;
+    }
+
+    const progress = await createProgressControls();
 
     // 1. Seed Categories (idempotent)
     console.log("🏷️  Creating categories...");
@@ -421,8 +606,6 @@ async function main() {
     // 2. Seed Admin Users
     console.log("👤 Creating admin users...");
     const hashedPassword = await bcrypt.hash("admin123", 10);
-
-    // Ensure admin user exists (upsert approach)
     const adminUsersData = [
       {
         email: "admin@luzimarket.shop",
@@ -446,36 +629,20 @@ async function main() {
         isActive: true
       }
     ];
-
-    const adminUsers = [];
-    for (const userData of adminUsersData) {
-      try {
-        // Try to insert, if it fails due to unique constraint, update instead
-        const [user] = await db.insert(schema.adminUsers).values(userData).returning();
-        adminUsers.push(user);
-        console.log(`✅ Created admin user: ${userData.email}`);
-      } catch (error: any) {
-        if (error.code === '23505' || error.message?.includes('duplicate key')) {
-          // User exists, update password and ensure it's active
-          console.log(`👤 Admin user ${userData.email} already exists, updating...`);
-          const [user] = await db.update(schema.adminUsers)
-            .set({
-              passwordHash: hashedPassword,
-              isActive: true,
-              name: userData.name,
-              role: userData.role
-            })
-            .where(eq(schema.adminUsers.email, userData.email))
-            .returning();
-          adminUsers.push(user);
-          console.log(`✅ Updated admin user: ${userData.email}`);
-        } else {
-          console.error(`❌ Error creating admin user ${userData.email}:`, error);
-          throw error;
-        }
-      }
-    }
-    console.log(`✅ Ensured ${adminUsers.length} admin users exist`);
+    const upsertedAdmins = await db
+      .insert(schema.adminUsers)
+      .values(adminUsersData)
+      .onConflictDoUpdate({
+        target: schema.adminUsers.email,
+        set: {
+          name: sql`excluded.name`,
+          passwordHash: sql`excluded.password_hash`,
+          role: sql`excluded.role`,
+          isActive: sql`excluded.is_active`,
+        },
+      })
+      .returning();
+    console.log(`✅ Ensured ${upsertedAdmins.length} admin users exist`);
 
     // 3. Seed Email Templates (idempotent)
     console.log("📧 Creating email templates...");
@@ -513,21 +680,19 @@ async function main() {
         isActive: true
       }
     ];
-    for (const tpl of EMAIL_TEMPLATES) {
-      await db
-        .insert(schema.emailTemplates)
-        .values(tpl)
-        .onConflictDoUpdate({
-          target: schema.emailTemplates.name,
-          set: {
-            subject: sql`excluded.subject`,
-            htmlTemplate: sql`excluded.html_template`,
-            textTemplate: sql`excluded.text_template`,
-            variables: sql`excluded.variables`,
-            isActive: sql`excluded.is_active`,
-          },
-        });
-    }
+    await db
+      .insert(schema.emailTemplates)
+      .values(EMAIL_TEMPLATES)
+      .onConflictDoUpdate({
+        target: schema.emailTemplates.name,
+        set: {
+          subject: sql`excluded.subject`,
+          htmlTemplate: sql`excluded.html_template`,
+          textTemplate: sql`excluded.text_template`,
+          variables: sql`excluded.variables`,
+          isActive: sql`excluded.is_active`,
+        },
+      });
     const emailTemplates = await db.select().from(schema.emailTemplates);
     console.log(`✅ Ensured ${emailTemplates.length} email templates`);
 
@@ -547,9 +712,9 @@ async function main() {
         contactName: faker.person.fullName(),
         email: faker.internet.email(),
         passwordHash: defaultPasswordHash, // All test vendors use password123
-        phone: faker.phone.number(),
-        whatsapp: faker.phone.number(),
-        businessPhone: faker.phone.number(),
+        phone: generateMxPhone(),
+        whatsapp: generateMxPhone(),
+        businessPhone: generateMxPhone(),
         businessHours: faker.helpers.arrayElement(BUSINESS_HOURS),
         street: faker.location.streetAddress(),
         city: faker.helpers.arrayElement(CITIES),
@@ -576,9 +741,9 @@ async function main() {
       contactName: "Test Vendor",
       email: "vendor@luzimarket.shop",
       passwordHash: defaultPasswordHash, // password123
-      phone: "+52 555 123 4567",
-      whatsapp: "+52 555 123 4567",
-      businessPhone: "+52 555 123 4567",
+      phone: "+52 55 5123 4567",
+      whatsapp: "+52 55 5123 4567",
+      businessPhone: "+52 55 5123 4567",
       businessHours: "Lun-Vie 9:00-18:00",
       street: "Calle Test 123",
       city: "Ciudad de México",
@@ -616,8 +781,7 @@ async function main() {
       "regalos-personalizados": PRODUCT_NAMES.slice(45, 60),
       "cajas-regalo": PRODUCT_NAMES.slice(60, 75),
       "decoracion-hogar": PRODUCT_NAMES.slice(75, 90),
-      "joyeria-accesorios": PRODUCT_NAMES.slice(90, 105),
-      "gourmet-delicatessen": PRODUCT_NAMES.slice(105, 120)
+  // trimmed to 6 categories for realistic demo
     };
 
     for (let i = 0; i < 100; i++) {
@@ -706,24 +870,31 @@ async function main() {
       console.log('\n🖼️  Assigning placeholder images...');
       // Categories without imageUrl
       const categoriesToSet = forceRegenerateImages ? categories : categories.filter(c => !c.imageUrl);
+      const bar = progress.start(categoriesToSet.length, '🖼️  Categories placeholders');
       for (const category of categoriesToSet) {
         const imageUrl = buildPlaceholderImageUrl('category', category.slug);
         await db.update(schema.categories)
           .set({ imageUrl })
           .where(eq(schema.categories.id, category.id));
+        progress.tick();
       }
+      progress.stop();
       console.log(`✅ Set placeholder images for ${categoriesToSet.length} categories`);
 
       // Products without images
       const productTargets = forceRegenerateImages ? products : products.filter(p => !p.images || (Array.isArray(p.images) && p.images.length === 0));
       let updatedCount = 0;
-      for (const product of productTargets.slice(0, imageBatchSize)) {
+      const targets = productTargets.slice(0, imageBatchSize);
+      const bar2 = progress.start(targets.length, '🖼️  Products placeholders');
+      for (const product of targets) {
         const imageUrl = buildPlaceholderImageUrl('product', product.slug);
         await db.update(schema.products)
           .set({ images: [imageUrl], imagesApproved: true, imagesPendingModeration: false })
           .where(eq(schema.products.id, product.id));
         updatedCount++;
+        progress.tick();
       }
+      progress.stop();
       console.log(`✅ Set placeholder images for ${updatedCount} products`);
     }
 
@@ -744,6 +915,7 @@ async function main() {
       const categoriesToImage = forceRegenerateImages ? categories : categories.filter(c => !c.imageUrl || c.imageUrl === null);
       console.log(`📊 Found ${categoriesToImage.length} categories ${forceRegenerateImages ? '(forced regeneration)' : 'without images'}`);
 
+      const bar3 = progress.start(categoriesToImage.length, '🖼️  AI: categories');
       for (const category of categoriesToImage) {
         try {
           const prompt = generateCategoryImagePrompt({
@@ -761,7 +933,9 @@ async function main() {
         } catch (error) {
           console.error(`❌ Error generating image for category ${category.name}:`, error);
         }
+        progress.tick();
       }
+      progress.stop();
 
       // Generate product images
       console.log('\n🖼️  Generating product images...');
@@ -769,6 +943,7 @@ async function main() {
       const productsToImage = productsNeedingImages.slice(0, imageBatchSize);
       console.log(`📊 Found ${productsNeedingImages.length} products ${forceRegenerateImages ? '(forced regeneration)' : 'without images'}, generating for ${productsToImage.length}`);
 
+      const bar4 = progress.start(productsToImage.length, '🖼️  AI: products');
       for (const product of productsToImage) {
         try {
           const prompt = generateProductImagePrompt({
@@ -787,7 +962,9 @@ async function main() {
         } catch (error) {
           console.error(`❌ Error generating image for product ${product.name}:`, error);
         }
+        progress.tick();
       }
+      progress.stop();
 
       console.log('\n✨ AI image generation completed!');
     } else if (imageMode === 'none') {
@@ -865,7 +1042,7 @@ async function main() {
 
     // 5.5 Seed Product Variants
     console.log("🎨 Creating product variants...");
-    const variantData = [];
+    const variantData = [] as Array<typeof schema.productVariants.$inferInsert>;
 
     // Define variant configurations by category
     const CATEGORY_VARIANTS: Record<string, { types: string[], values: Record<string, any[]> }> = {
@@ -990,19 +1167,28 @@ async function main() {
     }
 
     if (variantData.length > 0) {
-      for (const v of variantData) {
-        await db.insert(schema.productVariants).values(v).onConflictDoUpdate({
-          target: schema.productVariants.sku,
-          set: {
-            name: sql`excluded.name`,
-            variantType: sql`excluded.variant_type`,
-            price: sql`excluded.price`,
-            stock: sql`excluded.stock`,
-            attributes: sql`excluded.attributes`,
-            isActive: sql`excluded.is_active`,
-          },
-        });
+      const total = variantData.length;
+      const bar5 = progress.start(total, '🎨 Upserting variants');
+      const chunkSize = 300;
+      for (let i = 0; i < total; i += chunkSize) {
+        const chunk = variantData.slice(i, i + chunkSize);
+        await db
+          .insert(schema.productVariants)
+          .values(chunk)
+          .onConflictDoUpdate({
+            target: schema.productVariants.sku,
+            set: {
+              name: sql`excluded.name`,
+              variantType: sql`excluded.variant_type`,
+              price: sql`excluded.price`,
+              stock: sql`excluded.stock`,
+              attributes: sql`excluded.attributes`,
+              isActive: sql`excluded.is_active`,
+            },
+          });
+        progress.tick(chunk.length);
       }
+      progress.stop();
       console.log(`✅ Ensured ${variantData.length} product variants`);
     }
 
@@ -1076,7 +1262,9 @@ async function main() {
     const orderData = [];
     const carriers = ["fedex", "ups", "dhl", "estafeta", "correos-de-mexico"];
 
-    for (let i = 0; i < 150; i++) {
+    const ordersTotal = 150;
+    const bar6 = progress.start(ordersTotal, '🛒 Generating orders');
+    for (let i = 0; i < ordersTotal; i++) {
       const subtotal = faker.number.int({ min: 199, max: 9999 });
       const tax = Math.round(subtotal * 0.16);
       const shipping = faker.helpers.arrayElement([0, 99, 149, 199]);
@@ -1220,7 +1408,9 @@ async function main() {
         createdAt: orderCreatedAt,
         ...trackingData
       });
+      progress.tick();
     }
+    progress.stop();
     await db.insert(schema.orders).values(orderData).onConflictDoNothing({ target: schema.orders.orderNumber });
     const orders = await db.select().from(schema.orders);
     console.log(`✅ Ensured ${orders.length} orders`);
@@ -1228,6 +1418,7 @@ async function main() {
     // 9. Seed Order Items
     console.log("📋 Creating order items...");
     const orderItemData = [];
+    const bar7 = progress.start(orders.length, '📋 Generating order items');
     for (const order of orders) {
       const itemCount = faker.number.int({ min: 1, max: 5 });
       const selectedProducts = faker.helpers.arrayElements(products, itemCount);
@@ -1243,7 +1434,9 @@ async function main() {
           total: String(price * quantity)
         });
       }
+      progress.tick();
     }
+    progress.stop();
     await db.insert(schema.orderItems).values(orderItemData);
     console.log(`✅ Created ${orderItemData.length} order items`);
 
@@ -1263,6 +1456,7 @@ async function main() {
 
     // Create reviews for random products
     const productsWithReviews = faker.helpers.arrayElements(products, 120);
+    const bar8 = progress.start(productsWithReviews.length, '⭐ Generating reviews');
     for (const product of productsWithReviews) {
       const reviewCount = faker.number.int({ min: 1, max: 5 });
       for (let i = 0; i < reviewCount; i++) {
@@ -1286,7 +1480,9 @@ async function main() {
           helpfulCount: faker.number.int({ min: 0, max: 50 })
         });
       }
+      progress.tick();
     }
+    progress.stop();
     await db.insert(schema.reviews).values(reviewData);
     console.log(`✅ Created ${reviewData.length} reviews`);
 
@@ -1296,32 +1492,29 @@ async function main() {
     const forceFinancials = financialsMode === 'force' || process.argv.includes('--force-financials');
     const skipFinancials = financialsMode === 'skip';
 
-    // Ensure vendor Stripe accounts (by vendorId)
-    for (const v of vendors) {
-      const accountId = `acct_${faker.string.alphanumeric(16).toLowerCase()}`;
-      await db.insert(schema.vendorStripeAccounts).values({
-        vendorId: v.id,
-        stripeAccountId: accountId,
-        accountType: 'express',
-        onboardingStatus: 'completed',
-        chargesEnabled: true,
-        payoutsEnabled: true,
-        detailsSubmitted: true,
-        commissionRate: String(faker.number.int({ min: 10, max: 20 })),
-      }).onConflictDoNothing({ target: schema.vendorStripeAccounts.vendorId });
-    }
+    // Ensure vendor Stripe accounts (by vendorId) - batch insert
+    const accountRows = vendors.map((v) => ({
+      vendorId: v.id,
+      stripeAccountId: `acct_${faker.string.alphanumeric(16).toLowerCase()}`,
+      accountType: 'express' as const,
+      onboardingStatus: 'completed' as const,
+      chargesEnabled: true,
+      payoutsEnabled: true,
+      detailsSubmitted: true,
+      commissionRate: String(faker.number.int({ min: 10, max: 20 })),
+    }));
+    await db.insert(schema.vendorStripeAccounts).values(accountRows).onConflictDoNothing({ target: schema.vendorStripeAccounts.vendorId });
 
-    // Ensure vendor balances
-    for (const v of vendors) {
-      await db.insert(schema.vendorBalances).values({
-        vendorId: v.id,
-        availableBalance: '0',
-        pendingBalance: '0',
-        reservedBalance: '0',
-        currency: 'MXN',
-        lifetimeVolume: '0',
-      }).onConflictDoNothing({ target: schema.vendorBalances.vendorId });
-    }
+    // Ensure vendor balances - batch insert
+    const balanceRows = vendors.map((v) => ({
+      vendorId: v.id,
+      availableBalance: '0',
+      pendingBalance: '0',
+      reservedBalance: '0',
+      currency: 'MXN',
+      lifetimeVolume: '0',
+    }));
+    await db.insert(schema.vendorBalances).values(balanceRows).onConflictDoNothing({ target: schema.vendorBalances.vendorId });
 
     const existingFeesCount = await db.select({ c: sql<number>`COUNT(*)` }).from(schema.platformFees);
     const shouldCreateFees = forceFinancials || (existingFeesCount[0].c === 0);
@@ -1418,7 +1611,9 @@ async function main() {
     const shouldCreatePayouts = forceFinancials || (existingPayoutsCount[0].c === 0);
     if (!skipFinancials && shouldCreatePayouts) {
       console.log('🏦 Creating bank accounts and payouts...');
-      for (const v of vendors.slice(0, Math.min(15, vendors.length))) {
+      const payoutTargets = vendors.slice(0, Math.min(15, vendors.length));
+      const bar9 = progress.start(payoutTargets.length, '🏦 Creating payouts');
+      for (const v of payoutTargets) {
         const bank = await db.insert(schema.vendorBankAccounts).values({
           vendorId: v.id,
           accountHolderName: v.businessName,
@@ -1452,7 +1647,9 @@ async function main() {
             lastUpdated: new Date(),
           })
           .where(eq(schema.vendorBalances.vendorId, v.id));
+        progress.tick();
       }
+      progress.stop();
       console.log('✅ Payouts created where applicable');
     } else if (!skipFinancials) {
       console.log('ℹ️  Payouts already exist, skipping');

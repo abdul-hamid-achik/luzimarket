@@ -30,7 +30,7 @@ export const vendors = pgTable("vendors", {
   // Shipping fields
   shippingOriginState: text("shipping_origin_state"),
   freeShippingThreshold: decimal("free_shipping_threshold", { precision: 10, scale: 2 }),
-  defaultShippingMethodId: integer("default_shipping_method_id").references(() => shippingMethods.id),
+  defaultShippingMethodId: integer("default_shipping_method_id").references(() => shippingMethods.id, { onDelete: "set null" }),
   shippingSettings: json("shipping_settings").$type<{
     enabledMethods?: string[];
     packagingFee?: number;

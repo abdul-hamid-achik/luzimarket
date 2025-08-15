@@ -16,7 +16,7 @@ This directory contains end-to-end tests for the Luzimarket e-commerce platform 
 
 3. Setup test database (runs automatically on first test run):
    ```bash
-   npx tsx e2e/setup/test-database.ts
+   pnpm tsx db/seed.ts --images placeholders
    ```
 
 ## Test Database Setup
@@ -35,7 +35,7 @@ Tests will automatically run the database setup on first run
 
 ```bash
 # Run test database setup manually
-npx tsx e2e/setup/test-database.ts
+pnpm tsx db/seed.ts --images placeholders
 
 # Or if you need full seeding (without AI images)
 npm run db:seed -- --no-images
@@ -276,7 +276,7 @@ We use `data-testid` attributes throughout the application for reliable test sel
 3. Check screenshots in `test-results/` folder
 4. View traces for failed tests in the HTML report
 5. Check error context `.md` files for page structure
-6. Verify test data exists: `npx tsx e2e/setup/test-database.ts`
+6. Verify test data exists: `pnpm tsx db/seed.ts --images placeholders`
 
 ## CI/CD Integration
 
@@ -317,7 +317,7 @@ Tests use the same `.env.local` file as the application. For CI/CD, set:
 - For shadcn/ui components, use role selectors (e.g., `role="dialog"` for Sheet)
 
 ### Authentication issues
-- Ensure test users exist and are verified: `npx tsx e2e/setup/test-database.ts`
+- Ensure test users exist and are verified: `pnpm tsx db/seed.ts --images placeholders`
 - Check session handling in global.setup.ts
 - Verify AUTH_SECRET and NEXTAUTH_SECRET are set in `.env.local`
 
@@ -333,7 +333,7 @@ Tests use the same `.env.local` file as the application. For CI/CD, set:
 - Stripe integration requires proper API keys in environment variables
 
 ### Foreign Key Constraint Errors
-- Run test database setup: `npx tsx e2e/setup/test-database.ts`
+- Run seed: `pnpm tsx db/seed.ts --images placeholders`
 - Ensure categories exist before creating products
 - Check that vendor and user IDs are valid
 
