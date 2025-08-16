@@ -4,6 +4,8 @@ import { routes } from '../helpers/navigation';
 test.describe('Vendor Registration', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(routes.vendorRegister);
+    // Ensure form is rendered before interactions (SSR + i18n redirects)
+    await page.getByTestId('vendor-businessName').first().waitFor({ state: 'visible', timeout: 20000 });
   });
 
   test('should display vendor registration form', async ({ page }) => {

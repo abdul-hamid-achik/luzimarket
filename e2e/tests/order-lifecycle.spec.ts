@@ -19,7 +19,7 @@ test.describe('Order Lifecycle - Complete Flow', () => {
       await page.getByTestId('product-card').first().click();
       const productName = await page.getByTestId('product-name').first().textContent();
       const vendorName = await page.getByTestId('vendor-name').first().textContent();
-      
+
       await page.getByRole('button', { name: /agregar al carrito/i }).first().click();
       await page.waitForSelector('[role="dialog"]');
       await page.waitForTimeout(300);
@@ -54,7 +54,7 @@ test.describe('Order Lifecycle - Complete Flow', () => {
       // Simulate successful payment webhook
       orderId = 'ORD-' + Date.now();
       await page.goto(`/success?session_id=test_session&order_id=${orderId}`);
-      
+
       await expect(page.getByText(/gracias por tu compra/i)).toBeVisible();
       await expect(page.getByText(orderId)).toBeVisible();
     });
@@ -65,9 +65,9 @@ test.describe('Order Lifecycle - Complete Flow', () => {
       await page.goto(routes.login);
       await page.getByRole('tab', { name: 'Admin' }).click();
       await page.fill('input[name="email"]', 'admin@luzimarket.shop');
-      await page.fill('input[name="password"]', 'Admin123!@#');
+      await page.fill('input[name="password"]', 'admin123');
       await page.getByRole('button', { name: /iniciar sesión/i }).click();
-      
+
       // Navigate to orders
       await page.waitForURL('**/admin');
       await page.goto(routes.adminOrders);
@@ -75,15 +75,15 @@ test.describe('Order Lifecycle - Complete Flow', () => {
 
       // Find the new order
       await page.getByRole('cell', { name: orderId }).click();
-      
+
       // Verify order details
       await expect(page.getByText(customerEmail)).toBeVisible();
       await expect(page.getByText(/pending|pendiente/i)).toBeVisible();
-      
+
       // Update status to processing
       await page.getByTestId('order-status-select').selectOption('processing');
       await page.getByRole('button', { name: /actualizar estado/i }).click();
-      
+
       await expect(page.getByText(/estado actualizado/i)).toBeVisible();
     });
 
@@ -92,14 +92,14 @@ test.describe('Order Lifecycle - Complete Flow', () => {
       // Logout admin
       await page.getByTestId('user-menu').click();
       await page.getByRole('button', { name: /cerrar sesión/i }).click();
-      
+
       // Login as vendor (using first vendor from seed data)
       await page.goto(routes.login);
       await page.getByRole('tab', { name: 'Vendedor' }).click();
       await page.fill('input[name="email"]', 'vendor1@example.com');
       await page.fill('input[name="password"]', 'password123');
       await page.getByRole('button', { name: /iniciar sesión/i }).click();
-      
+
       // Navigate to vendor orders
       await page.waitForURL('**/vendor/dashboard');
       await page.goto('/vendor/orders');
@@ -107,15 +107,15 @@ test.describe('Order Lifecycle - Complete Flow', () => {
 
       // Find and click on the order
       await page.getByRole('cell', { name: new RegExp(orderId) }).click();
-      
+
       // Add tracking information
       await page.fill('input[name="trackingNumber"]', 'TRACK123456789');
       await page.selectOption('select[name="carrier"]', 'fedex');
-      
+
       // Update to shipped status
       await page.getByTestId('order-status-select').selectOption('shipped');
       await page.getByRole('button', { name: /actualizar orden/i }).click();
-      
+
       await expect(page.getByText(/orden actualizada/i)).toBeVisible();
     });
 
@@ -124,7 +124,7 @@ test.describe('Order Lifecycle - Complete Flow', () => {
       // Logout vendor
       await page.getByTestId('user-menu').click();
       await page.getByRole('button', { name: /cerrar sesión/i }).click();
-      
+
       // Guest order lookup
       await page.goto('/orders/lookup');
       await page.fill('input[name="email"]', customerEmail);
@@ -134,10 +134,10 @@ test.describe('Order Lifecycle - Complete Flow', () => {
       // Verify order shows shipped status
       await expect(page.getByText(/enviado|shipped/i)).toBeVisible();
       await expect(page.getByText('TRACK123456789')).toBeVisible();
-      
+
       // Click track package link
       await page.getByRole('button', { name: /rastrear paquete/i }).click();
-      
+
       // Should open tracking URL (we can verify the URL contains tracking number)
       const newTab = await page.waitForEvent('popup');
       expect(newTab.url()).toContain('TRACK123456789');
@@ -150,17 +150,17 @@ test.describe('Order Lifecycle - Complete Flow', () => {
       await page.goto(routes.login);
       await page.getByRole('tab', { name: 'Admin' }).click();
       await page.fill('input[name="email"]', 'admin@luzimarket.shop');
-      await page.fill('input[name="password"]', 'Admin123!@#');
+      await page.fill('input[name="password"]', 'admin123');
       await page.getByRole('button', { name: /iniciar sesión/i }).click();
-      
+
       // Go to order
       await page.goto(routes.adminOrders);
       await page.getByRole('cell', { name: orderId }).click();
-      
+
       // Update to delivered
       await page.getByTestId('order-status-select').selectOption('delivered');
       await page.getByRole('button', { name: /actualizar estado/i }).click();
-      
+
       await expect(page.getByText(/estado actualizado/i)).toBeVisible();
     });
 
@@ -169,7 +169,7 @@ test.describe('Order Lifecycle - Complete Flow', () => {
       // Logout and check order as guest
       await page.getByTestId('user-menu').click();
       await page.getByRole('button', { name: /cerrar sesión/i }).click();
-      
+
       await page.goto('/orders/lookup');
       await page.fill('input[name="email"]', customerEmail);
       await page.fill('input[name="orderNumber"]', orderId);
@@ -177,12 +177,12 @@ test.describe('Order Lifecycle - Complete Flow', () => {
 
       // Verify delivered status
       await expect(page.getByText(/entregado|delivered/i)).toBeVisible();
-      
+
       // Download invoice
       const downloadPromise = page.waitForEvent('download');
       await page.getByRole('button', { name: /descargar factura/i }).click();
       const download = await downloadPromise;
-      
+
       // Verify download
       expect(download.suggestedFilename()).toContain(orderId);
       expect(download.suggestedFilename()).toMatch(/\.(pdf|PDF)$/);
@@ -215,7 +215,7 @@ test.describe('Order Lifecycle - Complete Flow', () => {
     await page.route('**/api/checkout/sessions', async route => {
       await route.fulfill({ json: { url: 'https://stripe.com', sessionId: 'test' } });
     });
-    
+
     // Wait for checkout page to be ready and try multiple selector approaches
     await page.waitForLoadState('networkidle');
     const submitButton = page.locator('button').filter({ hasText: /proceder al pago|checkout|finalizar/i }).first();
@@ -231,10 +231,10 @@ test.describe('Order Lifecycle - Complete Flow', () => {
 
     // Request cancellation
     await page.getByRole('button', { name: /cancelar orden/i }).click();
-    
+
     // Confirm cancellation
     await page.getByRole('button', { name: /confirmar cancelación/i }).click();
-    
+
     // Should show cancellation requested
     await expect(page.getByText(/cancelación solicitada/i)).toBeVisible();
   });
@@ -264,7 +264,7 @@ test.describe('Order Lifecycle - Complete Flow', () => {
     await page.route('**/api/checkout/sessions', async route => {
       await route.fulfill({ json: { url: 'https://stripe.com/checkout/test', sessionId: 'test-session-id' } });
     });
-    
+
     // Submit checkout form
     await page.waitForLoadState('networkidle');
     const submitButton = page.locator('button').filter({ hasText: /proceder al pago|checkout|finalizar/i }).first();
@@ -273,12 +273,12 @@ test.describe('Order Lifecycle - Complete Flow', () => {
 
     // Verify successful checkout form submission
     await page.waitForLoadState('networkidle');
-    
+
     // Check that we're either redirected or the form was processed successfully
     const currentUrl = page.url();
     const isOnCheckoutPage = currentUrl.includes('/pagar');
     const isRedirected = currentUrl.includes('stripe.com') || currentUrl.includes('success');
-    
+
     // Either should be acceptable - staying on checkout page means form was processed
     expect(isOnCheckoutPage || isRedirected).toBe(true);
   });
@@ -303,7 +303,7 @@ test.describe('Order Lifecycle - Complete Flow', () => {
     await page.fill('input[name="state"]', 'CDMX');
     await page.fill('input[name="postalCode"]', '01000');
     await page.fill('input[name="country"]', 'México');
-    
+
     // Add special instructions
     await page.fill('textarea[name="notes"]', 'Por favor entregar en la tarde después de las 4pm');
     await page.locator('label[for="acceptTerms"]').click();
@@ -311,7 +311,7 @@ test.describe('Order Lifecycle - Complete Flow', () => {
     await page.route('**/api/checkout/sessions', async route => {
       await route.fulfill({ json: { url: 'https://stripe.com', sessionId: 'test' } });
     });
-    
+
     // Wait for checkout page to be ready and try multiple selector approaches
     await page.waitForLoadState('networkidle');
     const submitButton = page.locator('button').filter({ hasText: /proceder al pago|checkout|finalizar/i }).first();
@@ -325,7 +325,7 @@ test.describe('Order Lifecycle - Complete Flow', () => {
     await page.fill('input[name="email"]', 'vendor1@example.com');
     await page.fill('input[name="password"]', 'password123');
     await page.getByRole('button', { name: /iniciar sesión/i }).click();
-    
+
     await page.goto('/vendor/orders');
     await page.getByRole('cell', { name: new RegExp(noteOrderId) }).click();
 
@@ -335,7 +335,7 @@ test.describe('Order Lifecycle - Complete Flow', () => {
     // Vendor adds internal note
     await page.fill('textarea[name="vendorNotes"]', 'Programado para entrega a las 5pm');
     await page.getByRole('button', { name: /guardar nota/i }).click();
-    
+
     await expect(page.getByText(/nota guardada/i)).toBeVisible();
   });
 });

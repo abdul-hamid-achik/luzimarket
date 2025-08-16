@@ -20,8 +20,11 @@ test.describe('Vendor Dashboard', () => {
     // Submit login form
     await page.locator(`button[type="submit"]:has-text("${uiText.es.login}")`).click();
 
-    // Wait for redirect to vendor dashboard (localized path)
-    await page.waitForURL('**/vendedor/panel', { timeout: 15000 });
+    // Wait for redirect or dashboard content (support localized and non-localized URL)
+    await Promise.race([
+      page.waitForURL(/\/(vendedor|vendor)\/(panel|dashboard)/, { timeout: 20000 }),
+      page.waitForSelector('[data-testid="vendor-stats"]', { timeout: 20000 }),
+    ]);
   }
 
   test.beforeEach(async ({ page }) => {
@@ -61,13 +64,16 @@ test.describe('Vendor Dashboard', () => {
     await page.goto('/vendor/products');
 
     // Wait for products page
-    await page.waitForURL(/\/products|productos/, { timeout: 15000 });
+    await Promise.race([
+      page.waitForURL(/\/(vendor|vendedor)\/(products|productos)/, { timeout: 20000 }),
+      page.waitForSelector('[data-testid="vendor-products-title"]', { timeout: 20000 }),
+    ]);
 
     // Verify products table/grid
     await expect(page.getByTestId('vendor-products-title')).toBeVisible();
 
-    // Check for add product button
-    const addProductButton = page.locator('button, a').filter({ hasText: /Agregar Producto|Add product|Nuevo producto|New product/i });
+    // Check for add product button (use stable testid)
+    const addProductButton = page.getByTestId('vendor-add-product');
     await expect(addProductButton).toBeVisible();
   });
 

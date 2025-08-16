@@ -484,6 +484,30 @@ async function main() {
         await pgDb.insert(schema.categories).values(CATEGORIES as any).onConflictDoNothing({ target: schema.categories.slug });
         const categories = await pgDb.select().from(schema.categories);
 
+        // 1.5) Ensure default admin users exist (needed for e2e tests)
+        const autoHashedAdminPassword = await bcrypt.hash("admin123", 10);
+        const autoAdminUsers = [
+          {
+            email: "admin@luzimarket.shop",
+            name: "Administrador Principal",
+            passwordHash: autoHashedAdminPassword,
+            role: "super_admin" as const,
+            isActive: true,
+          },
+        ];
+        await pgDb
+          .insert(schema.adminUsers)
+          .values(autoAdminUsers as any)
+          .onConflictDoUpdate({
+            target: schema.adminUsers.email,
+            set: {
+              name: sql`excluded.name`,
+              passwordHash: sql`excluded.password_hash`,
+              role: sql`excluded.role`,
+              isActive: sql`excluded.is_active`,
+            },
+          });
+
         // 2) Get shipping methods for foreign key references
         const shippingMethodsList = await pgDb.select().from(schema.shippingMethods);
         const defaultShippingMethodId = shippingMethodsList.length > 0 ? shippingMethodsList[0].id : null;
@@ -498,7 +522,7 @@ async function main() {
           version: '2',
         } as any);
         // Normalize vendors to MX profile and set default shipping method
-        const vendors = await pgDb.select().from(schema.vendors);
+        let vendors = await pgDb.select().from(schema.vendors);
         for (const v of vendors) {
           await pgDb.update(schema.vendors)
             .set({
@@ -513,6 +537,95 @@ async function main() {
             })
             .where(eq(schema.vendors.id, (v as any).id));
         }
+
+        // 3.5) Ensure fixed test vendors exist with known passwords
+        const autoHashedVendorPassword = await bcrypt.hash("password123", 10);
+        await pgDb
+          .insert(schema.vendors)
+          .values([
+            {
+              businessName: 'Test Vendor Shop',
+              slug: 'test-vendor-shop',
+              contactName: 'Test Vendor',
+              email: 'vendor@luzimarket.shop',
+              passwordHash: autoHashedVendorPassword,
+              phone: '+52 55 5123 4567',
+              whatsapp: '+52 55 5123 4567',
+              businessPhone: '+52 55 5123 4567',
+              businessHours: 'Lun-Vie 9:00-18:00',
+              city: 'Ciudad de México',
+              state: 'CDMX',
+              country: 'México',
+              postalCode: '01000',
+              websiteUrl: 'https://testvendor.com',
+              description: 'Fixed test vendor for e2e tests',
+              hasDelivery: true,
+              deliveryService: 'own',
+              instagramUrl: '@testvendor',
+              facebookUrl: 'testvendor',
+              tiktokUrl: '@testvendor',
+              isActive: true,
+              shippingOriginState: 'Ciudad de México',
+              defaultShippingMethodId: defaultShippingMethodId,
+              freeShippingThreshold: '1000',
+            },
+            {
+              businessName: 'Vendor 1',
+              slug: 'vendor-1',
+              contactName: 'Vendor One',
+              email: 'vendor1@example.com',
+              passwordHash: autoHashedVendorPassword,
+              phone: generateMxPhone(),
+              whatsapp: generateMxPhone(),
+              businessPhone: generateMxPhone(),
+              businessHours: 'Lun-Vie 9:00-18:00',
+              city: 'Ciudad de México',
+              state: 'CDMX',
+              country: 'México',
+              postalCode: '01000',
+              description: 'Fixed vendor 1 for tests',
+              hasDelivery: true,
+              deliveryService: 'own',
+              isActive: true,
+              shippingOriginState: 'Ciudad de México',
+              defaultShippingMethodId: defaultShippingMethodId,
+            },
+            {
+              businessName: 'Vendor 2',
+              slug: 'vendor-2',
+              contactName: 'Vendor Two',
+              email: 'vendor2@example.com',
+              passwordHash: autoHashedVendorPassword,
+              phone: generateMxPhone(),
+              whatsapp: generateMxPhone(),
+              businessPhone: generateMxPhone(),
+              businessHours: 'Lun-Vie 9:00-18:00',
+              city: 'Guadalajara',
+              state: 'Jalisco',
+              country: 'México',
+              postalCode: '44100',
+              description: 'Fixed vendor 2 for tests',
+              hasDelivery: true,
+              deliveryService: 'own',
+              isActive: true,
+              shippingOriginState: 'Jalisco',
+              defaultShippingMethodId: defaultShippingMethodId,
+            },
+          ] as any)
+          .onConflictDoUpdate({
+            target: schema.vendors.email,
+            set: {
+              businessName: sql`excluded.business_name`,
+              slug: sql`excluded.slug`,
+              contactName: sql`excluded.contact_name`,
+              passwordHash: sql`excluded.password_hash`,
+              isActive: sql`excluded.is_active`,
+              defaultShippingMethodId: sql`excluded.default_shipping_method_id`,
+            },
+          });
+
+        // Refresh vendors list to include fixed vendors for downstream steps
+        vendors = await pgDb.select().from(schema.vendors);
 
         // 4) Seed products with controlled counts per category
         const productCounts: Record<string, number> = {
@@ -584,6 +697,80 @@ async function main() {
           ...(Number.isFinite(seedVal) ? { seed: seedVal } : {}),
           version: '2',
         } as any);
+
+        // 5.5) Ensure fixed test customers with known passwords and verification
+        const autoHashedUserPassword = await bcrypt.hash("password123", 10);
+        const now = new Date();
+        await pgDb
+          .insert(schema.users)
+          .values([
+            {
+              email: 'customer1@example.com',
+              name: 'Test Customer 1',
+              passwordHash: autoHashedUserPassword,
+              stripeCustomerId: 'cus_test_customer1',
+              isActive: true,
+              emailVerified: true,
+              emailVerifiedAt: now,
+            },
+            {
+              email: 'customer2@example.com',
+              name: 'Test Customer 2',
+              passwordHash: autoHashedUserPassword,
+              stripeCustomerId: 'cus_test_customer2',
+              isActive: true,
+              emailVerified: true,
+              emailVerifiedAt: now,
+            },
+            {
+              email: 'client@luzimarket.shop',
+              name: 'Test Customer',
+              passwordHash: autoHashedUserPassword,
+              stripeCustomerId: 'cus_client_main',
+              isActive: true,
+              emailVerified: true,
+              emailVerifiedAt: now,
+            },
+            {
+              email: 'client_2@luzimarket.shop',
+              name: 'Test Customer 2',
+              passwordHash: autoHashedUserPassword,
+              stripeCustomerId: 'cus_client_alt',
+              isActive: true,
+              emailVerified: true,
+              emailVerifiedAt: now,
+            },
+            {
+              email: 'unverified@example.com',
+              name: 'Unverified User',
+              passwordHash: autoHashedUserPassword,
+              isActive: true,
+              emailVerified: false,
+              emailVerifiedAt: null,
+            },
+            {
+              email: 'locked@example.com',
+              name: 'Locked User',
+              passwordHash: autoHashedUserPassword,
+              isActive: true,
+              emailVerified: true,
+              emailVerifiedAt: now,
+              failedLoginAttempts: 5,
+              lockedUntil: new Date(Date.now() + 30 * 60 * 1000),
+            },
+          ] as any)
+          .onConflictDoUpdate({
+            target: schema.users.email,
+            set: {
+              name: sql`excluded.name`,
+              passwordHash: sql`excluded.password_hash`,
+              isActive: sql`excluded.is_active`,
+              emailVerified: sql`excluded.email_verified`,
+              emailVerifiedAt: sql`excluded.email_verified_at`,
+              failedLoginAttempts: sql`excluded.failed_login_attempts`,
+              lockedUntil: sql`excluded.locked_until`,
+            },
+          });
       } finally {
         await client.end();
       }

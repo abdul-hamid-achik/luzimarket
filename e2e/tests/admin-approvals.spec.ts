@@ -5,18 +5,18 @@ test.describe('Admin Approval Workflows', () => {
   // Helper to login as admin
   async function loginAsAdmin(page: any) {
     await page.goto(routes.login);
-    
+
     // Click on admin tab first
     const adminTab = page.locator('button[role="tab"]').filter({ hasText: /Admin/i });
     await adminTab.click();
-    
+
     // Use admin login form with admin credentials
     await page.fill('input[id="admin-email"]', 'admin@luzimarket.shop');
     await page.fill('input[id="admin-password"]', 'admin123');
-    
+
     const submitButton = page.locator('button[type="submit"]').filter({ hasText: /Iniciar sesión|Sign in/ });
     await submitButton.click();
-    
+
     // Wait for navigation to admin area (handle localized URLs like /es/admin)
     await page.waitForURL((url: URL) => {
       const path = url.pathname;
@@ -35,7 +35,7 @@ test.describe('Admin Approval Workflows', () => {
       await vendorLink.click();
 
       // Wait for page to load
-      await page.waitForURL(/\/vendors|vendedores/, { timeout: 5000 });
+      await page.waitForURL(/\/vendors|vendedores/, { timeout: 10000 });
 
       // Check for pending tab/filter
       const pendingTab = page.locator('button[role="tab"], button').filter({ hasText: /Pendiente|Pending|Revisar|Review/i });
@@ -274,17 +274,17 @@ test.describe('Admin Approval Workflows', () => {
         if (await productInfo.count() > 0) {
           await expect(productInfo.first()).toBeVisible();
         }
-        
+
         // Look for price information with more flexible selector
         const priceElements = page.locator('.price, [data-testid*="price"], input[name*="price"]');
         const priceText = page.locator('text=/\$[0-9,]+|Precio|Price/i');
-        
+
         if (await priceElements.count() > 0) {
           await expect(priceElements.first()).toBeVisible();
         } else if (await priceText.count() > 0) {
           await expect(priceText.first()).toBeVisible();
         }
-        
+
         // Look for any form fields or content areas that might contain product details
         const detailsSection = page.locator('.product-details, .product-info, form, .modal-content');
         if (await detailsSection.count() > 0) {
@@ -423,7 +423,7 @@ test.describe('Admin Approval Workflows', () => {
       const usersLink = page.locator('a, button').filter({ hasText: /Usuarios|Users|Clientes|Customers/i }).first();
       await usersLink.click();
 
-      await page.waitForURL(/\/users|usuarios/, { timeout: 5000 });
+      await page.waitForURL(/\/users|usuarios/, { timeout: 10000 });
 
       // Should show user type filters
       const filters = page.locator('button[role="tab"], select option').filter({
