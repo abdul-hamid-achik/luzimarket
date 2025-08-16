@@ -89,6 +89,10 @@ export const routing = defineRouting({
       es: '/vendedor/configuracion/notificaciones',
       en: '/vendor/settings/notifications'
     },
+    '/vendor/settings/security': {
+      es: '/vendedor/configuracion/seguridad',
+      en: '/vendor/settings/security'
+    },
     '/vendor/settings/payments': {
       es: '/vendedor/configuracion/pagos',
       en: '/vendor/settings/payments'

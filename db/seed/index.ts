@@ -21,8 +21,8 @@ async function createProgressControls(): Promise<ProgressControls> {
     return {
       enabled: false,
       start: () => null,
-      tick: () => {},
-      stop: () => {},
+      tick: () => { },
+      stop: () => { },
     };
   }
   try {
@@ -50,8 +50,8 @@ async function createProgressControls(): Promise<ProgressControls> {
     return {
       enabled: false,
       start: () => null,
-      tick: () => {},
-      stop: () => {},
+      tick: () => { },
+      stop: () => { },
     };
   }
 }
@@ -111,8 +111,9 @@ function buildPlaceholderImageUrl(kind: 'category' | 'product', slug: string): s
     'photo-1542291026-7eec264c27ff', // generic flowers
     'photo-1519681393784-d120267933ba', // gift box
     'photo-1504754524776-8f4f37790ca0', // chocolate
-    'photo-1519681394823-2bda8d494253', // candles
-    'photo-1512291319326-9f4cebe47745', // jewelry
+    // Removed two IDs that currently 404 from Unsplash
+    // 'photo-1519681394823-2bda8d494253', // candles
+    // 'photo-1512291319326-9f4cebe47745', // jewelry
     'photo-1486427944299-d1955d23e34d', // decor
   ];
   const categoryImageIds = [
@@ -177,7 +178,7 @@ const CATEGORIES = [
     imageUrl: null, // Will be generated with AI
     displayOrder: 6
   },
-  
+
 ];
 
 const PRODUCT_NAMES = [
@@ -469,7 +470,7 @@ async function main() {
       await client.connect();
       try {
         const pgDb = drizzle(client, { schema });
-        
+
         // 0) Initialize shipping data FIRST to avoid foreign key issues
         console.log("🚚 Initializing shipping zones and methods...");
         const shippingResult = await initializeShippingData();
@@ -478,7 +479,7 @@ async function main() {
         } else {
           console.log(`⚠️  Shipping data initialization failed: ${shippingResult.error}`);
         }
-        
+
         // 1) Ensure our 6 fixed categories exist
         await pgDb.insert(schema.categories).values(CATEGORIES as any).onConflictDoNothing({ target: schema.categories.slug });
         const categories = await pgDb.select().from(schema.categories);
@@ -486,12 +487,11 @@ async function main() {
         // 2) Get shipping methods for foreign key references
         const shippingMethodsList = await pgDb.select().from(schema.shippingMethods);
         const defaultShippingMethodId = shippingMethodsList.length > 0 ? shippingMethodsList[0].id : null;
-        
+
         // 3) Seed a realistic number of vendors with proper shipping method reference
         const vendorTarget = 12;
-        await drizzleSeed(pgDb as any, { 
+        await drizzleSeed(pgDb as any, {
           vendors: schema.vendors,
-          shippingMethods: schema.shippingMethods 
         } as any, {
           count: vendorTarget,
           ...(Number.isFinite(seedVal) ? { seed: seedVal } : {}),
@@ -781,7 +781,7 @@ async function main() {
       "regalos-personalizados": PRODUCT_NAMES.slice(45, 60),
       "cajas-regalo": PRODUCT_NAMES.slice(60, 75),
       "decoracion-hogar": PRODUCT_NAMES.slice(75, 90),
-  // trimmed to 6 categories for realistic demo
+      // trimmed to 6 categories for realistic demo
     };
 
     for (let i = 0; i < 100; i++) {

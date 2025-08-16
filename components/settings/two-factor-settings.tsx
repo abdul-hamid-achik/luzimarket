@@ -419,10 +419,12 @@ export function TwoFactorSettings() {
                 const codes = backupCodesData?.backupCodes || [];
                 const blob = new Blob([codes.join('\n')], { type: 'text/plain' });
                 const url = URL.createObjectURL(blob);
-                const linkEl = document.createElement(String('a'));
+                const linkEl = document.createElement('a');
                 linkEl.href = url;
                 linkEl.download = 'luzimarket-backup-codes.txt';
+                document.body.appendChild(linkEl);
                 linkEl.click();
+                document.body.removeChild(linkEl);
                 URL.revokeObjectURL(url);
               }}
               className="flex-1"

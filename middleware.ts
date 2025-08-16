@@ -67,6 +67,17 @@ function applySecurityHeaders(response: NextResponse): NextResponse {
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
+  // Bypass middleware for static assets and public files explicitly
+  // This avoids locale/rate/csrf logic interfering with images and other assets
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/images/') ||
+    pathname === '/favicon.ico' ||
+    /\.[a-zA-Z0-9]+$/.test(pathname)
+  ) {
+    return NextResponse.next()
+  }
+
   // Track session activity for authenticated users (non-blocking)
   const sessionToken = request.headers.get('authorization')?.replace('Bearer ', '') ||
     request.cookies.get('next-auth.session-token')?.value ||
@@ -188,7 +199,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     // Skip all internal paths (_next, assets, etc)
-    '/((?!_next|_vercel|.*\\..*|api/health).*)',
+    '/((?!_next|_vercel|api/health|images/|.*\\.(?:svg|png|jpg|jpeg|webp|ico|otf|ttf|woff|woff2)).*)',
     // Include API routes for security handling
     '/api/:path*'
   ]

@@ -65,7 +65,7 @@ export default async function VendorSettingsPage() {
       color: "text-red-600",
       bgColor: "bg-red-50",
     },
-  ];
+  ] as const;
 
   return (
     <div className="space-y-6">

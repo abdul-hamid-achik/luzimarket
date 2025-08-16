@@ -134,11 +134,12 @@ export default defineConfig({
    */
 
   webServer: {
-    command: 'sh -c "npm run build && npm run start"',
+    command: 'npm run dev',
     url: `http://localhost:${process.env.PORT || '3000'}`,
     reuseExistingServer: !process.env.CI,
     timeout: 180 * 1000,
     env: {
+      PORT: process.env.PORT || '3000',
       NEXT_PUBLIC_APP_URL: `http://localhost:${process.env.PORT || '3000'}`,
       NEXTAUTH_URL: `http://localhost:${process.env.PORT || '3000'}`,
       NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || 'test_e2e_secret',

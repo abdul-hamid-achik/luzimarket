@@ -66,17 +66,17 @@ const REVIEW_COMMENTS = {
  */
 export async function seedReviewsAndRatings(database = db, options?: any) {
   console.log("⭐ Creating reviews and ratings...");
-  
+
   const orders = await database.query.orders.findMany({
     where: (orders, { eq }) => eq(orders.status, "delivered"),
     with: {
       items: true
     }
   });
-  
+
   const users = await database.select().from(schema.users);
   const products = await database.select().from(schema.products);
-  
+
   if (orders.length === 0) {
     console.log("⚠️  No delivered orders found for reviews");
     return { success: true, message: "No reviews created", data: { reviews: 0 } };
@@ -84,41 +84,44 @@ export async function seedReviewsAndRatings(database = db, options?: any) {
 
   const reviewData = [];
   const processedCombos = new Set(); // Track user-product combinations
-  
+
   // Create reviews for delivered orders
   for (const order of orders) {
     if (!order.userId) continue;
-    
+
     const user = users.find(u => u.id === order.userId);
     if (!user) continue;
-    
+
     // Determine customer type based on position in array
     const userIndex = users.indexOf(user);
     const customerType = userIndex < 10 ? 'vip' :
-                        userIndex < 40 ? 'loyal' :
-                        userIndex < 100 ? 'regular' : 'occasional';
-    
+      userIndex < 40 ? 'loyal' :
+        userIndex < 100 ? 'regular' : 'occasional';
+
     const orderValue = parseFloat(order.total);
     const shouldReview = reviewLikelihood(orderValue, customerType);
-    
+
     if (!shouldReview) continue;
-    
+
     // Review some or all items in the order
     const itemsToReview = faker.helpers.arrayElements(
       order.items,
       faker.number.int({ min: 1, max: Math.min(3, order.items.length) })
     );
-    
+
     for (const item of itemsToReview) {
       const comboKey = `${user.id}-${item.productId}`;
       if (processedCombos.has(comboKey)) continue;
       processedCombos.add(comboKey);
-      
+
       // Generate rating based on customer type and product
       const rating = generateRating(customerType);
       const titles = REVIEW_TITLES[rating as keyof typeof REVIEW_TITLES];
       const comments = REVIEW_COMMENTS[rating as keyof typeof REVIEW_COMMENTS];
-      
+
+      // Ensure we always have a valid Date for faker.date.between
+      const orderCreatedAt = order.createdAt ? new Date(order.createdAt) : new Date();
+
       reviewData.push({
         productId: item.productId,
         userId: user.id,
@@ -128,35 +131,35 @@ export async function seedReviewsAndRatings(database = db, options?: any) {
         comment: faker.helpers.arrayElement(comments),
         isVerifiedPurchase: true,
         helpfulCount: generateHelpfulCount(rating),
-        images: faker.datatype.boolean({ probability: 0.1 }) 
+        images: faker.datatype.boolean({ probability: 0.1 })
           ? [`/uploads/reviews/${faker.string.uuid()}.jpg`]
           : null,
-        createdAt: faker.date.between({ 
-          from: order.createdAt, 
+        createdAt: faker.date.between({
+          from: orderCreatedAt,
           to: new Date(Math.min(
-            order.createdAt.getTime() + 30 * 24 * 60 * 60 * 1000,
+            orderCreatedAt.getTime() + 30 * 24 * 60 * 60 * 1000,
             Date.now()
           ))
         })
       });
     }
   }
-  
+
   // Add some fake reviews (non-verified purchases) for popular products
   const popularProducts = products.slice(0, 30);
   const fakeReviewUsers = faker.helpers.arrayElements(users, 20);
-  
+
   for (const product of popularProducts) {
     if (faker.datatype.boolean({ probability: 0.3 })) {
       const user = faker.helpers.arrayElement(fakeReviewUsers);
       const comboKey = `${user.id}-${product.id}`;
-      
+
       if (!processedCombos.has(comboKey)) {
         processedCombos.add(comboKey);
         const rating = generateRating('occasional');
         const titles = REVIEW_TITLES[rating as keyof typeof REVIEW_TITLES];
         const comments = REVIEW_COMMENTS[rating as keyof typeof REVIEW_COMMENTS];
-        
+
         reviewData.push({
           productId: product.id,
           userId: user.id,
@@ -172,11 +175,11 @@ export async function seedReviewsAndRatings(database = db, options?: any) {
       }
     }
   }
-  
+
   if (reviewData.length > 0) {
     await database.insert(schema.reviews).values(reviewData);
   }
-  
+
   return {
     success: true,
     message: `Created ${reviewData.length} reviews`,
@@ -195,18 +198,18 @@ function generateRating(customerType: string): number {
     regular: { 5: 0.4, 4: 0.35, 3: 0.15, 2: 0.07, 1: 0.03 },
     occasional: { 5: 0.35, 4: 0.3, 3: 0.2, 2: 0.1, 1: 0.05 }
   };
-  
+
   const dist = distributions[customerType as keyof typeof distributions] || distributions.occasional;
   const random = Math.random();
   let cumulative = 0;
-  
+
   for (const [rating, probability] of Object.entries(dist)) {
     cumulative += probability;
     if (random < cumulative) {
       return parseInt(rating);
     }
   }
-  
+
   return 4; // Default
 }
 
@@ -219,6 +222,6 @@ function generateHelpfulCount(rating: number): number {
     2: faker.number.int({ min: 0, max: 10 }),
     1: faker.number.int({ min: 0, max: 5 })
   };
-  
+
   return baseCount[rating as keyof typeof baseCount] || 0;
 }

@@ -1224,9 +1224,9 @@
     "resendVerificationLink": "¿No recibiste el correo? Reenviar enlace de verificación",
     "subtitle": "Inicia sesión en tu cuenta",
     "tabs": {
-      "Admin": "Admin",
+      "admin": "Admin",
       "customer": "Cliente",
-      "Vendor": "Vendedor"
+      "vendor": "Vendedor"
     },
     "validation": {
       "invalidEmail": "Correo electrónico inválido",
@@ -1688,6 +1688,7 @@
     "specifications": "Especificaciones",
     "subtitle": "Descubre nuestra selección completa de regalos extraordinarios",
     "title": "Todos los Productos",
+    "vendor": "Vendedor",
     "Vendor": "Vendedor",
     "vendors": "Tiendas",
     "viewDetails": "Ver detalles"
@@ -2270,11 +2271,6 @@
       "total": "Total",
       "transactionId": "ID de transacción"
     },
-    "orderDetails.status.cancelled": "Cancelado",
-    "orderDetails.status.delivered": "Entregado",
-    "orderDetails.status.pending": "Pendiente",
-    "orderDetails.status.processing": "Procesando",
-    "orderDetails.status.shipped": "Enviado",
     "orderManagement": {
       "additionalNotes": "Notas Adicionales (Opcional)",
       "customer": "Cliente",

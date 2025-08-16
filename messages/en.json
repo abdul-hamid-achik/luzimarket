@@ -1224,9 +1224,9 @@
     "resendVerificationLink": "Didn't receive the email? Resend verification link",
     "subtitle": "Sign in to your account",
     "tabs": {
-      "Admin": "Admin",
+      "admin": "Admin",
       "customer": "Customer",
-      "Vendor": "Vendor"
+      "vendor": "Vendor"
     },
     "validation": {
       "invalidEmail": "Invalid email",
@@ -1688,6 +1688,7 @@
     "specifications": "Specifications",
     "subtitle": "Discover our complete selection of extraordinary gifts",
     "title": "All Products",
+    "vendor": "Vendor",
     "Vendor": "Vendor",
     "vendors": "Stores",
     "viewDetails": "View details"
@@ -2270,11 +2271,6 @@
       "total": "Total",
       "transactionId": "Transaction ID"
     },
-    "orderDetails.status.cancelled": "Cancelled",
-    "orderDetails.status.delivered": "Delivered",
-    "orderDetails.status.pending": "Pending",
-    "orderDetails.status.processing": "Processing",
-    "orderDetails.status.shipped": "Shipped",
     "orderManagement": {
       "additionalNotes": "Additional Notes (Optional)",
       "customer": "Customer",
