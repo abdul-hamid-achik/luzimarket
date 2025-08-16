@@ -50,9 +50,10 @@ export default function OrderLookupPage() {
 
       const result = await response.json();
 
-      if (response.ok && result.orderId) {
-        // Redirect to order details page
-        router.push(`/orders/${result.orderId}` as any);
+      if (response.ok && result.orderNumber) {
+        // Redirect to order details page using orderNumber for consistency and include email for guest access
+        const usp = new URLSearchParams({ email: data.email });
+        router.push((`/orders/${result.orderNumber}?${usp.toString()}`) as any);
       } else {
         setError(result.error || "No se encontró la orden con los datos proporcionados");
       }

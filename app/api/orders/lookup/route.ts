@@ -48,9 +48,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Return order ID for redirect
+    // Return orderNumber for redirect so guests can access with email
     return NextResponse.json({
-      orderId: order.id,
       orderNumber: order.orderNumber,
     });
   } catch (error) {

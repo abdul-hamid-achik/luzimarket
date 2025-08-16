@@ -66,7 +66,7 @@ export default defineConfig({
 
     /* Increase timeouts for slower operations */
     navigationTimeout: 60000,
-    actionTimeout: 30000,
+    actionTimeout: 5000,
 
     /* Browser context options */
     contextOptions: {

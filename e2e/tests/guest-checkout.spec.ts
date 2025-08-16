@@ -138,8 +138,8 @@ test.describe('Guest Checkout Flow', () => {
     await page.fill('input#orderNumber', orderNumber!);
     await page.getByRole('button', { name: /buscar pedido/i }).click();
 
-    // Guests are redirected to login when opening order details
-    await expect(page).toHaveURL(/\/(orders\/[^/]+|login)/);
+    // Guests should land on order detail page with locale and email in query
+    await expect(page).toHaveURL(/\/(pedidos|orders)\/[^/?#]+\?email=/);
   });
 
   test('should persist cart after failed checkout attempt', async ({ page }) => {

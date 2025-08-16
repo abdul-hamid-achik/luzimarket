@@ -167,6 +167,21 @@ export function useOrder(orderNumber: string) {
   });
 }
 
+// Hook for fetching a guest order (no auth) via email + orderNumber
+export function useGuestOrder(orderNumber: string, email: string | null) {
+  return useQuery<{ order: OrderDetail }>({
+    queryKey: ['guest-order', orderNumber, email],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (email) params.set('email', email);
+      return fetchWithAuth(`/api/orders/guest/${orderNumber}?${params.toString()}`);
+    },
+    enabled: !!orderNumber && !!email,
+    staleTime: 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+}
+
 // Hook for order statistics (useful for dashboard)
 export function useOrderStats() {
   const { data: session } = useSession();
