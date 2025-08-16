@@ -4,14 +4,14 @@ services:
     container_name: luzimarket-db
     ports:
       - "5432:5432"
-    environment:
-      NEON_API_KEY_FILE: /run/secrets/neon_api_key
-      NEON_PROJECT_ID_FILE: /run/secrets/neon_project_id
-      BRANCH_ID_FILE: /run/secrets/neon_branch_id
     secrets:
       - neon_api_key
       - neon_project_id
       - neon_branch_id
+    environment:
+      NEON_API_KEY: ${NEON_API_KEY}
+      NEON_PROJECT_ID: ${NEON_PROJECT_ID}
+      NEON_BRANCH_ID: ${NEON_BRANCH_ID}
     # Optional: Persist a Neon branch per Git branch and across restarts
     # See: https://neon.com/docs/local/neon-local
     # volumes:
@@ -20,8 +20,8 @@ services:
 
 secrets:
   neon_api_key:
-    file: ./tmp/secrets/neon_api_key.txt
+    environment: NEON_API_KEY
   neon_project_id:
-    file: ./tmp/secrets/neon_project_id.txt
+    environment: NEON_PROJECT_ID
   neon_branch_id:
-    file: ./tmp/secrets/neon_branch_id.txt
+    environment: NEON_BRANCH_ID

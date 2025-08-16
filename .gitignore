@@ -58,9 +58,6 @@ next-env.d.ts
 # neon local data
 .neon_local/
 
-# docker secrets
-/secrets/
-
 # e2e test fixtures
 /e2e/fixtures/*.jpg
 /e2e/fixtures/*.png

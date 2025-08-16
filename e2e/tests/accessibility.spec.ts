@@ -290,7 +290,8 @@ test.describe('Accessibility Tests', () => {
     await page.goto(routes.products);
 
     // Trigger a loading state (e.g., by filtering)
-    const filterCheckbox = page.locator('input[type="checkbox"]').first();
+    // Use ARIA role-based selector to target visible checkbox controls (shadcn/radix render buttons with role="checkbox")
+    const filterCheckbox = page.getByRole('checkbox').first();
 
     if (await filterCheckbox.isVisible()) {
       await filterCheckbox.click();
