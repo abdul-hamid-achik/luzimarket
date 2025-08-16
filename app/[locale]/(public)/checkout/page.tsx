@@ -29,22 +29,22 @@ const createCheckoutSchema = (t: any) => z.object({
   firstName: z.string().min(1, t("validation.firstNameRequired")),
   lastName: z.string().min(1, t("validation.lastNameRequired")),
   phone: z.string().min(10, t("validation.invalidPhone")),
-  
+
   // Shipping Address
   address: z.string().min(1, t("validation.addressRequired")),
   city: z.string().min(1, t("validation.cityRequired")),
   state: z.string().min(1, t("validation.stateRequired")),
   postalCode: z.string().min(5, t("validation.invalidPostalCode")),
   country: z.string().min(1, t("validation.countryRequired")),
-  
+
   // Optional fields
   apartment: z.string().optional(),
   company: z.string().optional(),
   instructions: z.string().optional(),
-  
+
   // Billing
   sameAsBilling: z.boolean(),
-  
+
   // Terms
   acceptTerms: z.boolean().refine(val => val === true, t("validation.acceptTermsRequired")),
   newsletter: z.boolean().optional(),
@@ -62,7 +62,7 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null);
   const [checkoutMode, setCheckoutMode] = useState<"guest" | "login">("guest");
   const { data: session } = useSession();
-  
+
   const checkoutSchema = createCheckoutSchema(t);
 
   const form = useForm<CheckoutForm>({
@@ -82,11 +82,11 @@ export default function CheckoutPage() {
   const total = subtotal + shippingCost + tax;
 
   // Memoize shipping items to prevent infinite loops
-  const shippingItems = useMemo(() => 
+  const shippingItems = useMemo(() =>
     items.map(item => ({
       productId: item.id,
       quantity: item.quantity
-    })), 
+    })),
     [items]
   );
 
@@ -171,7 +171,7 @@ export default function CheckoutPage() {
 
   return (
     <>
-      <Script 
+      <Script
         src="https://js.stripe.com/v3/"
         strategy="afterInteractive"
         onLoad={() => {
@@ -183,433 +183,433 @@ export default function CheckoutPage() {
       />
       <div className="min-h-screen bg-gray-50">
         <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-times-now">LUZIMARKET</h1>
-          <p className="text-sm text-gray-600 font-univers mt-2">
-            Finalizar compra
-          </p>
-        </div>
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-times-now">LUZIMARKET</h1>
+            <p className="text-sm text-gray-600 font-univers mt-2">
+              Finalizar compra
+            </p>
+          </div>
 
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Checkout Form */}
-            <div className="space-y-8">
-              {/* Checkout Mode Selection */}
-              {!session?.user && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 font-times-now">
-                      <User className="h-5 w-5" />
-                      Opciones de Compra
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <RadioGroup value={checkoutMode} onValueChange={(value) => setCheckoutMode(value as "guest" | "login")}>
-                      <div className="space-y-4">
-                        <div className="flex items-start space-x-3 border rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
-                          <RadioGroupItem value="guest" id="guest" className="mt-1" />
-                          <Label htmlFor="guest" className="flex-1 cursor-pointer">
-                            <div className="flex items-center gap-2 mb-1">
-                              <UserX className="h-4 w-4" />
-                              <span className="font-medium">Continuar como invitado</span>
-                            </div>
-                            <p className="text-sm text-gray-600 font-univers">
-                              Completa tu compra sin crear una cuenta. Recibirás el seguimiento de tu pedido por correo.
-                            </p>
-                          </Label>
-                        </div>
-                        <div className="flex items-start space-x-3 border rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
-                          <RadioGroupItem value="login" id="login" className="mt-1" />
-                          <Label htmlFor="login" className="flex-1 cursor-pointer">
-                            <div className="flex items-center gap-2 mb-1">
-                              <UserCheck className="h-4 w-4" />
-                              <span className="font-medium">Iniciar sesión o crear cuenta</span>
-                            </div>
-                            <p className="text-sm text-gray-600 font-univers">
-                              Accede a tu historial de pedidos, direcciones guardadas y ofertas exclusivas.
-                            </p>
-                          </Label>
-                        </div>
-                      </div>
-                    </RadioGroup>
-                    {checkoutMode === "login" && (
-                      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                        <p className="text-sm font-univers mb-3">
-                          Serás redirigido a la página de inicio de sesión
-                        </p>
-                        <Link href={{ pathname: "/login", query: { redirect: "/checkout" } }}>
-                          <Button className="w-full bg-black text-white hover:bg-gray-800">
-                            Ir a iniciar sesión
-                          </Button>
-                        </Link>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
-
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               {/* Checkout Form */}
-              {(checkoutMode === "guest" || session?.user) && (
-              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
-                {/* Contact Information */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 font-times-now">
-                      <Mail className="h-5 w-5" />
-                      Información de Contacto
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        {...form.register("email")}
-                        placeholder="tu@email.com"
-                      />
-                      {form.formState.errors.email && (
-                        <p className="text-sm text-red-600 mt-1">
-                          {form.formState.errors.email.message}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="firstName">Nombre</Label>
-                        <Input
-                          id="firstName"
-                          {...form.register("firstName")}
-                          placeholder="Nombre"
-                        />
-                        {form.formState.errors.firstName && (
-                          <p className="text-sm text-red-600 mt-1">
-                            {form.formState.errors.firstName.message}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <Label htmlFor="lastName">Apellido</Label>
-                        <Input
-                          id="lastName"
-                          {...form.register("lastName")}
-                          placeholder="Apellido"
-                        />
-                        {form.formState.errors.lastName && (
-                          <p className="text-sm text-red-600 mt-1">
-                            {form.formState.errors.lastName.message}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="phone">Teléfono</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        {...form.register("phone")}
-                        placeholder="+52 555 123 4567"
-                      />
-                      {form.formState.errors.phone && (
-                        <p className="text-sm text-red-600 mt-1">
-                          {form.formState.errors.phone.message}
-                        </p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Shipping Address */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 font-times-now">
-                      <MapPin className="h-5 w-5" />
-                      Dirección de Envío
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <Label htmlFor="address">Dirección</Label>
-                      <Input
-                        id="address"
-                        {...form.register("address")}
-                        placeholder="Calle y número"
-                      />
-                      {form.formState.errors.address && (
-                        <p className="text-sm text-red-600 mt-1">
-                          {form.formState.errors.address.message}
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <Label htmlFor="apartment">Apartamento, depto, etc. (opcional)</Label>
-                      <Input
-                        id="apartment"
-                        {...form.register("apartment")}
-                        placeholder="Apt 4B"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="city">Ciudad</Label>
-                        <Input
-                          id="city"
-                          {...form.register("city")}
-                          placeholder="Ciudad"
-                        />
-                        {form.formState.errors.city && (
-                          <p className="text-sm text-red-600 mt-1">
-                            {form.formState.errors.city.message}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <Label htmlFor="state">Estado</Label>
-                        <Input
-                          id="state"
-                          {...form.register("state")}
-                          placeholder="Estado"
-                        />
-                        {form.formState.errors.state && (
-                          <p className="text-sm text-red-600 mt-1">
-                            {form.formState.errors.state.message}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="postalCode">Código Postal</Label>
-                        <Input
-                          id="postalCode"
-                          {...form.register("postalCode")}
-                          placeholder="12345"
-                        />
-                        {form.formState.errors.postalCode && (
-                          <p className="text-sm text-red-600 mt-1">
-                            {form.formState.errors.postalCode.message}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <Label htmlFor="country">País</Label>
-                        <Input
-                          id="country"
-                          {...form.register("country")}
-                          placeholder="México"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="instructions">Instrucciones de entrega (opcional)</Label>
-                      <Textarea
-                        id="instructions"
-                        {...form.register("instructions")}
-                        placeholder="Ej: Tocar el timbre, entregar en recepción..."
-                        rows={3}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Shipping Options */}
-                {items.length > 0 && (
-                  <ShippingCalculator
-                    items={shippingItems}
-                    vendorId={vendorId}
-                    initialPostalCode={postalCode || ''}
-                    onShippingChange={(option, postalCode) => {
-                      if (option) {
-                        setShippingCost(option.cost);
-                        setSelectedShipping(option);
-                      } else {
-                        setShippingCost(0);
-                        setSelectedShipping(null);
-                      }
-                    }}
-                  />
-                )}
-
-                {/* Payment Info */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <div className="flex items-start gap-3">
-                    <CreditCard className="h-5 w-5 text-blue-600 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-univers font-medium text-blue-900">
-                        Métodos de pago seguros
-                      </p>
-                      <p className="text-sm font-univers text-blue-700 mt-1">
-                        Acepta tarjetas de crédito/débito, OXXO y otros métodos de pago. 
-                        Selecciona tu método preferido en la siguiente pantalla.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Terms and Submit */}
-                <div className="space-y-4">
-                  <div className="flex items-start">
-                    <Checkbox
-                      id="acceptTerms"
-                      checked={form.watch("acceptTerms")}
-                      onCheckedChange={(checked) => form.setValue("acceptTerms", checked as boolean)}
-                      className="mt-1"
-                    />
-                    <Label htmlFor="acceptTerms" className="ml-2 text-sm font-univers">
-                      {t("acceptTerms.prefix")}{" "}
-                      <Link href="/terms" className="text-black hover:underline">
-                        {t("acceptTerms.termsAndConditions")}
-                      </Link>{" "}
-                      {t("acceptTerms.and")}{" "}
-                      <Link href="/privacy" className="text-black hover:underline">
-                        {t("acceptTerms.privacyPolicy")}
-                      </Link>
-                    </Label>
-                  </div>
-
-                  <div className="flex items-start">
-                    <Checkbox
-                      id="newsletter"
-                      checked={form.watch("newsletter")}
-                      onCheckedChange={(checked) => form.setValue("newsletter", checked as boolean)}
-                      className="mt-1"
-                    />
-                    <Label htmlFor="newsletter" className="ml-2 text-sm font-univers text-gray-600">
-                      Quiero recibir ofertas especiales y noticias por email
-                    </Label>
-                  </div>
-
-                  {form.formState.errors.acceptTerms && (
-                    <p className="text-sm text-red-600">
-                      {form.formState.errors.acceptTerms.message}
-                    </p>
-                  )}
-
-                  {error && (
-                    <div className="bg-red-50 border border-red-200 rounded-md p-3">
-                      <p className="text-sm text-red-600">{error}</p>
-                    </div>
-                  )}
-
-                  <Button
-                    type="submit"
-                    className="w-full bg-black text-white hover:bg-gray-800 py-3"
-                    disabled={isLoading}
-                    data-testid="checkout-submit-button"
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Procesando...
-                      </>
-                    ) : (
-                      `Finalizar compra - ${formatPrice(total)}`
-                    )}
-                  </Button>
-                </div>
-              </form>
-              )}
-            </div>
-
-            {/* Order Summary */}
-            <div className="lg:sticky lg:top-8 lg:h-fit">
-              <Card data-testid="order-summary">
-                <CardHeader>
-                  <CardTitle className="font-times-now">Resumen del pedido</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Items */}
-                  <div className="space-y-3">
-                    {items.map((item) => (
-                      <div key={item.id} className="flex items-center gap-3">
-                        <div className="relative h-16 w-16 bg-gray-100 rounded overflow-hidden">
-                          {item.image ? (
-                            <Image
-                              src={item.image}
-                              alt={item.name}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="flex items-center justify-center h-full">
-                              <Package className="h-6 w-6 text-gray-400" />
-                            </div>
-                          )}
-                          <div className="absolute -top-2 -right-2 bg-gray-800 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                            {item.quantity}
+              <div className="space-y-8">
+                {/* Checkout Mode Selection */}
+                {!session?.user && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 font-times-now">
+                        <User className="h-5 w-5" />
+                        Opciones de Compra
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <RadioGroup value={checkoutMode} onValueChange={(value) => setCheckoutMode(value as "guest" | "login")}>
+                        <div className="space-y-4">
+                          <div className="flex items-start space-x-3 border rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
+                            <RadioGroupItem value="guest" id="guest" className="mt-1" />
+                            <Label htmlFor="guest" className="flex-1 cursor-pointer">
+                              <div className="flex items-center gap-2 mb-1">
+                                <UserX className="h-4 w-4" />
+                                <span className="font-medium">Continuar como invitado</span>
+                              </div>
+                              <p className="text-sm text-gray-600 font-univers">
+                                Completa tu compra sin crear una cuenta. Recibirás el seguimiento de tu pedido por correo.
+                              </p>
+                            </Label>
+                          </div>
+                          <div className="flex items-start space-x-3 border rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
+                            <RadioGroupItem value="login" id="login" className="mt-1" />
+                            <Label htmlFor="login" className="flex-1 cursor-pointer">
+                              <div className="flex items-center gap-2 mb-1">
+                                <UserCheck className="h-4 w-4" />
+                                <span className="font-medium">Iniciar sesión o crear cuenta</span>
+                              </div>
+                              <p className="text-sm text-gray-600 font-univers">
+                                Accede a tu historial de pedidos, direcciones guardadas y ofertas exclusivas.
+                              </p>
+                            </Label>
                           </div>
                         </div>
-                        <div className="flex-1">
-                          <h4 className="font-univers font-medium text-sm">{item.name}</h4>
-                          <p className="text-sm text-gray-600 font-univers">
-                            {formatPrice(item.price)} c/u
+                      </RadioGroup>
+                      {checkoutMode === "login" && (
+                        <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                          <p className="text-sm font-univers mb-3">
+                            Serás redirigido a la página de inicio de sesión
                           </p>
+                          <Link href={{ pathname: "/login", query: { redirect: "/checkout" } }}>
+                            <Button className="w-full bg-black text-white hover:bg-gray-800">
+                              Ir a iniciar sesión
+                            </Button>
+                          </Link>
                         </div>
-                        <div className="text-right">
-                          <p className="font-univers font-medium">
-                            {formatPrice(item.price * item.quantity)}
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Checkout Form */}
+                {(checkoutMode === "guest" || session?.user) && (
+                  <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+                    {/* Contact Information */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 font-times-now">
+                          <Mail className="h-5 w-5" />
+                          Información de Contacto
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div>
+                          <Label htmlFor="email">Email</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            {...form.register("email")}
+                            placeholder="tu@email.com"
+                          />
+                          {form.formState.errors.email && (
+                            <p className="text-sm text-red-600 mt-1">
+                              {form.formState.errors.email.message}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="firstName">Nombre</Label>
+                            <Input
+                              id="firstName"
+                              {...form.register("firstName")}
+                              placeholder="Nombre"
+                            />
+                            {form.formState.errors.firstName && (
+                              <p className="text-sm text-red-600 mt-1">
+                                {form.formState.errors.firstName.message}
+                              </p>
+                            )}
+                          </div>
+                          <div>
+                            <Label htmlFor="lastName">Apellido</Label>
+                            <Input
+                              id="lastName"
+                              {...form.register("lastName")}
+                              placeholder="Apellido"
+                            />
+                            {form.formState.errors.lastName && (
+                              <p className="text-sm text-red-600 mt-1">
+                                {form.formState.errors.lastName.message}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="phone">Teléfono</Label>
+                          <Input
+                            id="phone"
+                            type="tel"
+                            {...form.register("phone")}
+                            placeholder="+52 555 123 4567"
+                          />
+                          {form.formState.errors.phone && (
+                            <p className="text-sm text-red-600 mt-1">
+                              {form.formState.errors.phone.message}
+                            </p>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Shipping Address */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 font-times-now">
+                          <MapPin className="h-5 w-5" />
+                          Dirección de Envío
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div>
+                          <Label htmlFor="address">Dirección</Label>
+                          <Input
+                            id="address"
+                            {...form.register("address")}
+                            placeholder="Calle y número"
+                          />
+                          {form.formState.errors.address && (
+                            <p className="text-sm text-red-600 mt-1">
+                              {form.formState.errors.address.message}
+                            </p>
+                          )}
+                        </div>
+
+                        <div>
+                          <Label htmlFor="apartment">Apartamento, depto, etc. (opcional)</Label>
+                          <Input
+                            id="apartment"
+                            {...form.register("apartment")}
+                            placeholder="Apt 4B"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="city">Ciudad</Label>
+                            <Input
+                              id="city"
+                              {...form.register("city")}
+                              placeholder="Ciudad"
+                            />
+                            {form.formState.errors.city && (
+                              <p className="text-sm text-red-600 mt-1">
+                                {form.formState.errors.city.message}
+                              </p>
+                            )}
+                          </div>
+                          <div>
+                            <Label htmlFor="state">Estado</Label>
+                            <Input
+                              id="state"
+                              {...form.register("state")}
+                              placeholder="Estado"
+                            />
+                            {form.formState.errors.state && (
+                              <p className="text-sm text-red-600 mt-1">
+                                {form.formState.errors.state.message}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="postalCode">Código Postal</Label>
+                            <Input
+                              id="postalCode"
+                              {...form.register("postalCode")}
+                              placeholder="12345"
+                            />
+                            {form.formState.errors.postalCode && (
+                              <p className="text-sm text-red-600 mt-1">
+                                {form.formState.errors.postalCode.message}
+                              </p>
+                            )}
+                          </div>
+                          <div>
+                            <Label htmlFor="country">País</Label>
+                            <Input
+                              id="country"
+                              {...form.register("country")}
+                              placeholder="México"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="instructions">Instrucciones de entrega (opcional)</Label>
+                          <Textarea
+                            id="instructions"
+                            {...form.register("instructions")}
+                            placeholder="Ej: Tocar el timbre, entregar en recepción..."
+                            rows={3}
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Shipping Options */}
+                    {items.length > 0 && (
+                      <ShippingCalculator
+                        items={shippingItems}
+                        vendorId={vendorId}
+                        initialPostalCode={postalCode || ''}
+                        onShippingChange={(option, postalCode) => {
+                          if (option) {
+                            setShippingCost(option.cost);
+                            setSelectedShipping(option);
+                          } else {
+                            setShippingCost(0);
+                            setSelectedShipping(null);
+                          }
+                        }}
+                      />
+                    )}
+
+                    {/* Payment Info */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <CreditCard className="h-5 w-5 text-blue-600 mt-0.5" />
+                        <div>
+                          <p className="text-sm font-univers font-medium text-blue-900">
+                            Métodos de pago seguros
+                          </p>
+                          <p className="text-sm font-univers text-blue-700 mt-1">
+                            Acepta tarjetas de crédito/débito, OXXO y otros métodos de pago.
+                            Selecciona tu método preferido en la siguiente pantalla.
                           </p>
                         </div>
                       </div>
-                    ))}
-                  </div>
-
-                  <Separator />
-
-                  {/* Totals */}
-                  <div className="space-y-2">
-                    <div className="flex justify-between font-univers">
-                      <span>Subtotal</span>
-                      <span>{formatPrice(subtotal)}</span>
                     </div>
-                    <div className="flex justify-between font-univers" data-testid="shipping-line">
-                      <span>Envío</span>
-                      <span>
-                        {shippingCost === 0 && selectedShipping ? (
-                          <span className="text-green-600">GRATIS</span>
+
+                    {/* Terms and Submit */}
+                    <div className="space-y-4">
+                      <div className="flex items-start">
+                        <Checkbox
+                          id="acceptTerms"
+                          checked={form.watch("acceptTerms")}
+                          onCheckedChange={(checked) => form.setValue("acceptTerms", checked as boolean)}
+                          className="mt-1"
+                        />
+                        <Label htmlFor="acceptTerms" className="ml-2 text-sm font-univers">
+                          {t("acceptTerms.prefix")}{" "}
+                          <Link href="/terms" className="text-black hover:underline">
+                            {t("acceptTerms.termsAndConditions")}
+                          </Link>{" "}
+                          {t("acceptTerms.and")}{" "}
+                          <Link href="/privacy" className="text-black hover:underline">
+                            {t("acceptTerms.privacyPolicy")}
+                          </Link>
+                        </Label>
+                      </div>
+
+                      <div className="flex items-start">
+                        <Checkbox
+                          id="newsletter"
+                          checked={form.watch("newsletter")}
+                          onCheckedChange={(checked) => form.setValue("newsletter", checked as boolean)}
+                          className="mt-1"
+                        />
+                        <Label htmlFor="newsletter" className="ml-2 text-sm font-univers text-gray-600">
+                          Quiero recibir ofertas especiales y noticias por email
+                        </Label>
+                      </div>
+
+                      {form.formState.errors.acceptTerms && (
+                        <p className="text-sm text-red-600">
+                          {form.formState.errors.acceptTerms.message}
+                        </p>
+                      )}
+
+                      {error && (
+                        <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                          <p className="text-sm text-red-600">{error}</p>
+                        </div>
+                      )}
+
+                      <Button
+                        type="submit"
+                        className="w-full bg-black text-white hover:bg-gray-800 py-3"
+                        disabled={isLoading}
+                        data-testid="checkout-submit-button"
+                      >
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Procesando...
+                          </>
                         ) : (
-                          formatPrice(shippingCost)
+                          `Finalizar compra - ${formatPrice(total)}`
                         )}
-                      </span>
+                      </Button>
                     </div>
-                    <div className="flex justify-between font-univers" data-testid="tax-line">
-                      <span>IVA (16%)</span>
-                      <span>{formatPrice(tax)}</span>
-                    </div>
-                    <Separator />
-                    <div className="flex justify-between font-times-now text-lg">
-                      <span>Total</span>
-                      <span>{formatPrice(total)}</span>
-                    </div>
-                  </div>
+                  </form>
+                )}
+              </div>
 
-                  {/* Security badges */}
-                  <div className="pt-4 border-t">
-                    <div className="flex items-center justify-center gap-6 text-sm text-gray-600">
-                      <div className="flex items-center gap-1">
-                        <Shield className="h-4 w-4" />
-                        <span className="font-univers">Pago seguro</span>
+              {/* Order Summary */}
+              <div className="lg:sticky lg:top-8 lg:h-fit">
+                <Card data-testid="order-summary">
+                  <CardHeader>
+                    <CardTitle className="font-times-now">Resumen del pedido</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Items */}
+                    <div className="space-y-3">
+                      {items.map((item) => (
+                        <div key={item.id} className="flex items-center gap-3">
+                          <div className="relative h-16 w-16 bg-gray-100 rounded overflow-hidden">
+                            {item.image ? (
+                              <Image
+                                src={item.image}
+                                alt={item.name}
+                                fill
+                                className="object-cover"
+                              />
+                            ) : (
+                              <div className="flex items-center justify-center h-full">
+                                <Package className="h-6 w-6 text-gray-400" />
+                              </div>
+                            )}
+                            <div className="absolute -top-2 -right-2 bg-gray-800 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                              {item.quantity}
+                            </div>
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-univers font-medium text-sm">{item.name}</h4>
+                            <p className="text-sm text-gray-600 font-univers">
+                              {formatPrice(item.price)} c/u
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-univers font-medium">
+                              {formatPrice(item.price * item.quantity)}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <Separator />
+
+                    {/* Totals */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between font-univers">
+                        <span>Subtotal</span>
+                        <span data-testid="order-subtotal">{formatPrice(subtotal)}</span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Truck className="h-4 w-4" />
-                        <span className="font-univers">Envío protegido</span>
+                      <div className="flex justify-between font-univers" data-testid="shipping-line">
+                        <span>Envío</span>
+                        <span>
+                          {shippingCost === 0 && selectedShipping ? (
+                            <span className="text-green-600">GRATIS</span>
+                          ) : (
+                            formatPrice(shippingCost)
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex justify-between font-univers" data-testid="tax-line">
+                        <span>IVA (16%)</span>
+                        <span>{formatPrice(tax)}</span>
+                      </div>
+                      <Separator />
+                      <div className="flex justify-between font-times-now text-lg">
+                        <span>Total</span>
+                        <span data-testid="order-total">{formatPrice(total)}</span>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+
+                    {/* Security badges */}
+                    <div className="pt-4 border-t">
+                      <div className="flex items-center justify-center gap-6 text-sm text-gray-600">
+                        <div className="flex items-center gap-1">
+                          <Shield className="h-4 w-4" />
+                          <span className="font-univers">Pago seguro</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Truck className="h-4 w-4" />
+                          <span className="font-univers">Envío protegido</span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
     </>
   );
 }
