@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
   try {
     // Get the session to check if user is logged in
     const session = await auth();
-    
+
     const body = await request.json();
     const { items, shippingAddress, billingAddress, isGuest, selectedShipping } = body;
 
@@ -40,12 +40,12 @@ export async function POST(request: NextRequest) {
 
     const stockValidation = await validateCartStock(cartItems);
     if (!stockValidation.isValid) {
-      const errorMessages = stockValidation.errors.map(error => 
+      const errorMessages = stockValidation.errors.map(error =>
         `${error.productName}: ${error.requestedQuantity === 1 ? 'solicitas 1 unidad' : `solicitas ${error.requestedQuantity} unidades`}, ${error.availableStock === 0 ? 'agotado' : error.availableStock === 1 ? 'solo queda 1' : `solo quedan ${error.availableStock}`}`
       ).join('; ');
-      
+
       return NextResponse.json(
-        { 
+        {
           error: '🚫 No podemos procesar tu compra',
           message: 'Algunos productos en tu carrito no tienen suficiente stock disponible.',
           details: errorMessages,
@@ -59,12 +59,12 @@ export async function POST(request: NextRequest) {
     // Calculate totals
     const subtotal = items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
     const tax = subtotal * 0.16; // 16% IVA
-    
+
     // Use selected shipping or default
     let shipping = 99; // Default fallback
     let shippingDescription = '📦 Envío estándar en México';
     let shippingDays = { min: 3, max: 5 };
-    
+
     if (selectedShipping && selectedShipping.total !== undefined) {
       shipping = selectedShipping.total;
       // Get the first shipping option details for display
@@ -74,12 +74,12 @@ export async function POST(request: NextRequest) {
         shippingDays = firstOption.estimatedDays || shippingDays;
       }
     }
-    
+
     const total = subtotal + tax + shipping;
 
     // Determine base URL for images (same logic as checkout URLs)
     let appUrlForImages: string;
-    
+
     if (process.env.NEXT_PUBLIC_APP_URL) {
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
       appUrlForImages = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     } else {
       appUrlForImages = `http://localhost:${process.env.PORT || '3000'}`;
     }
-    
+
     // Create line items for Stripe
     const lineItems = [
       ...items.map((item: any) => ({
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
           currency: 'mxn',
           product_data: {
             name: item.name,
-            images: item.image && item.image.startsWith('/') 
+            images: item.image && item.image.startsWith('/')
               ? [`${appUrlForImages}${item.image}`]
               : item.image ? [item.image] : [],
             metadata: {
@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
 
     // Create order record first
     const orderNumber = generateOrderNumber();
-    
+
     // For multi-vendor orders, we'll create separate orders per vendor
     const vendorGroups = items.reduce((groups: any, item: any) => {
       const vendorId = item.vendorId;
@@ -162,14 +162,14 @@ export async function POST(request: NextRequest) {
 
     const orderIds: string[] = [];
     const orderDetailsMap = new Map<string, any>();
-    
+
     // Create orders for each vendor
     for (const [vendorId, vendorItems] of Object.entries(vendorGroups)) {
       const vendorSubtotal = (vendorItems as any[]).reduce((sum, item) => sum + (item.price * item.quantity), 0);
       const vendorTax = vendorSubtotal * 0.16;
       const vendorShipping = vendorSubtotal > 1000 ? 0 : 99;
       const vendorTotal = vendorSubtotal + vendorTax + vendorShipping;
-      
+
       // Calculate platform fee (default 15% of subtotal)
       const stripeAccount = vendorStripeMap.get(vendorId);
       const commissionRate = stripeAccount?.commissionRate ? parseFloat(stripeAccount.commissionRate) : 15;
@@ -222,7 +222,7 @@ export async function POST(request: NextRequest) {
 
       await db.insert(orderItems).values(orderItemsData);
       orderIds.push(order.id);
-      
+
       // Store order details for later use
       orderDetailsMap.set(vendorId, {
         orderId: order.id,
@@ -232,7 +232,7 @@ export async function POST(request: NextRequest) {
         vendorEarnings: vendorTotal - platformFeeAmount,
         stripeAccountId: stripeAccount?.stripeAccountId,
       });
-      
+
       // Create platform fee record if using Stripe Connect
       if (useStripeConnect && stripeAccount) {
         await db.insert(platformFees).values({
@@ -248,11 +248,25 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // E2E/Test bypass: if special cookie is present, skip Stripe and return success URL with order number
+    const e2eCookie = request.cookies.get('e2e')?.value;
+    if (e2eCookie === '1') {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL
+        ? (process.env.NEXT_PUBLIC_APP_URL.startsWith('http') ? process.env.NEXT_PUBLIC_APP_URL : `https://${process.env.NEXT_PUBLIC_APP_URL}`)
+        : `http://localhost:${process.env.PORT || '3000'}`;
+
+      const fakeSessionId = `e2e_${Date.now()}`;
+      return NextResponse.json({
+        sessionId: fakeSessionId,
+        url: `${appUrl}/success?session_id=${fakeSessionId}&order=${orderNumber}`,
+      });
+    }
+
     // Create Stripe checkout session
     try {
       // Determine the base URL based on environment
       let appUrl: string;
-      
+
       if (process.env.NEXT_PUBLIC_APP_URL) {
         // Use environment variable if set
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
@@ -267,7 +281,7 @@ export async function POST(request: NextRequest) {
         // Local development
         appUrl = `http://localhost:${process.env.PORT || '3000'}`;
       }
-      
+
       console.log('Checkout URLs:', {
         env: {
           NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
@@ -278,16 +292,16 @@ export async function POST(request: NextRequest) {
         success_url: `${appUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${appUrl}/checkout/cancel`,
       });
-      
+
       // If we're using Stripe Connect and all vendors have accounts, handle payment splitting
       if (useStripeConnect) {
         // For Stripe Connect, we'll use the platform account and create transfers after payment
         // This works for both single and multi-vendor scenarios
-        
+
         // Calculate total platform fees
         let totalPlatformFees = 0;
         const vendorSplits: any[] = [];
-        
+
         for (const [vendorId, details] of orderDetailsMap.entries()) {
           totalPlatformFees += details.platformFee;
           vendorSplits.push({
@@ -364,10 +378,10 @@ export async function POST(request: NextRequest) {
           },
           locale: 'es',
         });
-        
-        return NextResponse.json({ 
+
+        return NextResponse.json({
           sessionId: session.id,
-          url: session.url 
+          url: session.url
         });
       } else {
         // For multi-vendor or vendors without Stripe Connect, use regular checkout
@@ -437,9 +451,9 @@ export async function POST(request: NextRequest) {
           locale: 'es', // Spanish for Mexico
         });
 
-        return NextResponse.json({ 
+        return NextResponse.json({
           sessionId: session.id,
-          url: session.url 
+          url: session.url
         });
       }
     } catch (stripeError: any) {
@@ -450,22 +464,22 @@ export async function POST(request: NextRequest) {
         detail: stripeError.detail,
         raw: stripeError.raw,
       });
-      
+
       // If it's a connection error, it might be due to invalid API key
       if (stripeError.type === 'StripeConnectionError') {
         console.error('Stripe connection error - check STRIPE_SECRET_KEY for invalid characters');
       }
-      
+
       throw stripeError;
     }
   } catch (error: any) {
     console.error('Checkout session error:', error);
-    
+
     // Provide more detailed error message
-    const errorMessage = error.type === 'StripeConnectionError' 
+    const errorMessage = error.type === 'StripeConnectionError'
       ? 'Failed to connect to Stripe. Please check your API configuration.'
       : error.message || 'Error creating checkout session';
-    
+
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }

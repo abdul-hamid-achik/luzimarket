@@ -20,8 +20,8 @@
     "release": "semantic-release",
     "release:dry": "semantic-release --dry-run",
     "deploy": "vercel --yes --prod",
-    "vercel:env:pull": "vercel env pull",
-    "vercel:link": "vercel link --yes"
+    "env:pull": "vercel env pull",
+    "link": "vercel link --yes"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.9.1",

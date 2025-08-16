@@ -94,7 +94,7 @@ export default function ResendVerificationPage() {
 
         {/* Form */}
         <div className="bg-white py-8 px-6 shadow-sm rounded-lg border border-gray-200">
-          <form onSubmit={form.handleSubmit(handleResend)} className="space-y-6">
+          <form noValidate onSubmit={form.handleSubmit(handleResend)} className="space-y-6">
             <div>
               <Label htmlFor="email" className="block text-sm font-univers text-gray-700">
                 Correo electrónico

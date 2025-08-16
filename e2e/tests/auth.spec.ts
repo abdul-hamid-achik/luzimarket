@@ -5,16 +5,16 @@ import { testMessages, getMessage } from '../helpers/i18n-messages';
 test.describe('Authentication', () => {
   test('should display login page', async ({ page }) => {
     await page.goto(routes.login);
-    
+
     // Check page elements
     await expect(page.locator('h1:has-text("LUZIMARKET")')).toBeVisible();
     await expect(page.locator('text="Inicia sesión en tu cuenta"')).toBeVisible();
-    
+
     // Check tabs
     await expect(page.locator('button[role="tab"]:has-text("Cliente")')).toBeVisible();
     await expect(page.locator('button[role="tab"]:has-text("Vendedor")')).toBeVisible();
     await expect(page.locator('button[role="tab"]:has-text("Admin")')).toBeVisible();
-    
+
     // Check default form (Customer)
     await expect(page.locator('#customer-email')).toBeVisible();
     await expect(page.locator('#customer-password')).toBeVisible();
@@ -23,31 +23,31 @@ test.describe('Authentication', () => {
 
   test('should show user type tabs', async ({ page }) => {
     await page.goto(routes.login);
-    
+
     // Check tabs exist
     const tabsList = page.locator('[role="tablist"]');
     await expect(tabsList).toBeVisible();
-    
+
     // Check each tab
     const customerTab = page.locator('button[role="tab"]:has-text("Cliente")');
     const vendorTab = page.locator('button[role="tab"]:has-text("Vendedor")');
     const adminTab = page.locator('button[role="tab"]:has-text("Admin")');
-    
+
     await expect(customerTab).toBeVisible();
     await expect(vendorTab).toBeVisible();
     await expect(adminTab).toBeVisible();
-    
+
     // Customer should be selected by default
     await expect(customerTab).toHaveAttribute('aria-selected', 'true');
   });
 
   test('should validate login form', async ({ page }) => {
     await page.goto(routes.login);
-    
+
     // Try to submit empty form
     const submitButton = page.locator('button[type="submit"]:has-text("Iniciar sesión")').first();
     await submitButton.click();
-    
+
     // Should show validation errors
     const errors = page.locator('text=/inválido|debe tener/i');
     await expect(errors.first()).toBeVisible();
@@ -55,15 +55,15 @@ test.describe('Authentication', () => {
 
   test('should handle invalid credentials', async ({ page }) => {
     await page.goto(routes.login);
-    
+
     // Fill invalid credentials in customer form
     await page.fill('#customer-email', 'invalid@email.com');
     await page.fill('#customer-password', 'wrongpassword');
-    
+
     // Submit
     const submitButton = page.locator('button[type="submit"]:has-text("Iniciar sesión")').first();
     await submitButton.click();
-    
+
     // Should show error message - can be "Credenciales inválidas" or other auth error
     const errorMessage = page.locator('text="Credenciales inválidas"').or(
       page.locator('text="Error al iniciar sesión"')
@@ -75,37 +75,37 @@ test.describe('Authentication', () => {
 
   test('should login as customer', async ({ page }) => {
     await page.goto(routes.login);
-    
+
     // Customer tab is selected by default
     // Fill credentials
     await page.fill('#customer-email', 'customer1@example.com');
     await page.fill('#customer-password', 'password123');
-    
+
     // Submit
     const submitButton = page.locator('button[type="submit"]:has-text("Iniciar sesión")').first();
     await submitButton.click();
-    
+
     // Should redirect after successful login
     await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 10000 });
   });
 
   test('should login as admin', async ({ page }) => {
     await page.goto(routes.login);
-    
+
     // Switch to admin tab
     const adminTab = page.locator('button[role="tab"]:has-text("Admin")');
     await adminTab.click();
-    
+
     // Force wait for tab animation
     await page.waitForTimeout(1000);
-    
+
     // Fill admin credentials with force option
     await page.locator('#admin-email').fill('admin@luzimarket.shop', { force: true });
     await page.locator('#admin-password').fill('admin123', { force: true });
-    
+
     // Submit form - find the submit button within the admin form context
     await page.locator('form:has(#admin-email) button[type="submit"]:has-text("Iniciar sesión")').click();
-    
+
     // Should redirect to admin dashboard (accepts both /admin and /en/admin)
     await page.waitForURL(/\/(?:en\/)?admin/, { timeout: 10000 });
   });
@@ -113,40 +113,40 @@ test.describe('Authentication', () => {
   test.skip('should logout', async ({ page }) => {
     // Skip this test as it requires a properly seeded and verified user
     // The seed creates users but doesn't set emailVerified=true which is required for login
-    
+
     // First login
     await page.goto(routes.login);
-    
+
     // Ensure we're on the customer tab
     const customerTab = page.locator('button[role="tab"]').filter({ hasText: 'Cliente' });
     await customerTab.click();
     await page.waitForTimeout(300); // Wait for tab animation
-    
+
     await page.fill('#customer-email', 'customer1@example.com');
     await page.fill('#customer-password', 'password123');
-    
+
     const submitButton = page.locator('button[type="submit"]:has-text("Iniciar sesión")').first();
     await submitButton.click();
-    
+
     // Wait for successful login - should redirect away from login page
     await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 10000 });
-    
+
     // Find and click user menu button - it's the user icon button in the header
     const userMenuButton = page.locator('button[aria-label*="user" i], button[aria-label*="cuenta" i]').first();
     await userMenuButton.click();
-    
+
     // Wait for dropdown and click logout
     await page.waitForTimeout(500); // Wait for dropdown animation
     const logoutButton = page.locator('[role="menuitem"]').filter({ hasText: /Cerrar sesión|logout/i }).first();
     await logoutButton.click();
-    
+
     // Should redirect to home or login
     await expect(page).toHaveURL(/\/(es\/)?(login)?$/);
   });
 
   test('should show register link', async ({ page }) => {
     await page.goto(routes.login);
-    
+
     // Skip because register page doesn't exist yet
     // Check for register link
     const registerLink = page.locator('a:has-text("¿No tienes cuenta? Regístrate")');
@@ -155,17 +155,19 @@ test.describe('Authentication', () => {
 
   test('should show forgot password link', async ({ page }) => {
     await page.goto(routes.login);
-    
-    // Check for forgot password link in Spanish
-    const forgotLink = page.locator('a[href="/forgot-password"]').filter({ hasText: "¿Olvidaste tu contraseña?" }).first();
-    await expect(forgotLink).toBeVisible();
+
+    // Check for forgot password link (localized path and text)
+    const forgotLink = page
+      .getByRole('link', { name: /Olvidaste tu contraseña|Forgot your password/i })
+      .or(page.locator('a[href*="/forgot-password"]').first());
+    await expect(forgotLink.first()).toBeVisible();
   });
 });
 
 test.describe.skip('Registration', () => {
   test('should display registration form', async ({ page }) => {
     await page.goto(routes.register);
-    
+
     // Check form fields
     await expect(page.locator('input[name="name"]')).toBeVisible();
     await expect(page.locator('input[name="email"]')).toBeVisible();
@@ -175,16 +177,16 @@ test.describe.skip('Registration', () => {
 
   test('should validate password match', async ({ page }) => {
     await page.goto(routes.register);
-    
+
     // Fill form with mismatched passwords
     await page.fill('input[name="name"]', 'Test User');
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'password123');
     await page.fill('input[name="confirmPassword"]', 'different123');
-    
+
     // Submit
     await page.click('button[type="submit"]');
-    
+
     // Should show password mismatch error
     const error = page.locator('text=/coincidir|no coinciden/i').first();
     await expect(error).toBeVisible();
@@ -192,23 +194,23 @@ test.describe.skip('Registration', () => {
 
   test('should register new user', async ({ page }) => {
     await page.goto(routes.register);
-    
+
     // Fill form with unique email
     const uniqueEmail = `test${Date.now()}@example.com`;
     await page.fill('input[name="name"]', 'Test User');
     await page.fill('input[name="email"]', uniqueEmail);
     await page.fill('input[name="password"]', 'TestPass123!');
     await page.fill('input[name="confirmPassword"]', 'TestPass123!');
-    
+
     // Accept terms if checkbox exists
     const termsCheckbox = page.locator('input[type="checkbox"][name="terms"]').first();
     if (await termsCheckbox.isVisible()) {
       await termsCheckbox.check();
     }
-    
+
     // Submit
     await page.click('button[type="submit"]');
-    
+
     // Should redirect or show success
     await page.waitForURL((url) => !url.pathname.includes('/register'), { timeout: 10000 })
       .catch(() => {
