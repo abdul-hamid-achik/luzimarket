@@ -24,8 +24,15 @@ test.describe('Order Lifecycle - Complete Flow', () => {
       await page.waitForSelector('[role="dialog"]');
       await page.waitForTimeout(300);
 
-      // Proceed to checkout
-      await page.getByRole('button', { name: /pagar/i }).click();
+      // Proceed to checkout - try link first, then button
+      const checkoutLink = page.getByRole('link', { name: /proceder al pago|pagar/i });
+      const checkoutButton = page.getByRole('button', { name: /pagar/i });
+      
+      if (await checkoutLink.isVisible({ timeout: 2000 })) {
+        await checkoutLink.click();
+      } else if (await checkoutButton.isVisible({ timeout: 2000 })) {
+        await checkoutButton.click();
+      }
       await page.waitForURL('**/pagar');
 
       // Fill checkout form
@@ -49,7 +56,15 @@ test.describe('Order Lifecycle - Complete Flow', () => {
         await route.fulfill({ json });
       });
 
-      await page.getByRole('button', { name: /proceder al pago/i }).click();
+      // Submit the checkout form
+      const submitBtn = page.getByRole('button', { name: /proceder al pago|completar compra|pagar/i });
+      if (await submitBtn.isVisible({ timeout: 2000 })) {
+        await submitBtn.click();
+      } else {
+        // Try finding submit button by type
+        const formSubmit = page.locator('button[type="submit"]').last();
+        await formSubmit.click();
+      }
 
       // Simulate successful payment webhook
       orderId = 'ORD-' + Date.now();

@@ -127,13 +127,13 @@ test.describe('Admin Dashboard', () => {
   });
 
   test('should access email templates', async ({ page }) => {
-    await page.goto('/admin/email-templates');
+    await page.goto('/es/admin/email-templates');
 
     // Should show templates list (heading)
     await expect(page.getByRole('heading', { name: /Email Templates|Plantillas de correo/i })).toBeVisible();
 
     // Should show template types info or cards
-    await expect(page.getByText(/Plantillas de Email:/i)).toBeVisible();
+    await expect(page.getByText(/Plantillas de Email:|Email Templates/i)).toBeVisible();
   });
 
   test('should view reports', async ({ page }) => {

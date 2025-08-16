@@ -16,7 +16,6 @@
     "db:reset": "tsx db/seed/index.ts",
     "db:setup": "npm run db:push && npm run db:seed",
     "test": "playwright test",
-    "i18n:check": "node lib/i18n-check.js",
     "release": "semantic-release",
     "release:dry": "semantic-release --dry-run",
     "deploy": "vercel --yes --prod",

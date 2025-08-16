@@ -60,8 +60,15 @@ test.describe('Multi-Vendor Orders', () => {
     // Verify cart has products from both vendors
     await expect(page.getByTestId('cart-item')).toHaveCount(2);
 
-    // Proceed to checkout
-    await page.getByRole('button', { name: /pagar/i }).click();
+    // Proceed to checkout - try link first, then button
+    const checkoutLink = page.getByRole('link', { name: /proceder al pago|pagar/i });
+    const checkoutButton = page.getByRole('button', { name: /pagar/i });
+    
+    if (await checkoutLink.isVisible({ timeout: 2000 })) {
+      await checkoutLink.click();
+    } else if (await checkoutButton.isVisible({ timeout: 2000 })) {
+      await checkoutButton.click();
+    }
     await page.waitForURL('**/pagar', { timeout: 20000 });
     await page.waitForSelector('input[name="email"]', { timeout: 20000 });
 
@@ -105,7 +112,15 @@ test.describe('Multi-Vendor Orders', () => {
       });
     });
 
-    await page.getByRole('button', { name: /proceder al pago/i }).click();
+    // Submit the checkout form - look for the submit button
+    const submitButton = page.getByRole('button', { name: /proceder al pago|completar compra|pagar/i });
+    if (await submitButton.isVisible({ timeout: 2000 })) {
+      await submitButton.click();
+    } else {
+      // Try finding any submit button at the bottom of the form
+      const formSubmit = page.locator('button[type="submit"]').last();
+      await formSubmit.click();
+    }
   });
 
   test('should create separate orders for each vendor', async ({ page }) => {
@@ -131,8 +146,15 @@ test.describe('Multi-Vendor Orders', () => {
     await page.getByRole('button', { name: /agregar al carrito/i }).first().click();
     await page.waitForSelector('[role="dialog"]', { timeout: 10000 });
 
-    // Checkout
-    await page.getByRole('button', { name: /pagar/i }).click();
+    // Checkout - try link first, then button
+    const checkoutLink2 = page.getByRole('link', { name: /proceder al pago|pagar/i });
+    const checkoutButton2 = page.getByRole('button', { name: /pagar/i });
+    
+    if (await checkoutLink2.isVisible({ timeout: 2000 })) {
+      await checkoutLink2.click();
+    } else if (await checkoutButton2.isVisible({ timeout: 2000 })) {
+      await checkoutButton2.click();
+    }
     await page.waitForSelector('input[name="email"]', { timeout: 20000 });
     await page.fill('input[name="email"]', customerEmail);
     await page.fill('input[name="firstName"]', 'Test');
@@ -157,7 +179,15 @@ test.describe('Multi-Vendor Orders', () => {
       });
     });
 
-    await page.getByRole('button', { name: /proceder al pago/i }).click();
+    // Submit the checkout form - look for the submit button
+    const submitButton = page.getByRole('button', { name: /proceder al pago|completar compra|pagar/i });
+    if (await submitButton.isVisible({ timeout: 2000 })) {
+      await submitButton.click();
+    } else {
+      // Try finding any submit button at the bottom of the form
+      const formSubmit = page.locator('button[type="submit"]').last();
+      await formSubmit.click();
+    }
 
     // Simulate success page with multiple orders
     await page.goto(`/success?session_id=test-session&order_ids=${orderIds.join(',')}`);
@@ -210,7 +240,15 @@ test.describe('Multi-Vendor Orders', () => {
     await page.route('**/api/checkout/sessions', async route => {
       await route.fulfill({ json: { url: 'https://stripe.com', sessionId: 'test' } });
     });
-    await page.getByRole('button', { name: /proceder al pago/i }).click();
+    // Submit the checkout form - look for the submit button
+    const submitButton = page.getByRole('button', { name: /proceder al pago|completar compra|pagar/i });
+    if (await submitButton.isVisible({ timeout: 2000 })) {
+      await submitButton.click();
+    } else {
+      // Try finding any submit button at the bottom of the form
+      const formSubmit = page.locator('button[type="submit"]').last();
+      await formSubmit.click();
+    }
     await page.goto(`/success?order_ids=${vendor1OrderId},${vendor2OrderId}`);
 
     // Login as first vendor
@@ -273,7 +311,15 @@ test.describe('Multi-Vendor Orders', () => {
     const cancelOrderId1 = `ORD-CANCEL-V1-${Date.now()}`;
     const cancelOrderId2 = `ORD-CANCEL-V2-${Date.now()}`;
 
-    await page.getByRole('button', { name: /pagar/i }).click();
+    // Checkout - try link first, then button
+    const checkoutLink3 = page.getByRole('link', { name: /proceder al pago|pagar/i });
+    const checkoutButton3 = page.getByRole('button', { name: /pagar/i });
+    
+    if (await checkoutLink3.isVisible({ timeout: 2000 })) {
+      await checkoutLink3.click();
+    } else if (await checkoutButton3.isVisible({ timeout: 2000 })) {
+      await checkoutButton3.click();
+    }
     await page.fill('input[name="email"]', customerEmail);
     await page.fill('input[name="firstName"]', 'Cancel');
     await page.fill('input[name="lastName"]', 'Test');
@@ -288,7 +334,15 @@ test.describe('Multi-Vendor Orders', () => {
     await page.route('**/api/checkout/sessions', async route => {
       await route.fulfill({ json: { url: 'https://stripe.com', sessionId: 'test' } });
     });
-    await page.getByRole('button', { name: /proceder al pago/i }).click();
+    // Submit the checkout form - look for the submit button
+    const submitButton = page.getByRole('button', { name: /proceder al pago|completar compra|pagar/i });
+    if (await submitButton.isVisible({ timeout: 2000 })) {
+      await submitButton.click();
+    } else {
+      // Try finding any submit button at the bottom of the form
+      const formSubmit = page.locator('button[type="submit"]').last();
+      await formSubmit.click();
+    }
     await page.goto(`/success?order_ids=${cancelOrderId1},${cancelOrderId2}`);
 
     // Customer requests cancellation of one vendor's items
@@ -385,8 +439,15 @@ test.describe('Multi-Vendor Orders', () => {
     await vendor2Card.click();
     await page.getByRole('button', { name: /agregar al carrito/i }).first().click();
 
-    // Go to checkout
-    await page.getByRole('button', { name: /pagar/i }).click();
+    // Go to checkout - try link first, then button
+    const checkoutLink4 = page.getByRole('link', { name: /proceder al pago|pagar/i });
+    const checkoutButton4 = page.getByRole('button', { name: /pagar/i });
+    
+    if (await checkoutLink4.isVisible({ timeout: 2000 })) {
+      await checkoutLink4.click();
+    } else if (await checkoutButton4.isVisible({ timeout: 2000 })) {
+      await checkoutButton4.click();
+    }
 
     // Fill address to trigger tax calculation
     await page.fill('input[name="email"]', customerEmail);

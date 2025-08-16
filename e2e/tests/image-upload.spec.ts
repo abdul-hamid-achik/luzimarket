@@ -208,7 +208,7 @@ test.describe('Image Upload and Approval Workflow', () => {
     });
 
     test('should save product with images', async ({ page }) => {
-      await page.goto('/vendor/products/new');
+      await page.goto('/es/vendedor/productos/nuevo');
       
       // Fill basic product info
       await page.fill('input[name="name"], input[placeholder*="nombre"]', 'Test Product');
@@ -237,7 +237,7 @@ test.describe('Image Upload and Approval Workflow', () => {
         await expect(toastMessage).toBeVisible({ timeout: 8000 });
       } catch {
         // If no toast, check if we redirected successfully
-        await expect(page).toHaveURL(/\/vendor\/products/, { timeout: 5000 });
+        await expect(page).toHaveURL(/\/vendedor\/productos/, { timeout: 5000 });
       }
     });
   });
