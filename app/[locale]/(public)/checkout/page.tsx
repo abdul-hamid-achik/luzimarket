@@ -160,20 +160,15 @@ export default function CheckoutPage() {
 
       const result = await response.json();
 
-      if (response.ok && result.sessionId) {
-        // Redirect to Stripe checkout
-        // First try direct URL redirect (works without Stripe.js)
+      // Accept either a direct URL or a sessionId (tests may mock URL-only)
+      if (response.ok && (result.url || result.sessionId)) {
+        // Prefer direct URL when provided
         if (result.url) {
-          window.location.href = result.url;
+          window.location.href = result.url as string;
         } else if ((window as any).Stripe && process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
-          // Fallback to Stripe.js redirect
           const stripe = (window as any).Stripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
-          const { error } = await stripe.redirectToCheckout({
-            sessionId: result.sessionId,
-          });
-          if (error) {
-            setError(error.message || "Error al procesar el pago");
-          }
+          const { error } = await stripe.redirectToCheckout({ sessionId: result.sessionId });
+          if (error) setError(error.message || "Error al procesar el pago");
         } else {
           setError("Error: Missing Stripe configuration. Please add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY to your environment variables.");
         }

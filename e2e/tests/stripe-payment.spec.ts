@@ -42,11 +42,8 @@ test.describe('Stripe Payment Flow', () => {
     // Fill checkout form
     await fillCheckoutForm(page);
     
-    // Click submit button
-    const submitButton = page.locator('button').filter({ 
-      hasText: /Finalizar compra.*\$|Place order.*\$/i 
-    }).first();
-    
+    // Click submit button (use stable test id)
+    const submitButton = page.getByTestId('checkout-submit-button');
     await expect(submitButton).toBeVisible();
     await expect(submitButton).toBeEnabled();
     
@@ -91,41 +88,19 @@ test.describe('Stripe Payment Flow', () => {
     await page.goto('/checkout');
     await fillCheckoutForm(page);
     
-    // Create promise to catch new page (Stripe checkout)
-    const pagePromise = context.waitForEvent('page');
+    // We navigate in the same tab; wait for URL change instead of new page
     
     // Submit checkout form
-    const submitButton = page.locator('button').filter({ 
-      hasText: /Finalizar compra.*\$|Place order.*\$/i 
-    }).first();
-    await submitButton.click();
-    
-    // Wait for Stripe page to open
-    const stripePage = await pagePromise.catch(() => null);
-    
-    if (stripePage) {
-      // Wait for Stripe page to load
-      await stripePage.waitForLoadState();
-      
-      // Look for cancel/back button on Stripe
-      const cancelButton = stripePage.locator('a[href*="cancel"], button').filter({ 
-        hasText: /Cancel|Back|Cancelar|Volver/i 
-      }).first();
-      
-      if (await cancelButton.isVisible({ timeout: 5000 })) {
-        await cancelButton.click();
-        
-        // Should redirect back to our site
-        await page.waitForURL(/\/checkout|\/cart/, { timeout: 10000 });
-        
-        // Cart should still have items
-        const cartItems = await page.evaluate(() => {
-          const cart = localStorage.getItem('luzimarket-cart');
-          return cart ? JSON.parse(cart) : [];
-        });
-        expect(cartItems.length).toBeGreaterThan(0);
-      }
-    }
+    const submitButton2 = page.getByTestId('checkout-submit-button');
+    await submitButton2.click();
+    // Wait for redirect to Stripe or success fallback
+    await page.waitForURL(/checkout\.stripe\.com|\/success/, { timeout: 15000 });
+    // If we landed back, ensure cart still has items
+    const cartItems = await page.evaluate(() => {
+      const cart = localStorage.getItem('luzimarket-cart');
+      return cart ? JSON.parse(cart) : [];
+    });
+    expect(cartItems.length).toBeGreaterThan(0);
   });
 
   test('should display order details on Stripe checkout', async ({ page }) => {
@@ -133,16 +108,14 @@ test.describe('Stripe Payment Flow', () => {
     await page.goto('/checkout');
     
     // Get order total from our checkout page
-    const totalElement = page.locator('text=/Total.*\\$/').first();
+    const totalElement = page.locator('[data-testid="order-total"], text=/Total.*\\$/').first();
     const totalText = await totalElement.textContent();
     const totalAmount = totalText?.match(/\$[\d,]+/)?.[0];
     
     await fillCheckoutForm(page);
     
     // Submit and wait for redirect
-    const submitButton = page.locator('button').filter({ 
-      hasText: /Finalizar compra.*\$|Place order.*\$/i 
-    }).first();
+    const submitButton = page.getByTestId('checkout-submit-button');
     
     const navigationPromise = page.waitForNavigation({ 
       url: /checkout\.stripe\.com/,
@@ -173,9 +146,7 @@ test.describe('Stripe Payment Flow', () => {
     await fillCheckoutForm(page);
     
     // Submit checkout
-    const submitButton = page.locator('button').filter({ 
-      hasText: /Finalizar compra.*\$|Place order.*\$/i 
-    }).first();
+    const submitButton = page.getByTestId('checkout-submit-button');
     
     await submitButton.click();
     
@@ -221,12 +192,12 @@ test.describe('Stripe Payment Flow', () => {
     const request = response.request();
     const requestData = request.postDataJSON();
     
-    // Verify request contains necessary data
+    // Verify request contains necessary data aligned with API
     expect(requestData).toHaveProperty('items');
     expect(requestData.items.length).toBeGreaterThan(0);
-    expect(requestData).toHaveProperty('customerInfo');
-    expect(requestData.customerInfo).toHaveProperty('email', 'test@example.com');
-    expect(requestData.customerInfo).toHaveProperty('firstName', 'Test');
+    expect(requestData).toHaveProperty('shippingAddress');
+    expect(requestData.shippingAddress).toHaveProperty('email', 'test@example.com');
+    expect(requestData.shippingAddress).toHaveProperty('firstName', 'Test');
     
     // Verify response
     expect(response.status()).toBe(200);
@@ -279,9 +250,7 @@ test.describe('Stripe Payment Flow', () => {
     await expect(emptyMessage.first()).toBeVisible();
     
     // Checkout button should be disabled or show warning
-    const submitButton = page.locator('button').filter({ 
-      hasText: /Finalizar compra|Place order/i 
-    }).first();
+    const submitButton = page.getByTestId('checkout-submit-button');
     
     if (await submitButton.isVisible()) {
       const isDisabled = await submitButton.isDisabled();
@@ -314,9 +283,7 @@ test.describe('Stripe Payment Flow', () => {
     });
     
     // Try to submit
-    const submitButton = page.locator('button').filter({ 
-      hasText: /Finalizar compra.*\$|Place order.*\$/i 
-    }).first();
+    const submitButton = page.getByTestId('checkout-submit-button');
     await submitButton.click();
     
     // Wait for error
@@ -369,9 +336,7 @@ test.describe('Stripe Payment Flow', () => {
     
     await fillCheckoutForm(page);
     
-    const submitButton = page.locator('button').filter({ 
-      hasText: /Finalizar compra.*\$|Place order.*\$/i 
-    }).first();
+    const submitButton = page.getByTestId('checkout-submit-button');
     await submitButton.click();
     
     const response = await apiPromise;

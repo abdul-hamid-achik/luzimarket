@@ -145,6 +145,7 @@ export default defineConfig({
       NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || 'test_e2e_secret',
       AUTH_URL: `http://localhost:${process.env.PORT || '3000'}`,
       AUTH_TRUST_HOST: 'true',
+      NEXT_DISABLE_DEV_OVERLAY: '1',
     },
   },
 });

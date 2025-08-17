@@ -28,12 +28,21 @@ test.describe('Inventory Management', () => {
     // Wait for product cards to load
     await page.waitForSelector('[data-testid="product-card"]', { timeout: 10000 });
     
-    // Find any product card (stock info is not displayed on cards)
+    // Find any product card and click the link inside it
     const productCard = page.getByTestId('product-card').first();
     await expect(productCard).toBeVisible();
     
-    await productCard.click();
-    await page.waitForURL('**/productos/**', { timeout: 10000 });
+    // Click the product link (usually inside the card)
+    const productLink = productCard.locator('a[href*="/productos/"], a[href*="/products/"]').first();
+    if (await productLink.count() > 0) {
+      await productLink.click();
+    } else {
+      // Fallback: click the card itself
+      await productCard.click();
+    }
+    
+    // Wait for navigation to product page
+    await page.waitForURL(url => url.pathname.includes('/productos/') || url.pathname.includes('/products/'), { timeout: 10000 });
     await page.waitForLoadState('networkidle');
     
     // Check current stock from quantity selector max value or low stock warning
@@ -119,8 +128,15 @@ test.describe('Inventory Management', () => {
     
     // Click on first product card to get its detail page
     const firstProductCard = page.getByTestId('product-card').first();
-    await firstProductCard.click();
-    await page.waitForURL('**/productos/**', { timeout: 10000 });
+    const productLink = firstProductCard.locator('a[href*="/productos/"], a[href*="/products/"]').first();
+    if (await productLink.count() > 0) {
+      await productLink.click();
+    } else {
+      await firstProductCard.click();
+    }
+    
+    // Wait for navigation to product page
+    await page.waitForURL(url => url.pathname.includes('/productos/') || url.pathname.includes('/products/'), { timeout: 10000 });
     const productUrl = page.url();
     
     // Navigate second page to same product

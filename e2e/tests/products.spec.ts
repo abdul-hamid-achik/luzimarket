@@ -162,11 +162,18 @@ test.describe('Products', () => {
 
   test('should show vendor information', async ({ page }) => {
     // Check first product has vendor info
-    const firstProduct = page.locator('main').locator('a[href*="/products/"]').first();
-    // Vendor info appears as "+ VENDOR_NAME"
-    const vendorInfo = firstProduct.locator('p:has-text("+")');
-
-    await expect(vendorInfo).toBeVisible();
+    const firstProduct = page.locator('[data-testid="product-card"]').first();
+    
+    // Vendor info should be displayed - look for vendor-name test-id
+    const vendorInfo = firstProduct.locator('[data-testid="vendor-name"]');
+    
+    // If vendor info is not in test-id, look for text with "Por" or "+"
+    if (await vendorInfo.count() === 0) {
+      const vendorText = firstProduct.locator('text=/Por |\\+ /');
+      await expect(vendorText.first()).toBeVisible();
+    } else {
+      await expect(vendorInfo).toBeVisible();
+    }
   });
 
   test('should handle pagination', async ({ page }) => {
