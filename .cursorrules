@@ -1,0 +1,63 @@
+# Cursor Rules for Luzimarket
+
+Project context
+- Next.js 15 (app router, RSC), React 19, TypeScript, Tailwind CSS v4
+- Data: Drizzle ORM with Postgres (Neon), NextAuth v5
+- Tests: Playwright in `e2e/`
+- Storage/infra: Vercel Blob, Stripe, Resend, Vercel
+
+What to look at first
+- App logic: `app/`, `components/`, `lib/`, `db/`, `i18n/`, `contexts/`
+- Server actions live under `lib/actions/` (if referenced)
+- Config: `next.config.ts`, `middleware.ts`, `tailwind.config.ts`, `drizzle.config.ts`, `playwright.config.ts`
+- Tests: `e2e/` (fixtures, global setup), use these to infer intended behavior
+
+What to avoid loading into context
+- Large/derived: `node_modules/`, `.next/`, `.turbo/`, `tmp/`, `playwright-report/`, `test-results/`, `.vercel/`, `.git/`, lockfiles and large assets
+- Generated screenshots/traces under `e2e/`
+
+Coding standards
+- TypeScript: explicit exports, no `any`, avoid unsafe casts
+- Control flow: early returns, handle errors and edge cases first
+- Comments: keep minimal; explain why, not how
+- Formatting: match existing style, wrap long lines, avoid unrelated refactors
+- Naming: prefer descriptive names over abbreviations
+
+Security and privacy
+- Never commit or print secrets. Redact tokens in logs and messages.
+- Follow env var usage documented in README.
+
+Environment variables of interest
+- App uses `OPENAI_SECRET_KEY` in `lib/openai.ts` for DALL·E 3 image gen (optional).
+- Primary env is managed via Vercel secrets and `.env.local` during development.
+
+Tooling/workflows to prefer
+- After non-trivial edits that affect runtime or types, run:
+  - Build: `npm run build`
+  - Tests: `npm test` (Playwright). In CI, JSON/JUnit artifacts are written to `tmp/`.
+- For local dev server use `npm run dev` (see `playwright.config.ts` `webServer` block).
+- Use non-interactive flags for CLI commands and prefer deterministic outputs.
+
+Project-specific guidance
+- Next.js app router: prefer server components where practical; move client-only logic behind `"use client"`.
+- Forms: use React Hook Form + Zod schemas.
+- Styling: Tailwind v4, shadcn/ui. Keep classNames readable with `clsx`/`tailwind-merge`.
+- Database: prefer Drizzle schema changes via migrations; seed scripts under `db/seed/`.
+- i18n: use `next-intl`; Spanish is default locale.
+
+Context selection heuristics
+- When a user asks about a route: check `app/[locale]/**/page.tsx` and layout/providers.
+- For UI component issues: check `components/**` and usage sites.
+- For data or server actions: check `lib/**`, `db/**`.
+- For e2e failures: open failing spec and corresponding app code; align selectors to `data-testid`.
+
+LLM/provider preferences (advisory)
+- Use a strong reasoning model for complex refactors and test triage.
+- Use a fast code model for simple edits and boilerplate.
+- Be concise in chat; write high-clarity code with explicit types.
+
+Operational rules for this workspace
+- Do not block on confirmations; state assumptions and proceed safely.
+- Prefer small, isolated edits with clear commit messages (if VCS is in scope).
+- Never dump large files; cite only relevant snippets.
+- For image generation features, guard when `OPENAI_SECRET_KEY` is missing.
