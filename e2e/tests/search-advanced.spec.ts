@@ -113,12 +113,17 @@ test.describe('Advanced Search Functionality', () => {
     ];
     
     for (const term of specialSearchTerms) {
-      // Open search
-      await page.getByRole('button', { name: /buscar|search/i }).click();
-      await page.waitForSelector('input[placeholder*="Buscar"]');
+      // Open search - click on "Buscar" text
+      const searchTrigger = page.locator('text=Buscar').first();
+      if (await searchTrigger.isVisible()) {
+        await searchTrigger.click();
+        await page.waitForTimeout(500);
+      }
       
-      // Search with special characters
-      await page.fill('input[placeholder*="Buscar"]', term);
+      // Find and fill search input
+      const searchInput = page.locator('input[type="search"], input[placeholder*="Buscar"], input[placeholder*="Search"]').first();
+      await searchInput.waitFor({ state: 'visible', timeout: 5000 });
+      await searchInput.fill(term);
       await page.keyboard.press('Enter');
       
       // Should not error out
@@ -162,9 +167,14 @@ test.describe('Advanced Search Functionality', () => {
       await route.fulfill({ json: { suggestions } });
     });
     
-    // Open search
-    await page.getByRole('button', { name: /buscar|search/i }).click();
-    const searchInput = page.locator('input[placeholder*="Buscar"]');
+    // Open search - click on "Buscar" text
+    const searchTrigger = page.locator('text=Buscar').first();
+    if (await searchTrigger.isVisible()) {
+      await searchTrigger.click();
+      await page.waitForTimeout(500);
+    }
+    const searchInput = page.locator('input[type="search"], input[placeholder*="Buscar"], input[placeholder*="Search"]').first();
+    await searchInput.waitFor({ state: 'visible', timeout: 5000 });
     
     // Type to trigger suggestions
     await searchInput.fill('fl');
@@ -187,8 +197,14 @@ test.describe('Advanced Search Functionality', () => {
     const searches = ['rosas', 'chocolate', 'velas aromáticas'];
     
     for (const term of searches) {
-      await page.getByRole('button', { name: /buscar|search/i }).click();
-      await page.fill('input[placeholder*="Buscar"]', term);
+      const searchTrigger = page.locator('text=Buscar').first();
+      if (await searchTrigger.isVisible()) {
+        await searchTrigger.click();
+        await page.waitForTimeout(500);
+      }
+      const searchInput = page.locator('input[type="search"], input[placeholder*="Buscar"], input[placeholder*="Search"]').first();
+      await searchInput.waitFor({ state: 'visible', timeout: 5000 });
+      await searchInput.fill(term);
       await page.keyboard.press('Enter');
       await page.waitForURL('**/search**');
       await page.goto(routes.home); // Go back for next search

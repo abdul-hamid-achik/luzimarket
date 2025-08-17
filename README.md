@@ -332,13 +332,6 @@ pkill -f "next dev"
 
 # Run tests with different reporters
 npm test                    # Standard Playwright output
-npm run test:json          # JSON output for parsing
-npm run test:llm           # LLM-friendly output (JSON + JUnit XML)
-
-# Debug specific tests
-npm run test:ui            # Run with Playwright UI
-npm run test:debug         # Debug mode
-npm run test:headed        # See browser during tests
 ```
 
 ## Deployment

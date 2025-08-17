@@ -64,7 +64,7 @@ jobs:
       env:
         DATABASE_URL: postgresql://neon:npg@localhost:5432/neondb
 
-    - name: Run E2E tests (LLM)
+    - name: Run E2E tests
       env:
         DATABASE_URL: postgresql://neon:npg@localhost:5432/neondb
         CI: true
@@ -74,7 +74,7 @@ jobs:
         NEXT_PUBLIC_APP_URL: http://localhost:3000
         PW_WORKERS: 2
         CI_ALL_BROWSERS: 0
-      run: npm run test:llm
+      run: npm run test
     
     - name: Upload Playwright artifacts
       uses: actions/upload-artifact@v4
