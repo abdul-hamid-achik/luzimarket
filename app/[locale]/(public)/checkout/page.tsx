@@ -1,4 +1,3 @@
-/* eslint-disable i18n/messages-parity */
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
