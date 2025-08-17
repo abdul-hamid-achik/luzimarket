@@ -71,18 +71,6 @@ npm test tests/auth.spec.ts
 # Run tests with specific grep pattern
 npm test -- --grep "login"
 
-# Run tests with JSON output (for CI/debugging)
-npm run test:json
-
-# Run tests with LLM-friendly output
-npm run test:llm
-```
-
-### View test report
-```bash
-npm run test:e2e:report
-```
-
 ## Test Credentials
 
 These accounts are created by the test setup:

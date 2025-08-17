@@ -54,7 +54,7 @@ jobs:
         run: npm run db:push
 
       - name: Run Playwright tests (LLM)
-        run: npm run test:llm -- --project="${{ matrix.project }}"
+        run: npm run test -- --project="${{ matrix.project }}"
 
       - name: Upload LLM artifacts
         if: always()
