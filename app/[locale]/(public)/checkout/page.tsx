@@ -75,11 +75,27 @@ export default function CheckoutPage() {
     },
   });
 
+  // Group items by vendor
+  const itemsByVendor = useMemo(() => {
+    const groups: Record<string, typeof items> = {};
+    items.forEach(item => {
+      const vendorId = item.vendorId || 'default';
+      if (!groups[vendorId]) {
+        groups[vendorId] = [];
+      }
+      groups[vendorId].push(item);
+    });
+    return groups;
+  }, [items]);
+
   const subtotal = getTotalPrice();
   const [shippingCost, setShippingCost] = useState(0);
   const [selectedShipping, setSelectedShipping] = useState<any>(null);
+  const [shippingCostsByVendor, setShippingCostsByVendor] = useState<Record<string, number>>({});
+  const [selectedShippingByVendor, setSelectedShippingByVendor] = useState<Record<string, any>>({});
+  const totalShippingCost = Object.values(shippingCostsByVendor).reduce((sum, cost) => sum + cost, 0);
   const tax = subtotal * 0.16; // 16% IVA
-  const total = subtotal + shippingCost + tax;
+  const total = subtotal + totalShippingCost + tax;
 
   // Memoize shipping items to prevent infinite loops
   const shippingItems = useMemo(() =>
@@ -137,6 +153,8 @@ export default function CheckoutPage() {
             instructions: data.instructions,
           },
           selectedShipping: selectedShipping,
+          selectedShippingByVendor: selectedShippingByVendor,
+          shippingCostsByVendor: shippingCostsByVendor,
         }),
       });
 
@@ -510,7 +528,7 @@ export default function CheckoutPage() {
                             Procesando...
                           </>
                         ) : (
-                          `Finalizar compra - ${formatPrice(total)}`
+                          `Proceder al pago - ${formatPrice(total)}`
                         )}
                       </Button>
                     </div>
@@ -525,40 +543,77 @@ export default function CheckoutPage() {
                     <CardTitle className="font-times-now">Resumen del pedido</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {/* Items */}
-                    <div className="space-y-3">
-                      {items.map((item) => (
-                        <div key={item.id} className="flex items-center gap-3">
-                          <div className="relative h-16 w-16 bg-gray-100 rounded overflow-hidden">
-                            {item.image ? (
-                              <Image
-                                src={item.image}
-                                alt={item.name}
-                                fill
-                                className="object-cover"
-                              />
-                            ) : (
-                              <div className="flex items-center justify-center h-full">
-                                <Package className="h-6 w-6 text-gray-400" />
+                    {/* Items grouped by vendor */}
+                    <div className="space-y-4">
+                      {Object.entries(itemsByVendor).map(([vendorId, vendorItems]) => {
+                        const vendorName = vendorItems[0]?.vendorName || 'Vendedor';
+                        const vendorSubtotal = vendorItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        return (
+                          <div key={vendorId} className="space-y-3">
+                            {/* Vendor header */}
+                            <div className="flex items-center justify-between">
+                              <h5 className="font-univers font-medium text-sm text-gray-700">
+                                {vendorName}
+                              </h5>
+                              <span className="text-sm text-gray-500 font-univers">
+                                {vendorItems.length} {vendorItems.length === 1 ? 'producto' : 'productos'}
+                              </span>
+                            </div>
+                            
+                            {/* Vendor items */}
+                            {vendorItems.map((item) => (
+                              <div key={item.id} className="flex items-center gap-3 pl-4">
+                                <div className="relative h-16 w-16 bg-gray-100 rounded overflow-hidden">
+                                  {item.image ? (
+                                    <Image
+                                      src={item.image}
+                                      alt={item.name}
+                                      fill
+                                      className="object-cover"
+                                    />
+                                  ) : (
+                                    <div className="flex items-center justify-center h-full">
+                                      <Package className="h-6 w-6 text-gray-400" />
+                                    </div>
+                                  )}
+                                  <div className="absolute -top-2 -right-2 bg-gray-800 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                    {item.quantity}
+                                  </div>
+                                </div>
+                                <div className="flex-1">
+                                  <h4 className="font-univers font-medium text-sm">{item.name}</h4>
+                                  <p className="text-sm text-gray-600 font-univers">
+                                    {formatPrice(item.price)} c/u
+                                  </p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="font-univers font-medium">
+                                    {formatPrice(item.price * item.quantity)}
+                                  </p>
+                                </div>
                               </div>
-                            )}
-                            <div className="absolute -top-2 -right-2 bg-gray-800 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                              {item.quantity}
+                            ))}
+                            
+                            {/* Vendor subtotal and shipping */}
+                            <div className="pl-4 pt-2 border-t border-gray-100">
+                              <div className="flex justify-between text-sm font-univers text-gray-600">
+                                <span>Subtotal {vendorName}</span>
+                                <span>{formatPrice(vendorSubtotal)}</span>
+                              </div>
+                              <div className="flex justify-between text-sm font-univers text-gray-600" data-testid="shipping-line">
+                                <span>Envío {vendorName}</span>
+                                <span>
+                                  {shippingCostsByVendor[vendorId] === 0 && selectedShippingByVendor[vendorId] ? (
+                                    <span className="text-green-600">GRATIS</span>
+                                  ) : (
+                                    formatPrice(shippingCostsByVendor[vendorId] || 0)
+                                  )}
+                                </span>
+                              </div>
                             </div>
                           </div>
-                          <div className="flex-1">
-                            <h4 className="font-univers font-medium text-sm">{item.name}</h4>
-                            <p className="text-sm text-gray-600 font-univers">
-                              {formatPrice(item.price)} c/u
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-univers font-medium">
-                              {formatPrice(item.price * item.quantity)}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
 
                     <Separator />
@@ -569,13 +624,13 @@ export default function CheckoutPage() {
                         <span>Subtotal</span>
                         <span data-testid="order-subtotal">{formatPrice(subtotal)}</span>
                       </div>
-                      <div className="flex justify-between font-univers" data-testid="shipping-line">
-                        <span>Envío</span>
+                      <div className="flex justify-between font-univers">
+                        <span>Envío Total</span>
                         <span>
-                          {shippingCost === 0 && selectedShipping ? (
+                          {totalShippingCost === 0 && Object.keys(selectedShippingByVendor).length > 0 ? (
                             <span className="text-green-600">GRATIS</span>
                           ) : (
-                            formatPrice(shippingCost)
+                            formatPrice(totalShippingCost)
                           )}
                         </span>
                       </div>

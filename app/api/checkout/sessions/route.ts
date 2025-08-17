@@ -256,9 +256,12 @@ export async function POST(request: NextRequest) {
         : `http://localhost:${process.env.PORT || '3000'}`;
 
       const fakeSessionId = `e2e_${Date.now()}`;
+      // Include all order IDs for multi-vendor orders
+      const orderIdsParam = orderIds.length > 1 ? `&orderIds=${orderIds.join(',')}` : '';
       return NextResponse.json({
         sessionId: fakeSessionId,
-        url: `${appUrl}/success?session_id=${fakeSessionId}&order=${orderNumber}`,
+        url: `${appUrl}/success?session_id=${fakeSessionId}&order=${orderNumber}${orderIdsParam}`,
+        orderIds: orderIds, // Also return orderIds for the test to use
       });
     }
 

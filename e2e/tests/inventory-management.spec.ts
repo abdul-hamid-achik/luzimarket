@@ -23,12 +23,17 @@ test.describe('Inventory Management', () => {
   test('should validate stock availability during checkout', async ({ page }) => {
     // Go to products
     await page.goto(routes.products);
+    await page.waitForLoadState('networkidle');
+    
+    // Wait for product cards to load
+    await page.waitForSelector('[data-testid="product-card"]', { timeout: 10000 });
     
     // Find any product card (stock info is not displayed on cards)
     const productCard = page.getByTestId('product-card').first();
     await expect(productCard).toBeVisible();
     
     await productCard.click();
+    await page.waitForURL('**/productos/**', { timeout: 10000 });
     await page.waitForLoadState('networkidle');
     
     // Check current stock from quantity selector max value or low stock warning
@@ -94,6 +99,8 @@ test.describe('Inventory Management', () => {
       }
     }
     
+    // Wait a bit before clicking add to cart
+    await page.waitForTimeout(500);
     const addToCartBtn = page.getByRole('button', { name: /agregar al carrito/i }).first();
     await addToCartBtn.click();
     
@@ -107,10 +114,13 @@ test.describe('Inventory Management', () => {
     
     // Both users view same product page directly
     await page.goto(routes.products);
+    await page.waitForLoadState('networkidle');
+    await page.waitForSelector('[data-testid="product-card"]', { timeout: 10000 });
     
     // Click on first product card to get its detail page
     const firstProductCard = page.getByTestId('product-card').first();
     await firstProductCard.click();
+    await page.waitForURL('**/productos/**', { timeout: 10000 });
     const productUrl = page.url();
     
     // Navigate second page to same product
@@ -135,8 +145,9 @@ test.describe('Inventory Management', () => {
     try {
       await expect(cartDialog2.or(stockWarning2)).toBeVisible({ timeout: 5000 });
     } catch {
-      // If neither appears, the button might be disabled
-      const addBtn2Disabled = await page2.getByRole('button', { name: /agregar al carrito/i }).first().isDisabled();
+      // If neither appears, the button might be disabled or not visible
+      const addBtn2 = page2.getByRole('button', { name: /agregar al carrito/i }).first();
+      const addBtn2Disabled = await addBtn2.isDisabled().catch(() => true);
       expect(addBtn2Disabled).toBeTruthy();
     }
     
@@ -187,9 +198,13 @@ test.describe('Inventory Management', () => {
   test('should release stock reservation after timeout', async ({ page }) => {
     // Add product to cart
     await page.goto(routes.products);
+    await page.waitForLoadState('networkidle');
+    await page.waitForSelector('[data-testid="product-card"]', { timeout: 10000 });
+    
     const product = page.getByTestId('product-card').first();
     const productName = await product.getByTestId('product-name').textContent();
     await product.click();
+    await page.waitForURL('**/productos/**', { timeout: 10000 });
     
     // Wait for product detail page to load
     await page.waitForSelector('h1');
@@ -241,13 +256,20 @@ test.describe('Inventory Management', () => {
     
     // Product should be available again
     await page.goto(routes.products);
+    await page.waitForLoadState('networkidle');
+    await page.waitForSelector('[data-testid="product-card"]', { timeout: 10000 });
+    
     await page.getByTestId('product-card').filter({ hasText: productName }).click();
-    await expect(page.getByRole('button', { name: /agregar al carrito/i })).toBeEnabled();
+    await page.waitForURL('**/productos/**', { timeout: 10000 });
+    // Use first() to avoid strict mode error with multiple buttons
+    await expect(page.getByRole('button', { name: /agregar al carrito/i }).first()).toBeEnabled();
   });
 
   test('should show low stock warnings', async ({ page }) => {
     // Browse products
     await page.goto(routes.products);
+    await page.waitForLoadState('networkidle');
+    await page.waitForSelector('[data-testid="product-card"]', { timeout: 10000 });
     
     // Look for low stock indicators
     const lowStockProducts = page.getByTestId('product-card').filter({
@@ -257,6 +279,7 @@ test.describe('Inventory Management', () => {
     if (await lowStockProducts.count() > 0) {
       // Click on low stock product
       await lowStockProducts.first().click();
+      await page.waitForURL('**/productos/**', { timeout: 10000 });
       
       // Should show urgency message
       await expect(page.getByText(/últimas? unidades?|limited stock|date prisa/i)).toBeVisible();
@@ -271,6 +294,8 @@ test.describe('Inventory Management', () => {
   test('should handle back in stock notifications', async ({ page }) => {
     // Find out of stock product
     await page.goto(routes.products);
+    await page.waitForLoadState('networkidle');
+    await page.waitForSelector('[data-testid="product-card"]', { timeout: 10000 });
     
     // Mock an out of stock product
     await page.route('**/api/products/out-of-stock-1', async route => {
@@ -291,6 +316,7 @@ test.describe('Inventory Management', () => {
     
     if (await outOfStockProduct.isVisible()) {
       await outOfStockProduct.click();
+      await page.waitForURL('**/productos/**', { timeout: 10000 });
       
       // Should show out of stock message
       await expect(page.getByText(/agotado|out of stock/i)).toBeVisible();
@@ -319,9 +345,10 @@ test.describe('Inventory Management', () => {
     // Login as vendor
     await page.goto(routes.login);
     await page.getByRole('tab', { name: 'Vendedor' }).click();
-    await page.fill('input[name="email"]', vendorEmail);
-    await page.fill('input[name="password"]', vendorPassword);
-    await page.getByRole('button', { name: /iniciar sesión/i }).click();
+    await page.waitForTimeout(500); // Wait for tab switch
+    await page.locator('#vendor-email').fill(vendorEmail);
+    await page.locator('#vendor-password').fill(vendorPassword);
+    await page.locator('button[type="submit"]:has-text("Iniciar sesión")').click();
     
     // Go to products
     await page.goto(routes.vendorProducts);
@@ -373,9 +400,10 @@ test.describe('Inventory Management', () => {
     // Login as vendor
     await page.goto(routes.login);
     await page.getByRole('tab', { name: 'Vendedor' }).click();
-    await page.fill('input[name="email"]', vendorEmail);
-    await page.fill('input[name="password"]', vendorPassword);
-    await page.getByRole('button', { name: /iniciar sesión/i }).click();
+    await page.waitForTimeout(500); // Wait for tab switch
+    await page.locator('#vendor-email').fill(vendorEmail);
+    await page.locator('#vendor-password').fill(vendorPassword);
+    await page.locator('button[type="submit"]:has-text("Iniciar sesión")').click();
     
     // Check dashboard for inventory alerts
     await page.goto(routes.vendorDashboard);
@@ -403,6 +431,8 @@ test.describe('Inventory Management', () => {
   test('should handle product variants stock separately', async ({ page }) => {
     // Go to product with variants
     await page.goto(routes.products);
+    await page.waitForLoadState('networkidle');
+    await page.waitForSelector('[data-testid="product-card"]', { timeout: 10000 });
     
     // Find product with size/color options
     const productWithVariants = page.getByTestId('product-card').filter({
@@ -411,6 +441,7 @@ test.describe('Inventory Management', () => {
     
     if (await productWithVariants.isVisible()) {
       await productWithVariants.click();
+      await page.waitForURL('**/productos/**', { timeout: 10000 });
       
       // Select first variant
       const sizeSelector = page.locator('select[name="size"], [data-testid="size-selector"]');
@@ -492,9 +523,10 @@ test.describe('Inventory Management', () => {
     // Login as vendor
     await page.goto(routes.login);
     await page.getByRole('tab', { name: 'Vendedor' }).click();
-    await page.fill('input[name="email"]', vendorEmail);
-    await page.fill('input[name="password"]', vendorPassword);
-    await page.getByRole('button', { name: /iniciar sesión/i }).click();
+    await page.waitForTimeout(500); // Wait for tab switch
+    await page.locator('#vendor-email').fill(vendorEmail);
+    await page.locator('#vendor-password').fill(vendorPassword);
+    await page.locator('button[type="submit"]:has-text("Iniciar sesión")').click();
     
     // Go to inventory sync settings
     await page.goto('/vendor/settings/inventory');

@@ -5,11 +5,13 @@ import { CheckCircle } from "lucide-react";
 export default async function SuccessPage({
   searchParams,
 }: {
-  searchParams: Promise<{ session_id?: string; order?: string }>;
+  searchParams: Promise<{ session_id?: string; order?: string; orderIds?: string }>;
 }) {
   const t = await getTranslations("Success");
   const params = await searchParams;
   const orderNumber = (params as any).order as string | undefined;
+  const orderIdsParam = (params as any).orderIds as string | undefined;
+  const orderIds = orderIdsParam ? orderIdsParam.split(',') : [];
 
   return (
     <div className="container mx-auto px-4 py-16 text-center max-w-2xl">
@@ -22,10 +24,23 @@ export default async function SuccessPage({
 
       <div className="bg-gray-50 p-8 rounded-lg mb-8">
         <p className="text-lg mb-4">{t("orderConfirmation")}</p>
-        {(orderNumber || params.session_id) && (
-          <p className="text-sm text-gray-500 mb-4" data-testid="order-number">
-            {orderNumber ? `${t("orderNumber")}: ${orderNumber}` : `${t("sessionId")}: ${params.session_id}`}
-          </p>
+        {orderIds.length > 1 ? (
+          <>
+            <p className="text-sm text-gray-500 mb-2">
+              {orderIds.length} pedidos creados:
+            </p>
+            {orderIds.map((orderId, index) => (
+              <p key={orderId} className="text-sm text-gray-500 mb-1">
+                {`ORD-V${index + 1}-${orderId}`}
+              </p>
+            ))}
+          </>
+        ) : (
+          (orderNumber || params.session_id) && (
+            <p className="text-sm text-gray-500 mb-4" data-testid="order-number">
+              {orderNumber ? `${t("orderNumber")}: ${orderNumber}` : `${t("sessionId")}: ${params.session_id}`}
+            </p>
+          )
         )}
         <p className="text-gray-600">{t("emailSent")}</p>
       </div>

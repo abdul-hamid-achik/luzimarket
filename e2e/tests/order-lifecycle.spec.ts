@@ -111,9 +111,10 @@ test.describe('Order Lifecycle - Complete Flow', () => {
       // Login as vendor (using first vendor from seed data)
       await page.goto(routes.login);
       await page.getByRole('tab', { name: 'Vendedor' }).click();
-      await page.fill('input[name="email"]', 'vendor1@example.com');
-      await page.fill('input[name="password"]', 'password123');
-      await page.getByRole('button', { name: /iniciar sesión/i }).click();
+      await page.waitForTimeout(500); // Wait for tab switch
+      await page.locator('#vendor-email').fill('vendor1@example.com');
+      await page.locator('#vendor-password').fill('password123');
+      await page.locator('button[type="submit"]:has-text("Iniciar sesión")').click();
 
       // Navigate to vendor orders
       await page.waitForURL('**/vendor/dashboard');
@@ -337,9 +338,10 @@ test.describe('Order Lifecycle - Complete Flow', () => {
     // Vendor views order with notes
     await page.goto(routes.login);
     await page.getByRole('tab', { name: 'Vendedor' }).click();
-    await page.fill('input[name="email"]', 'vendor1@example.com');
-    await page.fill('input[name="password"]', 'password123');
-    await page.getByRole('button', { name: /iniciar sesión/i }).click();
+    await page.waitForTimeout(500); // Wait for tab switch
+    await page.locator('#vendor-email').fill('vendor1@example.com');
+    await page.locator('#vendor-password').fill('password123');
+    await page.locator('button[type="submit"]:has-text("Iniciar sesión")').click();
 
     await page.goto('/vendor/orders');
     await page.getByRole('cell', { name: new RegExp(noteOrderId) }).click();
