@@ -1306,6 +1306,7 @@
       "track": "Track"
     },
     "unitPrice": "Unit price",
+    "email": "Email",
     "Vendor": {
       "title": "Vendor information"
     }
@@ -1689,7 +1690,6 @@
     "subtitle": "Discover our complete selection of extraordinary gifts",
     "title": "All Products",
     "vendor": "Vendor",
-    "Vendor": "Vendor",
     "vendors": "Stores",
     "viewDetails": "View details"
   },
@@ -2257,8 +2257,7 @@
       "shipping": "Shipping",
       "shippingActions": "Shipping actions",
       "shippingAddress": "Shipping address",
-      "status": "Status",
-      "statuses": {
+      "orderStatuses": {
         "cancelled": "Cancelled",
         "delivered": "Delivered",
         "pending": "Pending",

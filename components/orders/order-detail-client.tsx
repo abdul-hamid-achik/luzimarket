@@ -98,9 +98,9 @@ export function OrderDetailClient({ orderNumber, locale }: OrderDetailClientProp
   const guestEmail = params.get('email');
 
   const isAuthenticated = !!session?.user;
-  const query = isAuthenticated
-    ? useOrder(orderNumber)
-    : useGuestOrder(orderNumber, guestEmail);
+  const userOrderQuery = useOrder(orderNumber);
+  const guestOrderQuery = useGuestOrder(orderNumber, guestEmail);
+  const query = isAuthenticated ? userOrderQuery : guestOrderQuery;
 
   const { data, isLoading, error, isError } = query as any;
 
@@ -221,12 +221,12 @@ export function OrderDetailClient({ orderNumber, locale }: OrderDetailClientProp
           {/* Order Progress */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className={`flex items-center gap-3 p-3 rounded-lg ${['pending', 'paid', 'shipped', 'delivered'].includes(order.status)
-                ? 'bg-green-50 border border-green-200'
-                : 'bg-gray-50 border border-gray-200'
+              ? 'bg-green-50 border border-green-200'
+              : 'bg-gray-50 border border-gray-200'
               }`}>
               <CheckCircle className={`h-5 w-5 ${['pending', 'paid', 'shipped', 'delivered'].includes(order.status)
-                  ? 'text-green-600'
-                  : 'text-gray-400'
+                ? 'text-green-600'
+                : 'text-gray-400'
                 }`} />
               <div>
                 <p className="font-univers font-medium text-sm">{t('progress.ordered')}</p>
@@ -235,12 +235,12 @@ export function OrderDetailClient({ orderNumber, locale }: OrderDetailClientProp
             </div>
 
             <div className={`flex items-center gap-3 p-3 rounded-lg ${['paid', 'shipped', 'delivered'].includes(order.status)
-                ? 'bg-green-50 border border-green-200'
-                : 'bg-gray-50 border border-gray-200'
+              ? 'bg-green-50 border border-green-200'
+              : 'bg-gray-50 border border-gray-200'
               }`}>
               <CreditCard className={`h-5 w-5 ${['paid', 'shipped', 'delivered'].includes(order.status)
-                  ? 'text-green-600'
-                  : 'text-gray-400'
+                ? 'text-green-600'
+                : 'text-gray-400'
                 }`} />
               <div>
                 <p className="font-univers font-medium text-sm">{t('progress.paid')}</p>
@@ -251,12 +251,12 @@ export function OrderDetailClient({ orderNumber, locale }: OrderDetailClientProp
             </div>
 
             <div className={`flex items-center gap-3 p-3 rounded-lg ${['shipped', 'delivered'].includes(order.status)
-                ? 'bg-green-50 border border-green-200'
-                : 'bg-gray-50 border border-gray-200'
+              ? 'bg-green-50 border border-green-200'
+              : 'bg-gray-50 border border-gray-200'
               }`}>
               <Truck className={`h-5 w-5 ${['shipped', 'delivered'].includes(order.status)
-                  ? 'text-green-600'
-                  : 'text-gray-400'
+                ? 'text-green-600'
+                : 'text-gray-400'
                 }`} />
               <div>
                 <p className="font-univers font-medium text-sm">{t('progress.shipped')}</p>
@@ -267,12 +267,12 @@ export function OrderDetailClient({ orderNumber, locale }: OrderDetailClientProp
             </div>
 
             <div className={`flex items-center gap-3 p-3 rounded-lg ${order.status === 'delivered'
-                ? 'bg-green-50 border border-green-200'
-                : 'bg-gray-50 border border-gray-200'
+              ? 'bg-green-50 border border-green-200'
+              : 'bg-gray-50 border border-gray-200'
               }`}>
               <Package className={`h-5 w-5 ${order.status === 'delivered'
-                  ? 'text-green-600'
-                  : 'text-gray-400'
+                ? 'text-green-600'
+                : 'text-gray-400'
                 }`} />
               <div>
                 <p className="font-univers font-medium text-sm">{t('progress.delivered')}</p>
@@ -297,7 +297,7 @@ export function OrderDetailClient({ orderNumber, locale }: OrderDetailClientProp
                 <CardTitle className="font-times-now">{t('orderItems')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {order.items.map((item) => (
+                {order.items.map((item: any) => (
                   <div key={item.id} className="flex items-start gap-4 p-4 border border-gray-200 rounded-lg">
                     <div className="h-16 w-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                       {item.product.images[0] ? (

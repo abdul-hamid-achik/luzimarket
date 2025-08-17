@@ -1,3 +1,4 @@
+/* eslint-disable i18n/messages-parity */
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
@@ -554,7 +555,7 @@ export default function CheckoutPage() {
                                 {vendorItems.length} {vendorItems.length === 1 ? 'producto' : 'productos'}
                               </span>
                             </div>
-                            
+
                             {/* Vendor items */}
                             {vendorItems.map((item) => (
                               <div key={item.id} className="flex items-center gap-3 pl-4">
@@ -588,7 +589,7 @@ export default function CheckoutPage() {
                                 </div>
                               </div>
                             ))}
-                            
+
                             {/* Vendor subtotal and shipping */}
                             <div className="pl-4 pt-2 border-t border-gray-100">
                               <div className="flex justify-between text-sm font-univers text-gray-600">

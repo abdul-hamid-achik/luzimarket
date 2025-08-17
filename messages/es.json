@@ -1306,6 +1306,7 @@
       "track": "Rastrear"
     },
     "unitPrice": "Precio unitario",
+    "email": "Correo electrónico",
     "Vendor": {
       "title": "Información del vendedor"
     }
@@ -1689,7 +1690,6 @@
     "subtitle": "Descubre nuestra selección completa de regalos extraordinarios",
     "title": "Todos los Productos",
     "vendor": "Vendedor",
-    "Vendor": "Vendedor",
     "vendors": "Tiendas",
     "viewDetails": "Ver detalles"
   },
@@ -2257,8 +2257,7 @@
       "shipping": "Envío",
       "shippingActions": "Acciones de envío",
       "shippingAddress": "Dirección de envío",
-      "status": "Estado",
-      "statuses": {
+      "orderStatuses": {
         "cancelled": "Cancelado",
         "delivered": "Entregado",
         "pending": "Pendiente",

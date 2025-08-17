@@ -49,25 +49,25 @@ export default async function VendorOrderDetailPage({
   const { id, locale } = await params;
   const session = await auth();
   const t = await getTranslations("Vendor.orderDetails");
-  
+
   if (!session || session.user.role !== "vendor") {
     redirect("/vendor/login");
   }
 
   const orderDetails = await getOrderDetails(id, session.user.id);
-  
+
   if (!orderDetails) {
     notFound();
   }
 
   return (
-    <VendorOrderDetailClient 
+    <VendorOrderDetailClient
       order={orderDetails}
       translations={{
         orderNumber: t("orderNumber"),
         orderInvoice: t("orderInvoice"),
         date: t("date"),
-        status: t("status"),
+        status: t("statusLabel"),
         customer: t("customer"),
         guest: t("guest"),
         shippingAddress: t("shippingAddress"),
@@ -90,11 +90,11 @@ export default async function VendorOrderDetailPage({
         notes: t("notes"),
         copiedToClipboard: t("copiedToClipboard"),
         orderNumberCopied: t("orderNumberCopied"),
-        statusPending: t("status.pending"),
-        statusProcessing: t("status.processing"),
-        statusShipped: t("status.shipped"),
-        statusDelivered: t("status.delivered"),
-        statusCancelled: t("status.cancelled"),
+        statusPending: t("orderStatuses.pending"),
+        statusProcessing: t("orderStatuses.processing"),
+        statusShipped: t("orderStatuses.shipped"),
+        statusDelivered: t("orderStatuses.delivered"),
+        statusCancelled: t("orderStatuses.cancelled"),
       }}
     />
   );
