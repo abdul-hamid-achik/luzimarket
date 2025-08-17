@@ -15,9 +15,8 @@ export default async function VendorLayout({
   const session = await auth();
   const t = await getTranslations("Vendor.layout");
 
-  // Skip auth check for registration page - will be handled by parallel route
+  // Guard vendor area; allow vendors only
   if (!session || !session.user || session.user.role !== "vendor") {
-    // Locale-aware redirect to login
     redirect({ href: "/login", locale: 'es' });
   }
 
