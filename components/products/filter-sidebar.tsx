@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -29,14 +30,15 @@ interface FilterSidebarProps {
   };
 }
 
-export function FilterSidebar({ 
-  categories = [], 
-  vendors = [], 
-  priceRange = { min: 0, max: 10000 } 
+export function FilterSidebar({
+  categories = [],
+  vendors = [],
+  priceRange = { min: 0, max: 10000 }
 }: FilterSidebarProps = {}) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+  const t = useTranslations("Products");
+
   // Parse current filters from URL
   const currentCategories = searchParams.get("categories")?.split(",").filter(Boolean) || [];
   const currentVendors = searchParams.get("vendors")?.split(",").filter(Boolean) || [];
@@ -46,7 +48,7 @@ export function FilterSidebar({
   // Local state for inputs
   const [minPrice, setMinPrice] = useState(currentMinPrice);
   const [maxPrice, setMaxPrice] = useState(currentMaxPrice);
-  
+
   // Collapsible states
   const [openSections, setOpenSections] = useState({
     categories: true,
@@ -57,7 +59,7 @@ export function FilterSidebar({
   // Update URL with new filters
   const updateFilters = (updates: Record<string, string | string[]>) => {
     const params = new URLSearchParams(searchParams);
-    
+
     Object.entries(updates).forEach(([key, value]) => {
       if (Array.isArray(value)) {
         if (value.length > 0) {
@@ -74,7 +76,7 @@ export function FilterSidebar({
 
     // Reset to page 1 when filters change
     params.set("page", "1");
-    
+
     router.push(`?${params.toString()}` as any);
   };
 
@@ -83,7 +85,7 @@ export function FilterSidebar({
     const newCategories = currentCategories.includes(categoryId)
       ? currentCategories.filter(id => id !== categoryId)
       : [...currentCategories, categoryId];
-    
+
     updateFilters({ categories: newCategories });
   };
 
@@ -92,7 +94,7 @@ export function FilterSidebar({
     const newVendors = currentVendors.includes(vendorId)
       ? currentVendors.filter(id => id !== vendorId)
       : [...currentVendors, vendorId];
-    
+
     updateFilters({ vendors: newVendors });
   };
 
@@ -109,17 +111,16 @@ export function FilterSidebar({
     router.push("/products");
   };
 
-  const hasActiveFilters = 
-    currentCategories.length > 0 || 
-    currentVendors.length > 0 || 
-    currentMinPrice || 
+  const hasActiveFilters =
+    currentCategories.length > 0 ||
+    currentVendors.length > 0 ||
+    currentMinPrice ||
     currentMaxPrice;
 
   return (
     <div className="w-full">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-univers">Filtros</h2>
+      <div className="flex items-center justify-between mb-2">
         {hasActiveFilters && (
           <Button
             variant="ghost"
@@ -127,7 +128,7 @@ export function FilterSidebar({
             onClick={clearAllFilters}
             className="text-xs font-univers"
           >
-            Limpiar todo
+            {t("clearAll")}
           </Button>
         )}
       </div>
@@ -139,7 +140,7 @@ export function FilterSidebar({
         className="mb-6"
       >
         <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-univers hover:text-gray-700">
-          <span>Categorías</span>
+          <span>{t("categories")}</span>
           {openSections.categories ? (
             <ChevronUp className="h-4 w-4" />
           ) : (
@@ -173,7 +174,7 @@ export function FilterSidebar({
         className="mb-6"
       >
         <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-univers hover:text-gray-700">
-          <span>Tiendas + Marcas</span>
+          <span>{t("vendors")}</span>
           {openSections.vendors ? (
             <ChevronUp className="h-4 w-4" />
           ) : (
@@ -207,7 +208,7 @@ export function FilterSidebar({
         className="mb-6"
       >
         <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-univers hover:text-gray-700">
-          <span>Rango de Precio</span>
+          <span>{t("priceRange")}</span>
           {openSections.price ? (
             <ChevronUp className="h-4 w-4" />
           ) : (
@@ -219,7 +220,7 @@ export function FilterSidebar({
             <div className="flex items-center gap-2">
               <div className="flex-1">
                 <Label htmlFor="min-price" className="text-xs font-univers text-gray-600">
-                  Mínimo
+                  {t("minPrice")}
                 </Label>
                 <Input
                   id="min-price"
@@ -232,7 +233,7 @@ export function FilterSidebar({
               </div>
               <div className="flex-1">
                 <Label htmlFor="max-price" className="text-xs font-univers text-gray-600">
-                  Máximo
+                  {t("maxPrice")}
                 </Label>
                 <Input
                   id="max-price"
@@ -249,7 +250,7 @@ export function FilterSidebar({
               className="w-full"
               size="sm"
             >
-              Aplicar
+              {t("applyFilters")}
             </Button>
           </div>
         </CollapsibleContent>

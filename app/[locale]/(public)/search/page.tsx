@@ -29,40 +29,46 @@ async function searchProducts(query: string, filters: any) {
     return { products: [], pagination: { page: 1, limit: 12, totalCount: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false }, allProductIds: [] };
   }
 
-  // Use the same filtering function but add search logic
-  // First get products that match the search term
-  const searchConditions = [
-    eq(products.isActive, true),
-    or(
-      ilike(products.name, `%${query}%`),
-      ilike(products.description, `%${query}%`)
-    )
-  ];
+  try {
+    // Use the same filtering function but add search logic
+    // First get products that match the search term
+    const searchConditions = [
+      eq(products.isActive, true),
+      or(
+        ilike(products.name, `%${query}%`),
+        ilike(products.description, `%${query}%`)
+      )
+    ];
 
-  const searchResults = await db
-    .select({ id: products.id })
-    .from(products)
-    .leftJoin(vendors, eq(products.vendorId, vendors.id))
-    .leftJoin(categories, eq(products.categoryId, categories.id))
-    .where(and(...searchConditions));
+    // Optimize query by only selecting necessary fields and removing unnecessary joins
+    const searchResults = await db
+      .select({ id: products.id })
+      .from(products)
+      .where(and(...searchConditions))
+      .limit(100); // Limit results to prevent overwhelming the connection pool
 
-  const searchProductIds = searchResults.map(r => r.id);
+    const searchProductIds = searchResults.map(r => r.id);
 
-  if (searchProductIds.length === 0) {
+    if (searchProductIds.length === 0) {
+      return { products: [], pagination: { page: 1, limit: 12, totalCount: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false }, allProductIds: [] };
+    }
+
+    // Now use getFilteredProducts with the search results
+    const filtered = await getFilteredProducts({
+      productIds: searchProductIds,
+      categoryIds: filters.category ? [filters.category] : undefined,
+      vendorIds: filters.vendor ? [filters.vendor] : undefined,
+      sortBy: filters.sort as any,
+      minPrice: filters.minPrice ? parseInt(filters.minPrice) : undefined,
+      maxPrice: filters.maxPrice ? parseInt(filters.maxPrice) : undefined,
+    });
+
+    return { ...filtered, allProductIds: searchProductIds };
+  } catch (error) {
+    console.error('Search error:', error);
+    // Return empty results on error instead of crashing
     return { products: [], pagination: { page: 1, limit: 12, totalCount: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false }, allProductIds: [] };
   }
-
-  // Now use getFilteredProducts with the search results
-  const filtered = await getFilteredProducts({
-    productIds: searchProductIds,
-    categoryIds: filters.category ? [filters.category] : undefined,
-    vendorIds: filters.vendor ? [filters.vendor] : undefined,
-    sortBy: filters.sort as any,
-    minPrice: filters.minPrice ? parseInt(filters.minPrice) : undefined,
-    maxPrice: filters.maxPrice ? parseInt(filters.maxPrice) : undefined,
-  });
-
-  return { ...filtered, allProductIds: searchProductIds };
 }
 
 export default async function SearchPage({ params, searchParams }: SearchPageProps) {
@@ -74,14 +80,17 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
   const searchResults = query ? await searchProducts(query, filters) : { products: [], pagination: { page: 1, limit: 12, totalCount: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false }, allProductIds: [] };
 
   // Get filter options using the same function as other pages
-  const filterOptions = await getProductFilterOptions();
-  const vendorsList = await db.query.vendors.findMany({
-    where: eq(vendors.isActive, true),
-    columns: {
-      id: true,
-      businessName: true,
-    }
-  });
+  const [filterOptions, vendorsList] = await Promise.all([
+    getProductFilterOptions(),
+    db.query.vendors.findMany({
+      where: eq(vendors.isActive, true),
+      columns: {
+        id: true,
+        businessName: true,
+      },
+      limit: 50 // Limit vendors to prevent too many results
+    })
+  ]);
 
   return (
     <main className="min-h-screen bg-white">

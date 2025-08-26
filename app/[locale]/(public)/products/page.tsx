@@ -38,22 +38,23 @@ export default async function ProductsPage({ params, searchParams }: ProductsPag
       ? (filters as any).vendors.split(',')
       : undefined);
 
-  const productsResult = await getFilteredProducts({
-    categoryIds,
-    vendorIds,
-    sortBy: filters.sort as any,
-    minPrice: filters.minPrice && !isNaN(parseInt(filters.minPrice)) ? parseInt(filters.minPrice) : undefined,
-    maxPrice: filters.maxPrice && !isNaN(parseInt(filters.maxPrice)) ? parseInt(filters.maxPrice) : undefined,
-  });
-
-  const filterOptions = await getProductFilterOptions({
-    categoryIds,
-    vendorIds,
-    minPrice: productsResult.pagination ? undefined : undefined,
-    // Note: price facet already constrained below by min/max from URL if provided
-    ...(filters.minPrice && !isNaN(parseInt(filters.minPrice)) ? { minPrice: parseInt(filters.minPrice) } : {}),
-    ...(filters.maxPrice && !isNaN(parseInt(filters.maxPrice)) ? { maxPrice: parseInt(filters.maxPrice) } : {}),
-  });
+  // Execute queries in parallel for better performance
+  const [productsResult, filterOptions] = await Promise.all([
+    getFilteredProducts({
+      categoryIds,
+      vendorIds,
+      sortBy: filters.sort as any,
+      minPrice: filters.minPrice && !isNaN(parseInt(filters.minPrice)) ? parseInt(filters.minPrice) : undefined,
+      maxPrice: filters.maxPrice && !isNaN(parseInt(filters.maxPrice)) ? parseInt(filters.maxPrice) : undefined,
+    }),
+    getProductFilterOptions({
+      categoryIds,
+      vendorIds,
+      // Note: price facet already constrained below by min/max from URL if provided
+      ...(filters.minPrice && !isNaN(parseInt(filters.minPrice)) ? { minPrice: parseInt(filters.minPrice) } : {}),
+      ...(filters.maxPrice && !isNaN(parseInt(filters.maxPrice)) ? { maxPrice: parseInt(filters.maxPrice) } : {}),
+    })
+  ]);
 
   return (
     <main className="min-h-screen">

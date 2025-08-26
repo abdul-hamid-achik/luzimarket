@@ -84,12 +84,12 @@ export async function switchUser(currentPage: any, newUserType: keyof typeof tes
 /**
  * Helper function for vendor-authenticated tests
  */
-export async function authenticatedTestVendor(page: Page, testFunction: () => Promise<void>) {
+export async function authenticatedTestVendor(page: Page, testFunction: (page: Page) => Promise<void>) {
   // Login as vendor
   await loginAs(page, 'vendor');
   
   // Run the test function
-  await testFunction();
+  await testFunction(page);
   
   // Logout after test
   await logout(page);

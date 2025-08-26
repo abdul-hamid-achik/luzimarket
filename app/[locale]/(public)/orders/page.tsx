@@ -40,13 +40,13 @@ export default async function OrdersPage({ params, searchParams }: OrdersPagePro
   // Build where conditions based on user role
   let whereConditions = [];
 
-  if (session.user.role === 'customer' && session.user.id) {
-    // For customers, check both userId and email
+  // For all authenticated users, check both userId and email
+  if (session.user.id && session.user.email) {
     whereConditions.push(
       sql`(${orders.userId} = ${session.user.id} OR ${orders.guestEmail} = ${session.user.email})`
     );
   } else if (session.user.email) {
-    // For vendors or admins, only check by email
+    // Fallback to email-only check if no userId
     whereConditions.push(eq(orders.guestEmail, session.user.email));
   }
 

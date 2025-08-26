@@ -18,6 +18,8 @@ import Link from "next/link";
 
 async function getStats() {
   const now = new Date();
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
 
   const [
     totalRevenue,
@@ -30,7 +32,14 @@ async function getStats() {
     lockedVendorsCount,
     lockedAdminsCount,
     pendingVendors,
-    pendingProducts
+    pendingProducts,
+    // Historical data for comparisons (last 30 days vs previous 30 days)
+    revenueLastMonth,
+    revenuePreviousMonth,
+    ordersLastMonth,
+    ordersPreviousMonth,
+    productsLastMonth,
+    vendorsLastMonth
   ] = await Promise.all([
     // Total revenue
     db.select({
@@ -82,12 +91,68 @@ async function getStats() {
     db.select({ count: sql<number>`count(*)` }).from(vendors).where(sql`${vendors.isActive} = false`),
 
     // Pending products
-    db.select({ count: sql<number>`count(*)` }).from(products).where(sql`${products.isActive} = false`)
+    db.select({ count: sql<number>`count(*)` }).from(products).where(sql`${products.isActive} = false`),
+
+    // Historical data - Revenue last 30 days
+    db.select({
+      total: sql<number>`COALESCE(SUM(${orders.total}::numeric), 0)`
+    }).from(orders).where(and(
+      sql`${orders.paymentStatus} = 'succeeded'`,
+      sql`${orders.createdAt} >= ${thirtyDaysAgo.toISOString()}`
+    )),
+
+    // Historical data - Revenue previous 30 days (30-60 days ago)
+    db.select({
+      total: sql<number>`COALESCE(SUM(${orders.total}::numeric), 0)`
+    }).from(orders).where(and(
+      sql`${orders.paymentStatus} = 'succeeded'`,
+      sql`${orders.createdAt} >= ${sixtyDaysAgo.toISOString()}`,
+      sql`${orders.createdAt} < ${thirtyDaysAgo.toISOString()}`
+    )),
+
+    // Orders last 30 days
+    db.select({ count: sql<number>`count(*)` }).from(orders)
+      .where(sql`${orders.createdAt} >= ${thirtyDaysAgo.toISOString()}`),
+
+    // Orders previous 30 days
+    db.select({ count: sql<number>`count(*)` }).from(orders)
+      .where(and(
+        sql`${orders.createdAt} >= ${sixtyDaysAgo.toISOString()}`,
+        sql`${orders.createdAt} < ${thirtyDaysAgo.toISOString()}`
+      )),
+
+    // Products created last 30 days
+    db.select({ count: sql<number>`count(*)` }).from(products)
+      .where(and(
+        sql`${products.isActive} = true`,
+        sql`${products.createdAt} >= ${thirtyDaysAgo.toISOString()}`
+      )),
+
+    // Vendors created last 30 days
+    db.select({ count: sql<number>`count(*)` }).from(vendors)
+      .where(and(
+        sql`${vendors.isActive} = true`,
+        sql`${vendors.createdAt} >= ${thirtyDaysAgo.toISOString()}`
+      ))
   ]);
 
   const totalLockedAccounts = (lockedUsersCount[0]?.count || 0) +
     (lockedVendorsCount[0]?.count || 0) +
     (lockedAdminsCount[0]?.count || 0);
+
+  // Calculate percentage changes
+  const revenueChange = calculatePercentageChange(
+    revenuePreviousMonth[0]?.total || 0,
+    revenueLastMonth[0]?.total || 0
+  );
+
+  const ordersChange = calculatePercentageChange(
+    ordersPreviousMonth[0]?.count || 0,
+    ordersLastMonth[0]?.count || 0
+  );
+
+  const productsChange = productsLastMonth[0]?.count || 0;
+  const vendorsChange = vendorsLastMonth[0]?.count || 0;
 
   return {
     totalRevenue: totalRevenue[0]?.total || 0,
@@ -98,50 +163,131 @@ async function getStats() {
     totalLockedAccounts,
     pendingVendors: pendingVendors[0]?.count || 0,
     pendingProducts: pendingProducts[0]?.count || 0,
-    recentOrders
+    recentOrders,
+    // Calculated changes
+    revenueChange,
+    ordersChange,
+    productsChange,
+    vendorsChange
   };
+}
+
+function calculatePercentageChange(oldValue: number, newValue: number): number {
+  if (oldValue === 0) return newValue > 0 ? 100 : 0;
+  return ((newValue - oldValue) / oldValue) * 100;
+}
+
+function formatNumber(num: number, maxDecimals: number = 2): string {
+  // Round to max decimals first
+  const rounded = Math.round(num * Math.pow(10, maxDecimals)) / Math.pow(10, maxDecimals);
+
+  // If it's a whole number, return without decimals
+  if (rounded % 1 === 0) {
+    return rounded.toString();
+  }
+
+  // Otherwise, return with up to maxDecimals decimal places, removing trailing zeros
+  return rounded.toFixed(maxDecimals).replace(/\.?0+$/, '');
+}
+
+function formatCurrency(amount: number): string {
+  // For currency, always show whole numbers if no cents, otherwise show 2 decimals
+  if (amount % 1 === 0) {
+    return `$${amount.toLocaleString('es-MX')}`;
+  }
+  return `$${amount.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+function getStatCardStyle(change: number, isNewItems: boolean = false) {
+  if (isNewItems) {
+    // For new products/vendors, any new additions are positive
+    if (change > 0) {
+      return {
+        trend: "up" as const,
+        color: "text-green-600",
+        bgColor: "bg-green-50",
+        changeText: `+${change} nuevo${change !== 1 ? 's' : ''}`
+      };
+    } else {
+      return {
+        trend: "neutral" as const,
+        color: "text-gray-600",
+        bgColor: "bg-gray-50",
+        changeText: "Sin cambios"
+      };
+    }
+  }
+
+  // For revenue and orders, show percentage changes
+  if (change > 0) {
+    return {
+      trend: "up" as const,
+      color: "text-green-600",
+      bgColor: "bg-green-50",
+      changeText: `+${formatNumber(change)}%`
+    };
+  } else if (change < 0) {
+    return {
+      trend: "down" as const,
+      color: "text-red-600",
+      bgColor: "bg-red-50",
+      changeText: `${formatNumber(change)}%`
+    };
+  } else {
+    return {
+      trend: "neutral" as const,
+      color: "text-gray-600",
+      bgColor: "bg-gray-50",
+      changeText: "Sin cambios"
+    };
+  }
 }
 
 export default async function AdminDashboard() {
   const t = await getTranslations("Admin");
   const stats = await getStats();
 
+  const revenueStyle = getStatCardStyle(stats.revenueChange);
+  const ordersStyle = getStatCardStyle(stats.ordersChange);
+  const productsStyle = getStatCardStyle(stats.productsChange, true);
+  const vendorsStyle = getStatCardStyle(stats.vendorsChange, true);
+
   const statsCards = [
     {
       title: t("totalRevenue"),
-      value: `$${stats.totalRevenue.toLocaleString('es-MX')}`,
-      change: "+12.5%",
-      trend: "up",
+      value: formatCurrency(stats.totalRevenue),
+      change: revenueStyle.changeText,
+      trend: revenueStyle.trend,
       icon: DollarSign,
-      color: "text-green-600",
-      bgColor: "bg-green-50"
+      color: revenueStyle.color,
+      bgColor: revenueStyle.bgColor
     },
     {
       title: t("totalOrders"),
       value: stats.totalOrders.toString(),
-      change: "+8.2%",
-      trend: "up",
+      change: ordersStyle.changeText,
+      trend: ordersStyle.trend,
       icon: ShoppingCart,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50"
+      color: ordersStyle.color,
+      bgColor: ordersStyle.bgColor
     },
     {
       title: t("activeProducts"),
       value: stats.totalProducts.toString(),
-      change: "+3.7%",
-      trend: "up",
+      change: productsStyle.changeText,
+      trend: productsStyle.trend,
       icon: Package,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50"
+      color: productsStyle.color,
+      bgColor: productsStyle.bgColor
     },
     {
       title: t("activeVendors"),
       value: stats.totalVendors.toString(),
-      change: "-2.1%",
-      trend: "down",
+      change: vendorsStyle.changeText,
+      trend: vendorsStyle.trend,
       icon: Store,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50"
+      color: vendorsStyle.color,
+      bgColor: vendorsStyle.bgColor
     }
   ];
 
@@ -159,7 +305,8 @@ export default async function AdminDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statsCards.map((stat) => {
           const Icon = stat.icon;
-          const TrendIcon = stat.trend === "up" ? ArrowUpRight : ArrowDownRight;
+          const TrendIcon = stat.trend === "up" ? ArrowUpRight :
+            stat.trend === "down" ? ArrowDownRight : null;
 
           return (
             <div key={stat.title} className="bg-white rounded-lg border border-gray-200 p-6">
@@ -167,10 +314,12 @@ export default async function AdminDashboard() {
                 <div className={`${stat.bgColor} p-3 rounded-lg`}>
                   <Icon className={`h-6 w-6 ${stat.color}`} />
                 </div>
-                <div className={`flex items-center gap-1 text-sm ${stat.trend === "up" ? "text-green-600" : "text-red-600"
+                <div className={`flex items-center gap-1 text-sm ${stat.trend === "up" ? "text-green-600" :
+                  stat.trend === "down" ? "text-red-600" :
+                    "text-gray-600"
                   }`}>
                   <span>{stat.change}</span>
-                  <TrendIcon className="h-4 w-4" />
+                  {TrendIcon && <TrendIcon className="h-4 w-4" />}
                 </div>
               </div>
               <h3 className="text-sm font-univers text-gray-600 mb-1">{stat.title}</h3>
@@ -251,7 +400,7 @@ export default async function AdminDashboard() {
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-univers font-medium text-gray-900">
-                        ${Number(order.total).toLocaleString('es-MX')}
+                        {formatCurrency(Number(order.total))}
                       </p>
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-univers ${order.status === 'delivered' ? 'bg-green-100 text-green-800' :
                         order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :

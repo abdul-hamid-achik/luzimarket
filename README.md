@@ -68,6 +68,26 @@ npm run dev:stripe
 
 Visit http://localhost:3000 to see the application.
 
+## Test Accounts
+
+- **Admin**
+  - Email: `admin@luzimarket.shop` — Password: `admin123`
+
+- **Vendors**
+  - Email: `vendor@luzimarket.shop` — Password: `password123`
+  - Email: `vendor1@example.com` — Password: `password123`
+  - Email: `vendor2@example.com` — Password: `password123`
+
+- **Customers**
+  - Email: `client@luzimarket.shop` — Password: `password123`
+  - Email: `client_2@luzimarket.shop` — Password: `password123`
+  - Email: `customer1@example.com` — Password: `password123`
+  - Email: `customer2@example.com` — Password: `password123`
+
+Notes:
+- Additional seeded admins exist (e.g., `support@luzimarket.shop`, `manager@luzimarket.shop`) with password `admin123`.
+- Special testing users: `unverified@example.com` (unverified) and `locked@example.com` (may be temporarily locked), both with password `password123`.
+
 ## Project Structure
 
 ```

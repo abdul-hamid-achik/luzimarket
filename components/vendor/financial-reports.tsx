@@ -254,7 +254,7 @@ export function FinancialReports({ vendorId }: FinancialReportsProps) {
     };
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-6" data-testid="revenue-report">
         {/* Balance Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
@@ -329,7 +329,7 @@ export function FinancialReports({ vendorId }: FinancialReportsProps) {
     if (!reportData) return null;
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-6" data-testid="products-report">
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
@@ -417,7 +417,7 @@ export function FinancialReports({ vendorId }: FinancialReportsProps) {
         <CardContent>
           {/* Date Range Picker */}
           <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2" data-testid="date-range-picker">
               <Calendar className="h-4 w-4 text-muted-foreground" />
               <DatePickerWithRange
                 date={dateRange}
@@ -438,15 +438,15 @@ export function FinancialReports({ vendorId }: FinancialReportsProps) {
           {/* Report Type Tabs */}
           <Tabs value={activeTab} onValueChange={handleGenerateReport}>
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="sales" disabled={isLoading}>
+              <TabsTrigger value="sales" disabled={isLoading} data-testid="tab-sales">
                 <TrendingUp className="h-4 w-4 mr-2" />
                 {t("salesReport")}
               </TabsTrigger>
-              <TabsTrigger value="revenue" disabled={isLoading}>
+              <TabsTrigger value="revenue" disabled={isLoading} data-testid="tab-revenue">
                 <DollarSign className="h-4 w-4 mr-2" />
                 {t("revenueReport")}
               </TabsTrigger>
-              <TabsTrigger value="products" disabled={isLoading}>
+              <TabsTrigger value="products" disabled={isLoading} data-testid="tab-products">
                 <Package className="h-4 w-4 mr-2" />
                 {t("productsReport")}
               </TabsTrigger>
@@ -454,17 +454,17 @@ export function FinancialReports({ vendorId }: FinancialReportsProps) {
 
             <TabsContent value="sales" className="mt-6">
               {isLoading ? (
-                <div className="flex items-center justify-center py-12">
+                <div className="flex items-center justify-center py-12" data-testid="report-loading">
                   <Loader2 className="h-8 w-8 animate-spin" />
                 </div>
               ) : (
-                renderSalesReport()
+                <div data-testid="revenue-chart">{renderSalesReport()}</div>
               )}
             </TabsContent>
 
             <TabsContent value="revenue" className="mt-6">
               {isLoading ? (
-                <div className="flex items-center justify-center py-12">
+                <div className="flex items-center justify-center py-12" data-testid="report-loading">
                   <Loader2 className="h-8 w-8 animate-spin" />
                 </div>
               ) : (
@@ -474,7 +474,7 @@ export function FinancialReports({ vendorId }: FinancialReportsProps) {
 
             <TabsContent value="products" className="mt-6">
               {isLoading ? (
-                <div className="flex items-center justify-center py-12">
+                <div className="flex items-center justify-center py-12" data-testid="report-loading">
                   <Loader2 className="h-8 w-8 animate-spin" />
                 </div>
               ) : (

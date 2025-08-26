@@ -40,19 +40,31 @@ export default async function HandpickedPage({ params, searchParams }: Handpicke
       ? (filters as any).vendors.split(',')
       : undefined);
 
-  let productsResult = await getFilteredProducts({
-    categoryIds,
-    vendorIds,
-    sortBy: filters.sort as any,
-    minPrice: filters.minPrice ? parseInt(filters.minPrice) : undefined,
-    maxPrice: filters.maxPrice ? parseInt(filters.maxPrice) : undefined,
-    tags: ['handpicked'], // Filter for handpicked products
-  });
+  // Execute queries in parallel for better performance
+  const [productsResult, filterOptions] = await Promise.all([
+    getFilteredProducts({
+      categoryIds,
+      vendorIds,
+      sortBy: filters.sort as any,
+      minPrice: filters.minPrice ? parseInt(filters.minPrice) : undefined,
+      maxPrice: filters.maxPrice ? parseInt(filters.maxPrice) : undefined,
+      tags: ['handpicked'], // Filter for handpicked products
+    }),
+    getProductFilterOptions({
+      categoryIds,
+      vendorIds,
+      ...(filters.minPrice ? { minPrice: parseInt(filters.minPrice) } : {}),
+      ...(filters.maxPrice ? { maxPrice: parseInt(filters.maxPrice) } : {}),
+    })
+  ]);
 
   // Fallback: if no handpicked products, show general products so the page is never empty
-  const usingFallback = productsResult.products.length === 0;
-  if (usingFallback) {
-    productsResult = await getFilteredProducts({
+  let usingFallback = false;
+  let finalProductsResult = productsResult;
+  
+  if (productsResult.products.length === 0) {
+    usingFallback = true;
+    finalProductsResult = await getFilteredProducts({
       categoryIds,
       vendorIds,
       sortBy: filters.sort as any,
@@ -61,12 +73,6 @@ export default async function HandpickedPage({ params, searchParams }: Handpicke
     });
   }
 
-  const filterOptions = await getProductFilterOptions({
-    categoryIds,
-    vendorIds,
-    ...(filters.minPrice ? { minPrice: parseInt(filters.minPrice) } : {}),
-    ...(filters.maxPrice ? { maxPrice: parseInt(filters.maxPrice) } : {}),
-  });
   const vendorsList = filterOptions.vendors.map((v: any) => ({ id: v.id, businessName: v.name, count: Number(v.count) }));
   const hasSearchParams = Object.values(filters || {}).some((v) => v !== undefined && v !== null && v !== "");
 
@@ -108,7 +114,7 @@ export default async function HandpickedPage({ params, searchParams }: Handpicke
           {/* Filters Sidebar */}
           <aside className="lg:w-64 flex-shrink-0">
             <div className="sticky top-24">
-              <h2 className="text-lg font-univers font-medium mb-6">{t('filterBy')}</h2>
+              <h2 className="text-lg font-univers font-medium mb-2">{t('filterBy')}</h2>
               <FilterSidebar
                 categories={filterOptions.categories.map((cat: any) => ({
                   id: cat.id.toString(),
@@ -130,11 +136,11 @@ export default async function HandpickedPage({ params, searchParams }: Handpicke
             {/* Sort and Results */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
               <div className="text-sm font-univers text-gray-600">
-                {hasSearchParams && productsResult.pagination.totalCount > 0 && (
+                {hasSearchParams && finalProductsResult.pagination.totalCount > 0 && (
                   <p>
                     {t('resultsCount', {
-                      count: productsResult.pagination.totalCount,
-                      defaultValue: `${productsResult.pagination.totalCount} ${productsResult.pagination.totalCount === 1 ? 'producto encontrado' : 'productos encontrados'}`
+                      count: finalProductsResult.pagination.totalCount,
+                      defaultValue: `${finalProductsResult.pagination.totalCount} ${finalProductsResult.pagination.totalCount === 1 ? 'producto encontrado' : 'productos encontrados'}`
                     })}
                   </p>
                 )}
@@ -143,11 +149,11 @@ export default async function HandpickedPage({ params, searchParams }: Handpicke
             </div>
 
             {/* Products */}
-            {productsResult.products.length > 0 ? (
+            {finalProductsResult.products.length > 0 ? (
               <Suspense fallback={<ProductGridSkeleton />}>
                 <InfiniteProductsGrid
-                  initialProducts={productsResult.products as any}
-                  initialPagination={productsResult.pagination}
+                  initialProducts={finalProductsResult.products as any}
+                  initialPagination={finalProductsResult.pagination}
                   staticFilters={usingFallback ? undefined : { tags: ['handpicked'] }}
                 />
               </Suspense>

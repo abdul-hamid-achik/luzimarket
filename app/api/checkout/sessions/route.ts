@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const session = await auth();
 
     const body = await request.json();
-    const { items, shippingAddress, billingAddress, isGuest, selectedShipping } = body;
+    const { items, shippingAddress, billingAddress, isGuest, selectedShipping, selectedShippingByVendor, shippingCostsByVendor } = body;
 
     // Validate required fields
     if (!items || !Array.isArray(items) || items.length === 0) {
@@ -60,18 +60,20 @@ export async function POST(request: NextRequest) {
     const subtotal = items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
     const tax = subtotal * 0.16; // 16% IVA
 
-    // Use selected shipping or default
-    let shipping = 99; // Default fallback
+    // Calculate total shipping from all vendors
+    const totalShippingFromVendors = shippingCostsByVendor ?
+      Object.values(shippingCostsByVendor).reduce((sum, cost) => sum + (cost || 0), 0) : 0;
+
+    let shipping = totalShippingFromVendors || 99; // Use calculated shipping or fallback
     let shippingDescription = '📦 Envío estándar en México';
     let shippingDays = { min: 3, max: 5 };
 
-    if (selectedShipping && selectedShipping.total !== undefined) {
-      shipping = selectedShipping.total;
-      // Get the first shipping option details for display
-      if (selectedShipping.options && selectedShipping.options.length > 0) {
-        const firstOption = selectedShipping.options[0].option;
-        shippingDescription = firstOption.name || shippingDescription;
-        shippingDays = firstOption.estimatedDays || shippingDays;
+    // If we have vendor-specific shipping info, try to get description from the first vendor
+    if (selectedShippingByVendor && Object.keys(selectedShippingByVendor).length > 0) {
+      const firstVendorShipping = Object.values(selectedShippingByVendor)[0];
+      if (firstVendorShipping) {
+        shippingDescription = firstVendorShipping.name || shippingDescription;
+        shippingDays = firstVendorShipping.estimatedDays || shippingDays;
       }
     }
 
@@ -167,7 +169,8 @@ export async function POST(request: NextRequest) {
     for (const [vendorId, vendorItems] of Object.entries(vendorGroups)) {
       const vendorSubtotal = (vendorItems as any[]).reduce((sum, item) => sum + (item.price * item.quantity), 0);
       const vendorTax = vendorSubtotal * 0.16;
-      const vendorShipping = vendorSubtotal > 1000 ? 0 : 99;
+      // Use calculated shipping cost for this vendor, fallback to default if not provided
+      const vendorShipping = shippingCostsByVendor?.[vendorId] ?? (vendorSubtotal > 1000 ? 0 : 99);
       const vendorTotal = vendorSubtotal + vendorTax + vendorShipping;
 
       // Calculate platform fee (default 15% of subtotal)
@@ -185,14 +188,13 @@ export async function POST(request: NextRequest) {
         shipping: vendorShipping.toFixed(2),
         total: vendorTotal.toFixed(2),
         currency: "MXN",
-        // Set userId if user is logged in (only for customers who have records in users table)
+        // Only set userId for customers (who exist in the users table)
+        // Vendors and admins have separate tables, so we track them via email
         ...(session?.user?.id && session.user.role === 'customer' ? { userId: session.user.id } : {}),
-        // Guest order fields (for guest users, vendors, or admins placing orders)
-        ...((isGuest && !session?.user) || session?.user?.role === 'vendor' || session?.user?.role === 'admin' ? {
-          guestEmail: shippingAddress.email,
-          guestName: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
-          guestPhone: shippingAddress.phone,
-        } : {}),
+        // Always store email for order tracking (helps with order lookup for all user types)
+        guestEmail: shippingAddress.email,
+        guestName: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
+        guestPhone: shippingAddress.phone,
         shippingAddress: {
           street: `${shippingAddress.address} ${shippingAddress.apartment || ''}`.trim(),
           city: shippingAddress.city,
@@ -370,6 +372,8 @@ export async function POST(request: NextRequest) {
             orderIds: orderIds.join(','),
             isGuest: isGuest ? 'true' : 'false',
             selectedShipping: selectedShipping ? JSON.stringify(selectedShipping) : '',
+            selectedShippingByVendor: selectedShippingByVendor ? JSON.stringify(selectedShippingByVendor) : '',
+            shippingCostsByVendor: shippingCostsByVendor ? JSON.stringify(shippingCostsByVendor) : '',
             useStripeConnect: 'true',
             vendorSplits: JSON.stringify(vendorSplits), // Store vendor split details
             totalPlatformFees: totalPlatformFees.toString(),
@@ -444,6 +448,8 @@ export async function POST(request: NextRequest) {
             orderIds: orderIds.join(','),
             isGuest: isGuest ? 'true' : 'false',
             selectedShipping: selectedShipping ? JSON.stringify(selectedShipping) : '',
+            selectedShippingByVendor: selectedShippingByVendor ? JSON.stringify(selectedShippingByVendor) : '',
+            shippingCostsByVendor: shippingCostsByVendor ? JSON.stringify(shippingCostsByVendor) : '',
           },
           // OXXO specific settings
           payment_method_options: {

@@ -15,11 +15,11 @@ export default async function SuccessPage({
 
   return (
     <div className="container mx-auto px-4 py-16 text-center max-w-2xl">
-      <div className="mb-8">
+      <div className="mb-8" data-testid="order-success">
         <CheckCircle className="w-24 h-24 text-green-500 mx-auto" />
       </div>
 
-      <h1 className="text-4xl font-times-now mb-4">{t("title")}</h1>
+      <h1 className="text-4xl font-times-now mb-4" data-testid="order-success-title">{t("title")}</h1>
       <p className="text-xl text-gray-600 mb-8">{t("subtitle")}</p>
 
       <div className="bg-gray-50 p-8 rounded-lg mb-8">

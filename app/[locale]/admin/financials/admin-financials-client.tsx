@@ -429,7 +429,7 @@ export function AdminFinancialsClient({
               <CardTitle>{t("vendors.title")}</CardTitle>
               <CardDescription>{t("vendors.description")}</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent data-testid="vendor-balances-table">
               <DataTable
                 columns={vendorBalanceColumns}
                 data={vendorBalances}
@@ -453,7 +453,7 @@ export function AdminFinancialsClient({
               <CardTitle>{t("fees.title")}</CardTitle>
               <CardDescription>{t("fees.description")}</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent data-testid="platform-fees-table">
               <DataTable
                 columns={platformFeeColumns}
                 data={platformFees}
@@ -476,7 +476,7 @@ export function AdminFinancialsClient({
               <CardTitle>{t("payouts.title")}</CardTitle>
               <CardDescription>{t("payouts.description")}</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent data-testid="payouts-table">
               <DataTable
                 columns={payoutColumns}
                 data={payouts}

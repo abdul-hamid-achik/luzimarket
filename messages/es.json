@@ -1368,11 +1368,7 @@
       "vendorLocation": "Ubicación del Vendedor"
     },
     "moreItems": "más",
-    "noOrders": {
-      "description": "Intenta ajustar tus filtros para encontrar lo que buscas.",
-      "startShopping": "Comenzar a Comprar",
-      "title": "No se encontraron pedidos"
-    },
+    "noOrders": "No se encontraron pedidos",
     "noResults": {
       "clearFilters": "Limpiar Filtros",
       "description": "Intenta ajustar tus filtros de búsqueda para encontrar lo que buscas.",
@@ -1395,13 +1391,13 @@
     "quantity": "Cantidad",
     "search": "Buscar",
     "startShopping": "Comenzar a Comprar",
-    "status": "Estado",
-    "statuses": {
-      "cancelled": "Cancelado",
-      "delivered": "Entregado",
-      "paid": "Pagado",
+    "status": {
       "pending": "Pendiente",
-      "shipped": "Enviado"
+      "paid": "Pagado",
+      "shipped": "Enviado",
+      "delivered": "Entregado",
+      "cancelled": "Cancelado",
+      "processing": "Procesando"
     },
     "subtitle": "Consulta el historial y estado de todos tus pedidos",
     "table": {
@@ -1617,6 +1613,7 @@
     "brand": "Marca",
     "categories": "Categorías",
     "category": "Categoría",
+    "clearAll": "Limpiar todo",
     "clearFilters": "Limpiar filtros",
     "color": "Color",
     "description": "Descripción",
@@ -1637,6 +1634,7 @@
     "priceLowToHigh": "Precio: Menor a Mayor",
     "priceRange": "Rango de precio",
     "productsFound": "productos encontrados",
+    "vendors": "Tiendas + Marcas",
     "quantity": "Cantidad",
     "quickView": "Vista rápida",
     "quickViewModal": {
@@ -1690,7 +1688,6 @@
     "subtitle": "Descubre nuestra selección completa de regalos extraordinarios",
     "title": "Todos los Productos",
     "vendor": "Vendedor",
-    "vendors": "Tiendas",
     "viewDetails": "Ver detalles"
   },
   "RegisterPage": {

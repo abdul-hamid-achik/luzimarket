@@ -953,9 +953,9 @@
     "affiliate": "Affiliate",
     "comingSoon": "COMING SOON",
     "comingSoonEn": "COMING SOON",
-    "comingSoonEs": "PRÓXIMAMENTE",
-    "comingSoonFr": "BIENTÔT",
-    "comingSoonKr": "곧 출시",
+    "comingSoonEs": "COMING SOON",
+    "comingSoonFr": "COMING SOON",
+    "comingSoonKr": "COMING SOON",
     "description": "LUZIMARKET® is a new online platform offering curation, sales, and home delivery of exceptional gifts for special moments, with a catalog of selected brands and stores throughout Mexico.",
     "title": "Handpicked extraordinary gifts"
   },
@@ -1006,7 +1006,7 @@
     "shippingTo": "Shipping to: {location}",
     "shoppingCart": "Shopping cart",
     "shoppingCartWithItems": "Cart with {count} items",
-    "spanish": "Español",
+    "spanish": "English",
     "success": "Success",
     "trackOrder": "Track Order",
     "user": "User",
@@ -1313,7 +1313,17 @@
   },
   "Orders": {
     "actions": {
-      "buyAgain": "Comprar de nuevo"
+      "buyAgain": "Buy again"
+    },
+    "stats": {
+      "pendingOrders": "Pending Orders",
+      "pendingOrdersDescription": "Orders waiting for payment",
+      "totalOrders": "Total Orders",
+      "totalOrdersDescription": "Orders processed",
+      "activeVendors": "Active Vendors",
+      "activeVendorsDescription": "With balance available",
+      "totalRevenue": "Total Revenue",
+      "totalRevenueDescription": "Fees collected"
     },
     "backToAccount": "Back to Account",
     "carrier": "Carrier",
@@ -1338,8 +1348,8 @@
       "vendorInfo": "Vendor information"
     },
     "error": {
-      "loading": "Error al cargar los pedidos",
-      "retry": "Reintentar"
+      "loading": "Error loading orders",
+      "retry": "Retry"
     },
     "estimatedDelivery": "Estimated delivery",
     "exportOrders": "Export Orders",
@@ -1368,11 +1378,7 @@
       "vendorLocation": "Vendor Location"
     },
     "moreItems": "more",
-    "noOrders": {
-      "description": "Try adjusting your filters to find what you are looking for.",
-      "startShopping": "Start Shopping",
-      "title": "No orders found"
-    },
+    "noOrders": "No orders found",
     "noResults": {
       "clearFilters": "Clear Filters",
       "description": "Try adjusting your search filters to find what you're looking for.",
@@ -1395,7 +1401,14 @@
     "quantity": "Quantity",
     "search": "Search",
     "startShopping": "Start Shopping",
-    "status": "Status",
+    "status": {
+      "cancelled": "Cancelled",
+      "delivered": "Delivered",
+      "paid": "Paid",
+      "pending": "Pending",
+      "shipped": "Shipped",
+      "processing": "Processing"
+    },
     "statuses": {
       "cancelled": "Cancelled",
       "delivered": "Delivered",
@@ -1617,6 +1630,7 @@
     "brand": "Brand",
     "categories": "Categories",
     "category": "Category",
+    "clearAll": "Clear all",
     "clearFilters": "Clear filters",
     "color": "Color",
     "description": "Description",
@@ -1637,6 +1651,7 @@
     "priceLowToHigh": "Price: Low to High",
     "priceRange": "Price range",
     "productsFound": "products found",
+    "vendors": "Stores + Brands",
     "quantity": "Quantity",
     "quickView": "Quick view",
     "quickViewModal": {
@@ -1690,7 +1705,6 @@
     "subtitle": "Discover our complete selection of extraordinary gifts",
     "title": "All Products",
     "vendor": "Vendor",
-    "vendors": "Stores",
     "viewDetails": "View details"
   },
   "RegisterPage": {
@@ -1901,14 +1915,14 @@
         "limitations": {
           "accuracy": "The accuracy of information provided by vendors",
           "availability": "The continuous availability of the Platform",
-          "disputes": "Disputas directas entre compradores y vendedores",
-          "platformFees": "Los vendedores son responsables del pago de comisiones de plataforma",
+          "disputes": "Direct disputes between buyers and sellers",
+          "platformFees": "Vendors are responsible for paying platform fees",
           "quality": "The quality, safety, or legality of listed products",
-          "shipping": "Retrasos o daños en el envío causados por vendedores o empresas de mensajería",
+          "shipping": "Shipping delays or damages caused by vendors or courier companies",
           "thirdParty": "Actions or omissions of third parties, including vendors and shipping services",
-          "vendorActions": "Las acciones, omisiones o incumplimientos de los vendedores"
+          "vendorActions": "The actions, omissions or breaches of vendors"
         },
-        "maxLiability": "En cualquier caso, la responsabilidad total de Luzimarket no excederá el valor de la transacción específica en cuestión.",
+        "maxLiability": "In any case, Luzimarket's total liability shall not exceed the value of the specific transaction in question.",
         "title": "Limitation of Liability"
       },
       "marketplaceModel": {
@@ -2038,31 +2052,31 @@
     "analytics": {
       "analyticsComingSoon": "Advanced analytics and reporting features are coming soon. Stay tuned for detailed insights about your business performance.",
       "averageOrder": "Average Order Value",
-      "chartComingSoon": "Gráfico próximamente",
+      "chartComingSoon": "Chart coming soon",
       "comingSoon": "Coming Soon",
       "conversionRate": "Conversion Rate",
-      "customers": "Clientes",
+      "customers": "Customers",
       "deletedProduct": "Deleted product",
       "description": "Track your business performance and growth",
-      "items": "artículos",
-      "last30Days": "Últimos 30 días",
-      "latestSuccessfulOrders": "Últimas órdenes exitosas",
+      "items": "items",
+      "last30Days": "Last 30 days",
+      "latestSuccessfulOrders": "Latest successful orders",
       "noOrders": "No orders",
-      "noProductsSold": "No hay productos vendidos aún",
-      "orders": "Órdenes",
-      "overview": "Vista General",
+      "noProductsSold": "No products sold yet",
+      "orders": "Orders",
+      "overview": "Overview",
       "products": "Productos",
-      "recentOrders": "Órdenes Recientes",
-      "revenue": "Ingresos",
-      "salesOverview": "Resumen de Ventas",
-      "subtitle": "Estadísticas de tu negocio",
+      "recentOrders": "Recent Orders",
+      "revenue": "Revenue",
+      "salesOverview": "Sales Overview",
+      "subtitle": "Your business statistics",
       "title": "Analytics",
-      "topSellingProducts": "Productos Más Vendidos",
+      "topSellingProducts": "Top Selling Products",
       "totalOrders": "Total Orders",
-      "totalRevenue": "Ingresos Totales",
+      "totalRevenue": "Total Revenue",
       "totalSales": "Total Sales",
-      "uniqueCustomers": "Clientes Únicos",
-      "unitsSold": "{count} unidades vendidas"
+      "uniqueCustomers": "Unique Customers",
+      "unitsSold": "{count} units sold"
     },
     "customerInfo": "Customer information",
     "dashboard": {

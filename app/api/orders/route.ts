@@ -45,13 +45,13 @@ export async function GET(request: NextRequest) {
     // Build where conditions based on user role
     let whereConditions = [];
     
-    if (session.user.role === 'customer' && userId) {
-      // For customers, check both userId and email
+    // For all authenticated users, check both userId and email
+    if (userId && userEmail) {
       whereConditions.push(
         sql`(${orders.userId} = ${userId} OR ${orders.guestEmail} = ${userEmail})`
       );
     } else if (userEmail) {
-      // For vendors or users without userId, only check by email
+      // Fallback to email-only check if no userId
       whereConditions.push(eq(orders.guestEmail, userEmail));
     } else {
       // Fallback - should not happen but prevents empty results

@@ -49,7 +49,7 @@ export async function getFilteredProducts(filters: ProductFilters = {}) {
       tags = [],
       sortBy = "newest",
       page = 1,
-      limit = 12,
+      limit = Math.min(filters.limit || 12, 50), // Cap limit to prevent excessive data transfer
     } = filters;
 
     // Build where conditions
@@ -108,26 +108,26 @@ export async function getFilteredProducts(filters: ProductFilters = {}) {
     // Calculate offset
     const offset = (page - 1) * limit;
 
-    // Query products with joins
-    const result = await db
-      .select({
-        product: products,
-        category: categories,
-        vendor: vendors,
-      })
-      .from(products)
-      .leftJoin(categories, eq(products.categoryId, categories.id))
-      .leftJoin(vendors, eq(products.vendorId, vendors.id))
-      .where(conditions.length > 0 ? and(...conditions) : undefined)
-      .orderBy(orderBy)
-      .limit(limit)
-      .offset(offset);
-
-    // Count total products for pagination
-    const countResult = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(products)
-      .where(conditions.length > 0 ? and(...conditions) : undefined);
+    // Execute product query and count in parallel for better performance
+    const [result, countResult] = await Promise.all([
+      db
+        .select({
+          product: products,
+          category: categories,
+          vendor: vendors,
+        })
+        .from(products)
+        .leftJoin(categories, eq(products.categoryId, categories.id))
+        .leftJoin(vendors, eq(products.vendorId, vendors.id))
+        .where(conditions.length > 0 ? and(...conditions) : undefined)
+        .orderBy(orderBy)
+        .limit(limit)
+        .offset(offset),
+      db
+        .select({ count: sql<number>`count(*)` })
+        .from(products)
+        .where(conditions.length > 0 ? and(...conditions) : undefined)
+    ]);
 
     const totalCount = Number(countResult[0]?.count || 0);
     const totalPages = Math.ceil(totalCount / limit);
@@ -197,53 +197,57 @@ export async function getProductFilterOptions(baseFilters: ProductFilters = {}) 
       return conds;
     };
 
-    // Get all active categories with product counts
-    const categoriesWithCounts = await db
-      .select({
-        id: categories.id,
-        name: categories.name,
-        slug: categories.slug,
-        count: sql<number>`count(${products.id})`,
-      })
-      .from(categories)
-      .leftJoin(
-        products,
-        and(
-          eq(products.categoryId, categories.id),
-          ...buildProductConditions({ includeCategoryFilter: false, includeVendorFilter: true })
+    // Execute all filter option queries in parallel for better performance
+    const [categoriesWithCounts, vendorsWithCounts, priceRange] = await Promise.all([
+      // Get all active categories with product counts
+      db
+        .select({
+          id: categories.id,
+          name: categories.name,
+          slug: categories.slug,
+          count: sql<number>`count(${products.id})`,
+        })
+        .from(categories)
+        .leftJoin(
+          products,
+          and(
+            eq(products.categoryId, categories.id),
+            ...buildProductConditions({ includeCategoryFilter: false, includeVendorFilter: true })
+          )
         )
-      )
-      .where(eq(categories.isActive, true))
-      .groupBy(categories.id)
-      .orderBy(categories.displayOrder);
-
-    // Get all vendors with product counts
-    const vendorsWithCounts = await db
-      .select({
-        id: vendors.id,
-        name: vendors.businessName,
-        count: sql<number>`count(${products.id})`,
-      })
-      .from(vendors)
-      .leftJoin(
-        products,
-        and(
-          eq(products.vendorId, vendors.id),
-          ...buildProductConditions({ includeCategoryFilter: true, includeVendorFilter: false })
+        .where(eq(categories.isActive, true))
+        .groupBy(categories.id)
+        .orderBy(categories.displayOrder),
+      
+      // Get all vendors with product counts
+      db
+        .select({
+          id: vendors.id,
+          name: vendors.businessName,
+          count: sql<number>`count(${products.id})`,
+        })
+        .from(vendors)
+        .leftJoin(
+          products,
+          and(
+            eq(products.vendorId, vendors.id),
+            ...buildProductConditions({ includeCategoryFilter: true, includeVendorFilter: false })
+          )
         )
-      )
-      .where(eq(vendors.isActive, true))
-      .groupBy(vendors.id)
-      .orderBy(vendors.businessName);
-
-    // Get price range
-    const priceRange = await db
-      .select({
-        min: sql<number>`min(cast(${products.price} as decimal))`,
-        max: sql<number>`max(cast(${products.price} as decimal))`,
-      })
-      .from(products)
-      .where(and(...buildProductConditions({ includeCategoryFilter: true, includeVendorFilter: true })));
+        .where(eq(vendors.isActive, true))
+        .groupBy(vendors.id)
+        .orderBy(vendors.businessName)
+        .limit(100), // Limit vendors to prevent excessive results
+      
+      // Get price range
+      db
+        .select({
+          min: sql<number>`min(cast(${products.price} as decimal))`,
+          max: sql<number>`max(cast(${products.price} as decimal))`,
+        })
+        .from(products)
+        .where(and(...buildProductConditions({ includeCategoryFilter: true, includeVendorFilter: true })))
+    ]);
 
     // Get all unique tags
     const allProducts = await db
