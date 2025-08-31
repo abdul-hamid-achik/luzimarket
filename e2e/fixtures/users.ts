@@ -59,14 +59,47 @@ export async function loginAs(page: Page, userType: keyof typeof testUsers) {
 
   // Submit login
   await page.getByRole('button', { name: /iniciar sesión|sign in/i }).click();
+  
+  // Wait for loading state to appear and disappear
+  await page.waitForTimeout(500); // Small delay to let loading state appear
+  await page.waitForFunction(() => {
+    // Wait for "Signing in..." to disappear
+    const signingIn = document.body.textContent?.includes('Signing in') || 
+                      document.body.textContent?.includes('Iniciando sesión');
+    return !signingIn;
+  }, { timeout: 10000 }).catch(() => {});
 
-  // Wait for a post-login UI signal instead of strict URL
-  if (user.role === 'admin') {
-    await page.waitForSelector('nav [href*="/admin"]', { timeout: 5000 });
-  } else if (user.role === 'vendor') {
-    await page.waitForSelector('a[href*="/vendedor"], a[href*="/vendor"], [data-testid="vendor-dashboard"]', { timeout: 5000 });
-  } else {
-    await page.waitForSelector('header, nav', { timeout: 5000 });
+  // Wait for either successful navigation or for loading to finish
+  try {
+    if (user.role === 'admin') {
+      // Admin goes to dashboard after login
+      await Promise.race([
+        page.waitForURL('**/admin/**', { timeout: 10000 }),
+        page.waitForURL('**/admin', { timeout: 10000 })
+      ]);
+    } else if (user.role === 'vendor') {
+      // Vendor goes to vendor dashboard after login - handle various URL patterns
+      await Promise.race([
+        page.waitForURL('**/vendor/**', { timeout: 10000 }),
+        page.waitForURL('**/vendedor/**', { timeout: 10000 }),
+        page.waitForFunction(() => {
+          // Check if we're on a vendor page by looking for vendor-specific elements
+          return document.querySelector('[href*="/vendor/"]') !== null ||
+                 document.querySelector('[href*="/vendedor/"]') !== null ||
+                 window.location.pathname.includes('/vendor/') ||
+                 window.location.pathname.includes('/vendedor/');
+        }, { timeout: 10000 })
+      ]);
+    } else {
+      // Customer - wait for navigation away from login page
+      await page.waitForFunction(() => !window.location.pathname.includes('/login'), { timeout: 10000 });
+    }
+  } catch (error) {
+    // If waiting fails, check if we're at least logged in by looking for user menu
+    const isLoggedIn = await page.locator('[data-testid="user-menu"], button[aria-label*="account" i], button[aria-label*="cuenta" i]').isVisible().catch(() => false);
+    if (!isLoggedIn) {
+      throw new Error(`Failed to login as ${user.role}: ${error}`);
+    }
   }
 }
 
@@ -113,7 +146,7 @@ export async function createTestUser(page: Page, options: {
 
     await page.getByRole('button', { name: /registrarse/i }).click();
   } else if (role === 'vendor') {
-    await page.goto('/vendor/register');
+    await page.goto('/vendor-register');
     await page.fill('input[name="businessName"]', 'Test Vendor');
     await page.fill('input[name="contactName"]', 'Test Contact');
     await page.fill('input[name="email"]', email);

@@ -91,7 +91,7 @@ export default function ComingSoonPage() {
           </p>
 
           <Link
-            href="/vendor/register"
+            href="/vendor-register"
             className="inline-block bg-black text-white px-10 py-4 font-univers text-sm tracking-wider hover:bg-gray-900 transition-colors"
             data-testid="affiliate-button"
           >

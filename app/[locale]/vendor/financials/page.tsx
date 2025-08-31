@@ -9,7 +9,7 @@ export default async function VendorFinancialsPage() {
   
   const vendorResult = await getVendorFromSession();
   if (!vendorResult.success || !vendorResult.data) {
-    redirect("/vendor/register");
+    redirect("/vendor-register");
   }
 
   const vendor = vendorResult.data;

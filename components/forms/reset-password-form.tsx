@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
-import { resetPassword } from '@/lib/actions/password-reset'
 import { Lock, Loader2, Eye, EyeOff } from 'lucide-react'
 
 const resetPasswordSchema = z.object({
@@ -44,15 +43,22 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     setIsLoading(true)
     
     try {
-      const formData = new FormData()
-      formData.append('token', token)
-      formData.append('password', data.password)
-      formData.append('confirmPassword', data.confirmPassword)
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token,
+          password: data.password,
+          confirmPassword: data.confirmPassword,
+        }),
+      })
       
-      const result = await resetPassword(formData)
+      const result = await response.json()
       
       if (result.success) {
-        toast.success(result.message)
+        toast.success(result.message || 'Tu contraseña ha sido actualizada exitosamente.')
         // Redirect to login after 2 seconds
         setTimeout(() => {
           router.push('/login')
@@ -68,7 +74,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
       <div>
         <Label htmlFor="password" className="block text-sm font-univers text-gray-700">
           Nueva contraseña

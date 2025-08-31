@@ -1,84 +1,43 @@
-# E2E Tests for Luzimarket
+# E2E Testing Documentation
 
-This directory contains end-to-end tests for the Luzimarket e-commerce platform using Playwright.
+> **Note:** This document contains detailed technical information for developers working with the test suite. For a general overview, see the [main README](../README.md#testing--quality-assurance).
 
-## Setup
+## Overview
 
-1. Install dependencies (already done if you ran `npm install`):
-   ```bash
-   npm install -D @playwright/test
-   ```
+The Luzimarket E2E test suite uses [Playwright](https://playwright.dev/) to provide comprehensive testing across the entire application stack, ensuring functionality works end-to-end from the user's perspective.
 
-2. Install Playwright browsers:
-   ```bash
-   npx playwright install
-   ```
+## Quick Start
 
-3. Setup test database (runs automatically on first test run):
-   ```bash
-   pnpm tsx db/seed.ts --images placeholders
-   ```
-
-## Test Database Setup
-
-The tests require specific data to pass. We have a test setup script that ensures:
-- Categories exist with correct names (matching UI)
-- Test users are verified and can login
-- Test vendor exists
-- Admin user exists
-
-### Automatic Setup
-
-Tests will automatically run the database setup on first run
-
-### Manual Setup
-
+**Prerequisites:**
 ```bash
-# Run test database setup manually
-pnpm tsx db/seed.ts --images placeholders
-
-# Or if you need full seeding (without AI images)
-npm run db:seed -- --no-images
+# Install dependencies and browsers
+npm install
+npx playwright install
 ```
 
-## Running Tests
-
-### Run all tests
+**Run Tests:**
 ```bash
-npm run test:e2e
+# Interactive UI (recommended for development)
+npm run test:ui
+
+# Headless (CI/production)
+npm test
+
+# Debug mode
+npm run test:debug
 ```
 
-### Run tests with UI mode (recommended for development)
-```bash
-npm run test:e2e:ui
-```
+## Test Database & Data
 
-### Run tests in headed mode (see browser)
-```bash
-npm run test:e2e:headed
-```
+Tests use isolated test data that's automatically set up:
 
-### Debug tests
-```bash
-npm run test:e2e:debug
-```
+**Automatic Setup:** Database is seeded automatically when tests run
+**Manual Setup:** `npm run db:seed -- --images placeholders`
 
-### Run specific tests
-```bash
-# Run specific test file
-npm test tests/auth.spec.ts
-
-# Run tests with specific grep pattern
-npm test -- --grep "login"
-
-## Test Credentials
-
-These accounts are created by the test setup:
-
-- **Admin**: admin@luzimarket.shop / admin123
-- **Vendor**: vendor@luzimarket.shop / password123
-- **Customer**: customer1@example.com / password123 (verified)
-- **Customer 2**: customer2@example.com / password123 (verified)
+**Test Accounts:** All accounts use predictable credentials for testing:
+- **Admin**: `admin@luzimarket.shop` / `admin123`
+- **Vendors**: `vendor@luzimarket.shop` / `password123`  
+- **Customers**: `customer1@example.com` / `password123`
 
 ## Test Structure
 

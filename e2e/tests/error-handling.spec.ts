@@ -63,7 +63,7 @@ test.describe('Error Handling', () => {
   });
 
   test('should handle form submission errors', async ({ page }) => {
-    await page.goto('/vendor/register');
+    await page.goto('/vendor-register');
 
     // Fill form with invalid data - use name attributes instead of placeholders
     await page.fill('input[name="email"]', 'invalid-email');
@@ -190,7 +190,7 @@ test.describe('Error Handling', () => {
       });
     } catch (error) {
       // If localStorage fails, skip this test as it's environment-specific
-      console.log('localStorage access failed, skipping test');
+      // 'localStorage access failed, skipping test');
       return;
     }
 
@@ -307,7 +307,7 @@ test.describe('Error Handling', () => {
     try {
       await page.evaluate(() => {
         // Simulate a non-critical error (like analytics failure)
-        console.error('Test error: Analytics failed');
+        // 'Test error: Analytics failed');
       });
     } catch {
       // Expected - this is just testing error handling

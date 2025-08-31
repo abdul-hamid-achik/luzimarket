@@ -69,7 +69,7 @@ export function ForgotPasswordForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
       <div>
         <Label htmlFor="email" className="block text-sm font-univers text-gray-700">
           Email

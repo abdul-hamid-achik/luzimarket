@@ -36,7 +36,7 @@ test.describe('Basic App Tests', () => {
     }
 
     if (!clicked) {
-      await page.goto('/vendor/register');
+      await page.goto('/vendor-register');
     }
 
     await page.waitForLoadState('networkidle');

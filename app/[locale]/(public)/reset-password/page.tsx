@@ -2,9 +2,7 @@ import { getTranslations } from 'next-intl/server'
 import { setRequestLocale } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
 import { redirect } from 'next/navigation'
-import { validateResetToken } from '@/lib/actions/password-reset'
-import { ResetPasswordForm } from '@/components/forms/reset-password-form'
-import { XCircle } from 'lucide-react'
+import { ResetPasswordClient } from '@/components/forms/reset-password-client'
 
 interface ResetPasswordPageProps {
   params: Promise<{ locale: string }>
@@ -23,9 +21,6 @@ export default async function ResetPasswordPage({ params, searchParams }: ResetP
     redirect('/forgot-password')
   }
 
-  // Validate token
-  const validation = await validateResetToken(token)
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -43,25 +38,7 @@ export default async function ResetPasswordPage({ params, searchParams }: ResetP
         </div>
 
         <div className="mt-8 bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          {validation.valid ? (
-            <ResetPasswordForm token={token} />
-          ) : (
-            <div className="text-center py-8">
-              <XCircle className="mx-auto h-12 w-12 text-red-500 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Enlace inválido o expirado
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                {validation.error || 'Este enlace de restablecimiento de contraseña ya no es válido.'}
-              </p>
-              <Link 
-                href="/forgot-password"
-                className="text-sm font-univers text-black hover:text-gray-700"
-              >
-                Solicitar nuevo enlace
-              </Link>
-            </div>
-          )}
+          <ResetPasswordClient token={token} />
         </div>
       </div>
     </div>

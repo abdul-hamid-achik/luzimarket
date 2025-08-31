@@ -1,25 +1,18 @@
-# E2E Test Fixtures
+# Test Fixtures
 
-This directory contains test files used by the e2e tests.
+Test assets and data files for E2E testing.
 
-## Required Test Images
+## Test Images Required
 
-Please add the following test images to this directory:
+Add these test files to this directory (git-ignored):
 
-1. **test-product.jpg** - A standard product image (JPEG, < 5MB)
-2. **test-product-1.jpg** - First product image for multiple upload tests
-3. **test-product-2.jpg** - Second product image for multiple upload tests
-4. **test-product-3.jpg** - Third product image for multiple upload tests
-5. **test-document.pdf** - A PDF file to test invalid file type rejection
-6. **test-large.jpg** - A large image file (> 10MB) to test size validation
+| File | Purpose | Requirements |
+|------|---------|-------------|
+| `test-product.jpg` | Standard product image | JPEG, < 5MB |
+| `test-product-1.jpg` | Multiple upload test #1 | JPEG, < 5MB |
+| `test-product-2.jpg` | Multiple upload test #2 | JPEG, < 5MB |
+| `test-product-3.jpg` | Multiple upload test #3 | JPEG, < 5MB |
+| `test-document.pdf` | Invalid file type test | PDF, any size |
+| `test-large.jpg` | Size validation test | JPEG, > 10MB |
 
-## Sample Images
-
-You can use any product images for testing. Here are some suggestions:
-- Flowers/bouquets for the flower shop category
-- Chocolates/sweets for the sweets category
-- Gift items for the gift shop category
-
-## Note
-
-These files are gitignored and won't be committed to the repository.
+**Image Suggestions:** Use flowers, chocolates, gift items, or any product-appropriate images.

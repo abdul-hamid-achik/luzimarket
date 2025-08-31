@@ -37,7 +37,7 @@ export const routing = defineRouting({
       es: '/pagar',
       en: '/checkout'
     },
-    '/vendor/register': {
+    '/vendor-register': {
       es: '/vendedor/registro',
       en: '/vendor/register'
     },

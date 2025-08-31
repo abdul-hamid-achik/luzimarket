@@ -196,7 +196,7 @@ test.describe('Products', () => {
       }
     } else {
       // Skip test if no pagination is present (not enough products)
-      console.log('No pagination controls found - likely not enough products');
+      // 'No pagination controls found - likely not enough products');
     }
   });
 });

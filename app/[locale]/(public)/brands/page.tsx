@@ -109,7 +109,7 @@ export default async function BrandsPage({ params }: BrandsPageProps) {
             Únete a nuestra plataforma de vendedores seleccionados
           </p>
           <Link
-            href="/vendor/register"
+            href="/vendor-register"
             className="inline-block bg-white text-black px-8 py-3 font-univers hover:bg-gray-100 transition-colors"
           >
             Regístrate como vendedor

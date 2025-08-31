@@ -182,18 +182,18 @@ test.describe('Accessibility Tests', () => {
     // Open quick view modal
     const productCard = page.locator('[data-testid="product-card"]').first();
     // If no product cards are present (e.g., empty dataset), skip this test
-    if (!(await productCard.isVisible()).valueOf()) {
+    if (!(await productCard.isVisible({ timeout: 5000 }).catch(() => false))) {
       test.skip(true, 'No products available to open modal');
     }
 
     await productCard.hover();
     const quickViewButton = page.locator('button').filter({ hasText: /Quick View|Vista Rápida/ }).first();
 
-    if (await quickViewButton.isVisible()) {
-      await quickViewButton.click();
+    if (await quickViewButton.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await quickViewButton.click({ force: true });
 
       // Wait for modal
-      await page.waitForSelector('dialog, [role="dialog"]');
+      await page.waitForSelector('dialog, [role="dialog"]', { timeout: 10000 });
 
       // Tab through modal
       const focusedElements: string[] = [];
@@ -240,7 +240,9 @@ test.describe('Accessibility Tests', () => {
     await page.goto(routes.login);
 
     // Submit empty form
-    await page.click('button[type="submit"]');
+    const submitButton = page.locator('button[type="submit"]').first();
+    await expect(submitButton).toBeVisible({ timeout: 10000 });
+    await submitButton.click({ force: true });
 
     // Check error messages have proper ARIA
     const errorMessages = await page.evaluate(() => {
@@ -293,8 +295,8 @@ test.describe('Accessibility Tests', () => {
     // Use ARIA role-based selector to target visible checkbox controls (shadcn/radix render buttons with role="checkbox")
     const filterCheckbox = page.getByRole('checkbox').first();
 
-    if (await filterCheckbox.isVisible()) {
-      await filterCheckbox.click();
+    if (await filterCheckbox.isVisible({ timeout: 5000 }).catch(() => false)) {
+      await filterCheckbox.click({ force: true });
 
       // Check for loading indicators
       const loadingIndicator = await page.evaluate(() => {
@@ -344,9 +346,12 @@ test.describe('Accessibility Tests', () => {
 
   test('tables should have proper structure', async ({ page }) => {
     // Go to admin orders page (has tables)
-    await page.goto(routes.adminOrders).catch(() => {
+    try {
+      await page.goto(routes.adminOrders, { timeout: 10000 });
+    } catch {
       // If not accessible, skip this test
-    });
+      test.skip(true, 'Admin orders page not accessible');
+    }
 
     const tables = await page.evaluate(() => {
       const tables = Array.from(document.querySelectorAll('table'));

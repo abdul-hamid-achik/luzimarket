@@ -52,7 +52,7 @@ export function Footer() {
               <h3 className="font-univers font-bold mb-4">{t('company')}</h3>
               <ul className="space-y-2 text-sm font-univers">
                 <li><Link href="/about" className="hover:underline">{t('aboutUs')}</Link></li>
-                <li><Link href="/vendor/register" className="hover:underline">{t('sellWithUs')}</Link></li>
+                <li><Link href="/vendor-register" className="hover:underline">{t('sellWithUs')}</Link></li>
                 <li><Link href="/contact" className="hover:underline">{t('contact')}</Link></li>
                 <li><Link href="/editorial" className="hover:underline">{t('editorial')}</Link></li>
                 <li><Link href="/orders/lookup" className="hover:underline">{t('trackOrder')}</Link></li>

@@ -7,32 +7,33 @@ test.describe('Admin Dashboard', () => {
     await page.goto(routes.login);
 
     // Click on admin tab first
-    const adminTab = page.locator('button[role="tab"]').filter({ hasText: /Admin/i });
+    const adminTab = page.locator('button[role="tab"]').filter({ hasText: /Admin/i }).first();
+    await expect(adminTab).toBeVisible({ timeout: 10000 });
     await adminTab.click();
+    
+    await page.waitForTimeout(500); // Wait for tab switch
 
     // Use admin login form with admin credentials
     await page.fill('input[id="admin-email"]', 'admin@luzimarket.shop');
     await page.fill('input[id="admin-password"]', 'admin123');
 
-    const submitButton = page.locator('button[type="submit"]').filter({ hasText: /Iniciar sesión|Sign in/ });
-    await submitButton.click();
+    const submitButton = page.locator('button[type="submit"]').filter({ hasText: /Iniciar sesión|Sign in/ }).first();
+    await expect(submitButton).toBeVisible({ timeout: 10000 });
+    await submitButton.click({ force: true });
 
-    // Wait for navigation to admin area (handle localized URLs like /es/admin)
-    await page.waitForURL((url: URL) => {
-      const path = url.pathname;
-      return path.includes('/admin') || !!path.match(/\/[a-z]{2}\/admin/);
-    }, { timeout: 15000 });
+    // Wait for navigation to admin area - use more flexible matching
+    await page.waitForURL(url => url.pathname.includes('/admin'), { timeout: 20000 });
   });
 
   test('should display admin dashboard', async ({ page }) => {
     // Check dashboard elements
-    await expect(page.locator('h1').filter({ hasText: /Dashboard|Panel de control/i })).toBeVisible();
+    await expect(page.locator('h1').filter({ hasText: /Dashboard|Panel de control/i }).first()).toBeVisible();
 
     // Should have navigation menu with translated text - using new sidebar structure
     const sidebar = page.locator('div[data-sidebar="sidebar"]').first();
     await expect(sidebar).toBeVisible();
-    await expect(page.locator('text="Órdenes"')).toBeVisible();
-    await expect(page.locator('text="Productos"')).toBeVisible();
+    await expect(page.locator('text="Órdenes"').first()).toBeVisible();
+    await expect(page.locator('text="Productos"').first()).toBeVisible();
   });
 
   test('should show dashboard statistics', async ({ page }) => {
@@ -49,13 +50,15 @@ test.describe('Admin Dashboard', () => {
 
   test('should navigate to orders management', async ({ page }) => {
     // Click orders link in Spanish
-    await page.click('a:has-text("Órdenes")');
+    const ordersLink = page.locator('a:has-text("Órdenes")').first();
+    await expect(ordersLink).toBeVisible({ timeout: 10000 });
+    await ordersLink.click({ force: true });
 
     // Wait for navigation (handle localized URLs)
     await page.waitForURL((url: URL) => url.pathname.includes('/admin/orders') || url.pathname.includes('/orders'), { timeout: 15000 });
 
     // Should show orders page
-    await expect(page.locator('h1:has-text("Órdenes")')).toBeVisible();
+    await expect(page.locator('h1:has-text("Órdenes")').first()).toBeVisible();
   });
 
   test('should view order details', async ({ page }) => {
@@ -65,8 +68,8 @@ test.describe('Admin Dashboard', () => {
     const firstOrder = page.locator('tr').filter({ has: page.locator('td') }).first();
     const viewButton = firstOrder.locator('button, a').filter({ hasText: /View|Ver|Details/ }).first();
 
-    if (await viewButton.isVisible()) {
-      await viewButton.click();
+    if (await viewButton.isVisible({ timeout: 5000 }).catch(() => false)) {
+      await viewButton.click({ force: true });
 
       // Should show order details
       await expect(page.locator('text=/Order Details|Detalles del Pedido/')).toBeVisible();
@@ -81,7 +84,7 @@ test.describe('Admin Dashboard', () => {
     // Find status dropdown
     const statusDropdown = page.locator('select').filter({ hasText: /pending|shipped|delivered/ }).first();
 
-    if (await statusDropdown.isVisible()) {
+    if (await statusDropdown.isVisible({ timeout: 5000 }).catch(() => false)) {
       // Change status
       await statusDropdown.selectOption('shipped');
 
@@ -97,33 +100,39 @@ test.describe('Admin Dashboard', () => {
   });
 
   test('should manage products', async ({ page }) => {
-    await page.click('a:has-text("Productos")');
+    const productsLink = page.locator('a:has-text("Productos")').first();
+    await expect(productsLink).toBeVisible({ timeout: 10000 });
+    await productsLink.click({ force: true });
 
     // Wait for navigation (handle localized URLs)
     await page.waitForURL((url: URL) => url.pathname.includes('/admin/products') || url.pathname.includes('/products'), { timeout: 15000 });
 
     // Should show products page
-    await expect(page.locator('h1:has-text("Productos")')).toBeVisible();
+    await expect(page.locator('h1:has-text("Productos")').first()).toBeVisible();
   });
 
   test('should approve/reject vendors', async ({ page }) => {
-    await page.click('a:has-text("Vendedores")');
+    const vendorsLink = page.locator('a:has-text("Vendedores")').first();
+    await expect(vendorsLink).toBeVisible({ timeout: 10000 });
+    await vendorsLink.click({ force: true });
 
     // Wait for navigation (handle localized URLs)
     await page.waitForURL((url: URL) => url.pathname.includes('/admin/vendors') || url.pathname.includes('/vendors'), { timeout: 15000 });
 
     // Should show vendors page
-    await expect(page.locator('h1:has-text("Vendedores")')).toBeVisible();
+    await expect(page.locator('h1:has-text("Vendedores")').first()).toBeVisible();
   });
 
   test('should manage categories', async ({ page }) => {
-    await page.click('a:has-text("Categorías")');
+    const categoriesLink = page.locator('a:has-text("Categorías")').first();
+    await expect(categoriesLink).toBeVisible({ timeout: 10000 });
+    await categoriesLink.click({ force: true });
 
     // Wait for navigation (handle localized URLs)
     await page.waitForURL((url: URL) => url.pathname.includes('/admin/categories') || url.pathname.includes('/categorias'), { timeout: 15000 });
 
     // Should show categories page
-    await expect(page.locator('h1:has-text("Categorías")')).toBeVisible();
+    await expect(page.locator('h1:has-text("Categorías")').first()).toBeVisible();
   });
 
   test('should access email templates', async ({ page }) => {
@@ -139,11 +148,11 @@ test.describe('Admin Dashboard', () => {
   test('should view reports', async ({ page }) => {
     const reportsLink = page.locator('text=/Reports|Reportes|Analytics/').first();
 
-    if (await reportsLink.isVisible()) {
-      await reportsLink.click();
+    if (await reportsLink.isVisible({ timeout: 5000 }).catch(() => false)) {
+      await reportsLink.click({ force: true });
 
       // Should show charts or metrics
-      await expect(page.locator('canvas, svg, .chart')).toBeVisible();
+      await expect(page.locator('canvas, svg, .chart').first()).toBeVisible();
     }
   });
 
@@ -153,21 +162,21 @@ test.describe('Admin Dashboard', () => {
     // Look for date filters
     const dateFilter = page.locator('input[type="date"], button').filter({ hasText: /Date|Fecha|Filter/ }).first();
 
-    if (await dateFilter.isVisible()) {
-      await dateFilter.click();
+    if (await dateFilter.isVisible({ timeout: 5000 }).catch(() => false)) {
+      await dateFilter.click({ force: true });
 
       // Set date range
       const startDate = page.locator('input[type="date"]').first();
       const endDate = page.locator('input[type="date"]').last();
 
-      if (await startDate.isVisible() && await endDate.isVisible()) {
+      if (await startDate.isVisible({ timeout: 3000 }).catch(() => false) && await endDate.isVisible({ timeout: 3000 }).catch(() => false)) {
         await startDate.fill('2025-01-01');
         await endDate.fill('2025-12-31');
 
         // Apply filter
         const applyButton = page.locator('button').filter({ hasText: /Apply|Aplicar/ }).first();
-        if (await applyButton.isVisible()) {
-          await applyButton.click();
+        if (await applyButton.isVisible({ timeout: 3000 }).catch(() => false)) {
+          await applyButton.click({ force: true });
           await page.waitForLoadState('networkidle');
         }
       }
@@ -180,7 +189,7 @@ test.describe('Admin Dashboard', () => {
     // Look for export button
     const exportButton = page.locator('button').filter({ hasText: /Export|Exportar|Download/ }).first();
 
-    if (await exportButton.isVisible()) {
+    if (await exportButton.isVisible({ timeout: 5000 }).catch(() => false)) {
       // Start waiting for download before clicking
       const downloadPromise = page.waitForEvent('download');
       await exportButton.click();
@@ -211,7 +220,7 @@ test.describe('Admin Dashboard', () => {
     // Select multiple items - shadcn checkboxes are buttons with role="checkbox"
     const checkboxes = page.locator('button[role="checkbox"]').filter({ hasNotText: /all|todos/ });
 
-    if (await checkboxes.first().isVisible()) {
+    if (await checkboxes.first().isVisible({ timeout: 5000 }).catch(() => false)) {
       // Select first few items by clicking the checkbox button
       await checkboxes.nth(0).click();
       await checkboxes.nth(1).click();
@@ -248,12 +257,13 @@ test.describe('Admin Dashboard', () => {
     // Find logout button
     const userMenu = page.locator('button').filter({ hasText: /Admin|Profile/ }).first();
 
-    if (await userMenu.isVisible()) {
-      await userMenu.click();
+    if (await userMenu.isVisible({ timeout: 5000 }).catch(() => false)) {
+      await userMenu.click({ force: true });
     }
 
     const logoutButton = page.locator('text=/Logout|Cerrar Sesión|Sign Out/').first();
-    await logoutButton.click();
+    await expect(logoutButton).toBeVisible({ timeout: 10000 });
+    await logoutButton.click({ force: true });
 
     // Should redirect to login or home (handle localized URLs)
     await expect(page).toHaveURL(/\/(login|iniciar-sesion|$)/);

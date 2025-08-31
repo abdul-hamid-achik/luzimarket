@@ -27,7 +27,7 @@ test.describe('Password Reset Flow', () => {
     await page.goto('/es/olvide-contrasena');
     
     // Try invalid email
-    await page.fill('input[id="email"]', 'invalid-email');
+    await page.fill('input[name="email"], input[type="email"]', 'invalid-email');
     await page.getByRole('button', { name: /enviar enlace/i }).click();
     
     // Should show validation error
@@ -38,7 +38,7 @@ test.describe('Password Reset Flow', () => {
     await page.goto('/es/olvide-contrasena');
     
     // Fill valid email
-    await page.fill('input[id="email"]', 'test@example.com');
+    await page.fill('input[name="email"], input[type="email"]', 'test@example.com');
     
     // Mock API response
     await page.route('**/api/auth/request-password-reset', async route => {
@@ -58,20 +58,20 @@ test.describe('Password Reset Flow', () => {
   test('should handle non-existent email', async ({ page }) => {
     await page.goto('/es/olvide-contrasena');
     
-    await page.fill('input[id="email"]', 'nonexistent@example.com');
+    await page.fill('input[name="email"], input[type="email"]', 'nonexistent@example.com');
     
-    // Mock API error
+    // Mock API response - always returns success to prevent email enumeration
     await page.route('**/api/auth/request-password-reset', async route => {
       await route.fulfill({
-        status: 400,
-        json: { success: false, error: 'Email no encontrado' }
+        status: 200,
+        json: { success: true, message: 'Si el email existe en nuestro sistema, recibirás un enlace para restablecer tu contraseña.' }
       });
     });
     
     await page.getByRole('button', { name: /enviar enlace/i }).click();
     
-    // Should show error toast message
-    await expect(page.getByText(/email.*no.*encontrado|ocurrió.*error/i)).toBeVisible();
+    // Should show success message (to prevent email enumeration)
+    await expect(page.getByText(/revisa tu correo/i)).toBeVisible();
   });
 
   test('should show reset password form with valid token', async ({ page }) => {
@@ -87,7 +87,7 @@ test.describe('Password Reset Flow', () => {
     await page.goto(`/es/restablecer-contrasena?token=${token}`);
     
     // Should show reset form
-    await expect(page.getByText(/nueva contraseña/i)).toBeVisible();
+    await expect(page.getByRole('heading', { name: /nueva contraseña/i })).toBeVisible();
     await expect(page.getByLabel(/nueva contraseña/i)).toBeVisible();
     await expect(page.getByLabel(/confirmar contraseña/i)).toBeVisible();
     await expect(page.getByRole('button', { name: /actualizar contraseña/i })).toBeVisible();
@@ -105,8 +105,8 @@ test.describe('Password Reset Flow', () => {
     await page.goto('/es/restablecer-contrasena?token=test-token');
     
     // Try weak password
-    await page.fill('input[id="password"]', 'weak');
-    await page.fill('input[id="confirmPassword"]', 'weak');
+    await page.fill('input[name="password"], input[type="password"]', 'weak');
+    await page.fill('input[name="confirmPassword"], input[name="confirm"]', 'weak');
     await page.getByRole('button', { name: /actualizar contraseña/i }).click();
     
     // Should show validation error
@@ -125,8 +125,8 @@ test.describe('Password Reset Flow', () => {
     await page.goto('/es/restablecer-contrasena?token=test-token');
     
     // Fill mismatched passwords
-    await page.fill('input[id="password"]', 'StrongPassword123!');
-    await page.fill('input[id="confirmPassword"]', 'DifferentPassword123!');
+    await page.fill('input[name="password"], input[type="password"]', 'StrongPassword123!');
+    await page.fill('input[name="confirmPassword"], input[name="confirm"]', 'DifferentPassword123!');
     await page.getByRole('button', { name: /actualizar contraseña/i }).click();
     
     // Should show mismatch error
@@ -145,8 +145,8 @@ test.describe('Password Reset Flow', () => {
     await page.goto('/es/restablecer-contrasena?token=valid-token');
     
     // Fill new password
-    await page.fill('input[id="password"]', 'NewPassword123!');
-    await page.fill('input[id="confirmPassword"]', 'NewPassword123!');
+    await page.fill('input[name="password"], input[type="password"]', 'NewPassword123!');
+    await page.fill('input[name="confirmPassword"], input[name="confirm"]', 'NewPassword123!');
     
     // Mock successful reset
     await page.route('**/api/auth/reset-password', async route => {
@@ -200,7 +200,7 @@ test.describe('Password Reset Flow', () => {
   test('should disable form during submission', async ({ page }) => {
     await page.goto('/es/olvide-contrasena');
     
-    await page.fill('input[id="email"]', 'test@example.com');
+    await page.fill('input[name="email"], input[type="email"]', 'test@example.com');
     
     // Mock slow API
     await page.route('**/api/auth/request-password-reset', async route => {
@@ -219,6 +219,6 @@ test.describe('Password Reset Flow', () => {
     await expect(page.getByText(/enviando/i)).toBeVisible();
     
     // Input should be disabled
-    await expect(page.locator('input[id="email"]')).toBeDisabled();
+    await expect(page.locator('input[name="email"], input[type="email"]').first()).toBeDisabled();
   });
 });

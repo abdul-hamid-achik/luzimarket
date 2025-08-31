@@ -13,7 +13,7 @@ export default async function VendorPaymentsSettingsPage() {
 
     const vendorResult = await getVendorFromSession();
     if (!vendorResult.success || !vendorResult.data) {
-        redirect("/vendor/register");
+        redirect("/vendor-register");
     }
 
     const vendor = vendorResult.data;

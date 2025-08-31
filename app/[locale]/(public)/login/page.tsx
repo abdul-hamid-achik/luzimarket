@@ -269,7 +269,7 @@ export default function LoginPage() {
               </Button>
 
               <div className="text-center space-y-2">
-                <Link href="/vendor/register" className="text-sm text-gray-600 hover:text-black font-univers block">
+                <Link href="/vendor-register" className="text-sm text-gray-600 hover:text-black font-univers block">
                   {t("wantToBeVendor")}
                 </Link>
                 <Link href="/forgot-password" className="text-sm text-gray-600 hover:text-black font-univers block">
