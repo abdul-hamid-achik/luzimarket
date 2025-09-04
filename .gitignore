@@ -67,3 +67,8 @@ next-env.d.ts
 
 junit-results.xml
 test-results.json
+
+
+# mcp
+.cursor/mcp.json
+tmp/
