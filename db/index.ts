@@ -97,18 +97,22 @@ export async function closeDatabase() {
   }
 }
 
-// Handle process termination gracefully (not needed in serverless but useful for local dev)
-// Only register these handlers in Node.js runtime, not Edge runtime
-if (typeof process !== 'undefined' && 
-    process.env.NODE_ENV !== 'production' && 
-    typeof process.on === 'function') {
-  process.on('SIGINT', async () => {
-    await closeDatabase();
-    process.exit(0);
-  });
-  
-  process.on('SIGTERM', async () => {
-    await closeDatabase();
-    process.exit(0);
-  });
+// Handle process termination gracefully (not needed in serverless but useful for local dev)  
+// Skip in Edge Runtime or production
+if (typeof process?.exit === 'function' && 
+    typeof process?.on === 'function' && 
+    process.env.NODE_ENV === 'development') {
+  try {
+    process.on('SIGINT', async () => {
+      await closeDatabase();
+      process.exit(0);
+    });
+    
+    process.on('SIGTERM', async () => {
+      await closeDatabase();
+      process.exit(0);
+    });
+  } catch (error) {
+    // Silently handle errors in Edge Runtime
+  }
 }

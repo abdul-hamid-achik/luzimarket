@@ -11,7 +11,7 @@ import {
   securityHeaders,
   getContentSecurityPolicy
 } from '@/lib/security-config'
-import { updateSessionActivity } from '@/lib/actions/session'
+// Remove direct import of server actions that use database
 
 // Create the internationalization middleware
 const intlMiddleware = createMiddleware(routing)
@@ -79,16 +79,8 @@ export async function middleware(request: NextRequest) {
   }
 
   // Track session activity for authenticated users (non-blocking)
-  const sessionToken = request.headers.get('authorization')?.replace('Bearer ', '') ||
-    request.cookies.get('next-auth.session-token')?.value ||
-    request.cookies.get('__Secure-next-auth.session-token')?.value;
-
-  if (sessionToken && !pathname.startsWith('/_next') && !pathname.startsWith('/api/')) {
-    // Update session activity in background
-    updateSessionActivity(sessionToken).catch(() => {
-      // Silently fail - don't block the request
-    });
-  }
+  // Note: Session activity tracking moved to a client-side approach or API route
+  // to avoid importing database functions in Edge Runtime middleware
 
   // Handle API routes
   if (pathname.startsWith('/api/')) {

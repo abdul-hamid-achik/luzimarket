@@ -3,7 +3,7 @@
 import { db } from "@/db";
 import { wishlists, products } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
-import { auth } from "@/auth";
+import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
 export async function addToWishlist(productId: string) {

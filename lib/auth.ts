@@ -1,3 +1,4 @@
+// Runtime configuration for Next.js
 export const runtime = 'nodejs';
 
 import NextAuth, { CredentialsSignin } from "next-auth";
