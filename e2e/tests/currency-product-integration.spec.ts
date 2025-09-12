@@ -69,6 +69,9 @@ test.describe('Currency Integration with Products', () => {
     // Go to products page
     await page.goto(routes.products);
 
+    // Wait for products to load
+    await page.waitForSelector('a[href*="/products/"], a[href*="/productos/"]', { timeout: 10000 });
+
     // Add a product to cart (click on first product)
     const firstProduct = page.locator('main').locator('a[href*="/products/"], a[href*="/productos/"]').first();
     await firstProduct.click();
@@ -79,34 +82,46 @@ test.describe('Currency Integration with Products', () => {
     const addToCartButton = detailScope.getByRole('button', { name: /agregar al carrito|add to cart/i }).first();
     await addToCartButton.click();
 
+    // Wait a moment for cart to be updated
+    await page.waitForTimeout(1000);
+
     // Open cart
     const cartButton = page.locator('[data-testid="cart-button"]');
     await cartButton.click();
+    
+    // Wait for cart dialog and items to load
     const cartDialog = page.getByRole('dialog');
-    await expect(cartDialog).toBeVisible();
-    // The cart may initially open during add-to-cart; ensure an item exists or toggle cart to refresh
-    await cartDialog.waitFor({ state: 'visible' });
-    const cartItem = cartDialog.locator('[data-testid="cart-item"]').first();
-    if (!(await cartItem.isVisible({ timeout: 2000 }).catch(() => false))) {
-      await page.keyboard.press('Escape');
-      await cartButton.click();
-    }
-    await expect(cartDialog.locator('[data-testid="cart-item"]').first()).toBeVisible();
+    await expect(cartDialog).toBeVisible({ timeout: 5000 });
+    
+    // Wait for cart items to appear
+    await expect(cartDialog.locator('[data-testid="cart-item"]').first()).toBeVisible({ timeout: 5000 });
 
     // Get price in MXN
     const cartPrice = cartDialog.locator('[data-testid="cart-item"] p:has-text("$")').first();
     await expect(cartPrice).toBeVisible();
     const mxnPrice = await cartPrice.textContent();
 
-    // Switch to USD by updating preference and reloading (avoids overlay interaction issues)
+    // Close cart first
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(500);
+
+    // Switch to USD by updating preference and reloading
     await page.evaluate(() => localStorage.setItem('preferred-currency', 'USD'));
     await page.reload();
+    
+    // Wait for page to load
+    await page.waitForLoadState('networkidle');
+    
     // Reopen cart
     await page.locator('[data-testid="cart-button"]').click();
-    await expect(page.getByRole('dialog')).toBeVisible();
+    const reopenedCartDialog = page.getByRole('dialog');
+    await expect(reopenedCartDialog).toBeVisible({ timeout: 5000 });
+    await expect(reopenedCartDialog.locator('[data-testid="cart-item"]').first()).toBeVisible({ timeout: 5000 });
 
     // Get price in USD
-    const usdPrice = await page.getByRole('dialog').locator('p:has-text("$")').first().textContent();
+    const usdPriceElement = reopenedCartDialog.locator('[data-testid="cart-item"] p:has-text("$")').first();
+    await expect(usdPriceElement).toBeVisible();
+    const usdPrice = await usdPriceElement.textContent();
 
     // Verify conversion
     expect(usdPrice).not.toBe(mxnPrice);

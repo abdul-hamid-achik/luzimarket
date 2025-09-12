@@ -1,1 +1,0 @@
-ALTER TABLE "vendors" ADD COLUMN "password_hash" text;

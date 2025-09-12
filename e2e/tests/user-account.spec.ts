@@ -40,13 +40,29 @@ test.describe('User Account', () => {
   });
 
   test('should access account dashboard', async ({ page }) => {
-    // Navigate directly to account to avoid flaky header interactions
+    // First verify we're actually logged in by checking for user menu
+    const userMenu = page.locator('[data-testid="user-menu"], button[aria-label*="account" i], [data-testid="account-button"]');
+    
+    // Wait for login to complete by checking user menu is visible
+    try {
+      await expect(userMenu.first()).toBeVisible({ timeout: 5000 });
+    } catch {
+      // If user menu is not visible, we're not logged in - try again
+      await page.goto(routes.login);
+      await page.fill('input[name="email"]', 'customer1@example.com');
+      await page.fill('input[name="password"]', 'password123');
+      await page.getByRole('button', { name: /iniciar sesión|sign in|login/i }).click();
+      await page.waitForTimeout(2000);
+      await expect(userMenu.first()).toBeVisible({ timeout: 5000 });
+    }
+    
+    // Navigate to account page
     await page.goto('/es/account');
     
-    // Wait for either the account page or a redirect to login
+    // Wait for page to load
     await page.waitForLoadState('networkidle');
     
-    // Check if we're on the account page or redirected to login
+    // Check if we're still redirected to login
     const currentUrl = page.url();
     if (currentUrl.includes('/login') || currentUrl.includes('/iniciar-sesion')) {
       throw new Error('Not authenticated - redirected to login');

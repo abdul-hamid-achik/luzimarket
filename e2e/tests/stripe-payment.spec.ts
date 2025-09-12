@@ -288,7 +288,12 @@ test.describe('Stripe Payment Flow', () => {
   });
 
   test('should create checkout session with correct metadata', async ({ page }) => {
+    // Add product to cart first to ensure there are items for checkout
+    await addProductToCart(page);
+    
     await page.goto('/es/checkout');
+    await page.waitForLoadState('networkidle');
+    
     await fillCheckoutForm(page);
     
     // Intercept the API call
@@ -297,8 +302,11 @@ test.describe('Stripe Payment Flow', () => {
       { timeout: 10000 }
     ).catch(() => null);
     
-    // Submit form - use more flexible selector
-    const submitButton = page.locator('[data-testid="checkout-submit-button"], button[type="submit"]').filter({ hasText: /proceder|checkout|pagar/i }).first();
+    // Wait for form to be fully loaded and validated
+    await page.waitForTimeout(1000);
+    
+    // Ensure submit button is available using the test ID specifically
+    const submitButton = page.getByTestId('checkout-submit-button');
     await expect(submitButton).toBeVisible({ timeout: 10000 });
     await expect(submitButton).toBeEnabled({ timeout: 10000 });
     await submitButton.click();

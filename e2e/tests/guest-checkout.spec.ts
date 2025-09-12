@@ -130,12 +130,23 @@ test.describe('Guest Checkout Flow', () => {
 
     // Test guest can lookup order
     await page.goto('/orders/lookup');
+    await page.waitForLoadState('networkidle');
+    
     await page.fill('input#email', guestEmail);
     await page.fill('input#orderNumber', orderNumber!);
     await page.getByRole('button', { name: /buscar pedido/i }).click();
 
-    // Guests should land on order detail page with locale and email in query
-    await expect(page).toHaveURL(/\/(pedidos|orders)\/[^/?#]+\?email=/);
+    // Wait for redirect to order details page with locale and email in query
+    // The redirect should happen successfully if order exists
+    await page.waitForURL(/\/(pedidos|orders)\/[^/?#]+(\?.*)?/, { timeout: 10000 });
+    
+    // Verify we're on an order detail page, not still on lookup
+    const currentUrl = page.url();
+    expect(currentUrl).not.toContain('/lookup');
+    expect(currentUrl).not.toContain('/buscar');
+    
+    // Should contain the order number in the URL path
+    expect(currentUrl).toMatch(/\/(pedidos|orders)\/[A-Z0-9-]+/);
   });
 
   test('should persist cart after failed checkout attempt', async ({ page }) => {

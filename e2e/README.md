@@ -13,6 +13,9 @@ The Luzimarket E2E test suite uses [Playwright](https://playwright.dev/) to prov
 # Install dependencies and browsers
 npm install
 npx playwright install
+
+# Start the local database (required for tests)
+npm run compose:up
 ```
 
 **Run Tests:**
@@ -30,6 +33,8 @@ npm run test:debug
 ## Test Database & Data
 
 Tests use isolated test data that's automatically set up:
+
+**Database Setup:** Tests require a running database. Use `npm run compose:up` to start the local Neon database via Docker Compose before running tests.
 
 **Automatic Setup:** Database is seeded automatically when tests run
 **Manual Setup:** `npm run db:seed -- --images placeholders`

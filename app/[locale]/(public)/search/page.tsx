@@ -21,6 +21,8 @@ interface SearchPageProps {
     sort?: string;
     minPrice?: string;
     maxPrice?: string;
+    minRating?: string;
+    availability?: string;
   }>;
 }
 
@@ -61,6 +63,8 @@ async function searchProducts(query: string, filters: any) {
       sortBy: filters.sort as any,
       minPrice: filters.minPrice ? parseInt(filters.minPrice) : undefined,
       maxPrice: filters.maxPrice ? parseInt(filters.maxPrice) : undefined,
+      minRating: filters.minRating ? parseInt(filters.minRating) : undefined,
+      availability: filters.availability as any,
     });
 
     return { ...filtered, allProductIds: searchProductIds };

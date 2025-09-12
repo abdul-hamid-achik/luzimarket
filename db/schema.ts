@@ -81,6 +81,12 @@ export const products = pgTable("products", {
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   images: json("images").$type<string[]>().default([]),
   tags: json("tags").$type<string[]>().default([]),
+  // Additional product attributes for enhanced filtering
+  brand: text("brand"),
+  colors: json("colors").$type<string[]>().default([]),
+  sizes: json("sizes").$type<string[]>().default([]),
+  materials: json("materials").$type<string[]>().default([]),
+  features: json("features").$type<string[]>().default([]),
   isActive: boolean("is_active").default(true),
   imagesApproved: boolean("images_approved").default(false),
   imagesPendingModeration: boolean("images_pending_moderation").default(false),
@@ -153,6 +159,9 @@ export const orders = pgTable("orders", {
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
   tax: decimal("tax", { precision: 10, scale: 2 }).notNull().default("0"),
   shipping: decimal("shipping", { precision: 10, scale: 2 }).notNull().default("0"),
+  discount: decimal("discount", { precision: 10, scale: 2 }).default("0"),
+  couponCode: text("coupon_code"),
+  couponId: uuid("coupon_id").references(() => coupons.id),
   total: decimal("total", { precision: 10, scale: 2 }).notNull(),
   currency: text("currency").notNull().default("MXN"),
   paymentIntentId: text("payment_intent_id"),
@@ -485,11 +494,13 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   orderItems: many(orderItems),
   reviews: many(reviews),
   variants: many(productVariants),
+  wishlists: many(wishlists),
 }));
 
 export const userRelations = relations(users, ({ many }) => ({
   orders: many(orders),
   reviews: many(reviews),
+  wishlists: many(wishlists),
 }));
 
 export const orderRelations = relations(orders, ({ one, many }) => ({
@@ -500,6 +511,10 @@ export const orderRelations = relations(orders, ({ one, many }) => ({
   vendor: one(vendors, {
     fields: [orders.vendorId],
     references: [vendors.id],
+  }),
+  coupon: one(coupons, {
+    fields: [orders.couponId],
+    references: [coupons.id],
   }),
   items: many(orderItems),
 }));
@@ -595,6 +610,31 @@ export const emailVerificationTokenRelations = relations(emailVerificationTokens
   user: one(users, {
     fields: [emailVerificationTokens.userId],
     references: [users.id],
+  }),
+}));
+
+// Wishlist table for persistent storage
+export const wishlists = pgTable("wishlists", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  productId: uuid("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  addedAt: timestamp("added_at").defaultNow(),
+}, (table) => {
+  return {
+    userIdx: index("wishlists_user_idx").on(table.userId),
+    productIdx: index("wishlists_product_idx").on(table.productId),
+    uniqueUserProduct: index("wishlists_unique_idx").on(table.userId, table.productId),
+  }
+});
+
+export const wishlistRelations = relations(wishlists, ({ one }) => ({
+  user: one(users, {
+    fields: [wishlists.userId],
+    references: [users.id],
+  }),
+  product: one(products, {
+    fields: [wishlists.productId],
+    references: [products.id],
   }),
 }));
 
@@ -804,3 +844,79 @@ export const productImageModeration = pgTable("product_image_moderation", {
 
 export type ProductImageModeration = typeof productImageModeration.$inferSelect;
 export type NewProductImageModeration = typeof productImageModeration.$inferInsert;
+
+// Coupons table
+export const coupons = pgTable("coupons", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  code: text("code").notNull().unique(),
+  name: text("name").notNull(),
+  description: text("description"),
+  type: text("type").notNull(), // 'percentage', 'fixed_amount', 'free_shipping'
+  value: decimal("value", { precision: 10, scale: 2 }).notNull(), // Percentage (0-100) or fixed amount
+  minimumOrderAmount: decimal("minimum_order_amount", { precision: 10, scale: 2 }),
+  maximumDiscountAmount: decimal("maximum_discount_amount", { precision: 10, scale: 2 }), // Cap for percentage discounts
+  usageLimit: integer("usage_limit"), // null = unlimited
+  usageCount: integer("usage_count").default(0),
+  userUsageLimit: integer("user_usage_limit").default(1), // Times a user can use this coupon
+  isActive: boolean("is_active").default(true),
+  startsAt: timestamp("starts_at"),
+  expiresAt: timestamp("expires_at"),
+  // Restrictions
+  restrictToCategories: json("restrict_to_categories").$type<string[]>(),
+  restrictToVendors: json("restrict_to_vendors").$type<string[]>(),
+  restrictToProducts: json("restrict_to_products").$type<string[]>(),
+  restrictToFirstTimeCustomers: boolean("restrict_to_first_time_customers").default(false),
+  // Metadata
+  createdBy: uuid("created_by").references(() => adminUsers.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  codeIdx: index("coupons_code_idx").on(table.code),
+  activeIdx: index("coupons_active_idx").on(table.isActive),
+  expiresIdx: index("coupons_expires_idx").on(table.expiresAt),
+}));
+
+// Coupon Usage table
+export const couponUsage = pgTable("coupon_usage", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  couponId: uuid("coupon_id").notNull().references(() => coupons.id, { onDelete: "cascade" }),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+  orderId: uuid("order_id").references(() => orders.id, { onDelete: "set null" }),
+  userEmail: text("user_email"), // For guest users
+  discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }).notNull(),
+  usedAt: timestamp("used_at").defaultNow(),
+}, (table) => ({
+  couponIdx: index("coupon_usage_coupon_idx").on(table.couponId),
+  userIdx: index("coupon_usage_user_idx").on(table.userId),
+  orderIdx: index("coupon_usage_order_idx").on(table.orderId),
+  emailIdx: index("coupon_usage_email_idx").on(table.userEmail),
+}));
+
+// Add coupon relations
+export const couponRelations = relations(coupons, ({ many, one }) => ({
+  usage: many(couponUsage),
+  createdByAdmin: one(adminUsers, {
+    fields: [coupons.createdBy],
+    references: [adminUsers.id],
+  }),
+}));
+
+export const couponUsageRelations = relations(couponUsage, ({ one }) => ({
+  coupon: one(coupons, {
+    fields: [couponUsage.couponId],
+    references: [coupons.id],
+  }),
+  user: one(users, {
+    fields: [couponUsage.userId],
+    references: [users.id],
+  }),
+  order: one(orders, {
+    fields: [couponUsage.orderId],
+    references: [orders.id],
+  }),
+}));
+
+export type Coupon = typeof coupons.$inferSelect;
+export type NewCoupon = typeof coupons.$inferInsert;
+export type CouponUsage = typeof couponUsage.$inferSelect;
+export type NewCouponUsage = typeof couponUsage.$inferInsert;

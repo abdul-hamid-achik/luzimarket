@@ -2,8 +2,8 @@
 
 
 import { db } from "@/db";
-import { products, categories, vendors } from "@/db/schema";
-import { eq, and, gte, lte, inArray, sql, desc, asc, or } from "drizzle-orm";
+import { products, categories, vendors, reviews } from "@/db/schema";
+import { eq, and, gte, lte, inArray, sql, desc, asc, or, avg } from "drizzle-orm";
 
 export interface ProductFilters {
   categoryIds?: string[];
@@ -12,7 +12,9 @@ export interface ProductFilters {
   minPrice?: number;
   maxPrice?: number;
   tags?: string[];
-  sortBy?: "price-asc" | "price-desc" | "name" | "newest";
+  minRating?: number;
+  availability?: "in-stock" | "out-of-stock" | "low-stock";
+  sortBy?: "price-asc" | "price-desc" | "name" | "newest" | "rating" | "popularity";
   page?: number;
   limit?: number;
 }
@@ -47,6 +49,8 @@ export async function getFilteredProducts(filters: ProductFilters = {}) {
       minPrice,
       maxPrice,
       tags = [],
+      minRating,
+      availability,
       sortBy = "newest",
       page = 1,
       limit = Math.min(filters.limit || 12, 50), // Cap limit to prevent excessive data transfer
@@ -87,6 +91,21 @@ export async function getFilteredProducts(filters: ProductFilters = {}) {
       conditions.push(or(...tagConds));
     }
 
+    // Availability filter
+    if (availability) {
+      switch (availability) {
+        case "in-stock":
+          conditions.push(gte(products.stock, 1));
+          break;
+        case "out-of-stock":
+          conditions.push(eq(products.stock, 0));
+          break;
+        case "low-stock":
+          conditions.push(and(gte(products.stock, 1), lte(products.stock, 5)));
+          break;
+      }
+    }
+
     // Build order by
     let orderBy;
     switch (sortBy) {
@@ -99,6 +118,14 @@ export async function getFilteredProducts(filters: ProductFilters = {}) {
       case "name":
         orderBy = asc(products.name);
         break;
+      case "rating":
+        // For now, order by creation date (can be enhanced later with rating calculation)
+        orderBy = desc(products.createdAt);
+        break;
+      case "popularity":
+        // For now, order by creation date (can be enhanced later with popularity metrics)
+        orderBy = desc(products.createdAt);
+        break;
       case "newest":
       default:
         orderBy = desc(products.createdAt);
@@ -108,9 +135,44 @@ export async function getFilteredProducts(filters: ProductFilters = {}) {
     // Calculate offset
     const offset = (page - 1) * limit;
 
-    // Execute product query and count in parallel for better performance
-    const [result, countResult] = await Promise.all([
-      db
+    // For rating filter, we need to modify the query to include rating calculations
+    let baseQuery, countQuery;
+    
+    if (minRating) {
+      // Query with rating calculation when rating filter is applied
+      baseQuery = db
+        .select({
+          product: products,
+          category: categories,
+          vendor: vendors,
+          avgRating: sql<number>`coalesce(avg(${reviews.rating}), 0)`,
+        })
+        .from(products)
+        .leftJoin(categories, eq(products.categoryId, categories.id))
+        .leftJoin(vendors, eq(products.vendorId, vendors.id))
+        .leftJoin(reviews, eq(products.id, reviews.productId))
+        .where(conditions.length > 0 ? and(...conditions) : undefined)
+        .groupBy(products.id, categories.id, vendors.id)
+        .having(sql`coalesce(avg(${reviews.rating}), 0) >= ${minRating}`)
+        .orderBy(orderBy)
+        .limit(limit)
+        .offset(offset);
+        
+      countQuery = db
+        .select({ count: sql<number>`count(*)` })
+        .from(
+          db
+            .select({ id: products.id })
+            .from(products)
+            .leftJoin(reviews, eq(products.id, reviews.productId))
+            .where(conditions.length > 0 ? and(...conditions) : undefined)
+            .groupBy(products.id)
+            .having(sql`coalesce(avg(${reviews.rating}), 0) >= ${minRating}`)
+            .as("filtered_products")
+        );
+    } else {
+      // Standard query without rating calculations
+      baseQuery = db
         .select({
           product: products,
           category: categories,
@@ -122,11 +184,18 @@ export async function getFilteredProducts(filters: ProductFilters = {}) {
         .where(conditions.length > 0 ? and(...conditions) : undefined)
         .orderBy(orderBy)
         .limit(limit)
-        .offset(offset),
-      db
+        .offset(offset);
+        
+      countQuery = db
         .select({ count: sql<number>`count(*)` })
         .from(products)
-        .where(conditions.length > 0 ? and(...conditions) : undefined)
+        .where(conditions.length > 0 ? and(...conditions) : undefined);
+    }
+
+    // Execute queries in parallel
+    const [result, countResult] = await Promise.all([
+      baseQuery,
+      countQuery
     ]);
 
     const totalCount = Number(countResult[0]?.count || 0);

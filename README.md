@@ -22,21 +22,87 @@ A modern e-commerce platform for curated gifts and unique experiences in Mexico.
 - **File Storage**: Vercel Blob
 - **Deployment**: Vercel
 
-## 🚀 Deployment to Vercel
+## 🚀 Quick Deployment Guide
 
-### Quick Deploy
+### One-Click Deploy
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyour-username%2Fluzimarket)
 
-### Manual Deployment Guide
+### Manual Deployment (5 Steps)
 
-#### 1. Prerequisites
+1. **Deploy to Vercel**
+   ```bash
+   # Install Vercel CLI
+   npm i -g vercel
+   
+   # Deploy your repo
+   vercel --prod
+   ```
+
+2. **Set up Neon Database**
+   - Create account at [Neon.tech](https://neon.tech)
+   - Create new project → Copy `DATABASE_URL`
+   - [📖 Neon Docs](https://neon.tech/docs/introduction)
+
+3. **Configure Environment Variables**
+   - In Vercel Dashboard → Settings → Environment Variables
+   - Add all required variables from `.env.example`
+   - [📖 Token Setup Guide](#environment-variables)
+
+4. **Run Database Migrations**
+   ```bash
+   # Install Vercel CLI if not done
+   npm i -g vercel
+   
+   # Pull environment variables  
+   vercel env pull .env.local
+   
+   # Push database schema
+   npm run db:push
+   
+   # Seed with sample data
+   npm run db:seed
+   ```
+
+5. **Set up Webhooks**
+   - **Stripe**: Dashboard → Webhooks → Add `https://your-domain.vercel.app/api/webhooks/stripe`
+   - **Events**: `payment_intent.succeeded`, `payment_intent.payment_failed`
+   
+✅ **Done!** Your app is live and ready.
+
+---
+
+### Database Management
+
+- **Visual Manager**: `npm run db:studio` - [Drizzle Studio](https://orm.drizzle.team/drizzle-studio/overview) GUI
+- **Schema Changes**: `npm run db:generate` → `npm run db:migrate` - [Migration Guide](https://orm.drizzle.team/docs/migrations)
+- **Fresh Data**: `npm run db:reset` - Reset with seed data
+- **Production**: Use `db:migrate` instead of `db:push` - [Best Practices](https://neon.tech/docs/guides/drizzle)
+
+**Quick Links:**
+- [📖 Drizzle ORM Docs](https://orm.drizzle.team/docs/overview)
+- [📖 Neon Database Docs](https://neon.tech/docs/introduction) 
+- [📖 Vercel Deployment](https://vercel.com/docs/deployments/overview)
+- [📖 Next.js Production](https://nextjs.org/docs/pages/building-your-application/deploying)
+
+### Common Issues
+
+- **Build Fails**: Check all required environment variables are set in Vercel
+- **Database Connection**: Ensure `DATABASE_URL` is from Neon connection string
+- **Stripe Webhooks**: Verify webhook URL and events are configured correctly
+- **Email Issues**: Confirm sender domain is verified in Resend
+
+### Detailed Deployment Guide
+
+#### 1. Prerequisites & Required Tokens
+
+Before deploying, you'll need accounts and API tokens from these services:
 
 - [Node.js 22+](https://nodejs.org/) and npm 10+
-- [Vercel account](https://vercel.com)
-- [Neon database account](https://neon.tech)
-- [Stripe account](https://stripe.com) for payments
-- [Resend account](https://resend.com) for emails
+- [Vercel account](https://vercel.com) - for deployment
+- [Neon database account](https://neon.tech) - for PostgreSQL database
+- [Stripe account](https://stripe.com) - for payment processing (**3 tokens required**)
+- [Resend account](https://resend.com) - for transactional emails (**1 token required**)
 
 #### 2. Create a Neon Database
 
@@ -97,36 +163,53 @@ vercel --prod
 
 In your Vercel project dashboard, go to **Settings > Environment Variables** and add:
 
-**Required Variables:**
+**Required Variables (Essential):**
 ```env
 # Database
 DATABASE_URL=postgresql://username:password@ep-name.region.neon.tech/dbname?sslmode=require
-DIRECT_URL=postgresql://username:password@ep-name.region.neon.tech/dbname?sslmode=require
 
-# Authentication
+# Authentication  
 NEXTAUTH_SECRET=your-nextauth-secret-here
 NEXTAUTH_URL=https://your-domain.vercel.app
 
-# Stripe
+# Stripe (3 tokens required)
 STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
 STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
 
-# Email
+# Email service
 RESEND_API_KEY=re_your_resend_api_key
 EMAIL_FROM=noreply@yourdomain.com
 
-# Vercel Blob Storage
+# File storage
 BLOB_READ_WRITE_TOKEN=vercel_blob_rw_your_token
 
-# App URL
+# Application URL
 NEXT_PUBLIC_APP_URL=https://your-domain.vercel.app
 ```
 
-**Optional Variables:**
+**Optional Variables (Enhance functionality):**
 ```env
-# AI Image Generation
+# Admin notifications
+ADMIN_EMAIL=admin@luzimarket.com
+
+# Development email control
+SEND_EMAILS=false
+
+# AI image generation (for seeding)
 OPENAI_SECRET_KEY=sk-your_openai_api_key
+
+# Database optimization
+DB_POOL_MAX=1
+DB_IDLE_TIMEOUT=10
+DB_CONNECT_TIMEOUT=5
+
+# E2E Testing (requires npm run compose:up)
+NEON_API_KEY=your_neon_api_key
+NEON_PROJECT_ID=your_project_id
+NEON_BRANCH_ID=your_branch_id
+PGSSLMODE=no-verify
+NEON_LOCAL=1
 ```
 
 > **Generate NEXTAUTH_SECRET:** Run `openssl rand -base64 32` or use an online generator
@@ -223,7 +306,7 @@ npm install
 cp .env.example .env.local
 
 # Edit .env.local with your actual values
-# At minimum, you need DATABASE_URL and NEXTAUTH_SECRET
+# See "Environment Variables" section below for required tokens
 ```
 
 4. **Set up the database**
@@ -304,13 +387,15 @@ Notes:
 - `npm run lint` - Run ESLint for code quality
 
 ### Database Management
-- `npm run db:generate` - Generate migrations from schema changes
-- `npm run db:push` - Apply schema directly to database (development)
-- `npm run db:migrate` - Run migrations (production)
-- `npm run db:seed` - Seed database with sample data
-- `npm run db:reset` - Reset and re-seed database
-- `npm run db:setup` - Push schema and seed data (combined)
-- `npm run db:studio` - Open Drizzle Studio GUI
+- `npm run db:studio` - 🎨 Open visual database manager ([Drizzle Studio](https://orm.drizzle.team/drizzle-studio/overview))
+- `npm run db:generate` - 📝 Generate migration files from schema changes  
+- `npm run db:push` - ⚡ Apply schema directly (development only)
+- `npm run db:migrate` - 🚀 Run migrations (production)
+- `npm run db:seed` - 🌱 Seed database with sample data
+- `npm run db:reset` - 🔄 Reset and re-seed database
+- `npm run db:setup` - ⚡ Push schema and seed data (combined)
+
+**💡 Tip**: Use `db:push` for development, `db:migrate` for production. [Learn more →](https://orm.drizzle.team/docs/migrations)
 
 ### Testing & Quality
 - `npm test` - Run E2E tests with Playwright
@@ -442,30 +527,30 @@ Notes:
 
 ## Environment Variables
 
-```env
-# Database (Neon)
-DATABASE_URL=postgresql://...
-DIRECT_URL=postgresql://...
+Copy `.env.example` to `.env.local` and fill in your values:
 
-# NextAuth
-NEXTAUTH_SECRET=your-secret-here
-NEXTAUTH_URL=http://localhost:3000
-
-# Stripe
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
-
-# Email (Resend)
-RESEND_API_KEY=re_...
-EMAIL_FROM=noreply@luzimarket.shop
-
-# Vercel Blob
-BLOB_READ_WRITE_TOKEN=...
-
-# Optional: AI Image Generation
-OPENAI_SECRET_KEY=sk-...
+```bash
+cp .env.example .env.local
 ```
+
+### Required Variables
+
+- **`DATABASE_URL`** - PostgreSQL connection string from Neon
+- **`NEXTAUTH_SECRET`** - Authentication secret (generate with `openssl rand -base64 32`)
+- **`NEXTAUTH_URL`** - Your app URL (http://localhost:3000 for local dev)
+- **`STRIPE_SECRET_KEY`** - Stripe secret key
+- **`NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`** - Stripe publishable key  
+- **`STRIPE_WEBHOOK_SECRET`** - Stripe webhook secret
+- **`RESEND_API_KEY`** - Resend API key for emails
+- **`EMAIL_FROM`** - Verified sender email address
+- **`BLOB_READ_WRITE_TOKEN`** - Vercel Blob storage token
+- **`NEXT_PUBLIC_APP_URL`** - Public app URL
+
+### Optional Variables
+
+- **`OPENAI_SECRET_KEY`** - For AI image generation during database seeding
+- **`ADMIN_EMAIL`** - For admin notifications
+- **`NEON_*`** - For running E2E tests with Docker (see testing section)
 
 ## Development Tips
 
@@ -528,6 +613,9 @@ OPENAI_SECRET_KEY=sk-...
 ```bash
 # Install Playwright browsers (one-time setup)
 npx playwright install
+
+# Start the local database (required for tests)
+npm run compose:up
 ```
 
 **Development Testing:**

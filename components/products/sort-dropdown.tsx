@@ -41,6 +41,8 @@ export function SortDropdown() {
           <SelectItem value="newest">{t('sortOptions.newest')}</SelectItem>
           <SelectItem value="price-asc">{t('sortOptions.priceAsc')}</SelectItem>
           <SelectItem value="price-desc">{t('sortOptions.priceDesc')}</SelectItem>
+          <SelectItem value="rating">Rating (High to Low)</SelectItem>
+          <SelectItem value="popularity">Most Popular</SelectItem>
         </SelectContent>
       </Select>
     </div>

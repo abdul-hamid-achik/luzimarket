@@ -22,6 +22,7 @@ import Script from "next/script";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useSession } from "next-auth/react";
 import { ShippingCalculator } from "@/components/checkout/shipping-calculator";
+import { CouponInput } from "@/components/checkout/coupon-input";
 
 const createCheckoutSchema = (t: any) => z.object({
   // Personal Information
@@ -94,8 +95,10 @@ export default function CheckoutPage() {
   const [shippingCostsByVendor, setShippingCostsByVendor] = useState<Record<string, number>>({});
   const [selectedShippingByVendor, setSelectedShippingByVendor] = useState<Record<string, any>>({});
   const totalShippingCost = Object.values(shippingCostsByVendor).reduce((sum, cost) => sum + cost, 0);
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
+  const discount = appliedCoupon?.discount || 0;
   const tax = subtotal * 0.16; // 16% IVA
-  const total = subtotal + totalShippingCost + tax;
+  const total = subtotal + totalShippingCost + tax - discount;
 
   // Memoize shipping items to prevent infinite loops
   const shippingItems = useMemo(() =>

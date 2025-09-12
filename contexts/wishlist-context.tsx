@@ -1,6 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useReducer, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { addToWishlist as addToWishlistDB, removeFromWishlist as removeFromWishlistDB, getUserWishlist, syncWishlistFromLocal } from "@/lib/actions/wishlist";
 
 export interface WishlistItem {
   id: string;
@@ -9,6 +11,7 @@ export interface WishlistItem {
   image: string;
   vendorId: string;
   vendorName: string;
+  addedAt?: Date | null;
 }
 
 interface WishlistState {
@@ -69,34 +72,85 @@ function wishlistReducer(state: WishlistState, action: WishlistAction): Wishlist
 }
 
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
+  const { data: session, status } = useSession();
   const [state, dispatch] = useReducer(wishlistReducer, {
     items: [],
   });
 
-  // Load wishlist from localStorage on mount
+  // Load wishlist based on authentication status
   useEffect(() => {
-    const savedWishlist = localStorage.getItem(WISHLIST_STORAGE_KEY);
-    if (savedWishlist) {
-      try {
-        const parsedWishlist = JSON.parse(savedWishlist);
-        dispatch({ type: "LOAD_WISHLIST", payload: parsedWishlist });
-      } catch (error) {
-        console.error("Error loading wishlist from storage:", error);
+    const loadWishlist = async () => {
+      if (status === "loading") return;
+      
+      if (session?.user?.id) {
+        // User is logged in, load from database
+        const dbWishlist = await getUserWishlist();
+        dispatch({ type: "LOAD_WISHLIST", payload: dbWishlist });
+        
+        // Sync any local items to database
+        const localWishlist = localStorage.getItem(WISHLIST_STORAGE_KEY);
+        if (localWishlist) {
+          try {
+            const parsedWishlist = JSON.parse(localWishlist);
+            const productIds = parsedWishlist.map((item: WishlistItem) => item.id);
+            await syncWishlistFromLocal(productIds);
+            // Clear local storage after sync
+            localStorage.removeItem(WISHLIST_STORAGE_KEY);
+          } catch (error) {
+            console.error("Error syncing local wishlist:", error);
+          }
+        }
+      } else {
+        // User is not logged in, load from localStorage
+        const savedWishlist = localStorage.getItem(WISHLIST_STORAGE_KEY);
+        if (savedWishlist) {
+          try {
+            const parsedWishlist = JSON.parse(savedWishlist);
+            dispatch({ type: "LOAD_WISHLIST", payload: parsedWishlist });
+          } catch (error) {
+            console.error("Error loading wishlist from storage:", error);
+          }
+        }
+      }
+    };
+    
+    loadWishlist();
+  }, [session, status]);
+
+  // Save wishlist to localStorage only for non-authenticated users
+  useEffect(() => {
+    if (!session?.user?.id) {
+      localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(state.items));
+    }
+  }, [state.items, session]);
+
+  const addToWishlist = async (item: WishlistItem) => {
+    // Add to local state immediately for optimistic UI
+    dispatch({ type: "ADD_ITEM", payload: item });
+    
+    // If user is logged in, also save to database
+    if (session?.user?.id) {
+      const result = await addToWishlistDB(item.id);
+      if (result.error) {
+        // Revert on error
+        dispatch({ type: "REMOVE_ITEM", payload: item.id });
+        console.error("Failed to add to wishlist:", result.error);
       }
     }
-  }, []);
-
-  // Save wishlist to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(state.items));
-  }, [state.items]);
-
-  const addToWishlist = (item: WishlistItem) => {
-    dispatch({ type: "ADD_ITEM", payload: item });
   };
 
-  const removeFromWishlist = (id: string) => {
+  const removeFromWishlist = async (id: string) => {
+    // Remove from local state immediately for optimistic UI
     dispatch({ type: "REMOVE_ITEM", payload: id });
+    
+    // If user is logged in, also remove from database
+    if (session?.user?.id) {
+      const result = await removeFromWishlistDB(id);
+      if (result.error) {
+        // Revert on error - need to get the item back
+        console.error("Failed to remove from wishlist:", result.error);
+      }
+    }
   };
 
   const isInWishlist = (id: string) => {

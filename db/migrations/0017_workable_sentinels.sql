@@ -1,1 +1,0 @@
-ALTER TABLE "vendor_balances" ADD COLUMN "lifetime_volume" numeric(10, 2) DEFAULT '0' NOT NULL;

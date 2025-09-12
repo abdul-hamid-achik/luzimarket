@@ -4,11 +4,12 @@ import { useState, useEffect } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Collapsible,
   CollapsibleContent,
@@ -44,6 +45,8 @@ export function FilterSidebar({
   const currentVendors = searchParams.get("vendors")?.split(",").filter(Boolean) || [];
   const currentMinPrice = searchParams.get("minPrice") || "";
   const currentMaxPrice = searchParams.get("maxPrice") || "";
+  const currentRating = searchParams.get("minRating") || "";
+  const currentAvailability = searchParams.get("availability") || "";
 
   // Local state for inputs
   const [minPrice, setMinPrice] = useState(currentMinPrice);
@@ -54,6 +57,8 @@ export function FilterSidebar({
     categories: true,
     vendors: true,
     price: true,
+    rating: true,
+    availability: true,
   });
 
   // Update URL with new filters
@@ -115,7 +120,9 @@ export function FilterSidebar({
     currentCategories.length > 0 ||
     currentVendors.length > 0 ||
     currentMinPrice ||
-    currentMaxPrice;
+    currentMaxPrice ||
+    currentRating ||
+    currentAvailability;
 
   return (
     <div className="w-full">
@@ -253,6 +260,93 @@ export function FilterSidebar({
               {t("applyFilters")}
             </Button>
           </div>
+        </CollapsibleContent>
+      </Collapsible>
+
+      {/* Rating Filter */}
+      <Collapsible
+        open={openSections.rating}
+        onOpenChange={(open) => setOpenSections(prev => ({ ...prev, rating: open }))}
+        className="mb-6"
+      >
+        <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-univers hover:text-gray-700">
+          <span>Rating</span>
+          {openSections.rating ? (
+            <ChevronUp className="h-4 w-4" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
+          )}
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-4 space-y-3">
+          <RadioGroup
+            value={currentRating}
+            onValueChange={(value) => updateFilters({ minRating: value })}
+          >
+            {[4, 3, 2, 1].map((rating) => (
+              <div key={rating} className="flex items-center space-x-2">
+                <RadioGroupItem value={rating.toString()} id={`rating-${rating}`} />
+                <Label
+                  htmlFor={`rating-${rating}`}
+                  className="flex items-center gap-1 text-sm font-univers cursor-pointer flex-1"
+                >
+                  <div className="flex items-center">
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <Star
+                        key={i}
+                        className={`h-4 w-4 ${
+                          i < rating
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-gray-300"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="ml-2">& up</span>
+                </Label>
+              </div>
+            ))}
+          </RadioGroup>
+        </CollapsibleContent>
+      </Collapsible>
+
+      {/* Availability Filter */}
+      <Collapsible
+        open={openSections.availability}
+        onOpenChange={(open) => setOpenSections(prev => ({ ...prev, availability: open }))}
+        className="mb-6"
+      >
+        <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-univers hover:text-gray-700">
+          <span>Availability</span>
+          {openSections.availability ? (
+            <ChevronUp className="h-4 w-4" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
+          )}
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-4 space-y-3">
+          <RadioGroup
+            value={currentAvailability}
+            onValueChange={(value) => updateFilters({ availability: value })}
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="in-stock" id="in-stock" />
+              <Label htmlFor="in-stock" className="text-sm font-univers cursor-pointer">
+                In Stock
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="out-of-stock" id="out-of-stock" />
+              <Label htmlFor="out-of-stock" className="text-sm font-univers cursor-pointer">
+                Out of Stock
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="low-stock" id="low-stock" />
+              <Label htmlFor="low-stock" className="text-sm font-univers cursor-pointer">
+                Low Stock (≤ 5 items)
+              </Label>
+            </div>
+          </RadioGroup>
         </CollapsibleContent>
       </Collapsible>
     </div>
