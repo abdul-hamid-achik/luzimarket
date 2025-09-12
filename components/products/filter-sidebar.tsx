@@ -270,7 +270,7 @@ export function FilterSidebar({
         className="mb-6"
       >
         <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-univers hover:text-gray-700">
-          <span>Rating</span>
+          <span>{t("minRating")}</span>
           {openSections.rating ? (
             <ChevronUp className="h-4 w-4" />
           ) : (
@@ -316,7 +316,7 @@ export function FilterSidebar({
         className="mb-6"
       >
         <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-univers hover:text-gray-700">
-          <span>Availability</span>
+          <span>{t("availability")}</span>
           {openSections.availability ? (
             <ChevronUp className="h-4 w-4" />
           ) : (

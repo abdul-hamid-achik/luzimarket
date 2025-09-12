@@ -7,7 +7,7 @@ import { MapPin, Phone, Globe, Clock, Star, Package } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ProductGrid } from "@/components/products/product-grid";
+import { ProductsGrid } from "@/components/products/products-grid";
 import { SocialShare } from "@/components/products/social-share";
 import { db } from "@/db";
 import { vendors, products, reviews } from "@/db/schema";
@@ -231,7 +231,7 @@ export default async function VendorPage({ params }: VendorPageProps) {
         </div>
 
         <Suspense fallback={<div className="text-center py-8">Loading products...</div>}>
-          <ProductGrid products={vendor.products} />
+          <ProductsGrid products={vendor.products} />
         </Suspense>
 
         {vendor.products.length === 0 && (
@@ -241,7 +241,7 @@ export default async function VendorPage({ params }: VendorPageProps) {
               No products yet
             </h3>
             <p className="text-gray-600">
-              This vendor hasn't added any products yet. Check back later!
+              This vendor hasn&apos;t added any products yet. Check back later!
             </p>
           </div>
         )}

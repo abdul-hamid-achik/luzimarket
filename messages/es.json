@@ -1624,6 +1624,8 @@
     "lowStock": "Solo quedan {count}",
     "maxPrice": "Precio máximo",
     "minPrice": "Precio mínimo",
+    "minRating": "Calificación mínima",
+    "availability": "Disponibilidad",
     "newest": "Más reciente",
     "noProducts": "No se encontraron productos",
     "onlyLeft": "Solo quedan {count}",

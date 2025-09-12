@@ -1641,6 +1641,8 @@
     "lowStock": "Only {count} left",
     "maxPrice": "Max price",
     "minPrice": "Min price",
+    "minRating": "Minimum rating",
+    "availability": "Availability",
     "newest": "Newest",
     "noProducts": "No products found",
     "onlyLeft": "Only {count} left",

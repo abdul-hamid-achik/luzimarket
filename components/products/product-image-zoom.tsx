@@ -249,15 +249,18 @@ export function ProductImageModalZoom({
           cursor: scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default',
         }}
       >
-        <img
+        <Image
           src={images[currentIndex]}
           alt={`${alt} - Image ${currentIndex + 1}`}
+          width={1200}
+          height={800}
           className="max-w-full max-h-[90vh] object-contain"
           style={{
             transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
             transition: isDragging ? 'none' : 'transform 0.2s',
           }}
           draggable={false}
+          unoptimized
         />
       </div>
 
