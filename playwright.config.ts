@@ -69,13 +69,7 @@ export default defineConfig({
     navigationTimeout: 10_000,
     actionTimeout: isCi ? 10_000 : 5_000,
 
-    /* Browser context options */
-    contextOptions: {
-      // Grant permissions that tests might need
-      permissions: ['clipboard-read', 'clipboard-write'],
-      // Bypass CSP for tests
-      bypassCSP: true,
-    },
+    /* Browser context options - moved to per-browser configuration */
   },
 
   /* Global timeout for tests */
@@ -90,29 +84,61 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        // Chromium supports clipboard permissions
+        contextOptions: {
+          permissions: ['clipboard-read', 'clipboard-write'],
+          bypassCSP: true,
+        },
+      },
     },
 
     // Additional browsers enabled in CI only when CI_ALL_BROWSERS=1
     ...(includeAdditionalBrowsers ? [
       {
         name: 'firefox',
-        use: { ...devices['Desktop Firefox'] },
+        use: {
+          ...devices['Desktop Firefox'],
+          // Firefox doesn't support clipboard permissions in the same way
+          contextOptions: {
+            bypassCSP: true,
+          },
+        },
       },
 
       {
         name: 'webkit',
-        use: { ...devices['Desktop Safari'] },
+        use: {
+          ...devices['Desktop Safari'],
+          // Safari/webkit doesn't support clipboard permissions in the same way
+          contextOptions: {
+            bypassCSP: true,
+          },
+        },
       },
 
       /* Test against mobile viewports. */
       {
         name: 'Mobile Chrome',
-        use: { ...devices['Pixel 5'] },
+        use: {
+          ...devices['Pixel 5'],
+          // Mobile Chrome supports clipboard permissions
+          contextOptions: {
+            permissions: ['clipboard-read', 'clipboard-write'],
+            bypassCSP: true,
+          },
+        },
       },
       {
         name: 'Mobile Safari',
-        use: { ...devices['iPhone 12'] },
+        use: {
+          ...devices['iPhone 12'],
+          // Mobile Safari doesn't support clipboard permissions in the same way
+          contextOptions: {
+            bypassCSP: true,
+          },
+        },
       },
     ] : []),
 
