@@ -104,7 +104,7 @@ export default async function VendorDashboard() {
 
   // Handle case where vendor info is not found
   if (!vendorInfo) {
-    redirect({ href: "/vendor/register", locale: 'es' });
+    redirect({ href: "/vendor-register", locale: 'es' });
   }
 
   const statsCards = [

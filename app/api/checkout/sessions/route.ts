@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     // Calculate total shipping from all vendors
     const totalShippingFromVendors = shippingCostsByVendor ?
-      Object.values(shippingCostsByVendor).reduce((sum, cost) => sum + (cost || 0), 0) : 0;
+      Object.values(shippingCostsByVendor).reduce((sum: number, cost) => sum + (Number(cost) || 0), 0) : 0;
 
     let shipping = totalShippingFromVendors || 99; // Use calculated shipping or fallback
     let shippingDescription = '📦 Envío estándar en México';
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     // If we have vendor-specific shipping info, try to get description from the first vendor
     if (selectedShippingByVendor && Object.keys(selectedShippingByVendor).length > 0) {
-      const firstVendorShipping = Object.values(selectedShippingByVendor)[0];
+      const firstVendorShipping = Object.values(selectedShippingByVendor)[0] as any;
       if (firstVendorShipping) {
         shippingDescription = firstVendorShipping.name || shippingDescription;
         shippingDays = firstVendorShipping.estimatedDays || shippingDays;

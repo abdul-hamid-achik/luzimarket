@@ -16,39 +16,39 @@ export const metadata: Metadata = {
 };
 
 interface VendorsPageProps {
-  searchParams: {
+  searchParams: Promise<{
     q?: string;
     city?: string;
     state?: string;
-  };
+  }>;
 }
 
-async function getVendors(searchParams: VendorsPageProps['searchParams']) {
+async function getVendors(searchParams: Awaited<VendorsPageProps['searchParams']>) {
   const { q, city, state } = searchParams;
 
-  let whereClause = eq(vendors.isActive, true);
+  const conditions = [eq(vendors.isActive, true)];
 
   // Add search filters
   if (q) {
-    whereClause = and(
-      whereClause,
-      or(
-        like(vendors.businessName, `%${q}%`),
-        like(vendors.description, `%${q}%`)
-      )
+    const searchCondition = or(
+      like(vendors.businessName, `%${q}%`),
+      like(vendors.description, `%${q}%`)
     );
+    if (searchCondition) {
+      conditions.push(searchCondition);
+    }
   }
 
   if (city) {
-    whereClause = and(whereClause, like(vendors.city, `%${city}%`));
+    conditions.push(like(vendors.city, `%${city}%`));
   }
 
   if (state) {
-    whereClause = and(whereClause, like(vendors.state, `%${state}%`));
+    conditions.push(like(vendors.state, `%${state}%`));
   }
 
   const vendorsList = await db.query.vendors.findMany({
-    where: whereClause,
+    where: and(...conditions),
     orderBy: [desc(vendors.createdAt)],
     limit: 24,
   });
@@ -76,8 +76,9 @@ async function getVendors(searchParams: VendorsPageProps['searchParams']) {
 }
 
 export default async function VendorsPage({ searchParams }: VendorsPageProps) {
+  const resolvedSearchParams = await searchParams;
   const t = await getTranslations("Vendors");
-  const vendorsList = await getVendors(searchParams);
+  const vendorsList = await getVendors(resolvedSearchParams);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -100,7 +101,7 @@ export default async function VendorsPage({ searchParams }: VendorsPageProps) {
                 type="search"
                 name="q"
                 placeholder="Search vendors..."
-                defaultValue={searchParams.q}
+                defaultValue={resolvedSearchParams.q}
                 className="flex-1"
               />
             </form>
@@ -117,7 +118,7 @@ export default async function VendorsPage({ searchParams }: VendorsPageProps) {
                 <div className="text-sm text-gray-600">Active Vendors</div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-6 text-center">
                 <Package className="h-8 w-8 text-green-600 mx-auto mb-2" />
@@ -127,14 +128,14 @@ export default async function VendorsPage({ searchParams }: VendorsPageProps) {
                 <div className="text-sm text-gray-600">Products Available</div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-6 text-center">
                 <Star className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-900">
                   {(vendorsList
                     .filter(v => v.stats.avgRating)
-                    .reduce((acc, v) => acc + Number(v.stats.avgRating), 0) / 
+                    .reduce((acc, v) => acc + Number(v.stats.avgRating), 0) /
                     vendorsList.filter(v => v.stats.avgRating).length || 0
                   ).toFixed(1)}
                 </div>
@@ -228,7 +229,7 @@ export default async function VendorsPage({ searchParams }: VendorsPageProps) {
                 No vendors found
               </h3>
               <p className="text-gray-600">
-                {searchParams.q 
+                {resolvedSearchParams.q
                   ? "Try adjusting your search terms"
                   : "We're working on adding more vendors to the platform"
                 }

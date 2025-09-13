@@ -15,10 +15,10 @@ import { eq, and, desc, avg, count, sql } from "drizzle-orm";
 import { getTranslations } from "next-intl/server";
 
 interface VendorPageProps {
-  params: {
+  params: Promise<{
     locale: string;
     slug: string;
-  };
+  }>;
 }
 
 async function getVendorData(slug: string) {
@@ -60,8 +60,9 @@ async function getVendorData(slug: string) {
 }
 
 export async function generateMetadata({ params }: VendorPageProps): Promise<Metadata> {
-  const data = await getVendorData(params.slug);
-  
+  const resolvedParams = await params;
+  const data = await getVendorData(resolvedParams.slug);
+
   if (!data) {
     return {
       title: "Vendor not found",
@@ -82,9 +83,10 @@ export async function generateMetadata({ params }: VendorPageProps): Promise<Met
 }
 
 export default async function VendorPage({ params }: VendorPageProps) {
+  const resolvedParams = await params;
   const t = await getTranslations("Vendor");
-  const data = await getVendorData(params.slug);
-  
+  const data = await getVendorData(resolvedParams.slug);
+
   if (!data) {
     notFound();
   }
@@ -124,7 +126,7 @@ export default async function VendorPage({ params }: VendorPageProps) {
                 {/* Contact Info */}
                 <div className="space-y-3">
                   <h3 className="font-semibold text-gray-900">Contact Information</h3>
-                  
+
                   {(vendor.street || vendor.city || vendor.state) && (
                     <div className="flex items-start gap-2">
                       <MapPin className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
@@ -133,7 +135,7 @@ export default async function VendorPage({ params }: VendorPageProps) {
                       </div>
                     </div>
                   )}
-                  
+
                   {vendor.businessPhone && (
                     <div className="flex items-center gap-2">
                       <Phone className="h-5 w-5 text-gray-400" />
@@ -142,13 +144,13 @@ export default async function VendorPage({ params }: VendorPageProps) {
                       </a>
                     </div>
                   )}
-                  
+
                   {vendor.websiteUrl && (
                     <div className="flex items-center gap-2">
                       <Globe className="h-5 w-5 text-gray-400" />
-                      <a 
-                        href={vendor.websiteUrl} 
-                        target="_blank" 
+                      <a
+                        href={vendor.websiteUrl}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm text-blue-600 hover:text-blue-800"
                       >
@@ -156,7 +158,7 @@ export default async function VendorPage({ params }: VendorPageProps) {
                       </a>
                     </div>
                   )}
-                  
+
                   {vendor.businessHours && (
                     <div className="flex items-start gap-2">
                       <Clock className="h-5 w-5 text-gray-400 mt-0.5" />
@@ -170,7 +172,7 @@ export default async function VendorPage({ params }: VendorPageProps) {
                 {/* Stats */}
                 <div className="space-y-3">
                   <h3 className="font-semibold text-gray-900">Store Statistics</h3>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <Card>
                       <CardContent className="p-4 text-center">
@@ -181,7 +183,7 @@ export default async function VendorPage({ params }: VendorPageProps) {
                         <div className="text-sm text-gray-600">Products</div>
                       </CardContent>
                     </Card>
-                    
+
                     {stats.avgRating && (
                       <Card>
                         <CardContent className="p-4 text-center">
@@ -231,7 +233,13 @@ export default async function VendorPage({ params }: VendorPageProps) {
         </div>
 
         <Suspense fallback={<div className="text-center py-8">Loading products...</div>}>
-          <ProductsGrid products={vendor.products} />
+          <ProductsGrid products={vendor.products.map(product => ({
+            ...product,
+            vendor: {
+              id: vendor.id,
+              businessName: vendor.businessName
+            }
+          }))} />
         </Suspense>
 
         {vendor.products.length === 0 && (

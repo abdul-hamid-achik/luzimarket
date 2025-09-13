@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { coupons, couponUsage, users, orders } from "@/db/schema";
-import { eq, and, gte, lte, lt, sql, desc, or } from "drizzle-orm";
+import { eq, and, gte, lte, lt, sql, desc, or, isNull } from "drizzle-orm";
 import { z } from "zod";
 
 export interface CouponValidationResult {
@@ -69,7 +69,7 @@ export async function validateCoupon(
     }
 
     // Check global usage limit
-    if (coupon.usageLimit && coupon.usageCount >= coupon.usageLimit) {
+    if (coupon.usageLimit && (coupon.usageCount ?? 0) >= coupon.usageLimit) {
       return {
         isValid: false,
         error: "Coupon usage limit exceeded"
@@ -172,9 +172,9 @@ export async function validateCoupon(
 
 function getEligibleCartItems(cartItems: CartItem[], coupon: any): CartItem[] {
   // If no restrictions, all items are eligible
-  if (!coupon.restrictToCategories?.length && 
-      !coupon.restrictToVendors?.length && 
-      !coupon.restrictToProducts?.length) {
+  if (!coupon.restrictToCategories?.length &&
+    !coupon.restrictToVendors?.length &&
+    !coupon.restrictToProducts?.length) {
     return cartItems;
   }
 
@@ -260,7 +260,7 @@ export async function applyCouponToOrder(
     // Update coupon usage count
     await db
       .update(coupons)
-      .set({ 
+      .set({
         usageCount: sql`${coupons.usageCount} + 1`,
         updatedAt: new Date()
       })
@@ -277,23 +277,23 @@ export async function applyCouponToOrder(
 export async function getAvailableCoupons(userId?: string) {
   try {
     const now = new Date();
-    
+
     const availableCoupons = await db.query.coupons.findMany({
       where: and(
         eq(coupons.isActive, true),
         // Only show coupons that haven't expired
         or(
-          eq(coupons.expiresAt, null),
+          isNull(coupons.expiresAt),
           gte(coupons.expiresAt, now)
         ),
         // Only show coupons that have started
         or(
-          eq(coupons.startsAt, null),
+          isNull(coupons.startsAt),
           lte(coupons.startsAt, now)
         ),
         // Only show coupons that haven't reached their usage limit
         or(
-          eq(coupons.usageLimit, null),
+          isNull(coupons.usageLimit),
           lt(coupons.usageCount, coupons.usageLimit)
         )
       ),

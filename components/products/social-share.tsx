@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 interface SocialShareProps {
   title: string;
@@ -20,16 +20,15 @@ interface SocialShareProps {
   className?: string;
 }
 
-export function SocialShare({ 
-  title, 
-  description = "", 
-  url, 
+export function SocialShare({
+  title,
+  description = "",
+  url,
   image,
   price,
-  className = "" 
+  className = ""
 }: SocialShareProps) {
   const [copied, setCopied] = useState(false);
-  const { toast } = useToast();
 
   const shareText = `${title}${price ? ` - ${price}` : ""} | LuziMarket`;
   const shareUrl = typeof window !== 'undefined' ? window.location.origin + url : url;
@@ -46,17 +45,10 @@ export function SocialShare({
     try {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
-      toast({
-        title: "Link copied!",
-        description: "Product link has been copied to clipboard",
-      });
+      toast("Link copied to clipboard!");
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      toast({
-        title: "Failed to copy",
-        description: "Please try again",
-        variant: "destructive",
-      });
+      toast("Failed to copy link. Please try again.");
     }
   };
 
@@ -81,7 +73,7 @@ export function SocialShare({
     const height = 400;
     const left = (window.innerWidth - width) / 2;
     const top = (window.innerHeight - height) / 2;
-    
+
     window.open(
       url,
       'share',
@@ -90,7 +82,7 @@ export function SocialShare({
   };
 
   // If native sharing is available on mobile devices
-  if (typeof window !== 'undefined' && navigator.share && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+  if (typeof window !== 'undefined' && 'share' in navigator && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     return (
       <Button
         variant="outline"
@@ -117,33 +109,33 @@ export function SocialShare({
           <Facebook className="h-4 w-4 mr-2 text-blue-600" />
           Facebook
         </DropdownMenuItem>
-        
+
         <DropdownMenuItem onClick={() => openShareWindow(shareLinks.twitter)}>
           <Twitter className="h-4 w-4 mr-2 text-blue-400" />
           Twitter
         </DropdownMenuItem>
-        
+
         <DropdownMenuItem onClick={() => openShareWindow(shareLinks.whatsapp)}>
           <div className="h-4 w-4 mr-2 bg-green-500 rounded-full flex items-center justify-center text-white text-xs">
             W
           </div>
           WhatsApp
         </DropdownMenuItem>
-        
+
         <DropdownMenuItem onClick={() => openShareWindow(shareLinks.telegram)}>
           <div className="h-4 w-4 mr-2 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">
             T
           </div>
           Telegram
         </DropdownMenuItem>
-        
+
         <DropdownMenuItem onClick={() => openShareWindow(shareLinks.pinterest)}>
           <div className="h-4 w-4 mr-2 bg-red-600 rounded-full flex items-center justify-center text-white text-xs">
             P
           </div>
           Pinterest
         </DropdownMenuItem>
-        
+
         <DropdownMenuItem onClick={copyToClipboard}>
           {copied ? (
             <Check className="h-4 w-4 mr-2 text-green-600" />
@@ -158,11 +150,11 @@ export function SocialShare({
 }
 
 // Compact version for product cards
-export function SocialShareButton({ 
-  title, 
-  url, 
+export function SocialShareButton({
+  title,
+  url,
   price,
-  className = "" 
+  className = ""
 }: Pick<SocialShareProps, 'title' | 'url' | 'price' | 'className'>) {
   const shareUrl = typeof window !== 'undefined' ? window.location.origin + url : url;
   const shareText = `${title}${price ? ` - ${price}` : ""} | LuziMarket`;
