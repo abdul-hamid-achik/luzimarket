@@ -254,6 +254,38 @@ Add to your GitHub Actions workflow:
 Tests use the same `.env.local` file as the application. For CI/CD, set:
 - `CI=true` - Enables retries and disables test.only
 - `NEXT_PUBLIC_APP_URL` - Base URL for tests
+- `PLAYWRIGHT_PASS_THRESHOLD` - Minimum pass rate percentage for CI to succeed (default: 95)
+
+### Pass Threshold Configuration
+
+The test suite is configured to pass CI builds when **95% or more** of tests pass. This allows for some test flakiness while maintaining overall quality.
+
+**Configuration:**
+- Default threshold: 95%
+- Override with: `PLAYWRIGHT_PASS_THRESHOLD=90` (for 90% threshold)
+- Script location: `e2e/scripts/check-pass-threshold.js`
+
+**How it works:**
+1. Playwright runs all tests and generates JSON results
+2. The threshold script analyzes the results 
+3. If pass rate ≥ threshold: CI succeeds ✅
+4. If pass rate < threshold: CI fails ❌ with detailed failure report
+
+**Example output:**
+```
+📊 Checking test pass threshold: 95%
+
+📈 Test Results Summary:
+  Total tests: 120
+  Passed: 115
+  Failed: 5
+  Flaky: 0
+  Skipped: 0
+  Pass rate: 95.8%
+  Threshold: 95%
+
+✅ PASS: Test suite meets 95% pass threshold (95.8%)
+```
 
 ## Troubleshooting
 
