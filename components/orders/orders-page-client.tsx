@@ -5,12 +5,12 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { 
-  Package, 
-  Calendar, 
-  CreditCard, 
-  Eye, 
-  Truck, 
+import {
+  Package,
+  Calendar,
+  CreditCard,
+  Eye,
+  Truck,
   Filter,
   Search,
   Download,
@@ -24,7 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
+import {
   Table,
   TableBody,
   TableCell,
@@ -84,7 +84,7 @@ export function OrdersPageClient({ locale }: OrdersPageClientProps) {
   // Handle filter changes
   const onFiltersChange = (formData: FilterFormData) => {
     const params = new URLSearchParams();
-    
+
     // Only add non-empty values to URL
     Object.entries(formData).forEach(([key, value]) => {
       if (value && value !== 'all' && value !== '') {
@@ -202,7 +202,7 @@ export function OrdersPageClient({ locale }: OrdersPageClientProps) {
 
           {/* Filters */}
           <Form {...form}>
-            <form 
+            <form
               onSubmit={form.handleSubmit(onFiltersChange)}
               className="grid grid-cols-1 md:grid-cols-5 gap-4"
             >
@@ -232,7 +232,7 @@ export function OrdersPageClient({ locale }: OrdersPageClientProps) {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="status"
@@ -247,7 +247,7 @@ export function OrdersPageClient({ locale }: OrdersPageClientProps) {
                     >
                       <FormControl>
                         <SelectTrigger className="font-univers">
-                           <SelectValue placeholder={t('filters.statusPlaceholder')} />
+                          <SelectValue placeholder={t('filters.statusPlaceholder')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -357,7 +357,7 @@ function OrdersLoadingSkeleton() {
           </Table>
         </Card>
       </div>
-      
+
       <div className="block md:hidden space-y-4">
         {[1, 2, 3].map((i) => (
           <Card key={i}>
@@ -374,14 +374,14 @@ function OrdersLoadingSkeleton() {
   );
 }
 
-function OrdersContent({ 
-  data, 
-  t, 
-  locale, 
-  onPageChange 
-}: { 
-  data: any; 
-  t: any; 
+function OrdersContent({
+  data,
+  t,
+  locale,
+  onPageChange
+}: {
+  data: any;
+  t: any;
   locale: string;
   onPageChange: (page: number) => void;
 }) {
@@ -465,7 +465,7 @@ function OrdersContent({
                 </Badge>
               </div>
             </CardHeader>
-            
+
             <CardContent className="space-y-4">
               {/* Order Items Preview */}
               <div className="flex items-center gap-3">
@@ -537,7 +537,7 @@ function OrdersContent({
                     {order.orderNumber}
                   </div>
                   <div className="text-xs text-gray-500 font-univers">
-                    {order.paymentStatus === 'succeeded' ? t('paid') : t('pending')}
+                    {order.paymentStatus === 'succeeded' ? t('statuses.paid') : t('statuses.pending')}
                   </div>
                 </TableCell>
                 <TableCell>
@@ -616,9 +616,9 @@ function OrdersContent({
           </p>
           <div className="flex items-center gap-2">
             {pagination.hasPrev && (
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 className="font-univers"
                 onClick={() => onPageChange(pagination.currentPage - 1)}
               >
@@ -626,9 +626,9 @@ function OrdersContent({
               </Button>
             )}
             {pagination.hasNext && (
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 className="font-univers"
                 onClick={() => onPageChange(pagination.currentPage + 1)}
               >

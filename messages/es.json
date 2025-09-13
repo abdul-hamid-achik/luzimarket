@@ -1315,6 +1315,23 @@
     "actions": {
       "buyAgain": "Comprar de nuevo"
     },
+    "stats": {
+      "pendingOrders": "Pedidos Pendientes",
+      "pendingOrdersDescription": "Pedidos esperando pago",
+      "totalOrders": "Total de Pedidos",
+      "totalOrdersDescription": "Pedidos procesados",
+      "activeVendors": "Vendedores Activos",
+      "activeVendorsDescription": "Con saldo disponible",
+      "totalRevenue": "Ingresos Totales",
+      "totalRevenueDescription": "Comisiones recolectadas"
+    },
+    "statuses": {
+      "cancelled": "Cancelado",
+      "delivered": "Entregado",
+      "paid": "Pagado",
+      "pending": "Pendiente",
+      "shipped": "Enviado"
+    },
     "backToAccount": "Volver a Mi Cuenta",
     "carrier": "Transportista",
     "deliveryAddress": "Dirección de Entrega",
@@ -1368,7 +1385,11 @@
       "vendorLocation": "Ubicación del Vendedor"
     },
     "moreItems": "más",
-    "noOrders": "No se encontraron pedidos",
+    "noOrders": {
+      "description": "Aún no has realizado ningún pedido",
+      "startShopping": "Comenzar a Comprar",
+      "title": "No se encontraron pedidos"
+    },
     "noResults": {
       "clearFilters": "Limpiar Filtros",
       "description": "Intenta ajustar tus filtros de búsqueda para encontrar lo que buscas.",

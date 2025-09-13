@@ -1378,7 +1378,11 @@
       "vendorLocation": "Vendor Location"
     },
     "moreItems": "more",
-    "noOrders": "No orders found",
+    "noOrders": {
+      "description": "You haven't placed any orders yet",
+      "startShopping": "Start Shopping",
+      "title": "No orders found"
+    },
     "noResults": {
       "clearFilters": "Clear Filters",
       "description": "Try adjusting your search filters to find what you're looking for.",
