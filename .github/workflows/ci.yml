@@ -33,15 +33,6 @@ jobs:
     - name: Install dependencies
       run: npm ci
     
-    - name: Wait for Neon Local to be ready
-      run: |
-        for i in {1..60}; do
-          nc -z localhost 5432 && echo "Neon Local is ready" && exit 0
-          sleep 1
-        done
-        echo "Neon Local did not become ready in time" >&2
-        exit 1
-    
     - name: i18n parity check
       run: npm run i18n:check
     
