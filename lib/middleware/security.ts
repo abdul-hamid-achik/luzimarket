@@ -22,16 +22,16 @@ export function rateLimit(config: RateLimitConfig) {
     const clientIp = getClientIp(request);
     const key = `${clientIp}:${request.nextUrl.pathname}`;
     const now = Date.now();
-    
+
     // Clean up expired entries
     for (const [k, v] of rateLimitStore.entries()) {
       if (now > v.resetTime) {
         rateLimitStore.delete(k);
       }
     }
-    
+
     const current = rateLimitStore.get(key);
-    
+
     if (!current) {
       // First request
       rateLimitStore.set(key, {
@@ -40,7 +40,7 @@ export function rateLimit(config: RateLimitConfig) {
       });
       return null; // Allow request
     }
-    
+
     if (now > current.resetTime) {
       // Window expired, reset
       rateLimitStore.set(key, {
@@ -49,15 +49,15 @@ export function rateLimit(config: RateLimitConfig) {
       });
       return null; // Allow request
     }
-    
+
     if (current.count >= config.maxRequests) {
       // Rate limit exceeded
       return NextResponse.json(
-        { 
+        {
           error: config.message || "Too many requests",
           retryAfter: Math.ceil((current.resetTime - now) / 1000)
         },
-        { 
+        {
           status: 429,
           headers: {
             'Retry-After': Math.ceil((current.resetTime - now) / 1000).toString(),
@@ -68,11 +68,11 @@ export function rateLimit(config: RateLimitConfig) {
         }
       );
     }
-    
+
     // Increment counter
     current.count++;
     rateLimitStore.set(key, current);
-    
+
     return null; // Allow request
   };
 }
@@ -84,19 +84,19 @@ function getClientIp(request: NextRequest): string {
   const forwarded = request.headers.get('x-forwarded-for');
   const real = request.headers.get('x-real-ip');
   const cf = request.headers.get('cf-connecting-ip');
-  
+
   if (forwarded) {
     return forwarded.split(',')[0].trim();
   }
-  
+
   if (real) {
     return real;
   }
-  
+
   if (cf) {
     return cf;
   }
-  
+
   return (request as any).ip || 'unknown';
 }
 
@@ -125,12 +125,12 @@ export function securityHeaders(response: NextResponse): NextResponse {
   response.headers.set('X-XSS-Protection', '1; mode=block');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-  
+
   // HSTS (only in production with HTTPS)
   if (process.env.NODE_ENV === 'production') {
     response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   }
-  
+
   return response;
 }
 
@@ -143,7 +143,7 @@ export class InputSanitizer {
    */
   static sanitizeHtml(input: string): string {
     if (typeof input !== 'string') return '';
-    
+
     // Basic HTML entity encoding
     return input
       .replace(/&/g, '&amp;')
@@ -153,13 +153,13 @@ export class InputSanitizer {
       .replace(/'/g, '&#x27;')
       .replace(/\//g, '&#x2F;');
   }
-  
+
   /**
    * Sanitize SQL input to prevent injection
    */
   static sanitizeSql(input: string): string {
     if (typeof input !== 'string') return '';
-    
+
     // Remove or escape potentially dangerous characters
     return input
       .replace(/[';\\]/g, '') // Remove semicolons and backslashes
@@ -168,59 +168,59 @@ export class InputSanitizer {
       .replace(/\*\//g, '') // Remove SQL block comments end
       .trim();
   }
-  
+
   /**
    * Validate and sanitize email
    */
   static sanitizeEmail(email: string): string | null {
     if (typeof email !== 'string') return null;
-    
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const sanitized = email.toLowerCase().trim();
-    
+
     if (!emailRegex.test(sanitized)) {
       return null;
     }
-    
+
     return sanitized;
   }
-  
+
   /**
    * Sanitize phone number
    */
   static sanitizePhone(phone: string): string {
     if (typeof phone !== 'string') return '';
-    
+
     // Remove all non-digit characters except + at the beginning
     return phone.replace(/[^\d+]/g, '').replace(/(?!^)\+/g, '');
   }
-  
+
   /**
    * Sanitize text input (general purpose)
    */
   static sanitizeText(input: string, maxLength: number = 1000): string {
     if (typeof input !== 'string') return '';
-    
+
     return input
       .trim()
       .slice(0, maxLength)
       .replace(/[\x00-\x1F\x7F]/g, ''); // Remove control characters
   }
-  
+
   /**
    * Validate and sanitize URL
    */
   static sanitizeUrl(url: string): string | null {
     if (typeof url !== 'string') return null;
-    
+
     try {
       const parsed = new URL(url);
-      
+
       // Only allow http and https protocols
       if (!['http:', 'https:'].includes(parsed.protocol)) {
         return null;
       }
-      
+
       return parsed.toString();
     } catch {
       return null;
@@ -240,7 +240,7 @@ export async function validateRequest(
   } = {}
 ): Promise<NextResponse | null> {
   const { maxBodySize = 1024 * 1024, allowedMethods, requireAuth = false } = options;
-  
+
   // Check HTTP method
   if (allowedMethods && !allowedMethods.includes(request.method)) {
     return NextResponse.json(
@@ -248,7 +248,7 @@ export async function validateRequest(
       { status: 405 }
     );
   }
-  
+
   // Check content length
   const contentLength = request.headers.get('content-length');
   if (contentLength && parseInt(contentLength) > maxBodySize) {
@@ -257,7 +257,7 @@ export async function validateRequest(
       { status: 413 }
     );
   }
-  
+
   // Check content type for POST/PUT/PATCH requests
   if (['POST', 'PUT', 'PATCH'].includes(request.method)) {
     const contentType = request.headers.get('content-type');
@@ -268,7 +268,7 @@ export async function validateRequest(
       );
     }
   }
-  
+
   // Basic auth check (you'll need to implement proper auth validation)
   if (requireAuth) {
     const authorization = request.headers.get('authorization');
@@ -279,7 +279,7 @@ export async function validateRequest(
       );
     }
   }
-  
+
   return null; // Allow request
 }
 
@@ -291,17 +291,17 @@ export function csrfProtection(request: NextRequest): NextResponse | null {
   if (['GET', 'HEAD', 'OPTIONS'].includes(request.method)) {
     return null;
   }
-  
+
   const origin = request.headers.get('origin');
   const referer = request.headers.get('referer');
   const host = request.headers.get('host');
-  
+
   const allowedOrigins = [
     process.env.NEXT_PUBLIC_APP_URL,
     `https://${host}`,
     `http://${host}`, // For development
   ].filter(Boolean);
-  
+
   // Check origin
   if (origin && !allowedOrigins.includes(origin)) {
     return NextResponse.json(
@@ -309,7 +309,7 @@ export function csrfProtection(request: NextRequest): NextResponse | null {
       { status: 403 }
     );
   }
-  
+
   // Check referer as fallback
   if (!origin && referer) {
     const refererUrl = new URL(referer);
@@ -320,7 +320,7 @@ export function csrfProtection(request: NextRequest): NextResponse | null {
       );
     }
   }
-  
+
   return null; // Allow request
 }
 
@@ -385,15 +385,6 @@ export class AuditLogger {
         errorStack: event.errorStack,
       });
 
-      // Also log to console in development
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[AUDIT]', {
-          action: event.action,
-          category,
-          severity: event.severity || 'info',
-          userId: event.userId,
-        });
-      }
     } catch (error) {
       // Don't let audit logging failures break the application
       console.error('Failed to write audit log:', error);

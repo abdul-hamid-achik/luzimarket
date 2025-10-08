@@ -1,11 +1,12 @@
 import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import { Metadata } from 'next';
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { db } from "@/db";
-import { products, vendors, categories } from "@/db/schema";
-import { eq, and, ne } from "drizzle-orm";
+import { products, vendors, categories, reviews } from "@/db/schema";
+import { eq, and, ne, sql } from "drizzle-orm";
 import { Button } from "@/components/ui/button";
 import { Heart, ShoppingBag, Package, Shield, Gift } from "lucide-react";
 import { ProductReviews } from "@/components/products/product-reviews";
@@ -18,6 +19,58 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ProductPageProps {
   params: Promise<{ locale: string; slug: string }>;
+}
+
+// Generate metadata for SEO
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+  const { slug, locale } = await params;
+  const productData = await getProduct(slug);
+
+  if (!productData) {
+    return {
+      title: 'Product Not Found',
+    };
+  }
+
+  const { product } = productData;
+  const images = product.images as string[] || [];
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://luzimarket.shop';
+
+  return {
+    title: `${product.name} | Luzimarket`,
+    description: product.description || `Compra ${product.name} en Luzimarket. ${product.vendor?.businessName}`,
+    keywords: [
+      product.name,
+      product.category?.name || '',
+      product.vendor?.businessName || '',
+      'regalos México',
+      'e-commerce',
+      'marketplace',
+      ...(product.tags as string[] || []),
+    ].filter(Boolean),
+    openGraph: {
+      title: product.name,
+      description: product.description || `Compra ${product.name} en Luzimarket`,
+      images: images.length > 0 ? [{ url: images[0], width: 1200, height: 630 }] : [],
+      type: 'website',
+      url: `${baseUrl}/${locale}/productos/${product.slug}`,
+      siteName: 'Luzimarket',
+      locale: locale === 'es' ? 'es_MX' : 'en_US',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: product.name,
+      description: product.description || '',
+      images: images.length > 0 ? [images[0]] : [],
+    },
+    alternates: {
+      canonical: `${baseUrl}/es/productos/${product.slug}`,
+      languages: {
+        'es': `${baseUrl}/es/productos/${product.slug}`,
+        'en': `${baseUrl}/en/products/${product.slug}`,
+      },
+    },
+  };
 }
 
 async function getProduct(slug: string) {
@@ -82,8 +135,60 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const { product, relatedProducts } = productData;
   const images = product.images as string[] || [];
 
+  // Get review stats for structured data
+  const reviewStats = await db
+    .select({
+      avgRating: sql<number>`COALESCE(AVG(${reviews.rating}), 0)`,
+      reviewCount: sql<number>`COUNT(*)`,
+    })
+    .from(reviews)
+    .where(eq(reviews.productId, product.id));
+
+  const avgRating = reviewStats[0]?.avgRating || 0;
+  const reviewCount = reviewStats[0]?.reviewCount || 0;
+
+  // JSON-LD structured data for Google
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name,
+    "description": product.description,
+    "image": images,
+    "brand": {
+      "@type": "Brand",
+      "name": product.vendor?.businessName || "Luzimarket"
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": `${process.env.NEXT_PUBLIC_APP_URL}/es/productos/${product.slug}`,
+      "priceCurrency": "MXN",
+      "price": product.price,
+      "availability": product.stock && product.stock > 0
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      "seller": {
+        "@type": "Organization",
+        "name": product.vendor?.businessName || "Luzimarket"
+      }
+    },
+    ...(reviewCount > 0 && {
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": avgRating.toFixed(1),
+        "reviewCount": reviewCount,
+        "bestRating": 5,
+        "worstRating": 1
+      }
+    })
+  };
+
   return (
     <main className="min-h-screen">
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="text-sm font-univers mb-8">

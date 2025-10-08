@@ -12,10 +12,10 @@ export interface AnalyticsEvent {
 }
 
 // Built-in event types
-export type BuiltInEvents = 
+export type BuiltInEvents =
   | "page_view"
   | "product_view"
-  | "product_search" 
+  | "product_search"
   | "add_to_cart"
   | "remove_from_cart"
   | "add_to_wishlist"
@@ -101,11 +101,6 @@ class Analytics {
 
     // Send to analytics service (implement based on your provider)
     this.sendEvent(event);
-
-    // Log in development
-    if (process.env.NODE_ENV === "development") {
-      console.log("📊 Analytics Event:", event);
-    }
   }
 
   private async sendEvent(event: AnalyticsEvent) {
@@ -207,7 +202,7 @@ class Analytics {
     });
   }
 
-  public trackPurchase(orderId: string, orderValue: number, items: Array<{id: string, name: string, quantity: number, price: number}>) {
+  public trackPurchase(orderId: string, orderValue: number, items: Array<{ id: string, name: string, quantity: number, price: number }>) {
     this.track("purchase_completed", {
       order_id: orderId,
       order_value: orderValue,
@@ -270,7 +265,7 @@ export const trackError = (error: Error, context?: Record<string, any>) => {
 export const measurePerformance = (name: string, fn: () => void | Promise<void>) => {
   const start = performance.now();
   const result = fn();
-  
+
   if (result instanceof Promise) {
     return result.finally(() => {
       const end = performance.now();

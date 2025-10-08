@@ -280,7 +280,7 @@ export async function POST(req: NextRequest) {
             userId: order.userId || undefined,
             userType: order.userId ? "user" : "guest",
             userEmail: order.guestEmail || undefined,
-            ip: paymentIntent.charges.data[0]?.billing_details?.address?.country || "unknown",
+            ip: "stripe-webhook",
             resourceType: "order",
             resourceId: order.id,
             details: {
@@ -323,7 +323,7 @@ export async function POST(req: NextRequest) {
             userId: order.userId || undefined,
             userType: order.userId ? "user" : "guest",
             userEmail: order.guestEmail || undefined,
-            ip: paymentIntent.charges.data[0]?.billing_details?.address?.country || "unknown",
+            ip: "stripe-webhook",
             resourceType: "order",
             resourceId: order.id,
             details: {
@@ -338,7 +338,6 @@ export async function POST(req: NextRequest) {
 
           // Send payment failed email
           await sendPaymentFailedEmail({ orderId: order.id });
-          console.log("Payment failed email sent for order:", order.id);
         }
         break;
       }

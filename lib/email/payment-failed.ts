@@ -15,7 +15,6 @@ export async function sendPaymentFailedEmail({ orderId, retryUrl }: SendPaymentF
   try {
     // Skip if email sending is disabled
     if (process.env.SEND_EMAILS === 'false') {
-      console.log('Email sending disabled, skipping payment failed email');
       return { success: true, skipped: true };
     }
 
@@ -77,7 +76,6 @@ export async function sendPaymentFailedEmail({ orderId, retryUrl }: SendPaymentF
       return { success: false, error: error.message };
     }
 
-    console.log('Payment failed email sent successfully:', data?.id);
     return { success: true, emailId: data?.id };
   } catch (error) {
     console.error('Error sending payment failed email:', error);

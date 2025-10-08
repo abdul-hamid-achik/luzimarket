@@ -73,6 +73,7 @@ export async function POST(request: NextRequest) {
                     currency: order.currency.toLowerCase(),
                     product_data: {
                         name: "Shipping",
+                        images: [],
                     },
                     unit_amount: Math.round(parseFloat(order.shipping) * 100),
                 },
@@ -87,6 +88,7 @@ export async function POST(request: NextRequest) {
                     currency: order.currency.toLowerCase(),
                     product_data: {
                         name: "Tax",
+                        images: [],
                     },
                     unit_amount: Math.round(parseFloat(order.tax) * 100),
                 },
