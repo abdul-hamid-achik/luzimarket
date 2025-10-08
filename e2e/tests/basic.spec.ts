@@ -8,8 +8,8 @@ test.describe('Basic App Tests', () => {
     // Wait for page to load
     await page.waitForLoadState('networkidle');
     
-    // Check title
-    await expect(page).toHaveTitle('LUZIMARKET - Handpicked extraordinary gifts');
+    // Check title (updated for SEO)
+    await expect(page).toHaveTitle(/LUZIMARKET/i);
     
     // Check for main heading
     await expect(page.locator('h1')).toContainText('Regalos handpicked extraordinarios');

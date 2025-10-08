@@ -110,9 +110,8 @@ test.describe('Authentication', () => {
     await page.waitForURL(/\/(?:en\/)?admin/, { timeout: 10000 });
   });
 
-  test.skip('should logout', async ({ page }) => {
-    // Skip this test as it requires a properly seeded and verified user
-    // The seed creates users but doesn't set emailVerified=true which is required for login
+  test('should logout', async ({ page }) => {
+    // Test now works with properly seeded verified users
 
     // First login
     await page.goto(routes.login);
@@ -164,7 +163,7 @@ test.describe('Authentication', () => {
   });
 });
 
-test.describe.skip('Registration', () => {
+test.describe('Registration', () => {
   test('should display registration form', async ({ page }) => {
     await page.goto(routes.register);
 

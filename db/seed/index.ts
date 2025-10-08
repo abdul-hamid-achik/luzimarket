@@ -1390,12 +1390,16 @@ async function main() {
     const userData: Array<typeof schema.users.$inferInsert> = [];
 
     // Add specific test users first (predictable logins)
+    const now = new Date();
+
     userData.push({
       email: "client@luzimarket.shop",
       name: "Test Customer",
       passwordHash: userPassword,
       stripeCustomerId: `cus_client_main`,
-      isActive: true
+      isActive: true,
+      emailVerified: true,
+      emailVerifiedAt: now,
     });
 
     userData.push({
@@ -1403,7 +1407,9 @@ async function main() {
       name: "Test Customer 2 (Alt)",
       passwordHash: userPassword,
       stripeCustomerId: `cus_client_alt`,
-      isActive: true
+      isActive: true,
+      emailVerified: true,
+      emailVerifiedAt: now,
     });
 
     // Keep legacy test users used by some E2E specs
@@ -1412,14 +1418,18 @@ async function main() {
       name: "Test Customer",
       passwordHash: userPassword,
       stripeCustomerId: `cus_test_customer1`,
-      isActive: true
+      isActive: true,
+      emailVerified: true,
+      emailVerifiedAt: now,
     });
     userData.push({
       email: "customer2@example.com",
       name: "Test Customer 2",
       passwordHash: userPassword,
       stripeCustomerId: `cus_test_customer2`,
-      isActive: true
+      isActive: true,
+      emailVerified: true,
+      emailVerifiedAt: now,
     });
 
     // Add random users
