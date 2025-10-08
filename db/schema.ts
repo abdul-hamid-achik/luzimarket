@@ -920,3 +920,6 @@ export type Coupon = typeof coupons.$inferSelect;
 export type NewCoupon = typeof coupons.$inferInsert;
 export type CouponUsage = typeof couponUsage.$inferSelect;
 export type NewCouponUsage = typeof couponUsage.$inferInsert;
+
+// Export audit logs from separate file
+export { auditLogs, type AuditLog, type NewAuditLog } from './schema/audit-logs';

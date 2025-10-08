@@ -1,9 +1,8 @@
 "use server";
 
 import { db } from "@/db";
-import { products, orderItems } from "@/db/schema";
-import { eq, sql, and, gte } from "drizzle-orm";
-import { checkStockWithReservations, cleanupExpiredReservations } from "./stock-reservation";
+import { products, orderItems, stockReservations } from "@/db/schema";
+import { eq, sql, and, gte, gt, isNull } from "drizzle-orm";
 
 export interface CartItem {
   id: string;
@@ -55,16 +54,12 @@ export async function checkProductStock(productId: string, requestedQuantity: nu
     }
 
     // Check stock with reservations
-    const stockCheck = await checkStockWithReservations(
-      productId,
-      requestedQuantity,
-      userId,
-      sessionId
-    );
-    
+    const availableStock = await getAvailableStock(productId);
+    const isAvailable = availableStock >= requestedQuantity;
+
     return {
-      isAvailable: stockCheck.isAvailable,
-      availableStock: stockCheck.availableStock,
+      isAvailable,
+      availableStock,
       productName: product.name,
     };
   } catch (error) {
@@ -133,7 +128,14 @@ export async function validateCartStock(items: CartItem[]): Promise<StockValidat
  * Reserves stock for items during checkout process
  * This prevents overselling during the payment process
  */
-export async function reserveStock(items: CartItem[], reservationId: string): Promise<boolean> {
+export async function reserveStock(
+  items: CartItem[],
+  reservationId: string,
+  userId?: string,
+  sessionId?: string,
+  reservationType: 'cart' | 'checkout' = 'checkout',
+  expirationMinutes: number = 15
+): Promise<boolean> {
   try {
     // First validate stock is available
     const validation = await validateCartStock(items);
@@ -141,15 +143,133 @@ export async function reserveStock(items: CartItem[], reservationId: string): Pr
       return false;
     }
 
-    // In a production system, you'd want to implement actual stock reservation
-    // For now, we'll just validate again at the time of payment
-    // TODO: Implement proper stock reservation table
-    console.log(`Stock reserved for reservation ${reservationId}:`, items);
-    
+    // Clean up expired reservations first
+    await cleanupExpiredReservations();
+
+    // Calculate expiration time
+    const expiresAt = new Date(Date.now() + expirationMinutes * 60 * 1000);
+
+    // Create stock reservations for each item
+    const reservations = items.map(item => ({
+      productId: item.id,
+      quantity: item.quantity,
+      userId,
+      sessionId: sessionId || reservationId,
+      reservationType,
+      expiresAt,
+    }));
+
+    // Insert reservations
+    await db.insert(stockReservations).values(reservations);
+
+    console.log(`Stock reserved for ${reservationType} ${reservationId}:`, items);
     return true;
   } catch (error) {
     console.error("Error reserving stock:", error);
     return false;
+  }
+}
+
+/**
+ * Releases stock reservations
+ */
+export async function releaseReservation(
+  sessionId: string,
+  userId?: string
+): Promise<boolean> {
+  try {
+    const conditions = [eq(stockReservations.sessionId, sessionId)];
+    if (userId) {
+      conditions.push(eq(stockReservations.userId, userId));
+    }
+
+    // Mark reservations as released
+    await db
+      .update(stockReservations)
+      .set({ releasedAt: new Date() })
+      .where(and(...conditions));
+
+    console.log(`Stock reservation released for session ${sessionId}`);
+    return true;
+  } catch (error) {
+    console.error("Error releasing reservation:", error);
+    return false;
+  }
+}
+
+/**
+ * Cleans up expired stock reservations
+ */
+export async function cleanupExpiredReservations(): Promise<number> {
+  try {
+    const now = new Date();
+
+    // Find and release expired reservations
+    const result = await db
+      .update(stockReservations)
+      .set({ releasedAt: now })
+      .where(
+        and(
+          isNull(stockReservations.releasedAt),
+          gt(stockReservations.expiresAt, now)
+        )
+      );
+
+    // Note: result doesn't have a standard count property in Drizzle
+    // We'll log the operation success
+    console.log('Expired reservations cleanup completed');
+    const count = 0;
+    if (count > 0) {
+      console.log(`Cleaned up ${count} expired stock reservations`);
+    }
+
+    return count;
+  } catch (error) {
+    console.error("Error cleaning up expired reservations:", error);
+    return 0;
+  }
+}
+
+/**
+ * Gets available stock considering reservations
+ */
+export async function getAvailableStock(productId: string): Promise<number> {
+  try {
+    // Clean up expired reservations first
+    await cleanupExpiredReservations();
+
+    // Get product stock
+    const [product] = await db
+      .select({ stock: products.stock })
+      .from(products)
+      .where(eq(products.id, productId))
+      .limit(1);
+
+    if (!product) {
+      return 0;
+    }
+
+    // Get active reservations
+    const activeReservations = await db
+      .select({
+        totalReserved: sql<number>`SUM(${stockReservations.quantity})`
+      })
+      .from(stockReservations)
+      .where(
+        and(
+          eq(stockReservations.productId, productId),
+          isNull(stockReservations.releasedAt),
+          gt(stockReservations.expiresAt, new Date())
+        )
+      );
+
+    const reserved = activeReservations[0]?.totalReserved || 0;
+    const available = Math.max(0, (product.stock || 0) - reserved);
+
+    return available;
+  } catch (error) {
+    console.error("Error getting available stock:", error);
+    return 0;
   }
 }
 

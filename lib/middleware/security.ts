@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
+import { db } from '@/db';
+import { auditLogs } from '@/db/schema';
+import { UAParser } from 'ua-parser-js';
 
 // Rate limiting storage (in production, use Redis or a proper cache)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
@@ -327,26 +330,72 @@ export function csrfProtection(request: NextRequest): NextResponse | null {
 export class AuditLogger {
   static async log(event: {
     action: string;
+    category?: string;
+    severity?: 'info' | 'warning' | 'error' | 'critical';
     userId?: string;
+    userType?: string;
+    userEmail?: string;
     ip: string;
     userAgent?: string;
-    resource?: string;
+    method?: string;
+    path?: string;
+    statusCode?: string;
+    resourceType?: string;
+    resourceId?: string;
     details?: Record<string, any>;
-    timestamp?: Date;
+    metadata?: Record<string, any>;
+    errorMessage?: string;
+    errorStack?: string;
   }): Promise<void> {
     try {
-      const logEntry = {
-        ...event,
-        timestamp: event.timestamp || new Date(),
-        environment: process.env.NODE_ENV,
-      };
-      
-      // In production, you'd send this to a logging service
-      console.log('[AUDIT]', JSON.stringify(logEntry));
-      
-      // TODO: Implement proper audit logging to database or external service
-      // await db.insert(auditLogs).values(logEntry);
+      // Parse user agent for metadata
+      let parsedMetadata = event.metadata || {};
+      if (event.userAgent) {
+        const parser = new UAParser(event.userAgent);
+        const result = parser.getResult();
+        parsedMetadata = {
+          ...parsedMetadata,
+          browser: result.browser.name,
+          os: result.os.name,
+          device: result.device.type || 'desktop',
+        };
+      }
+
+      // Determine category from action if not provided
+      const category = event.category || event.action.split('.')[0] || 'general';
+
+      // Insert into database
+      await db.insert(auditLogs).values({
+        action: event.action,
+        category,
+        severity: event.severity || 'info',
+        userId: event.userId,
+        userType: event.userType,
+        userEmail: event.userEmail,
+        ip: event.ip,
+        userAgent: event.userAgent,
+        method: event.method,
+        path: event.path,
+        statusCode: event.statusCode,
+        resourceType: event.resourceType,
+        resourceId: event.resourceId,
+        details: event.details || {},
+        metadata: parsedMetadata,
+        errorMessage: event.errorMessage,
+        errorStack: event.errorStack,
+      });
+
+      // Also log to console in development
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[AUDIT]', {
+          action: event.action,
+          category,
+          severity: event.severity || 'info',
+          userId: event.userId,
+        });
+      }
     } catch (error) {
+      // Don't let audit logging failures break the application
       console.error('Failed to write audit log:', error);
     }
   }

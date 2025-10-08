@@ -38,12 +38,17 @@ export async function PATCH(
     }
 
     // Check if user is the vendor for this order
-    // For now, we'll skip vendor ownership check since auth is not fully implemented
-    // In production, you would verify that session.user.id corresponds to the vendor
-    // TODO: Implement proper vendor authentication
-    if (session.user.role !== "vendor") {
+    if (session.user.role !== "vendor" || !session.user.vendor?.id) {
       return NextResponse.json(
         { error: "Unauthorized - vendor access required" },
+        { status: 403 }
+      );
+    }
+
+    // Verify vendor owns this order
+    if (order.vendor.id !== session.user.vendor.id) {
+      return NextResponse.json(
+        { error: "Forbidden - you can only update your own orders" },
         { status: 403 }
       );
     }
@@ -111,10 +116,17 @@ export async function GET(
     }
 
     // Check if user is the vendor for this order
-    // TODO: Implement proper vendor authentication
-    if (session.user.role !== "vendor") {
+    if (session.user.role !== "vendor" || !session.user.vendor?.id) {
       return NextResponse.json(
         { error: "Unauthorized - vendor access required" },
+        { status: 403 }
+      );
+    }
+
+    // Verify vendor owns this order
+    if (order.vendor.id !== session.user.vendor.id) {
+      return NextResponse.json(
+        { error: "Forbidden - you can only view your own orders" },
         { status: 403 }
       );
     }

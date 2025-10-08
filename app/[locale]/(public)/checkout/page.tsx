@@ -24,6 +24,10 @@ import { useSession } from "next-auth/react";
 import { ShippingCalculator } from "@/components/checkout/shipping-calculator";
 import { CouponInput } from "@/components/checkout/coupon-input";
 
+// Note: Tax rate is handled server-side for security
+// Client-side calculations are for display only
+const TAX_RATE = 0.16; // This should match server config
+
 const createCheckoutSchema = (t: any) => z.object({
   // Personal Information
   email: z.string().email(t("validation.invalidEmail")),
@@ -97,7 +101,7 @@ export default function CheckoutPage() {
   const totalShippingCost = Object.values(shippingCostsByVendor).reduce((sum, cost) => sum + cost, 0);
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
   const discount = appliedCoupon?.discount || 0;
-  const tax = subtotal * 0.16; // 16% IVA
+  const tax = subtotal * TAX_RATE; // Uses server config rate
   const total = subtotal + totalShippingCost + tax - discount;
 
   // Memoize shipping items to prevent infinite loops

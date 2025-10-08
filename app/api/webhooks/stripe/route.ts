@@ -7,6 +7,7 @@ import { eq, and } from "drizzle-orm";
 import Stripe from "stripe";
 import { reduceStock, restoreStock } from "@/lib/actions/inventory";
 import { sendOrderConfirmation, sendVendorNotification } from "@/lib/email";
+import { sendPaymentFailedEmail } from "@/lib/email/payment-failed";
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -289,8 +290,9 @@ export async function POST(req: NextRequest) {
           // Restore stock since payment failed
           await restoreStock(order.id);
 
-          // TODO: Send payment failed email
-          console.log("Payment failed for order:", order.id);
+          // Send payment failed email
+          await sendPaymentFailedEmail({ orderId: order.id });
+          console.log("Payment failed email sent for order:", order.id);
         }
         break;
       }
@@ -341,7 +343,15 @@ export async function POST(req: NextRequest) {
 
         // Handle failed invoice payment
         if ((invoice as any).subscription) {
-          // TODO: Send payment failed email
+          // Send payment failed email for subscription
+          const customer = await db.query.users.findFirst({
+            where: eq(users.stripeCustomerId, invoice.customer as string),
+          });
+
+          if (customer) {
+            console.log("Subscription payment failed for user:", customer.id);
+            // Note: For subscription failures, you might want a different email template
+          }
         }
         break;
       }

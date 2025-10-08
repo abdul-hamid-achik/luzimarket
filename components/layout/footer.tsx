@@ -3,18 +3,19 @@ import { Link } from "@/i18n/navigation";
 import { Newsletter } from "./newsletter";
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
+import { businessConfig } from '@/lib/config/business';
 
 export function Footer() {
   const t = useTranslations('Footer');
   const locale = useLocale();
   const currentYear = new Date().getFullYear();
   const socialLinks = [
-    { name: "Instagram", href: "#", icon: "/images/socials/Instagram.png" },
-    { name: "Facebook", href: "#", icon: "/images/socials/Facebook.png" },
-    { name: "TikTok", href: "#", icon: "/images/socials/TikTok.png" },
-    { name: "WhatsApp", href: "#", icon: "/images/socials/Whatsapp.png" },
-    { name: "X", href: "#", icon: "/images/socials/X.png" },
-    { name: "YouTube", href: "#", icon: "/images/socials/Youtube.png" },
+    { name: "Instagram", href: businessConfig.social.instagram, icon: "/images/socials/Instagram.png" },
+    { name: "Facebook", href: businessConfig.social.facebook, icon: "/images/socials/Facebook.png" },
+    { name: "TikTok", href: businessConfig.social.tiktok, icon: "/images/socials/TikTok.png" },
+    { name: "WhatsApp", href: "https://wa.me/521234567890", icon: "/images/socials/Whatsapp.png" }, // Update with actual WhatsApp number
+    { name: "X", href: businessConfig.social.twitter, icon: "/images/socials/X.png" },
+    { name: "YouTube", href: "https://youtube.com/@luzimarket", icon: "/images/socials/Youtube.png" }, // Update with actual YouTube channel
   ];
 
   return (

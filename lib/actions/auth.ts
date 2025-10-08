@@ -6,6 +6,8 @@ import { eq, and, gt } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { sendEmail } from "@/lib/email";
 import { getTranslations } from "next-intl/server";
+import { AuditLogger } from "@/lib/middleware/security";
+import { headers } from "next/headers";
 
 const LOCKOUT_THRESHOLD = 5; // Number of failed attempts before lockout
 const LOCKOUT_WINDOW_MINUTES = 15; // Time window for counting failed attempts

@@ -6,6 +6,7 @@ import { orders, orderItems, vendorStripeAccounts, platformFees } from "@/db/sch
 import { eq, inArray } from "drizzle-orm";
 import { generateOrderNumber } from "@/lib/utils/order-id";
 import { auth } from "@/lib/auth";
+import { businessConfig, calculateTax, calculateShipping } from "@/lib/config/business";
 
 export async function POST(request: NextRequest) {
   try {
@@ -58,13 +59,13 @@ export async function POST(request: NextRequest) {
 
     // Calculate totals
     const subtotal = items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
-    const tax = subtotal * 0.16; // 16% IVA
+    const tax = calculateTax(subtotal);
 
     // Calculate total shipping from all vendors
     const totalShippingFromVendors = shippingCostsByVendor ?
       Object.values(shippingCostsByVendor).reduce((sum: number, cost) => sum + (Number(cost) || 0), 0) : 0;
 
-    let shipping = totalShippingFromVendors || 99; // Use calculated shipping or fallback
+    let shipping = totalShippingFromVendors || businessConfig.shipping.defaultCost; // Use calculated shipping or fallback
     let shippingDescription = '📦 Envío estándar en México';
     let shippingDays = { min: 3, max: 5 };
 
@@ -168,14 +169,14 @@ export async function POST(request: NextRequest) {
     // Create orders for each vendor
     for (const [vendorId, vendorItems] of Object.entries(vendorGroups)) {
       const vendorSubtotal = (vendorItems as any[]).reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const vendorTax = vendorSubtotal * 0.16;
+      const vendorTax = calculateTax(vendorSubtotal);
       // Use calculated shipping cost for this vendor, fallback to default if not provided
-      const vendorShipping = shippingCostsByVendor?.[vendorId] ?? (vendorSubtotal > 1000 ? 0 : 99);
+      const vendorShipping = shippingCostsByVendor?.[vendorId] ?? calculateShipping(vendorSubtotal);
       const vendorTotal = vendorSubtotal + vendorTax + vendorShipping;
 
-      // Calculate platform fee (default 15% of subtotal)
+      // Calculate platform fee
       const stripeAccount = vendorStripeMap.get(vendorId);
-      const commissionRate = stripeAccount?.commissionRate ? parseFloat(stripeAccount.commissionRate) : 15;
+      const commissionRate = stripeAccount?.commissionRate ? parseFloat(stripeAccount.commissionRate) : (businessConfig.commission.rate * 100);
       const platformFeeAmount = vendorSubtotal * (commissionRate / 100);
 
       // Ensure decimal values are properly formatted

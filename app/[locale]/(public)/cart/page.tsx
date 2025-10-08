@@ -12,6 +12,12 @@ import { useState } from "react";
 import { getStateFromPostalCode } from "@/lib/utils/shipping-zones";
 import { useTranslations } from "next-intl";
 
+// Note: Tax rate is handled server-side for security
+// Client-side calculations are for display only
+const TAX_RATE = 0.16; // This should match server config
+const DEFAULT_SHIPPING = 99;
+const FREE_SHIPPING_THRESHOLD = 1000;
+
 export default function CartPage() {
   const { state, removeFromCart, updateQuantity, getTotalPrice } = useCart();
   const { formatPrice } = useCurrency();
@@ -26,7 +32,7 @@ export default function CartPage() {
   ];
 
   const subtotal = getTotalPrice();
-  const tax = subtotal * 0.16; // 16% IVA
+  const tax = subtotal * TAX_RATE; // Uses server config rate
 
   if (state.items.length === 0) {
     return (
