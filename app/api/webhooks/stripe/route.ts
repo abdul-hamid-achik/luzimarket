@@ -8,6 +8,7 @@ import Stripe from "stripe";
 import { reduceStock, restoreStock } from "@/lib/actions/inventory";
 import { sendOrderConfirmation, sendVendorNotification } from "@/lib/email";
 import { sendPaymentFailedEmail } from "@/lib/email/payment-failed";
+import { AuditLogger } from "@/lib/middleware/security";
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -265,7 +266,31 @@ export async function POST(req: NextRequest) {
 
       case "payment_intent.succeeded": {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        // Optional: persist minimal audit log if needed in the future
+
+        // Log successful payment
+        const order = await db.query.orders.findFirst({
+          where: eq(orders.paymentIntentId, paymentIntent.id),
+        });
+
+        if (order) {
+          await AuditLogger.log({
+            action: "payment.succeeded",
+            category: "payment",
+            severity: "info",
+            userId: order.userId || undefined,
+            userType: order.userId ? "user" : "guest",
+            userEmail: order.guestEmail || undefined,
+            ip: paymentIntent.charges.data[0]?.billing_details?.address?.country || "unknown",
+            resourceType: "order",
+            resourceId: order.id,
+            details: {
+              orderNumber: order.orderNumber,
+              amount: paymentIntent.amount / 100,
+              currency: paymentIntent.currency,
+              paymentMethod: paymentIntent.payment_method,
+            },
+          });
+        }
         break;
       }
 
@@ -289,6 +314,27 @@ export async function POST(req: NextRequest) {
 
           // Restore stock since payment failed
           await restoreStock(order.id);
+
+          // Log payment failure
+          await AuditLogger.log({
+            action: "payment.failed",
+            category: "payment",
+            severity: "warning",
+            userId: order.userId || undefined,
+            userType: order.userId ? "user" : "guest",
+            userEmail: order.guestEmail || undefined,
+            ip: paymentIntent.charges.data[0]?.billing_details?.address?.country || "unknown",
+            resourceType: "order",
+            resourceId: order.id,
+            details: {
+              orderNumber: order.orderNumber,
+              amount: paymentIntent.amount / 100,
+              currency: paymentIntent.currency,
+              failureCode: paymentIntent.last_payment_error?.code,
+              failureMessage: paymentIntent.last_payment_error?.message,
+            },
+            errorMessage: paymentIntent.last_payment_error?.message,
+          });
 
           // Send payment failed email
           await sendPaymentFailedEmail({ orderId: order.id });

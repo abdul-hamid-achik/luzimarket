@@ -23,10 +23,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useSession } from "next-auth/react";
 import { ShippingCalculator } from "@/components/checkout/shipping-calculator";
 import { CouponInput } from "@/components/checkout/coupon-input";
+import { businessConfig } from "@/lib/config/business";
 
 // Note: Tax rate is handled server-side for security
 // Client-side calculations are for display only
-const TAX_RATE = 0.16; // This should match server config
+const TAX_RATE = businessConfig.tax.rate;
 
 const createCheckoutSchema = (t: any) => z.object({
   // Personal Information

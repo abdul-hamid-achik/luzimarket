@@ -59,10 +59,14 @@ export async function getFilteredProducts(filters: ProductFilters = {}) {
     // Build where conditions
     const conditions = [];
 
-    // Only show active products (temporarily allow non-approved images for development)
+    // Only show active products with approved images
     conditions.push(eq(products.isActive, true));
-    // TODO: Re-enable after fixing image approval workflow
-    // conditions.push(eq(products.imagesApproved, true));
+
+    // Re-enabled: Only show products with approved images in production
+    // In development/testing, you can set imagesApproved=true via db:studio
+    if (process.env.NODE_ENV === 'production' || process.env.ENABLE_IMAGE_APPROVAL === 'true') {
+      conditions.push(eq(products.imagesApproved, true));
+    }
 
     if (productIds.length > 0) {
       conditions.push(inArray(products.id, productIds));
@@ -137,7 +141,7 @@ export async function getFilteredProducts(filters: ProductFilters = {}) {
 
     // For rating filter, we need to modify the query to include rating calculations
     let baseQuery, countQuery;
-    
+
     if (minRating) {
       // Query with rating calculation when rating filter is applied
       baseQuery = db
@@ -157,7 +161,7 @@ export async function getFilteredProducts(filters: ProductFilters = {}) {
         .orderBy(orderBy)
         .limit(limit)
         .offset(offset);
-        
+
       countQuery = db
         .select({ count: sql<number>`count(*)` })
         .from(
@@ -185,7 +189,7 @@ export async function getFilteredProducts(filters: ProductFilters = {}) {
         .orderBy(orderBy)
         .limit(limit)
         .offset(offset);
-        
+
       countQuery = db
         .select({ count: sql<number>`count(*)` })
         .from(products)
@@ -287,7 +291,7 @@ export async function getProductFilterOptions(baseFilters: ProductFilters = {}) 
         .where(eq(categories.isActive, true))
         .groupBy(categories.id)
         .orderBy(categories.displayOrder),
-      
+
       // Get all vendors with product counts
       db
         .select({
@@ -307,7 +311,7 @@ export async function getProductFilterOptions(baseFilters: ProductFilters = {}) 
         .groupBy(vendors.id)
         .orderBy(vendors.businessName)
         .limit(100), // Limit vendors to prevent excessive results
-      
+
       // Get price range
       db
         .select({

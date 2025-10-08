@@ -11,12 +11,13 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { getStateFromPostalCode } from "@/lib/utils/shipping-zones";
 import { useTranslations } from "next-intl";
+import { businessConfig } from "@/lib/config/business";
 
 // Note: Tax rate is handled server-side for security
 // Client-side calculations are for display only
-const TAX_RATE = 0.16; // This should match server config
-const DEFAULT_SHIPPING = 99;
-const FREE_SHIPPING_THRESHOLD = 1000;
+const TAX_RATE = businessConfig.tax.rate;
+const DEFAULT_SHIPPING = businessConfig.shipping.defaultCost;
+const FREE_SHIPPING_THRESHOLD = businessConfig.shipping.freeThreshold;
 
 export default function CartPage() {
   const { state, removeFromCart, updateQuantity, getTotalPrice } = useCart();
@@ -51,20 +52,20 @@ export default function CartPage() {
       </div>
     );
   }
-  
+
   // Basic shipping estimate based on subtotal
   const getShippingEstimate = () => {
     if (subtotal > 1000) return 0;
     if (!postalCode || postalCode.length !== 5) return 99;
-    
+
     const state = getStateFromPostalCode(postalCode);
     if (!state) return 99;
-    
+
     // Basic estimate based on zone
     const zone = state === 'Ciudad de México' || state === 'Estado de México' ? 'central' : 'other';
     return zone === 'central' ? 99 : 149;
   };
-  
+
   const shipping = estimatedShipping !== null ? estimatedShipping : getShippingEstimate();
   const total = subtotal + tax + shipping;
 
@@ -154,7 +155,7 @@ export default function CartPage() {
           <div>
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-lg font-univers mb-4">{t("orderSummary")}</h2>
-              
+
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm font-univers">
                   <span>{t("subtotal")}</span>

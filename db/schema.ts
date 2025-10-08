@@ -921,5 +921,23 @@ export type NewCoupon = typeof coupons.$inferInsert;
 export type CouponUsage = typeof couponUsage.$inferSelect;
 export type NewCouponUsage = typeof couponUsage.$inferInsert;
 
+// Platform Settings table for admin configuration
+export const platformSettings = pgTable("platform_settings", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  key: text("key").notNull().unique(),
+  value: json("value").notNull(),
+  category: text("category").notNull(), // 'general', 'payment', 'email', 'shipping', 'localization'
+  description: text("description"),
+  updatedBy: uuid("updated_by").references(() => adminUsers.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  keyIdx: index("platform_settings_key_idx").on(table.key),
+  categoryIdx: index("platform_settings_category_idx").on(table.category),
+}));
+
+export type PlatformSetting = typeof platformSettings.$inferSelect;
+export type NewPlatformSetting = typeof platformSettings.$inferInsert;
+
 // Export audit logs from separate file
 export { auditLogs, type AuditLog, type NewAuditLog } from './schema/audit-logs';

@@ -883,6 +883,11 @@ async function main() {
     const emailTemplates = await db.select().from(schema.emailTemplates);
     console.log(`✅ Ensured ${emailTemplates.length} email templates`);
 
+    // 3.5 Seed Platform Settings
+    console.log("⚙️  Creating platform settings...");
+    const { seedPlatformSettings } = await import("./tables/08-platform-settings");
+    await seedPlatformSettings();
+
     // 4. Seed Vendors
     console.log("🏪 Creating vendors...");
     const vendorData = [];

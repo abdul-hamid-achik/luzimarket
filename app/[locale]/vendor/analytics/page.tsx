@@ -17,6 +17,7 @@ import {
   ArrowUpRight,
   ArrowDownRight
 } from "lucide-react";
+import { VendorAnalyticsCharts } from "@/components/vendor/vendor-analytics-charts";
 
 async function getVendorAnalytics(vendorId: string) {
   const now = new Date();
@@ -217,10 +218,7 @@ export default async function VendorAnalyticsPage() {
               <CardDescription>{t("last30Days")}</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-64 flex items-center justify-center text-gray-400">
-                <Calendar className="h-8 w-8 mr-2" />
-                <span>{t("chartComingSoon")}</span>
-              </div>
+              <VendorAnalyticsCharts vendorId={session.user.id} />
             </CardContent>
           </Card>
         </TabsContent>

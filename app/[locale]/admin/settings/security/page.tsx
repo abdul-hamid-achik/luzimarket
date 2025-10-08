@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Shield, Key, Monitor, Bell } from "lucide-react";
 import { ChangePasswordForm } from "@/components/forms/change-password-form";
 import { SessionManager } from "@/components/settings/session-manager";
+import { TwoFactorSettings } from "@/components/settings/two-factor-settings";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -12,7 +13,7 @@ import { Label } from "@/components/ui/label";
 export default async function AdminSecurityPage() {
   const session = await auth();
   const t = await getTranslations("Admin.security");
-  
+
   if (!session || session.user.role !== "admin") {
     redirect("/login");
   }
@@ -50,25 +51,7 @@ export default async function AdminSecurityPage() {
           <CardDescription>{t("twoFactor.description")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">{t("twoFactor.authenticatorApp")}</p>
-                <p className="text-xs text-gray-600">{t("twoFactor.authenticatorDescription")}</p>
-              </div>
-              <Switch />
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">{t("twoFactor.smsBackup")}</p>
-                <p className="text-xs text-gray-600">{t("twoFactor.smsDescription")}</p>
-              </div>
-              <Switch />
-            </div>
-            <Button variant="outline" className="w-full">
-              {t("twoFactor.viewBackupCodes")}
-            </Button>
-          </div>
+          <TwoFactorSettings />
         </CardContent>
       </Card>
 

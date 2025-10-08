@@ -44,18 +44,18 @@ const reporters: ReporterDescription[] = [
 export default defineConfig({
   testDir: './e2e',
   /* Run tests in files in parallel */
-  fullyParallel: true,
+  fullyParallel: false, // Changed to false for sequential execution
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: isCi ? 2 : 0,
-  
+
   /* Pass threshold: CI will pass if ${passThreshold}% of tests pass
    * Use e2e/scripts/check-pass-threshold.js to validate results
    * Set PLAYWRIGHT_PASS_THRESHOLD env var to override (default: 95)
    */
-  /* Control workers in CI via PW_WORKERS (default 2). */
-  workers: workersCount,
+  /* Control workers in CI via PW_WORKERS (default 2). Set to 1 for sequential execution. */
+  workers: 1,
   /* Reporter to use. Avoid HTML by default so tests don't open a report server */
   reporter: reporters,
   /* Run global setup to prepare DB/test data */

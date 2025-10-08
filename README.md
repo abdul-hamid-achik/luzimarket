@@ -279,6 +279,474 @@ For local development with Docker:
    npm run db:setup
    ```
 
+## 🛠️ Complete Setup Guide for New Developers
+
+This comprehensive guide will help you set up the project from scratch in under 30 minutes.
+
+### Prerequisites
+
+Before starting, ensure you have:
+
+- **Node.js**: v22+ (check with `node -v`)
+- **npm**: v10+ (check with `npm -v`)
+- **Git**: Latest version
+- **Code Editor**: VS Code recommended
+- **Terminal**: bash, zsh, or equivalent
+
+### Step-by-Step Setup
+
+#### Step 1: Clone and Install Dependencies
+
+```bash
+# Clone the repository
+git clone <your-repo-url>
+cd luzimarket
+
+# Install all dependencies (this may take 2-3 minutes)
+npm install
+```
+
+#### Step 2: Set Up Database
+
+You have two options: **Neon Cloud** (recommended for quick start) or **Local PostgreSQL**.
+
+**Option A: Neon Cloud (Recommended - 5 minutes)**
+
+1. Create account at [neon.tech](https://neon.tech)
+2. Create new project (choose a region close to you)
+3. Copy the connection string from dashboard
+4. It will look like: `postgresql://user:pass@ep-xxx.region.neon.tech/dbname?sslmode=require`
+
+**Option B: Local PostgreSQL (Advanced)**
+
+```bash
+# Install PostgreSQL (macOS with Homebrew)
+brew install postgresql@16
+brew services start postgresql@16
+
+# Create database
+createdb luzimarket
+
+# Your DATABASE_URL will be:
+# postgresql://yourusername@localhost:5432/luzimarket
+```
+
+#### Step 3: Configure Environment Variables
+
+```bash
+# Copy the example file
+cp .env.example .env.local
+
+# Generate authentication secret
+openssl rand -base64 32
+# Copy the output for NEXTAUTH_SECRET
+```
+
+Now edit `.env.local` with your values:
+
+```env
+# Required - Database
+DATABASE_URL="postgresql://..." # From Step 2
+
+# Required - Authentication (use output from openssl command)
+NEXTAUTH_SECRET="paste-generated-secret-here"
+NEXTAUTH_URL="http://localhost:3000"
+AUTH_SECRET="same-as-nextauth-secret"
+
+# Required - Stripe (get from https://dashboard.stripe.com/test/apikeys)
+STRIPE_SECRET_KEY="sk_test_..." 
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_..."
+STRIPE_WEBHOOK_SECRET="whsec_..." # See Step 5
+
+# Required - Email (get from https://resend.com/api-keys)
+RESEND_API_KEY="re_..."
+EMAIL_FROM="noreply@yourdomain.com" # Must be verified in Resend
+SEND_EMAILS="true"
+
+# Required - File Storage (get from Vercel dashboard or use local)
+BLOB_READ_WRITE_TOKEN="vercel_blob_rw_..." # Or leave empty for local development
+
+# Required - App URL
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+NODE_ENV="development"
+```
+
+**Getting API Keys:**
+
+1. **Stripe Keys** (2 minutes):
+   - Go to https://dashboard.stripe.com/test/apikeys
+   - Copy "Secret key" and "Publishable key"
+   - Use test mode keys (they start with `sk_test_` and `pk_test_`)
+
+2. **Resend API Key** (2 minutes):
+   - Go to https://resend.com
+   - Sign up / log in
+   - Create API key
+   - Verify a domain or use the test domain
+
+3. **Vercel Blob** (optional for local dev):
+   - Go to https://vercel.com/dashboard
+   - Create project → Storage → Create Blob store
+   - Copy the token
+
+#### Step 4: Initialize Database
+
+```bash
+# Push database schema to your database
+npm run db:push
+
+# This will create all tables: users, vendors, products, orders, etc.
+# Should complete in 10-20 seconds
+```
+
+Verify it worked:
+```bash
+# Open visual database editor
+npm run db:studio
+
+# This opens http://localhost:4983 in your browser
+# You should see all the tables listed on the left
+```
+
+#### Step 5: Seed Sample Data
+
+```bash
+# Add sample data for testing
+npm run db:seed
+
+# This creates:
+# - Sample admin account
+# - Sample vendor accounts
+# - Sample products (10-20 items)
+# - Sample categories
+# - Sample orders
+# Takes about 30-60 seconds
+```
+
+After seeding, you can log in with:
+- **Admin**: Check console output for credentials
+- **Vendor**: Check console output for credentials
+- **Customer**: Register a new account or check seed output
+
+#### Step 6: Configure Stripe Webhooks (Local Development)
+
+For local testing, you need Stripe CLI to forward webhooks:
+
+```bash
+# Install Stripe CLI
+# macOS
+brew install stripe/stripe-cli/stripe
+
+# Windows (with Scoop)
+scoop bucket add stripe https://github.com/stripe/scoop-stripe-cli.git
+scoop install stripe
+
+# Linux
+# Download from: https://github.com/stripe/stripe-cli/releases/latest
+
+# Login to Stripe
+stripe login
+
+# This opens browser to authenticate
+# Follow the prompts
+```
+
+Get your webhook secret:
+```bash
+# Start webhook listener (keep this running)
+stripe listen --forward-to localhost:3000/api/webhooks/stripe
+
+# Copy the webhook signing secret (starts with whsec_)
+# Add it to .env.local as STRIPE_WEBHOOK_SECRET
+```
+
+#### Step 7: Start Development Server
+
+```bash
+# Start the development server
+npm run dev
+
+# This starts:
+# - Next.js dev server on http://localhost:3000
+# - Stripe webhook listener (if configured in package.json)
+
+# You should see:
+# ✓ Ready in X seconds
+# ○ Compiling / ...
+# ✓ Compiled successfully
+```
+
+#### Step 8: Verify Everything Works
+
+Open your browser and test:
+
+1. **Homepage**: http://localhost:3000
+   - Should show product catalog
+   
+2. **Admin Dashboard**: http://localhost:3000/admin
+   - Log in with admin credentials from seed
+   
+3. **Vendor Dashboard**: http://localhost:3000/vendor
+   - Log in with vendor credentials from seed
+
+4. **Database Studio**: http://localhost:4983
+   - Verify data exists
+
+5. **Test a Purchase** (optional):
+   - Add product to cart
+   - Go to checkout
+   - Use Stripe test card: `4242 4242 4242 4242`
+   - Any future date for expiry
+   - Any 3-digit CVC
+
+### Common Setup Issues and Solutions
+
+#### "Database connection failed"
+
+```bash
+# Check your DATABASE_URL format
+# Neon: postgresql://user:pass@ep-xxx.region.neon.tech/dbname?sslmode=require
+# Local: postgresql://username@localhost:5432/luzimarket
+
+# Test connection
+npm run db:studio
+# If this fails, your DATABASE_URL is wrong
+```
+
+#### "Stripe webhooks not receiving events"
+
+```bash
+# Make sure Stripe CLI is running
+stripe listen --forward-to localhost:3000/api/webhooks/stripe
+
+# In another terminal, test it:
+stripe trigger payment_intent.succeeded
+
+# Check dev server console for webhook received
+```
+
+#### "Email not sending"
+
+```bash
+# Check these in .env.local:
+# 1. RESEND_API_KEY starts with "re_"
+# 2. EMAIL_FROM is verified in Resend dashboard
+# 3. SEND_EMAILS="true"
+
+# Test email manually:
+# Create a test account and trigger password reset
+```
+
+#### "Module not found" or "Cannot find module"
+
+```bash
+# Clear cache and reinstall
+rm -rf node_modules package-lock.json .next
+npm install
+
+# If still failing, check Node version
+node -v  # Should be 22.x or higher
+```
+
+#### "Port 3000 already in use"
+
+```bash
+# Find and kill the process
+lsof -ti:3000 | xargs kill -9
+
+# Or use a different port
+PORT=3001 npm run dev
+```
+
+### Development Workflow
+
+Once set up, your daily workflow:
+
+```bash
+# 1. Start development (in project root)
+npm run dev
+
+# 2. In another terminal, if using Stripe
+stripe listen --forward-to localhost:3000/api/webhooks/stripe
+
+# 3. Make your changes
+# - Edit files in /app, /components, /lib
+# - Hot reload is automatic
+
+# 4. View database
+npm run db:studio  # If you need to check data
+
+# 5. Run tests (optional)
+npm run test
+
+# 6. Check for errors
+npm run lint
+
+# 7. Before committing
+npm run build  # Make sure it builds
+```
+
+### Project Structure Overview
+
+```
+luzimarket/
+├── app/                        # Next.js 15 App Router
+│   ├── [locale]/              # Internationalized routes (Spanish/English)
+│   │   ├── (public)/         # Public pages (homepage, products, checkout)
+│   │   ├── admin/            # Admin dashboard (protected)
+│   │   └── vendor/           # Vendor dashboard (protected)
+│   └── api/                  # API routes
+│       ├── auth/             # Authentication (login, register, 2FA)
+│       ├── checkout/         # Payment processing
+│       └── webhooks/         # Stripe webhooks
+├── components/                # React components
+│   ├── ui/                   # Base UI components (shadcn/ui)
+│   ├── admin/                # Admin-specific components
+│   ├── vendor/               # Vendor-specific components
+│   └── ...                   # Feature components
+├── lib/                      # Business logic & utilities
+│   ├── actions/              # Server actions (data mutations)
+│   ├── config/               # Configuration
+│   └── utils/                # Helper functions
+├── db/                       # Database
+│   ├── schema.ts             # Drizzle ORM schema
+│   ├── migrations/           # Database migrations
+│   └── seed/                 # Seed data scripts
+├── emails/                   # React Email templates
+├── messages/                 # i18n translations (en.json, es.json)
+└── public/                   # Static files (images, fonts)
+```
+
+### Quick Commands Reference
+
+```bash
+# Development
+npm run dev              # Start dev server (http://localhost:3000)
+npm run build            # Build for production
+npm run start            # Start production server
+npm run lint             # Check for code issues
+
+# Database
+npm run db:studio        # Visual database editor (http://localhost:4983)
+npm run db:push          # Push schema changes to database
+npm run db:generate      # Generate migration files
+npm run db:migrate       # Run migrations
+npm run db:seed          # Populate with sample data
+npm run db:reset         # Reset and reseed database
+
+# Testing
+npm run test             # Run E2E tests
+npm run test:ui          # Run tests with UI
+npm run test:debug       # Debug failing tests
+
+# Docker (optional)
+npm run compose:up       # Start Docker services
+docker-compose down      # Stop Docker services
+```
+
+### Adding New Features
+
+**1. Add a Database Table**
+
+```typescript
+// db/schema.ts
+export const myNewTable = pgTable("my_new_table", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+```
+
+```bash
+# Generate and apply migration
+npm run db:generate
+npm run db:push
+```
+
+**2. Create a Server Action**
+
+```typescript
+// lib/actions/my-feature.ts
+"use server";
+
+import { db } from "@/db";
+import { myNewTable } from "@/db/schema";
+
+export async function createItem(name: string) {
+  try {
+    const [item] = await db
+      .insert(myNewTable)
+      .values({ name })
+      .returning();
+    
+    return { success: true, data: item };
+  } catch (error) {
+    return { success: false, error: "Failed to create item" };
+  }
+}
+```
+
+**3. Create a Page**
+
+```typescript
+// app/[locale]/(public)/my-page/page.tsx
+import { getTranslations } from "next-intl/server";
+
+export default async function MyPage() {
+  const t = await getTranslations("MyPage");
+  
+  return (
+    <div>
+      <h1>{t("title")}</h1>
+      {/* Your content */}
+    </div>
+  );
+}
+```
+
+**4. Add Translations**
+
+```json
+// messages/en.json
+{
+  "MyPage": {
+    "title": "My Page",
+    "description": "This is my new page"
+  }
+}
+
+// messages/es.json
+{
+  "MyPage": {
+    "title": "Mi Página",
+    "description": "Esta es mi nueva página"
+  }
+}
+```
+
+### Getting Help
+
+- **Check README**: Most questions answered here
+- **Check PLAN.md**: Known issues and completion status
+- **Check docs/**: API documentation and guides
+- **Database Issues**: Use `npm run db:studio` to inspect
+- **Stripe Issues**: Check Stripe dashboard logs
+- **Email Issues**: Check Resend dashboard logs
+
+### Next Steps
+
+Now that you're set up:
+
+1. ✅ Explore the admin dashboard at `/admin`
+2. ✅ Browse the vendor dashboard at `/vendor`
+3. ✅ Test the checkout flow with Stripe test cards
+4. ✅ Review the database schema in `db/schema.ts`
+5. ✅ Check the project structure above
+6. ✅ Read `PLAN.md` for incomplete features
+7. ✅ Start building! 🚀
+
+---
+
 ## Getting Started (Local Development)
 
 ### Prerequisites

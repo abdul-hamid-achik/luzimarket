@@ -118,6 +118,23 @@ export async function authenticateUser(
       })
       .where(eq(table.email, email));
 
+    // Log successful login
+    const headersList = await headers();
+    await AuditLogger.log({
+      action: "login.success",
+      category: "auth",
+      severity: "info",
+      userId: user.id,
+      userType: userType,
+      userEmail: user.email,
+      ip: headersList.get("x-forwarded-for") || headersList.get("x-real-ip") || "unknown",
+      userAgent: headersList.get("user-agent") || undefined,
+      details: {
+        loginMethod: "password",
+        userType: userType,
+      },
+    });
+
     return {
       success: true,
       user: {
@@ -186,6 +203,24 @@ async function handleFailedLoginAttempt(
     .update(table)
     .set(updateData)
     .where(eq(table.email, email));
+
+  // Log failed login attempt
+  const headersList = await headers();
+  await AuditLogger.log({
+    action: failedAttempts >= LOCKOUT_THRESHOLD ? "login.locked" : "login.failed",
+    category: "security",
+    severity: failedAttempts >= LOCKOUT_THRESHOLD ? "warning" : "info",
+    userId: user.id,
+    userType: userType,
+    userEmail: user.email,
+    ip: headersList.get("x-forwarded-for") || headersList.get("x-real-ip") || "unknown",
+    userAgent: headersList.get("user-agent") || undefined,
+    details: {
+      failedAttempts: failedAttempts,
+      accountLocked: failedAttempts >= LOCKOUT_THRESHOLD,
+      userType: userType,
+    },
+  });
 }
 
 async function sendAccountLockoutNotification(email: string, name: string, locale: string = "es") {
