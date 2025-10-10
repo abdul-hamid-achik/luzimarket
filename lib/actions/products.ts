@@ -501,3 +501,104 @@ export async function createVendorProduct(data: {
 
   return product;
 }
+
+// Bulk operations for vendors
+export async function bulkUpdateVendorProductPrices(
+  productIds: string[],
+  vendorId: string,
+  priceUpdate: { type: 'percentage' | 'fixed'; value: number }
+) {
+  try {
+    // Verify all products belong to vendor
+    const vendorProducts = await db
+      .select({ id: products.id, price: products.price })
+      .from(products)
+      .where(and(
+        inArray(products.id, productIds),
+        eq(products.vendorId, vendorId)
+      ));
+
+    if (vendorProducts.length !== productIds.length) {
+      return { success: false, error: 'Some products do not belong to this vendor' };
+    }
+
+    // Update prices
+    for (const product of vendorProducts) {
+      const currentPrice = Number(product.price);
+      let newPrice: number;
+
+      if (priceUpdate.type === 'percentage') {
+        newPrice = currentPrice * (1 + priceUpdate.value / 100);
+      } else {
+        newPrice = currentPrice + priceUpdate.value;
+      }
+
+      // Ensure price doesn't go below 0
+      newPrice = Math.max(0, newPrice);
+
+      await db
+        .update(products)
+        .set({ price: String(newPrice.toFixed(2)) })
+        .where(eq(products.id, product.id));
+    }
+
+    return { success: true, message: `${vendorProducts.length} productos actualizados` };
+  } catch (error) {
+    console.error("Error bulk updating prices:", error);
+    return { success: false, error: 'Error al actualizar precios' };
+  }
+}
+
+export async function bulkDeleteVendorProducts(productIds: string[], vendorId: string) {
+  try {
+    // Verify all products belong to vendor
+    const result = await db
+      .delete(products)
+      .where(and(
+        inArray(products.id, productIds),
+        eq(products.vendorId, vendorId)
+      ))
+      .returning({ id: products.id });
+
+    if (result.length !== productIds.length) {
+      return { success: false, error: 'Some products could not be deleted' };
+    }
+
+    return { success: true, message: `${result.length} productos eliminados` };
+  } catch (error) {
+    console.error("Error bulk deleting products:", error);
+    return { success: false, error: 'Error al eliminar productos' };
+  }
+}
+
+export async function toggleVendorProductStatus(productId: string, vendorId: string) {
+  const { auth } = await import("@/lib/auth");
+  const session = await auth();
+
+  if (!session || session.user.role !== "vendor" || !session.user.vendor?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  // Verify the product belongs to the vendor
+  const existingProduct = await db.query.products.findFirst({
+    where: and(
+      eq(products.id, productId),
+      eq(products.vendorId, vendorId)
+    ),
+  });
+
+  if (!existingProduct) {
+    throw new Error("Product not found or unauthorized");
+  }
+
+  // Toggle the isActive status
+  const [updatedProduct] = await db
+    .update(products)
+    .set({
+      isActive: !existingProduct.isActive,
+    })
+    .where(eq(products.id, productId))
+    .returning();
+
+  return updatedProduct;
+}

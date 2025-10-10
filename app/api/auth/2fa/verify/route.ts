@@ -5,6 +5,7 @@ import { db } from '@/db';
 import { users, vendors, adminUsers } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import speakeasy from 'speakeasy';
+import { logAuthEvent } from '@/lib/audit-helpers';
 
 /**
  * POST /api/auth/2fa/verify
@@ -24,7 +25,7 @@ import speakeasy from 'speakeasy';
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
-    
+
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { token } = await request.json();
-    
+
     if (!token || typeof token !== 'string') {
       return NextResponse.json(
         { error: 'TOTP token is required' },
@@ -43,10 +44,10 @@ export async function POST(request: NextRequest) {
 
     const userId = session.user.id;
     const userRole = session.user.role as 'customer' | 'vendor' | 'admin';
-    
+
     // Get user's current 2FA secret
     let userData;
-    
+
     switch (userRole) {
       case 'customer':
         const [customerData] = await db
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
           .limit(1);
         userData = customerData;
         break;
-        
+
       case 'vendor':
         const [vendorData] = await db
           .select({
@@ -71,7 +72,7 @@ export async function POST(request: NextRequest) {
           .limit(1);
         userData = vendorData;
         break;
-        
+
       case 'admin':
         const [adminData] = await db
           .select({
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
           .limit(1);
         userData = adminData;
         break;
-        
+
       default:
         return NextResponse.json(
           { error: 'Invalid user role' },
@@ -115,7 +116,7 @@ export async function POST(request: NextRequest) {
 
     // Enable 2FA for the user
     let updateResult;
-    
+
     switch (userRole) {
       case 'customer':
         updateResult = await db
@@ -127,7 +128,7 @@ export async function POST(request: NextRequest) {
           .where(eq(users.id, userId))
           .returning({ id: users.id });
         break;
-        
+
       case 'vendor':
         updateResult = await db
           .update(vendors)
@@ -138,7 +139,7 @@ export async function POST(request: NextRequest) {
           .where(eq(vendors.id, userId))
           .returning({ id: vendors.id });
         break;
-        
+
       case 'admin':
         updateResult = await db
           .update(adminUsers)
@@ -157,6 +158,18 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Log 2FA verification success
+    await logAuthEvent({
+      action: '2fa_verified',
+      userId,
+      userEmail: session.user.email!,
+      userType: userRole,
+      details: {
+        verifiedAt: new Date().toISOString(),
+        twoFactorEnabled: true,
+      },
+    });
 
     return NextResponse.json({
       success: true,

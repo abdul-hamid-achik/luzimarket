@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   ArrowLeft,
   Package,
@@ -14,7 +15,8 @@ import {
   Mail,
   Phone,
   Copy,
-  ExternalLink
+  ExternalLink,
+  AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +29,7 @@ import { useOrder, useGuestOrder } from "@/lib/hooks/use-orders";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { MultiVendorSummary } from "@/components/orders/multi-vendor-summary";
 
 interface OrderDetailClientProps {
   orderNumber: string;
@@ -96,6 +99,9 @@ export function OrderDetailClient({ orderNumber, locale }: OrderDetailClientProp
   const { data: session } = useSession();
   const params = useSearchParams();
   const guestEmail = params.get('email');
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [cancelError, setCancelError] = useState<string | null>(null);
 
   const isAuthenticated = !!session?.user;
   const userOrderQuery = useOrder(orderNumber);
@@ -185,6 +191,36 @@ export function OrderDetailClient({ orderNumber, locale }: OrderDetailClientProp
     name: order.guestName,
     email: order.guestEmail,
     phone: order.guestPhone
+  };
+
+  const handleCancelOrder = async () => {
+    setIsCancelling(true);
+    setCancelError(null);
+
+    try {
+      const response = await fetch(`/api/orders/${orderNumber}/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: customerInfo.email,
+          reason: 'Solicitado por el cliente'
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Refresh the page to show updated status
+        window.location.reload();
+      } else {
+        setCancelError(result.error || 'Error al cancelar la orden');
+      }
+    } catch (error) {
+      setCancelError('Error de conexión al cancelar la orden');
+    } finally {
+      setIsCancelling(false);
+      setShowCancelConfirm(false);
+    }
   };
 
   return (
@@ -288,6 +324,16 @@ export function OrderDetailClient({ orderNumber, locale }: OrderDetailClientProp
             </div>
           </div>
         </div>
+
+        {/* Multi-Vendor Summary */}
+        {data?.relatedOrders && data.relatedOrders.length > 0 && (
+          <div className="mb-8">
+            <MultiVendorSummary
+              relatedOrders={data.relatedOrders as any}
+              currentOrderId={order.id}
+            />
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Order Items */}
@@ -496,6 +542,57 @@ export function OrderDetailClient({ orderNumber, locale }: OrderDetailClientProp
                 <CardTitle className="font-times-now">{t('actions.title')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
+                {/* Cancel Order Button - only show if not already cancelled/delivered/shipped */}
+                {!['cancelled', 'delivered', 'shipped'].includes(order.status) && (
+                  <>
+                    {!showCancelConfirm ? (
+                      <Button
+                        variant="destructive"
+                        className="w-full font-univers"
+                        onClick={() => setShowCancelConfirm(true)}
+                      >
+                        <XCircle className="h-4 w-4 mr-2" />
+                        Cancelar orden
+                      </Button>
+                    ) : (
+                      <div className="space-y-2 p-3 bg-red-50 rounded-lg border border-red-200">
+                        <div className="flex items-start gap-2">
+                          <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
+                          <p className="text-sm text-red-800">
+                            ¿Estás seguro de que deseas cancelar esta orden?
+                          </p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={handleCancelOrder}
+                            disabled={isCancelling}
+                            className="flex-1"
+                          >
+                            {isCancelling ? 'Cancelando...' : 'Confirmar'}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setShowCancelConfirm(false);
+                              setCancelError(null);
+                            }}
+                            disabled={isCancelling}
+                            className="flex-1"
+                          >
+                            No, mantener
+                          </Button>
+                        </div>
+                        {cancelError && (
+                          <p className="text-xs text-red-600 mt-2">{cancelError}</p>
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+                
                 {order.status === 'delivered' && (
                   <Button className="w-full font-univers">
                     {t('actions.buyAgain')}

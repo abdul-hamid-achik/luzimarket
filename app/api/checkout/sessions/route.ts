@@ -2,11 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { validateCartStock, type CartItem } from "@/lib/actions/inventory";
 import { db } from "@/db";
-import { orders, orderItems, vendorStripeAccounts, platformFees } from "@/db/schema";
+import { orders, orderItems, vendorStripeAccounts, platformFees, vendors } from "@/db/schema";
 import { eq, inArray } from "drizzle-orm";
 import { generateOrderNumber } from "@/lib/utils/order-id";
 import { auth } from "@/lib/auth";
 import { businessConfig, calculateTax, calculateShipping } from "@/lib/config/business";
+import crypto from "crypto";
+import { calculateTaxForState, getTaxRate } from "@/lib/utils/tax-rates";
 
 export async function POST(request: NextRequest) {
   try {
@@ -158,7 +160,6 @@ export async function POST(request: NextRequest) {
       const stripeAccount = vendorStripeMap.get(vendorId);
       if (!stripeAccount || !stripeAccount.chargesEnabled || !stripeAccount.payoutsEnabled) {
         useStripeConnect = false;
-        console.log(`Vendor ${vendorId} does not have an active Stripe Connect account`);
         break;
       }
     }
@@ -166,10 +167,24 @@ export async function POST(request: NextRequest) {
     const orderIds: string[] = [];
     const orderDetailsMap = new Map<string, any>();
 
+    // Generate a single orderGroupId for all orders from this checkout (multi-vendor tracking)
+    const orderGroupId = crypto.randomUUID();
+
     // Create orders for each vendor
     for (const [vendorId, vendorItems] of Object.entries(vendorGroups)) {
       const vendorSubtotal = (vendorItems as any[]).reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const vendorTax = calculateTax(vendorSubtotal);
+
+      // Get vendor state to calculate proper tax rate
+      const vendorDetails = await db
+        .select({ state: vendors.state })
+        .from(vendors)
+        .where(eq(vendors.id, vendorId))
+        .limit(1);
+
+      const vendorState = vendorDetails[0]?.state;
+      const taxRate = getTaxRate(vendorState);
+      const vendorTax = calculateTaxForState(vendorSubtotal, vendorState);
+
       // Use calculated shipping cost for this vendor, fallback to default if not provided
       const vendorShipping = shippingCostsByVendor?.[vendorId] ?? calculateShipping(vendorSubtotal);
       const vendorTotal = vendorSubtotal + vendorTax + vendorShipping;
@@ -183,9 +198,16 @@ export async function POST(request: NextRequest) {
       const orderData = {
         orderNumber: orderNumber,
         vendorId: vendorId,
+        orderGroupId: orderGroupId, // Link all orders from same checkout
         status: "pending" as const,
         subtotal: vendorSubtotal.toFixed(2),
         tax: vendorTax.toFixed(2),
+        taxBreakdown: {
+          vendorId: vendorId,
+          rate: taxRate,
+          amount: vendorTax,
+          state: vendorState || 'Unknown'
+        },
         shipping: vendorShipping.toFixed(2),
         total: vendorTotal.toFixed(2),
         currency: "MXN",
@@ -287,17 +309,6 @@ export async function POST(request: NextRequest) {
         // Local development
         appUrl = `http://localhost:${process.env.PORT || '3000'}`;
       }
-
-      console.log('Checkout URLs:', {
-        env: {
-          NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
-          VERCEL_URL: process.env.VERCEL_URL,
-          NODE_ENV: process.env.NODE_ENV,
-        },
-        appUrl,
-        success_url: `${appUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${appUrl}/checkout/cancel`,
-      });
 
       // If we're using Stripe Connect and all vendors have accounts, handle payment splitting
       if (useStripeConnect) {

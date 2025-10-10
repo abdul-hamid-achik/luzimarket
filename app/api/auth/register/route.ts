@@ -8,6 +8,7 @@ import { z } from "zod";
 import { sendEmail } from "@/lib/email";
 import crypto from "crypto";
 import { convertGuestOrdersToUser } from "@/lib/actions/guest-orders";
+import { logAuthEvent } from "@/lib/audit-helpers";
 
 const registerSchema = z.object({
   name: z.string().min(2),
@@ -18,25 +19,25 @@ const registerSchema = z.object({
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    
+
     // Validate input
     const validatedData = registerSchema.parse(body);
-    
+
     // Check if user already exists
     const existingUser = await db.query.users.findFirst({
       where: (users, { eq }) => eq(users.email, validatedData.email),
     });
-    
+
     if (existingUser) {
       return NextResponse.json(
         { error: "El correo electrónico ya está registrado" },
         { status: 400 }
       );
     }
-    
+
     // Hash password
     const hashedPassword = await bcrypt.hash(validatedData.password, 10);
-    
+
     // Create user (not verified by default)
     const [newUser] = await db
       .insert(users)
@@ -47,23 +48,23 @@ export async function POST(request: Request) {
         emailVerified: false,
       })
       .returning();
-    
+
     // Generate verification token
     const verificationToken = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 24); // 24 hour expiry
-    
+
     // Save verification token
     await db.insert(emailVerificationTokens).values({
       userId: newUser.id,
       token: verificationToken,
       expiresAt,
     });
-    
+
     // Send verification email
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || `http://localhost:${process.env.PORT || '3000'}`;
     const verificationUrl = `${appUrl}/api/auth/verify-email?token=${verificationToken}`;
-    
+
     await sendEmail({
       to: newUser.email,
       subject: "Verifica tu correo electrónico - LUZIMARKET",
@@ -105,13 +106,26 @@ export async function POST(request: Request) {
         </div>
       `,
     });
-    
+
     // Convert any guest orders to this new user account
     const conversionResult = await convertGuestOrdersToUser({
       userId: newUser.id,
       email: newUser.email,
     });
-    
+
+    // Log registration event
+    await logAuthEvent({
+      action: 'registration',
+      userId: newUser.id,
+      userEmail: newUser.email,
+      userType: 'customer',
+      details: {
+        name: newUser.name,
+        emailVerified: false,
+        guestOrdersConverted: conversionResult.convertedCount || 0,
+      },
+    });
+
     return NextResponse.json({
       user: {
         id: newUser.id,
@@ -128,7 +142,7 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    
+
     console.error("Registration error:", error);
     return NextResponse.json(
       { error: "Error al crear la cuenta" },

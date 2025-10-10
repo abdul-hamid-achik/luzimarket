@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { stripe } from "@/lib/stripe";
 import { db } from "@/db";
-import { orders, orderItems, users, vendorBalances, transactions, platformFees, vendorStripeAccounts } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { orders, users, platformFees, vendorStripeAccounts, transactions } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import Stripe from "stripe";
-import { reduceStock, restoreStock } from "@/lib/actions/inventory";
-import { sendOrderConfirmation, sendVendorNotification } from "@/lib/email";
-import { sendPaymentFailedEmail } from "@/lib/email/payment-failed";
-import { AuditLogger } from "@/lib/middleware/security";
+import { processOrderPayment, handlePaymentFailure, logPaymentSuccess } from "@/lib/services/payment-service";
+import { processRefundWebhook, handleRefundFailure } from "@/lib/services/refund-service";
+import { syncPayoutStatus, notifyPayoutCompleted, handlePayoutFailure } from "@/lib/services/payout-service";
+import { reduceStock } from "@/lib/actions/inventory";
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -38,149 +38,16 @@ export async function POST(req: NextRequest) {
         const orderIds = session.metadata?.orderIds?.split(',') || [];
 
         if (orderIds.length > 0) {
-          // Update all orders to processing status
+          // Process each order using payment service
           for (const orderId of orderIds) {
-            // Fetch order details
-            const order = await db.query.orders.findFirst({
-              where: eq(orders.id, orderId),
-              with: {
-                items: {
-                  with: {
-                    product: true,
-                  },
-                },
-                vendor: true,
-              },
+            await processOrderPayment({
+              orderId,
+              paymentIntentId: session.payment_intent as string,
+              sessionId: session.id,
+              customerEmail: session.customer_details?.email || undefined,
+              customerName: session.customer_details?.name || undefined,
             });
-
-            if (!order) continue;
-
-            await db
-              .update(orders)
-              .set({
-                status: "processing",
-                paymentStatus: "succeeded",
-                paymentIntentId: session.payment_intent as string,
-                updatedAt: new Date(),
-              })
-              .where(eq(orders.id, orderId));
-
-            // Update vendor balance and create transaction if using Stripe Connect
-            const platformFee = await db.query.platformFees.findFirst({
-              where: eq(platformFees.orderId, orderId),
-            });
-
-            if (platformFee) {
-              // Update vendor balance
-              const vendorBalance = await db.query.vendorBalances.findFirst({
-                where: eq(vendorBalances.vendorId, order.vendorId),
-              });
-
-              if (vendorBalance) {
-                const newAvailableBalance = parseFloat(vendorBalance.availableBalance) + parseFloat(platformFee.vendorEarnings);
-
-                await db
-                  .update(vendorBalances)
-                  .set({
-                    availableBalance: newAvailableBalance.toString(),
-                    lastUpdated: new Date(),
-                  })
-                  .where(eq(vendorBalances.vendorId, order.vendorId));
-
-                // Create transaction record
-                await db.insert(transactions).values({
-                  vendorId: order.vendorId,
-                  orderId: orderId,
-                  type: "sale",
-                  amount: platformFee.vendorEarnings,
-                  currency: "MXN",
-                  status: "completed",
-                  description: `Venta - Orden #${order.orderNumber}`,
-                  metadata: {
-                    orderNumber: order.orderNumber,
-                    paymentIntentId: session.payment_intent,
-                  },
-                  stripeChargeId: session.payment_intent as string,
-                  balanceTransaction: {
-                    before: {
-                      available: parseFloat(vendorBalance.availableBalance),
-                      pending: parseFloat(vendorBalance.pendingBalance),
-                      reserved: parseFloat(vendorBalance.reservedBalance),
-                    },
-                    after: {
-                      available: newAvailableBalance,
-                      pending: parseFloat(vendorBalance.pendingBalance),
-                      reserved: parseFloat(vendorBalance.reservedBalance),
-                    },
-                  },
-                  completedAt: new Date(),
-                });
-
-                // Update platform fee status
-                await db
-                  .update(platformFees)
-                  .set({
-                    status: "collected",
-                    stripeApplicationFeeId: session.payment_intent as string,
-                    collectedAt: new Date(),
-                  })
-                  .where(eq(platformFees.orderId, orderId));
-              }
-            }
-
-            // Reduce stock for each order
-            const stockReduced = await reduceStock(orderId);
-            if (!stockReduced) {
-              console.error(`Failed to reduce stock for order ${orderId}`);
-              // In a production system, you might want to handle this more gracefully
-              // For now, we'll log the error but continue processing
-            }
-
-            // Send confirmation emails
-            try {
-              const customerEmail = order.guestEmail || session.customer_details?.email;
-              const customerName = order.guestName || session.customer_details?.name || 'Cliente';
-
-              if (customerEmail) {
-                // Send customer confirmation
-                await sendOrderConfirmation({
-                  orderNumber: order.orderNumber,
-                  customerEmail,
-                  customerName,
-                  items: order.items.map(item => ({
-                    name: item.product?.name || 'Producto',
-                    quantity: item.quantity,
-                    price: parseFloat(item.price),
-                  })),
-                  total: parseFloat(order.total),
-                  vendorName: order.vendor?.businessName || 'Vendedor',
-                });
-
-                // Send vendor notification
-                if (order.vendor?.email) {
-                  await sendVendorNotification({
-                    vendorEmail: order.vendor.email,
-                    vendorName: order.vendor.businessName || 'Vendedor',
-                    orderNumber: order.orderNumber,
-                    customerName,
-                    items: order.items.map(item => ({
-                      name: item.product?.name || 'Producto',
-                      quantity: item.quantity,
-                      price: parseFloat(item.price),
-                    })),
-                    total: parseFloat(order.total),
-                    shippingAddress: order.shippingAddress as any,
-                  });
-                }
-              }
-            } catch (emailError) {
-              console.error(`Failed to send confirmation emails for order ${orderId}:`, emailError);
-            }
-
-            console.log(`Order ${orderId} processed successfully`);
           }
-
-          console.log("Orders paid:", orderIds.join(', '));
 
           // Handle Stripe Connect transfers for multi-vendor orders
           if (session.metadata?.useStripeConnect === 'true' && session.metadata?.vendorSplits) {
@@ -206,8 +73,6 @@ export async function POST(req: NextRequest) {
                       vendorId: split.vendorId,
                     },
                   });
-
-                  console.log(`Transfer created for vendor ${split.vendorId}: ${transfer.id}`);
 
                   // Update platform fee status to transferred
                   await db
@@ -243,7 +108,6 @@ export async function POST(req: NextRequest) {
             .where(eq(orders.id, session.metadata.orderId));
 
           await reduceStock(session.metadata.orderId);
-          console.log("Legacy order paid:", session.metadata.orderId);
         }
 
         // Create/update customer if needed
@@ -266,79 +130,80 @@ export async function POST(req: NextRequest) {
 
       case "payment_intent.succeeded": {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
-
-        // Log successful payment
-        const order = await db.query.orders.findFirst({
-          where: eq(orders.paymentIntentId, paymentIntent.id),
-        });
-
-        if (order) {
-          await AuditLogger.log({
-            action: "payment.succeeded",
-            category: "payment",
-            severity: "info",
-            userId: order.userId || undefined,
-            userType: order.userId ? "user" : "guest",
-            userEmail: order.guestEmail || undefined,
-            ip: "stripe-webhook",
-            resourceType: "order",
-            resourceId: order.id,
-            details: {
-              orderNumber: order.orderNumber,
-              amount: paymentIntent.amount / 100,
-              currency: paymentIntent.currency,
-              paymentMethod: paymentIntent.payment_method,
-            },
-          });
-        }
+        await logPaymentSuccess(paymentIntent.id);
         break;
       }
 
       case "payment_intent.payment_failed": {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
 
-        // Update order status to failed
         const order = await db.query.orders.findFirst({
           where: eq(orders.paymentIntentId, paymentIntent.id),
         });
 
         if (order) {
-          await db
-            .update(orders)
-            .set({
-              status: "cancelled",
-              paymentStatus: "failed",
-              updatedAt: new Date(),
-            })
-            .where(eq(orders.id, order.id));
-
-          // Restore stock since payment failed
-          await restoreStock(order.id);
-
-          // Log payment failure
-          await AuditLogger.log({
-            action: "payment.failed",
-            category: "payment",
-            severity: "warning",
-            userId: order.userId || undefined,
-            userType: order.userId ? "user" : "guest",
-            userEmail: order.guestEmail || undefined,
-            ip: "stripe-webhook",
-            resourceType: "order",
-            resourceId: order.id,
-            details: {
-              orderNumber: order.orderNumber,
-              amount: paymentIntent.amount / 100,
-              currency: paymentIntent.currency,
-              failureCode: paymentIntent.last_payment_error?.code,
-              failureMessage: paymentIntent.last_payment_error?.message,
-            },
-            errorMessage: paymentIntent.last_payment_error?.message,
-          });
-
-          // Send payment failed email
-          await sendPaymentFailedEmail({ orderId: order.id });
+          await handlePaymentFailure(order.id, paymentIntent.last_payment_error);
         }
+        break;
+      }
+
+      case "charge.refunded": {
+        const charge = event.data.object as Stripe.Charge;
+        // Process refund from charge object
+        if (charge.refunds && charge.refunds.data.length > 0) {
+          const refund = charge.refunds.data[0];
+          await processRefundWebhook(refund.id);
+        }
+        break;
+      }
+
+      case "refund.created": {
+        const refund = event.data.object as Stripe.Refund;
+
+        // Find order by payment intent
+        const paymentIntent = await stripe.paymentIntents.retrieve(refund.payment_intent as string);
+        const order = await db.query.orders.findFirst({
+          where: eq(orders.paymentIntentId, paymentIntent.id),
+        });
+
+        if (order) {
+          // Create refund transaction record
+          await db.insert(transactions).values({
+            vendorId: order.vendorId,
+            orderId: order.id,
+            type: "refund",
+            amount: (-(refund.amount / 100)).toString(), // Negative for refund
+            currency: refund.currency.toUpperCase(),
+            status: "pending",
+            description: `Reembolso iniciado - Orden #${order.orderNumber}`,
+            stripeRefundId: refund.id,
+            metadata: {
+              orderNumber: order.orderNumber,
+              paymentIntentId: paymentIntent.id,
+              reason: refund.reason,
+            },
+          });
+        }
+        break;
+      }
+
+      case "refund.updated": {
+        const refund = event.data.object as Stripe.Refund;
+
+        // Update transaction status
+        await db
+          .update(transactions)
+          .set({
+            status: refund.status === "succeeded" ? "completed" : refund.status === "failed" ? "failed" : "pending",
+            completedAt: refund.status === "succeeded" ? new Date() : undefined,
+          })
+          .where(eq(transactions.stripeRefundId, refund.id));
+        break;
+      }
+
+      case "refund.failed": {
+        const refund = event.data.object as Stripe.Refund;
+        await handleRefundFailure(refund.id, refund.failure_reason);
         break;
       }
 
@@ -353,7 +218,6 @@ export async function POST(req: NextRequest) {
 
         if (user) {
           // Update user subscription status
-          console.log("Subscription updated for user:", user.id);
         }
         break;
       }
@@ -368,7 +232,6 @@ export async function POST(req: NextRequest) {
 
         if (user) {
           // Update user subscription status
-          console.log("Subscription cancelled for user:", user.id);
         }
         break;
       }
@@ -394,7 +257,6 @@ export async function POST(req: NextRequest) {
           });
 
           if (customer) {
-            console.log("Subscription payment failed for user:", customer.id);
             // Note: For subscription failures, you might want a different email template
           }
         }
@@ -424,8 +286,6 @@ export async function POST(req: NextRequest) {
               updatedAt: new Date(),
             })
             .where(eq(vendorStripeAccounts.stripeAccountId, account.id));
-
-          console.log(`Vendor account ${account.id} updated`);
         }
         break;
       }
@@ -482,16 +342,25 @@ export async function POST(req: NextRequest) {
       case "payout.updated": {
         const payout = event.data.object as Stripe.Payout;
 
-        // Handle payout status updates
-        // No-op for now
+        // Sync payout status
+        const status = payout.status as 'pending' | 'paid' | 'failed' | 'canceled';
+        await syncPayoutStatus(payout.id, status);
         break;
       }
 
       case "payout.paid": {
         const payout = event.data.object as Stripe.Payout;
 
-        // Mark payout as completed
-        // No-op for now
+        // Mark payout as completed and notify vendor
+        await syncPayoutStatus(payout.id, "paid");
+
+        // Notify vendor of successful payout
+        if (payout.metadata?.vendorId) {
+          await notifyPayoutCompleted(
+            payout.metadata.vendorId,
+            payout.amount / 100
+          );
+        }
         break;
       }
 
@@ -499,7 +368,8 @@ export async function POST(req: NextRequest) {
         const payout = event.data.object as Stripe.Payout;
 
         // Handle failed payout
-        // No-op for now
+        await syncPayoutStatus(payout.id, "failed");
+        await handlePayoutFailure(payout.id, payout.failure_message);
         break;
       }
 

@@ -7,6 +7,7 @@ import { eq } from 'drizzle-orm';
 import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
 import crypto from 'crypto';
+import { logAuthEvent } from '@/lib/audit-helpers';
 
 /**
  * POST /api/auth/2fa/enable
@@ -27,7 +28,7 @@ import crypto from 'crypto';
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
-    
+
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     const userId = session.user.id;
     const userRole = session.user.role as 'customer' | 'vendor' | 'admin';
-    
+
     // Generate TOTP secret
     const secret = speakeasy.generateSecret({
       name: `LuziMarket (${session.user.email})`,
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Generate backup codes (8 codes, 8 characters each)
-    const backupCodes = Array.from({ length: 8 }, () => 
+    const backupCodes = Array.from({ length: 8 }, () =>
       crypto.randomBytes(4).toString('hex').toUpperCase()
     );
 
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
     // Store the secret in the appropriate user table
     // Note: We don't enable 2FA yet - user must verify first
     let updateResult;
-    
+
     switch (userRole) {
       case 'customer':
         updateResult = await db
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest) {
           .where(eq(users.id, userId))
           .returning({ id: users.id });
         break;
-        
+
       case 'vendor':
         updateResult = await db
           .update(vendors)
@@ -81,7 +82,7 @@ export async function POST(request: NextRequest) {
           .where(eq(vendors.id, userId))
           .returning({ id: vendors.id });
         break;
-        
+
       case 'admin':
         updateResult = await db
           .update(adminUsers)
@@ -93,7 +94,7 @@ export async function POST(request: NextRequest) {
           .where(eq(adminUsers.id, userId))
           .returning({ id: adminUsers.id });
         break;
-        
+
       default:
         return NextResponse.json(
           { error: 'Invalid user role' },
@@ -107,6 +108,19 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Log 2FA setup initiated (not yet verified)
+    await logAuthEvent({
+      action: '2fa_enabled',
+      userId,
+      userEmail: session.user.email!,
+      userType: userRole,
+      details: {
+        setupInitiated: true,
+        verified: false,
+        backupCodesGenerated: backupCodes.length,
+      },
+    });
 
     return NextResponse.json({
       success: true,

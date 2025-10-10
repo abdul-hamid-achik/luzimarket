@@ -195,9 +195,6 @@ export default function CheckoutPage() {
       <Script
         src="https://js.stripe.com/v3/"
         strategy="afterInteractive"
-        onLoad={() => {
-          console.log('Stripe.js loaded successfully');
-        }}
         onError={() => {
           console.error('Failed to load Stripe.js');
         }}

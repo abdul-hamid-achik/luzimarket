@@ -30,6 +30,7 @@ export async function GET(
       .select({
         id: orders.id,
         orderNumber: orders.orderNumber,
+        orderGroupId: orders.orderGroupId,
         total: orders.total,
         subtotal: orders.subtotal,
         tax: orders.tax,
@@ -112,7 +113,57 @@ export async function GET(
       }))
     };
 
-    return NextResponse.json({ order: orderWithItems });
+    // Fetch related orders if this is part of a multi-vendor checkout
+    let relatedOrders: any[] = [];
+    if (orderData.orderGroupId) {
+      const related = await db
+        .select({
+          id: orders.id,
+          orderNumber: orders.orderNumber,
+          status: orders.status,
+          total: orders.total,
+          trackingNumber: orders.trackingNumber,
+          carrier: orders.carrier,
+          vendor: {
+            id: vendors.id,
+            businessName: vendors.businessName,
+          }
+        })
+        .from(orders)
+        .leftJoin(vendors, eq(orders.vendorId, vendors.id))
+        .where(eq(orders.orderGroupId, orderData.orderGroupId));
+
+      // Get items count for each related order
+      for (const relatedOrder of related) {
+        const relatedItems = await db
+          .select({
+            id: orderItems.id,
+            quantity: orderItems.quantity,
+            product: {
+              name: products.name,
+            }
+          })
+          .from(orderItems)
+          .leftJoin(products, eq(orderItems.productId, products.id))
+          .where(eq(orderItems.orderId, relatedOrder.id));
+
+        relatedOrders.push({
+          ...relatedOrder,
+          items: relatedItems.map(item => ({
+            id: item.id,
+            quantity: item.quantity,
+            product: {
+              name: item.product?.name || 'Producto eliminado',
+            }
+          }))
+        });
+      }
+    }
+
+    return NextResponse.json({ 
+      order: orderWithItems,
+      relatedOrders: relatedOrders.length > 1 ? relatedOrders : []
+    });
 
   } catch (error) {
     console.error("Error fetching order details:", error);

@@ -77,7 +77,7 @@ export async function checkProductStock(productId: string, requestedQuantity: nu
  */
 export async function validateCartStock(items: CartItem[]): Promise<StockValidationResult> {
   const errors: StockValidationResult['errors'] = [];
-  
+
   try {
     for (const item of items) {
       const product = await db.query.products.findFirst({
@@ -103,7 +103,7 @@ export async function validateCartStock(items: CartItem[]): Promise<StockValidat
       }
 
       const currentStock = product.stock ?? 0;
-      
+
       if (currentStock < item.quantity) {
         errors.push({
           productId: item.id,
@@ -162,7 +162,6 @@ export async function reserveStock(
     // Insert reservations
     await db.insert(stockReservations).values(reservations);
 
-    console.log(`Stock reserved for ${reservationType} ${reservationId}:`, items);
     return true;
   } catch (error) {
     console.error("Error reserving stock:", error);
@@ -189,7 +188,6 @@ export async function releaseReservation(
       .set({ releasedAt: new Date() })
       .where(and(...conditions));
 
-    console.log(`Stock reservation released for session ${sessionId}`);
     return true;
   } catch (error) {
     console.error("Error releasing reservation:", error);
@@ -216,12 +214,7 @@ export async function cleanupExpiredReservations(): Promise<number> {
       );
 
     // Note: result doesn't have a standard count property in Drizzle
-    // We'll log the operation success
-    console.log('Expired reservations cleanup completed');
     const count = 0;
-    if (count > 0) {
-      console.log(`Cleaned up ${count} expired stock reservations`);
-    }
 
     return count;
   } catch (error) {
@@ -302,7 +295,7 @@ export async function reduceStock(orderId: string): Promise<boolean> {
       items.map(async (item) => {
         const currentStock = item.product?.stock || 0;
         const newStock = Math.max(0, currentStock - item.quantity);
-        
+
         if (currentStock < item.quantity) {
           console.warn(
             `Insufficient stock for product ${item.product?.name} (${item.productId}). ` +
@@ -330,7 +323,6 @@ export async function reduceStock(orderId: string): Promise<boolean> {
       return false;
     }
 
-    console.log(`Successfully reduced stock for ${items.length} items in order ${orderId}`);
     return true;
   } catch (error) {
     console.error("Error reducing stock:", error);
@@ -373,7 +365,6 @@ export async function restoreStock(orderId: string): Promise<boolean> {
       return false;
     }
 
-    console.log(`Successfully restored stock for ${items.length} items in order ${orderId}`);
     return true;
   } catch (error) {
     console.error("Error restoring stock:", error);

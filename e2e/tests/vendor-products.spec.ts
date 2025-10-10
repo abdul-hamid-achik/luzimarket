@@ -8,18 +8,18 @@ test.describe('Vendor Product Management', () => {
     await page.goto(routes.login);
     const vendorTab = page.locator('button[role="tab"]').filter({ hasText: /Vendedor|Vendor/ }).first();
     await expect(vendorTab).toBeVisible({ timeout: 10000 });
-    await vendorTab.click();
-    
+    await vendorTab.click({ force: true });
+
     await page.waitForTimeout(500); // Wait for tab switch
-    
+
     // Use the IDs from the vendor form
     await page.fill('#vendor-email', 'vendor@luzimarket.shop');
     await page.fill('#vendor-password', 'password123');
-    
+
     const submitButton = page.locator('button[type="submit"]').filter({ hasText: /Iniciar sesión|Sign in/ }).first();
     await expect(submitButton).toBeVisible({ timeout: 10000 });
     await submitButton.click({ force: true });
-    
+
     // Wait for redirect to vendor area - use more flexible URL matching
     await page.waitForURL(url => url.pathname.includes('/vendor') || url.pathname.includes('/vendedor'), { timeout: 20000 });
   }
@@ -64,10 +64,10 @@ test.describe('Vendor Product Management', () => {
 
       // Submit the form - try to find and click the submit button
       await page.waitForTimeout(1000); // Wait for any async validation
-      
+
       const publishButton = page.locator('button').filter({ hasText: /Publicar|Publish|Crear|Create/i });
       const draftButton = page.locator('button').filter({ hasText: /Guardar.*borrador|Save.*draft/i });
-      
+
       if (await publishButton.isVisible({ timeout: 2000 })) {
         await publishButton.click();
         await page.waitForTimeout(2000); // Wait for submission
@@ -85,23 +85,23 @@ test.describe('Vendor Product Management', () => {
 
       // Wait for potential redirect or success message
       await page.waitForTimeout(3000);
-      
+
       // Should show success message or redirect (success indicators)
       const successMessage = await page.locator('text=/creado|created|guardado|saved|éxito|success|publicado|published/i').first().isVisible({ timeout: 3000 }).catch(() => false);
-      
+
       // Check for toast notifications as well
       const toastMessage = await page.locator('[role="alert"], .toast, .notification').first().isVisible({ timeout: 2000 }).catch(() => false);
 
       // Should either redirect to products list or show success message
       const currentUrl = page.url();
       const isRedirected = !currentUrl.includes('/nuevo') && !currentUrl.includes('/new');
-      
+
       // Also check if product was saved by looking for edit mode indicators
       const isInEditMode = currentUrl.includes('/edit') || currentUrl.includes('/editar');
-      
+
       // Success is indicated by any of: success message, toast, redirect, or edit mode
       expect(successMessage || toastMessage || isRedirected || isInEditMode).toBeTruthy();
-      
+
       if (isRedirected && !isInEditMode) {
         // Verify we're on products list page
         const productsPageIndicator = page.locator('h1, h2, [data-testid="page-title"]').filter({ hasText: /Productos|Products|Mis productos|My products/i });
@@ -179,13 +179,13 @@ test.describe('Vendor Product Management', () => {
       await page.fill('input[name="price"]', '100');
 
       // Try to save - look for any save button
-      const saveButton = page.locator('button[type="submit"], button').filter({ 
-        hasText: /Guardar|Save|Borrador|Draft|Crear|Create/i 
+      const saveButton = page.locator('button[type="submit"], button').filter({
+        hasText: /Guardar|Save|Borrador|Draft|Crear|Create/i
       }).first();
-      
+
       if (await saveButton.isVisible({ timeout: 2000 })) {
         await saveButton.click();
-        
+
         // Wait for response
         await page.waitForTimeout(2000);
         const successToast = page.locator('[data-sonner-toast], .toast');
@@ -199,12 +199,12 @@ test.describe('Vendor Product Management', () => {
       // Check if we were redirected or got a success message
       await page.waitForTimeout(1000);
       const currentUrl = page.url();
-      
+
       if (currentUrl.includes('/vendor/products') && !currentUrl.includes('/new')) {
         // Successfully saved and redirected
         const draftProduct = page.locator('tr, .product-card').filter({ hasText: 'Producto en Borrador' });
         const isDraftVisible = await draftProduct.isVisible({ timeout: 2000 }).catch(() => false);
-        
+
         if (isDraftVisible) {
           await expect(draftProduct.locator('text=/Borrador|Draft|Guardado|Saved/i').first()).toBeVisible();
         }
@@ -250,8 +250,8 @@ test.describe('Vendor Product Management', () => {
 
         // Should show success
         // Check for success message
-      const successMsg = page.locator('text=/actualizado|updated|guardado|saved/i');
-      await expect(successMsg).toBeVisible({ timeout: 3000 });
+        const successMsg = page.locator('text=/actualizado|updated|guardado|saved/i');
+        await expect(successMsg).toBeVisible({ timeout: 3000 });
       }
     });
 
@@ -466,11 +466,11 @@ test.describe('Vendor Product Management', () => {
         await page.waitForTimeout(1000);
         const successMsg = page.locator('text=/eliminado|deleted/i');
         const msgVisible = await successMsg.isVisible({ timeout: 2000 }).catch(() => false);
-        
+
         if (msgVisible) {
           await expect(successMsg).toBeVisible();
         }
-        
+
         // Product count should decrease or product should be gone
         const finalProducts = await page.locator('tr:not(:first-child), .product-card').count();
         expect(finalProducts).toBeLessThanOrEqual(initialProducts);

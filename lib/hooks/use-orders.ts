@@ -154,11 +154,32 @@ export function useInfiniteOrders(params: Omit<OrdersQueryParams, 'page'> = {}) 
   });
 }
 
+// Related order (for multi-vendor tracking)
+interface RelatedOrder {
+  id: string;
+  orderNumber: string;
+  status: string;
+  total: string;
+  trackingNumber: string | null;
+  carrier: string | null;
+  vendor: {
+    id: string;
+    businessName: string;
+  };
+  items: Array<{
+    id: string;
+    quantity: number;
+    product: {
+      name: string;
+    };
+  }>;
+}
+
 // Hook for fetching single order details
 export function useOrder(orderNumber: string) {
   const { data: session } = useSession();
 
-  return useQuery<{ order: OrderDetail }>({
+  return useQuery<{ order: OrderDetail; relatedOrders?: RelatedOrder[] }>({
     queryKey: ['order', orderNumber],
     queryFn: () => fetchWithAuth(`/api/orders/${orderNumber}`),
     enabled: !!session?.user && !!orderNumber,
@@ -169,7 +190,7 @@ export function useOrder(orderNumber: string) {
 
 // Hook for fetching a guest order (no auth) via email + orderNumber
 export function useGuestOrder(orderNumber: string, email: string | null) {
-  return useQuery<{ order: OrderDetail }>({
+  return useQuery<{ order: OrderDetail; relatedOrders?: RelatedOrder[] }>({
     queryKey: ['guest-order', orderNumber, email],
     queryFn: async () => {
       const params = new URLSearchParams();

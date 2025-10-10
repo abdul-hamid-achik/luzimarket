@@ -5,6 +5,7 @@ import { products, productImageModeration, vendors } from "@/db/schema";
 import { eq, desc, and, inArray, or } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { logImageModerationEvent } from "@/lib/audit-helpers";
 import { z } from "zod";
 import { sendImageApprovalNotification, sendImageRejectionNotification } from "@/lib/email";
 
@@ -67,12 +68,12 @@ export async function getModeratedImages(status?: "approved" | "rejected") {
       throw new Error("Unauthorized");
     }
 
-    const conditions = status 
+    const conditions = status
       ? eq(productImageModeration.status, status)
       : or(
-          eq(productImageModeration.status, "approved"),
-          eq(productImageModeration.status, "rejected")
-        );
+        eq(productImageModeration.status, "approved"),
+        eq(productImageModeration.status, "rejected")
+      );
 
     const moderatedImages = await db
       .select({
@@ -198,6 +199,19 @@ export async function approveImages(data: z.infer<typeof approveImagesSchema>) {
       }
     }
 
+    // Log image moderation approval
+    await logImageModerationEvent({
+      action: 'approved',
+      imageIds: validatedData.imageIds,
+      productId: validatedData.imageIds.length > 0 ? moderationRecords[0]?.productId : undefined,
+      adminUserId: session.user.id,
+      adminEmail: session.user.email!,
+      details: {
+        imageCount: validatedData.imageIds.length,
+        approvedAt: new Date().toISOString(),
+      },
+    });
+
     revalidatePath("/admin/moderation/images");
     return { success: true, message: "Images approved successfully" };
   } catch (error) {
@@ -301,6 +315,23 @@ export async function rejectImages(data: z.infer<typeof rejectImagesSchema>) {
         }
       }
     }
+
+    // Log image moderation rejection
+    await logImageModerationEvent({
+      action: 'rejected',
+      imageIds: validatedData.imageIds,
+      productId: validatedData.imageIds.length > 0 ? moderationRecords[0]?.productId : undefined,
+      adminUserId: session.user.id,
+      adminEmail: session.user.email!,
+      details: {
+        imageCount: validatedData.imageIds.length,
+        rejectedAt: new Date().toISOString(),
+        reason: validatedData.reason,
+        category: validatedData.category,
+        notes: validatedData.notes,
+      },
+      severity: 'warning',
+    });
 
     revalidatePath("/admin/moderation/images");
     return { success: true, message: "Images rejected successfully" };

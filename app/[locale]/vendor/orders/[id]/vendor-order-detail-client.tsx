@@ -5,11 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Package, 
-  User, 
-  MapPin, 
-  CreditCard, 
+import {
+  Package,
+  User,
+  MapPin,
+  CreditCard,
   Truck,
   Calendar,
   Mail,
@@ -17,7 +17,9 @@ import {
   Copy,
   Download,
   Printer,
-  CheckCircle
+  CheckCircle,
+  AlertTriangle,
+  XCircle
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -33,12 +35,38 @@ interface VendorOrderDetailClientProps {
 
 export function VendorOrderDetailClient({ order, translations: t }: VendorOrderDetailClientProps) {
   const [copied, setCopied] = useState(false);
+  const [isProcessingCancellation, setIsProcessingCancellation] = useState(false);
 
   const handleCopyOrderNumber = () => {
     navigator.clipboard.writeText(`#${order.order.orderNumber}`);
     setCopied(true);
     toast.success(t.orderNumberCopied);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCancellationRequest = async (action: 'approve' | 'reject', notes?: string) => {
+    setIsProcessingCancellation(true);
+    try {
+      const response = await fetch(`/api/vendor/orders/${order.order.id}/cancel-request`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, notes }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast.success(result.message || 'Solicitud procesada');
+        // Reload page to show updated status
+        window.location.reload();
+      } else {
+        toast.error(result.error || 'Error al procesar la solicitud');
+      }
+    } catch (error) {
+      toast.error('Error de conexión');
+    } finally {
+      setIsProcessingCancellation(false);
+    }
   };
 
   const handlePrint = () => {
@@ -177,6 +205,57 @@ export function VendorOrderDetailClient({ order, translations: t }: VendorOrderD
               </div>
             </CardContent>
           </Card>
+
+          {/* Cancellation Request Alert */}
+          {order.order.cancellationStatus === 'requested' && (
+            <Card className="border-orange-200 bg-orange-50/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-orange-900">
+                  <AlertTriangle className="h-5 w-5" />
+                  Solicitud de Cancelación
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="p-3 bg-white rounded-lg border border-orange-200">
+                  <p className="text-sm text-gray-700">
+                    <strong>Razón:</strong> {order.order.cancellationReason || 'No especificada'}
+                  </p>
+                  {order.order.cancelledAt && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Solicitado: {new Date(order.order.cancelledAt).toLocaleDateString('es-MX')}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex gap-2">
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => handleCancellationRequest('approve', 'Aprobado por vendedor')}
+                    disabled={isProcessingCancellation}
+                  >
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    {isProcessingCancellation ? 'Procesando...' : 'Aprobar y Reembolsar'}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => handleCancellationRequest('reject', 'Rechazado - Orden ya en proceso')}
+                    disabled={isProcessingCancellation}
+                  >
+                    <XCircle className="h-4 w-4 mr-2" />
+                    Rechazar
+                  </Button>
+                </div>
+
+                <p className="text-xs text-gray-600">
+                  Si apruebas, se procesará un reembolso automático y se restaurará el inventario.
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Shipping Actions */}
           {order.order.status !== 'cancelled' && order.order.status !== 'delivered' && (

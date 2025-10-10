@@ -1,0 +1,1 @@
+ALTER TABLE "orders" ADD COLUMN "tax_breakdown" json;

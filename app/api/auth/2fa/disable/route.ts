@@ -6,6 +6,7 @@ import { db } from '@/db';
 import { users, vendors, adminUsers } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import speakeasy from 'speakeasy';
+import { logAuthEvent } from '@/lib/audit-helpers';
 
 /**
  * POST /api/auth/2fa/disable
@@ -24,7 +25,7 @@ import speakeasy from 'speakeasy';
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
-    
+
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { token, password } = await request.json();
-    
+
     if (!token && !password) {
       return NextResponse.json(
         { error: 'Either TOTP token or password is required to disable 2FA' },
@@ -43,10 +44,10 @@ export async function POST(request: NextRequest) {
 
     const userId = session.user.id;
     const userRole = session.user.role as 'customer' | 'vendor' | 'admin';
-    
+
     // Get user's current 2FA status and credentials
     let userData;
-    
+
     switch (userRole) {
       case 'customer':
         const [customerData] = await db
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest) {
           .limit(1);
         userData = customerData;
         break;
-        
+
       case 'vendor':
         const [vendorData] = await db
           .select({
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
           .limit(1);
         userData = vendorData;
         break;
-        
+
       case 'admin':
         const [adminData] = await db
           .select({
@@ -86,7 +87,7 @@ export async function POST(request: NextRequest) {
           .limit(1);
         userData = adminData;
         break;
-        
+
       default:
         return NextResponse.json(
           { error: 'Invalid user role' },
@@ -134,7 +135,7 @@ export async function POST(request: NextRequest) {
 
     // Disable 2FA and clear secrets
     let updateResult;
-    
+
     switch (userRole) {
       case 'customer':
         updateResult = await db
@@ -148,7 +149,7 @@ export async function POST(request: NextRequest) {
           .where(eq(users.id, userId))
           .returning({ id: users.id });
         break;
-        
+
       case 'vendor':
         updateResult = await db
           .update(vendors)
@@ -161,7 +162,7 @@ export async function POST(request: NextRequest) {
           .where(eq(vendors.id, userId))
           .returning({ id: vendors.id });
         break;
-        
+
       case 'admin':
         updateResult = await db
           .update(adminUsers)
@@ -182,6 +183,19 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Log 2FA disabled event
+    await logAuthEvent({
+      action: '2fa_disabled',
+      userId,
+      userEmail: session.user.email!,
+      userType: userRole,
+      details: {
+        disabledAt: new Date().toISOString(),
+        verificationMethod: token ? 'totp' : 'password',
+      },
+      severity: 'warning',
+    });
 
     return NextResponse.json({
       success: true,

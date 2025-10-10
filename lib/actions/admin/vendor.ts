@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { createVendorStripeAccount } from "@/lib/actions/stripe-connect.action";
+import { logVendorEvent } from "@/lib/audit-helpers";
 
 export async function approveVendor(vendorId: string) {
   const session = await auth();
@@ -93,16 +94,24 @@ export async function approveVendor(vendorId: string) {
           <p>${t('welcome')}</p>
         `;
 
-        // For now, log the email content since sendEmail is not imported
-        console.log('Approval email would be sent:', {
-          to: vendorData.email,
-          subject: t('subject'),
-          html: emailHtml
-        });
       } catch (emailError) {
         console.error("Error sending approval email:", emailError);
       }
     }
+
+    // Log vendor approval
+    await logVendorEvent({
+      action: 'approved',
+      vendorId: vendorData.id,
+      vendorEmail: vendorData.email,
+      vendorName: vendorData.businessName,
+      adminUserId: session.user.id,
+      adminEmail: session.user.email!,
+      details: {
+        approvedAt: new Date().toISOString(),
+        userAccountCreated: !existingUser.length,
+      },
+    });
 
     revalidatePath("/admin/vendors");
     return { success: true };
@@ -157,16 +166,23 @@ export async function rejectVendor(vendorId: string) {
           <p>${t('thanks2')}</p>
         `;
 
-        // For now, log the email content since sendEmail is not imported
-        console.log('Rejection email would be sent:', {
-          to: vendorData.email,
-          subject: t('subject'),
-          html: emailHtml
-        });
       } catch (emailError) {
         console.error("Error sending rejection email:", emailError);
       }
     }
+
+    // Log vendor rejection
+    await logVendorEvent({
+      action: 'rejected',
+      vendorId: vendorData.id,
+      vendorEmail: vendorData.email,
+      vendorName: vendorData.businessName,
+      adminUserId: session.user.id,
+      adminEmail: session.user.email!,
+      details: {
+        rejectedAt: new Date().toISOString(),
+      },
+    });
 
     revalidatePath("/admin/vendors");
     return { success: true };

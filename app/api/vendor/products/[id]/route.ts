@@ -5,6 +5,7 @@ import { products } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { z } from "zod";
 import { createImageModerationRecords } from "@/lib/actions/image-moderation";
+import { logProductEvent } from "@/lib/audit-helpers";
 
 const updateProductSchema = z.object({
   name: z.string().min(3),
@@ -24,7 +25,7 @@ export async function GET(
   try {
     const { id } = await params;
     const session = await auth();
-    
+
     if (!session || session.user.role !== "vendor" || !session.user.vendor?.id) {
       return NextResponse.json(
         { error: "No autorizado" },
@@ -66,7 +67,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const session = await auth();
-    
+
     if (!session || session.user.role !== "vendor" || !session.user.vendor?.id) {
       return NextResponse.json(
         { error: "No autorizado" },
@@ -131,10 +132,26 @@ export async function PUT(
       );
     }
 
+    // Log product update
+    await logProductEvent({
+      action: 'updated',
+      productId: id,
+      productName: updatedProduct.name,
+      vendorId: session.user.vendor.id,
+      userId: session.user.id,
+      userEmail: session.user.email!,
+      userType: 'vendor',
+      details: {
+        imagesChanged,
+        statusChanged: existingProduct.isActive !== validatedData.isActive,
+        newStatus: validatedData.isActive ? 'active' : 'inactive',
+      },
+    });
+
     return NextResponse.json(updatedProduct);
   } catch (error) {
     console.error("Error updating product:", error);
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Datos inválidos", details: error.errors },
@@ -156,7 +173,7 @@ export async function DELETE(
   try {
     const { id } = await params;
     const session = await auth();
-    
+
     if (!session || session.user.role !== "vendor" || !session.user.vendor?.id) {
       return NextResponse.json(
         { error: "No autorizado" },
@@ -188,6 +205,22 @@ export async function DELETE(
           eq(products.vendorId, session.user.vendor.id)
         )
       );
+
+    // Log product deletion
+    await logProductEvent({
+      action: 'deleted',
+      productId: id,
+      productName: existingProduct.name,
+      vendorId: session.user.vendor.id,
+      userId: session.user.id,
+      userEmail: session.user.email!,
+      userType: 'vendor',
+      details: {
+        slug: existingProduct.slug,
+        categoryId: existingProduct.categoryId,
+        deletedAt: new Date().toISOString(),
+      },
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {

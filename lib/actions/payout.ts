@@ -6,6 +6,7 @@ import { payouts, vendorBalances, transactions, vendors, vendorStripeAccounts } 
 import { eq, and, desc, gte } from "drizzle-orm";
 import { stripe } from "@/lib/stripe";
 import { z } from "zod";
+import { logPayoutEvent } from "@/lib/audit-helpers";
 
 const requestPayoutSchema = z.object({
   vendorId: z.string().uuid(),
@@ -103,6 +104,23 @@ export async function requestPayout(data: z.infer<typeof requestPayoutSchema>) {
       });
 
       return payout;
+    });
+
+    // Log payout request
+    await logPayoutEvent({
+      action: 'requested',
+      payoutId: result.id,
+      vendorId: validatedData.vendorId,
+      amount: validatedData.amount,
+      currency: 'MXN',
+      userId: session.user.id,
+      userEmail: session.user.email!,
+      userType: 'vendor',
+      details: {
+        requestedAt: new Date().toISOString(),
+        availableBalanceBefore: availableBalance,
+        availableBalanceAfter: availableBalance - validatedData.amount,
+      },
     });
 
     return { success: true, data: result };
@@ -209,10 +227,27 @@ export async function processPayoutRequest(payoutId: string) {
           .where(eq(transactions.metadata, { payoutId }));
       });
 
+      // Log payout processing
+      await logPayoutEvent({
+        action: 'processed',
+        payoutId: payout.payout.id,
+        vendorId: payout.payout.vendorId,
+        amount: parseFloat(payout.payout.amount),
+        currency: 'MXN',
+        userId: session.user.id,
+        userEmail: session.user.email!,
+        userType: 'admin',
+        details: {
+          processedAt: new Date().toISOString(),
+          stripePayoutId: stripePayout.id,
+          vendorBusinessName: payout.vendor?.businessName,
+        },
+      });
+
       return { success: true, data: stripePayout };
     } catch (stripeError: any) {
       console.error("Stripe payout error:", stripeError);
-      
+
       // Update payout as failed
       await db
         .update(payouts)

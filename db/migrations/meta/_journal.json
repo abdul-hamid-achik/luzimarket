@@ -22,6 +22,34 @@
       "when": 1759886549190,
       "tag": "0002_sleepy_blur",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1760058273963,
+      "tag": "0003_square_warbird",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1760058795979,
+      "tag": "0004_faithful_grim_reaper",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1760059914247,
+      "tag": "0005_majestic_thunderbolts",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1760060594135,
+      "tag": "0006_mature_hawkeye",
+      "breakpoints": true
     }
   ]
 }

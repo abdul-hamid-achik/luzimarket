@@ -19,7 +19,7 @@ dotenv.config({ path: path.resolve(__dirname, '.env.local') });
 const isCi = !!process.env.CI;
 const port = String(process.env.PORT || '3000');
 const includeAdditionalBrowsers = isCi ? process.env.CI_ALL_BROWSERS === '1' : false;
-const workersCount = isCi ? Number(process.env.PW_WORKERS || '2') : undefined;
+const workersCount = isCi ? Number(process.env.PW_WORKERS || '1') : undefined;
 
 // Pass threshold configuration - allow CI to pass with 95% of tests passing
 const passThreshold = Number(process.env.PLAYWRIGHT_PASS_THRESHOLD || '95');

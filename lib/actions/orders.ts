@@ -4,11 +4,12 @@ import { db } from "@/db";
 import { orders, orderItems, vendors, users, products } from "@/db/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { sendEmail } from "@/lib/email";
-import { 
-  generateVendorNewOrderEmail, 
-  generateCustomerConfirmationEmail, 
-  generateShippingNotificationEmail 
+import {
+  generateVendorNewOrderEmail,
+  generateCustomerConfirmationEmail,
+  generateShippingNotificationEmail
 } from "@/lib/email-templates";
+import { logOrderEvent } from "@/lib/audit-helpers";
 
 export type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded";
 
@@ -54,8 +55,8 @@ export interface OrderWithDetails {
  * Updates order status and sends appropriate notifications
  */
 export async function updateOrderStatus(
-  orderId: string, 
-  newStatus: OrderStatus, 
+  orderId: string,
+  newStatus: OrderStatus,
   notes?: string,
   trackingNumber?: string
 ): Promise<boolean> {
@@ -79,7 +80,22 @@ export async function updateOrderStatus(
     // Send notifications based on status change
     await handleStatusChangeNotifications(order, newStatus, trackingNumber);
 
-    console.log(`Order ${orderId} status updated to ${newStatus}`);
+    // Log order status change
+    await logOrderEvent({
+      action: 'status_changed',
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      userId: order.user?.id || null,
+      userEmail: order.user?.email,
+      vendorId: order.vendor.id,
+      details: {
+        previousStatus: order.status,
+        newStatus,
+        trackingNumber,
+        notes,
+      },
+    });
+
     return true;
   } catch (error) {
     console.error("Error updating order status:", error);
@@ -233,8 +249,8 @@ export async function getUserOrders(userId: string): Promise<OrderWithDetails[]>
  * Handles notifications when order status changes
  */
 async function handleStatusChangeNotifications(
-  order: OrderWithDetails, 
-  newStatus: OrderStatus, 
+  order: OrderWithDetails,
+  newStatus: OrderStatus,
   trackingNumber?: string
 ): Promise<void> {
   try {
@@ -368,10 +384,10 @@ async function sendCustomerOrderConfirmation(order: OrderWithDetails): Promise<v
   } catch (error) {
     console.error('Error sending customer confirmation email:', error);
     // Fallback to simple email if template fails
-    const itemsList = order.items.map(item => 
+    const itemsList = order.items.map(item =>
       `- ${item.product.name} (Cantidad: ${item.quantity}) - $${item.total} MXN`
     ).join('\n');
-    
+
     const emailContent = `
     <h2>🎉 ¡Gracias por tu compra en Luzimarket!</h2>
     <p>Estimado(a) ${order.user.name},</p>
@@ -472,7 +488,7 @@ async function sendCustomerShippingNotification(order: OrderWithDetails, trackin
   } catch (error) {
     console.error('Error sending shipping notification email:', error);
     // Fallback to simple email if template fails
-    const trackingInfo = trackingNumber 
+    const trackingInfo = trackingNumber
       ? `<p><strong>Número de rastreo:</strong> ${trackingNumber}</p>`
       : '';
 
@@ -606,6 +622,53 @@ async function sendCustomerRefundNotification(order: OrderWithDetails): Promise<
     subject: `Reembolso procesado #${order.orderNumber} - Luzimarket`,
     html: emailContent,
   });
+}
+
+/**
+ * Gets all related orders that were part of the same checkout (multi-vendor)
+ */
+export async function getRelatedOrders(orderGroupId: string): Promise<OrderWithDetails[]> {
+  try {
+    const relatedOrders = await db.query.orders.findMany({
+      where: eq(orders.orderGroupId, orderGroupId),
+      with: {
+        vendor: {
+          columns: {
+            id: true,
+            businessName: true,
+            email: true,
+          }
+        },
+        user: {
+          columns: {
+            id: true,
+            name: true,
+            email: true,
+          }
+        },
+        items: {
+          with: {
+            product: {
+              columns: {
+                id: true,
+                name: true,
+                images: true,
+              }
+            }
+          }
+        }
+      },
+      orderBy: desc(orders.createdAt),
+    });
+
+    return relatedOrders.map((order: any) => ({
+      ...order,
+      status: order.status as OrderStatus,
+    }));
+  } catch (error) {
+    console.error("Error fetching related orders:", error);
+    return [];
+  }
 }
 
 /**

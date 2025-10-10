@@ -6,6 +6,7 @@ import { z } from "zod";
 import { nanoid } from "nanoid";
 import { eq } from "drizzle-orm";
 import { createImageModerationRecords } from "@/lib/actions/image-moderation";
+import { logProductEvent } from "@/lib/audit-helpers";
 
 const createProductSchema = z.object({
   name: z.string().min(3),
@@ -20,7 +21,7 @@ const createProductSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
-    
+
     if (!session || session.user.role !== "vendor" || !session.user.vendor?.id) {
       return NextResponse.json(
         { error: "No autorizado" },
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
     const slug = validatedData.name
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "") + 
+      .replace(/(^-|-$)/g, "") +
       "-" + nanoid(6);
 
     // Create the product
@@ -77,10 +78,29 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Log product creation
+    await logProductEvent({
+      action: 'created',
+      productId: newProduct.id,
+      productName: newProduct.name,
+      vendorId: session.user.vendor.id,
+      userId: session.user.id,
+      userEmail: session.user.email!,
+      userType: 'vendor',
+      details: {
+        slug: newProduct.slug,
+        categoryId: newProduct.categoryId,
+        price: newProduct.price,
+        stock: newProduct.stock,
+        imageCount: validatedData.images.length,
+        pendingModeration: newProduct.imagesPendingModeration,
+      },
+    });
+
     return NextResponse.json(newProduct);
   } catch (error) {
     console.error("Error creating product:", error);
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Datos inválidos", details: error.errors },
@@ -98,7 +118,7 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const session = await auth();
-    
+
     if (!session || session.user.role !== "vendor" || !session.user.vendor?.id) {
       return NextResponse.json(
         { error: "No autorizado" },

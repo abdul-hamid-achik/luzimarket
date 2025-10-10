@@ -7,6 +7,7 @@ import { users, vendors, adminUsers } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { logPasswordEvent } from "@/lib/audit-helpers";
 
 const changePasswordSchema = z.object({
   currentPassword: z.string().min(1),
@@ -20,7 +21,7 @@ const changePasswordSchema = z.object({
 export async function POST(request: Request) {
   try {
     const session = await auth();
-    
+
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
     // Get the user based on their role
     let userRecord;
     let table;
-    
+
     switch (session.user.role) {
       case "customer":
         table = users;
@@ -86,11 +87,22 @@ export async function POST(request: Request) {
     // Update password
     await db
       .update(table)
-      .set({ 
+      .set({
         passwordHash: hashedPassword,
         updatedAt: new Date()
       })
       .where(eq(table.id, session.user.id));
+
+    // Log password change event
+    await logPasswordEvent({
+      action: 'password_changed',
+      userId: session.user.id,
+      userEmail: session.user.email!,
+      userType: session.user.role,
+      details: {
+        changedAt: new Date().toISOString(),
+      },
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {

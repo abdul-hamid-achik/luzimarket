@@ -151,13 +151,25 @@ export const orders = pgTable("orders", {
   orderNumber: text("order_number").notNull().unique(),
   userId: uuid("user_id").references(() => users.id),
   vendorId: uuid("vendor_id").notNull().references(() => vendors.id),
+  // Multi-vendor order grouping
+  orderGroupId: uuid("order_group_id"), // Links related orders from same checkout
   // Guest order fields
   guestEmail: text("guest_email"),
   guestName: text("guest_name"),
   guestPhone: text("guest_phone"),
   status: text("status").notNull().default("pending"), // pending, paid, shipped, delivered, cancelled
+  // Cancellation fields
+  cancellationStatus: text("cancellation_status"), // null, 'requested', 'approved', 'rejected'
+  cancellationReason: text("cancellation_reason"),
+  cancelledAt: timestamp("cancelled_at"),
+  cancelledBy: uuid("cancelled_by"), // userId who requested cancellation
+  // Refund tracking fields
+  refundId: text("refund_id"), // Stripe refund ID
+  refundStatus: text("refund_status"), // pending, succeeded, failed
+  refundedAt: timestamp("refunded_at"),
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
   tax: decimal("tax", { precision: 10, scale: 2 }).notNull().default("0"),
+  taxBreakdown: json("tax_breakdown").$type<{ vendorId: string; rate: number; amount: number; state: string }>(),
   shipping: decimal("shipping", { precision: 10, scale: 2 }).notNull().default("0"),
   discount: decimal("discount", { precision: 10, scale: 2 }).default("0"),
   couponCode: text("coupon_code"),

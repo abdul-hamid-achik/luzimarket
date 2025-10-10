@@ -775,6 +775,115 @@ async function main() {
         await client.end();
       }
       console.log('✅ drizzle-seed auto seeding complete');
+
+      // Add multi-vendor test orders for E2E tests
+      console.log("🧪 Creating multi-vendor test orders...");
+      try {
+        const testCustomer = await db.select().from(schema.users)
+          .where(eq(schema.users.email, 'customer1@example.com'))
+          .limit(1);
+
+        const vendor1 = await db.select().from(schema.vendors)
+          .where(eq(schema.vendors.email, 'vendor1@example.com'))
+          .limit(1);
+        const vendor2 = await db.select().from(schema.vendors)
+          .where(eq(schema.vendors.email, 'vendor2@example.com'))
+          .limit(1);
+
+        if (testCustomer[0] && vendor1[0] && vendor2[0]) {
+          const vendor1Products = await db.select().from(schema.products)
+            .where(eq(schema.products.vendorId, vendor1[0].id))
+            .limit(1);
+          const vendor2Products = await db.select().from(schema.products)
+            .where(eq(schema.products.vendorId, vendor2[0].id))
+            .limit(1);
+
+          if (vendor1Products.length > 0 && vendor2Products.length > 0) {
+            const testOrdersData = [
+              {
+                orderNumber: 'LM-TEST-MV1',
+                vendorId: vendor1[0].id,
+                userId: testCustomer[0].id,
+                guestEmail: null,
+                total: '500.00',
+                subtotal: '400.00',
+                tax: '64.00',
+                shipping: '36.00',
+                status: 'paid' as const,
+                paymentStatus: 'succeeded' as const,
+                shippingAddress: {
+                  street: 'Av. Reforma 123',
+                  city: 'Ciudad de México',
+                  state: 'CDMX',
+                  postalCode: '06600',
+                  country: 'MX'
+                },
+                billingAddress: {
+                  street: 'Av. Reforma 123',
+                  city: 'Ciudad de México',
+                  state: 'CDMX',
+                  postalCode: '06600',
+                  country: 'MX'
+                },
+                notes: 'Multi-vendor test order - Vendor 1 portion'
+              },
+              {
+                orderNumber: 'LM-TEST-MV2',
+                vendorId: vendor2[0].id,
+                userId: testCustomer[0].id,
+                guestEmail: null,
+                total: '350.00',
+                subtotal: '300.00',
+                tax: '48.00',
+                shipping: '2.00',
+                status: 'paid' as const,
+                paymentStatus: 'succeeded' as const,
+                shippingAddress: {
+                  street: 'Av. Reforma 123',
+                  city: 'Ciudad de México',
+                  state: 'CDMX',
+                  postalCode: '06600',
+                  country: 'MX'
+                },
+                billingAddress: {
+                  street: 'Av. Reforma 123',
+                  city: 'Ciudad de México',
+                  state: 'CDMX',
+                  postalCode: '06600',
+                  country: 'MX'
+                },
+                notes: 'Multi-vendor test order - Vendor 2 portion'
+              }
+            ];
+
+            const testOrders = await db.insert(schema.orders)
+              .values(testOrdersData)
+              .onConflictDoNothing({ target: schema.orders.orderNumber })
+              .returning();
+
+            if (testOrders.length > 0) {
+              const testOrderItems = [];
+              for (let i = 0; i < testOrders.length; i++) {
+                const order = testOrders[i];
+                const product = i === 0 ? vendor1Products[0] : vendor2Products[0];
+                testOrderItems.push({
+                  orderId: order.id,
+                  productId: product.id,
+                  quantity: 1,
+                  price: product.price,
+                  total: product.price
+                });
+              }
+
+              await db.insert(schema.orderItems).values(testOrderItems);
+              console.log(`✅ Created ${testOrders.length} multi-vendor test orders`);
+            }
+          }
+        }
+      } catch (error) {
+        console.warn('⚠️  Could not create test orders:', error);
+      }
+
       console.log("\n✅ Database seeded successfully!");
       return;
     }
@@ -782,16 +891,13 @@ async function main() {
     const progress = await createProgressControls();
 
     // 1. Seed Categories (idempotent)
-    console.log("🏷️  Creating categories...");
     await db
       .insert(schema.categories)
       .values(CATEGORIES)
       .onConflictDoNothing({ target: schema.categories.slug });
     const categories = await db.select().from(schema.categories);
-    console.log(`✅ Ensured ${categories.length} categories`);
 
     // 2. Seed Admin Users
-    console.log("👤 Creating admin users...");
     const hashedPassword = await bcrypt.hash("admin123", 10);
     const adminUsersData = [
       {
@@ -1133,7 +1239,6 @@ async function main() {
       console.log('\n🖼️  Generating product images...');
       const productsNeedingImages = forceRegenerateImages ? products : products.filter(p => !p.images || (Array.isArray(p.images) && p.images.length === 0));
       const productsToImage = productsNeedingImages.slice(0, imageBatchSize);
-      console.log(`📊 Found ${productsNeedingImages.length} products ${forceRegenerateImages ? '(forced regeneration)' : 'without images'}, generating for ${productsToImage.length}`);
 
       const bar4 = progress.start(productsToImage.length, '🖼️  AI: products');
       for (const product of productsToImage) {
