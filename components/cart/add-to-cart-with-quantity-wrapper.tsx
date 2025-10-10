@@ -10,17 +10,18 @@ interface AddToCartWithQuantityWrapperProps {
     image: string;
     vendorId: string;
     vendorName: string;
+    vendorState?: string | null;
     stock?: number;
   };
   className?: string;
 }
 
-export function AddToCartWithQuantityWrapper({ 
-  product, 
-  className 
+export function AddToCartWithQuantityWrapper({
+  product,
+  className
 }: AddToCartWithQuantityWrapperProps) {
   return (
-    <AddToCartWithQuantity 
+    <AddToCartWithQuantity
       product={product}
       className={className}
     />

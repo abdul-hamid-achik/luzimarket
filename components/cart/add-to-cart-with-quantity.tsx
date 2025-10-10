@@ -18,14 +18,15 @@ interface AddToCartWithQuantityProps {
     image: string;
     vendorId: string;
     vendorName: string;
+    vendorState?: string | null;
     stock?: number;
   };
   className?: string;
 }
 
-export function AddToCartWithQuantity({ 
-  product, 
-  className 
+export function AddToCartWithQuantity({
+  product,
+  className
 }: AddToCartWithQuantityProps) {
   const { addToCart, toggleCart, state } = useCart();
   const [quantity, setQuantity] = useState(1);
@@ -36,7 +37,7 @@ export function AddToCartWithQuantity({
 
   const handleAddToCart = async () => {
     setIsLoading(true);
-    
+
     try {
       // Check current quantity in cart
       const currentCartItem = state.items.find((item: any) => item.id === product.id);
@@ -45,7 +46,7 @@ export function AddToCartWithQuantity({
 
       // Check stock availability
       const stockCheck = await checkProductStock(product.id, requestedQuantity);
-      
+
       if (!stockCheck.isAvailable) {
         if (stockCheck.availableStock === 0) {
           toast.error(t('stockValidation.outOfStock'), {
@@ -54,12 +55,12 @@ export function AddToCartWithQuantity({
         } else {
           const remainingCanAdd = stockCheck.availableStock - currentQuantity;
           toast.error(t('stockValidation.limitedStock'), {
-            description: remainingCanAdd === 1 
+            description: remainingCanAdd === 1
               ? t('stockValidation.limitedStockDescriptionSingle', { productName: product.name })
-              : t('stockValidation.limitedStockDescriptionMultiple', { 
-                  count: remainingCanAdd, 
-                  productName: product.name 
-                })
+              : t('stockValidation.limitedStockDescriptionMultiple', {
+                count: remainingCanAdd,
+                productName: product.name
+              })
           });
         }
         return;
@@ -69,18 +70,18 @@ export function AddToCartWithQuantity({
       for (let i = 0; i < quantity; i++) {
         addToCart(product);
       }
-      
+
       setIsAdded(true);
-      
+
       toast.success(t('stockValidation.addedSuccess'), {
-        description: quantity === 1 
+        description: quantity === 1
           ? t('stockValidation.addedSuccessDescription', { productName: product.name })
-          : t('stockValidation.addedSuccessDescriptionMultiple', { 
-              count: quantity, 
-              productName: product.name 
-            })
+          : t('stockValidation.addedSuccessDescriptionMultiple', {
+            count: quantity,
+            productName: product.name
+          })
       });
-      
+
       // Show the cart
       setTimeout(() => {
         toggleCart();
@@ -115,14 +116,14 @@ export function AddToCartWithQuantity({
             disabled={isLoading || isAdded}
           />
         </div>
-        
+
         {product.stock !== undefined && product.stock < 10 && product.stock > 0 && (
           <span className="text-sm text-orange-600 font-univers">
             {tProducts('lowStock', { count: product.stock })}
           </span>
         )}
       </div>
-      
+
       <Button
         onClick={handleAddToCart}
         className={cn(
@@ -140,11 +141,11 @@ export function AddToCartWithQuantity({
         ) : (
           <ShoppingBag className="h-5 w-5 mr-2" />
         )}
-        {isLoading 
-          ? t('stockValidation.checking') 
-          : isAdded 
-          ? tProducts('added') 
-          : tProducts('addToCart')
+        {isLoading
+          ? t('stockValidation.checking')
+          : isAdded
+            ? tProducts('added')
+            : tProducts('addToCart')
         }
       </Button>
     </div>

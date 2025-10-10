@@ -10,6 +10,7 @@ export interface CartItem {
   image: string;
   vendorId: string;
   vendorName: string;
+  vendorState?: string | null; // For per-vendor tax calculation
 }
 
 interface CartState {
@@ -43,7 +44,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case "ADD_ITEM": {
       const existingItem = state.items.find(item => item.id === action.payload.id);
-      
+
       if (existingItem) {
         return {
           ...state,
@@ -54,19 +55,19 @@ function cartReducer(state: CartState, action: CartAction): CartState {
           ),
         };
       }
-      
+
       return {
         ...state,
         items: [...state.items, { ...action.payload, quantity: 1 }],
       };
     }
-    
+
     case "REMOVE_ITEM":
       return {
         ...state,
         items: state.items.filter(item => item.id !== action.payload),
       };
-    
+
     case "UPDATE_QUANTITY":
       if (action.payload.quantity <= 0) {
         return {
@@ -74,7 +75,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
           items: state.items.filter(item => item.id !== action.payload.id),
         };
       }
-      
+
       return {
         ...state,
         items: state.items.map(item =>
@@ -83,25 +84,25 @@ function cartReducer(state: CartState, action: CartAction): CartState {
             : item
         ),
       };
-    
+
     case "CLEAR_CART":
       return {
         ...state,
         items: [],
       };
-    
+
     case "TOGGLE_CART":
       return {
         ...state,
         isOpen: !state.isOpen,
       };
-    
+
     case "LOAD_CART":
       return {
         ...state,
         items: action.payload,
       };
-    
+
     default:
       return state;
   }

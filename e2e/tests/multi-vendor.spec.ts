@@ -378,8 +378,8 @@ test.describe('Multi-Vendor Orders', () => {
     await page.fill('input[name="orderNumber"]', cancelOrderId1);
     await page.getByRole('button', { name: /buscar/i }).click();
 
-    // Wait for order page to load
-    await page.waitForURL(`**/orders/${cancelOrderId1}**`, { timeout: 10000 });
+    // Wait for order page to load (matches both /orders/ and /pedidos/ localized routes)
+    await page.waitForURL(`**/${cancelOrderId1}**`, { timeout: 10000 });
     await page.waitForSelector('text=Cancelar orden', { timeout: 5000 });
 
     // Click cancel button
@@ -431,7 +431,7 @@ test.describe('Multi-Vendor Orders', () => {
     await page.getByRole('button', { name: /buscar/i }).click();
 
     // Should show cancelled status
-    await page.waitForURL(`**/orders/${cancelOrderId1}**`, { timeout: 10000 });
+    await page.waitForURL(`**/${cancelOrderId1}**`, { timeout: 10000 });
     await expect(page.getByText(/cancelado|cancelled/i).first()).toBeVisible();
 
     // Mock vendor 2's order (still active)
@@ -573,7 +573,7 @@ test.describe('Multi-Vendor Orders', () => {
     await expect(page.getByText(/vendedores diferentes/i)).toBeVisible();
   });
 
-  test.skip('should calculate taxes per vendor based on their location', async ({ page }) => {
+  test('should calculate taxes per vendor based on their location', async ({ page }) => {
     // Add products from different vendors
     await page.goto(routes.products);
 

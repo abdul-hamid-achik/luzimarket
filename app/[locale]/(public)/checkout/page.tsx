@@ -24,6 +24,7 @@ import { useSession } from "next-auth/react";
 import { ShippingCalculator } from "@/components/checkout/shipping-calculator";
 import { CouponInput } from "@/components/checkout/coupon-input";
 import { businessConfig } from "@/lib/config/business";
+import { calculateTaxForState, getTaxRateLabel } from "@/lib/utils/tax-rates";
 
 // Note: Tax rate is handled server-side for security
 // Client-side calculations are for display only
@@ -102,7 +103,25 @@ export default function CheckoutPage() {
   const totalShippingCost = Object.values(shippingCostsByVendor).reduce((sum, cost) => sum + cost, 0);
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
   const discount = appliedCoupon?.discount || 0;
-  const tax = subtotal * TAX_RATE; // Uses server config rate
+
+  // Calculate tax per vendor based on their state
+  const vendorTaxInfo = useMemo(() => {
+    return Object.entries(itemsByVendor).map(([vendorId, vendorItems]) => {
+      const vendorSubtotal = vendorItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const vendorState = vendorItems[0]?.vendorState;
+      const vendorTax = calculateTaxForState(vendorSubtotal, vendorState);
+
+      return {
+        id: vendorId,
+        name: vendorItems[0]?.vendorName || 'Vendedor',
+        state: vendorState,
+        subtotal: vendorSubtotal,
+        tax: vendorTax,
+      };
+    });
+  }, [itemsByVendor]);
+
+  const tax = vendorTaxInfo.reduce((sum, vendor) => sum + vendor.tax, 0);
   const total = subtotal + totalShippingCost + tax - discount;
 
   // Memoize shipping items to prevent infinite loops
@@ -634,10 +653,28 @@ export default function CheckoutPage() {
                           )}
                         </span>
                       </div>
-                      <div className="flex justify-between font-univers" data-testid="tax-line">
-                        <span>IVA (16%)</span>
-                        <span>{formatPrice(tax)}</span>
-                      </div>
+                      {/* Tax breakdown by vendor */}
+                      {vendorTaxInfo.length > 1 ? (
+                        // Multi-vendor: Show per-vendor tax
+                        <>
+                          {vendorTaxInfo.map((vendor) => (
+                            <div key={vendor.id} className="flex justify-between font-univers text-sm" data-testid="tax-line">
+                              <span>IVA {getTaxRateLabel(vendor.state)} ({vendor.name})</span>
+                              <span>{formatPrice(vendor.tax)}</span>
+                            </div>
+                          ))}
+                          <div className="flex justify-between font-univers font-medium">
+                            <span>IVA Total</span>
+                            <span>{formatPrice(tax)}</span>
+                          </div>
+                        </>
+                      ) : (
+                        // Single vendor: Show single tax line
+                        <div className="flex justify-between font-univers" data-testid="tax-line">
+                          <span>IVA {getTaxRateLabel(vendorTaxInfo[0]?.state)}</span>
+                          <span>{formatPrice(tax)}</span>
+                        </div>
+                      )}
                       <Separator />
                       <div className="flex justify-between font-times-now text-lg">
                         <span>Total</span>

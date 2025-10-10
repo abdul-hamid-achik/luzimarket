@@ -184,10 +184,13 @@ export function VendorProductsClient({ products, vendorId }: VendorProductsClien
                             <thead className="bg-gray-50 border-b border-gray-200">
                                 <tr>
                                     <th className="px-6 py-3 text-left">
-                                        <Checkbox
-                                            checked={selectedProducts.size === products.length}
-                                            onCheckedChange={handleSelectAll}
-                                        />
+                                        <div onClick={(e) => e.stopPropagation()}>
+                                            <Checkbox
+                                                checked={selectedProducts.size === products.length}
+                                                onCheckedChange={handleSelectAll}
+                                                aria-label="Select all products"
+                                            />
+                                        </div>
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-univers font-medium text-gray-500 uppercase">
                                         Producto
@@ -215,10 +218,14 @@ export function VendorProductsClient({ products, vendorId }: VendorProductsClien
                                     return (
                                         <tr key={product.id}>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <Checkbox
-                                                    checked={selectedProducts.has(product.id)}
-                                                    onCheckedChange={() => handleToggleSelect(product.id)}
-                                                />
+                                                <div onClick={(e) => e.stopPropagation()}>
+                                                    <Checkbox
+                                                        checked={selectedProducts.has(product.id)}
+                                                        onCheckedChange={() => handleToggleSelect(product.id)}
+                                                        aria-label={`Select ${product.name}`}
+                                                        data-product-id={product.id}
+                                                    />
+                                                </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">

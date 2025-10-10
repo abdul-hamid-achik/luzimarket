@@ -554,11 +554,11 @@ async function main() {
               businessPhone: '+52 55 5123 4567',
               businessHours: 'Lun-Vie 9:00-18:00',
               city: 'Ciudad de México',
-              state: 'CDMX',
+              state: 'Ciudad de México', // 16% IVA (standard rate)
               country: 'México',
               postalCode: '01000',
               websiteUrl: 'https://testvendor.com',
-              description: 'Fixed test vendor for e2e tests',
+              description: 'Test vendor for e2e tests - Standard tax rate',
               hasDelivery: true,
               deliveryService: 'own',
               instagramUrl: '@testvendor',
@@ -566,6 +566,31 @@ async function main() {
               tiktokUrl: '@testvendor',
               isActive: true,
               shippingOriginState: 'Ciudad de México',
+              defaultShippingMethodId: defaultShippingMethodId,
+            },
+            {
+              businessName: 'Border Vendor Shop',
+              slug: 'border-vendor-shop',
+              contactName: 'Border Vendor',
+              email: 'bordervendor@luzimarket.shop',
+              passwordHash: autoHashedVendorPassword,
+              phone: '+52 664 5123 4567',
+              whatsapp: '+52 664 5123 4567',
+              businessPhone: '+52 664 5123 4567',
+              businessHours: 'Lun-Vie 9:00-18:00',
+              city: 'Tijuana',
+              state: 'Baja California', // 8% IVA (border rate)
+              country: 'México',
+              postalCode: '22000',
+              websiteUrl: 'https://bordervendor.com',
+              description: 'Border test vendor for e2e tests - Border tax rate',
+              hasDelivery: true,
+              deliveryService: 'own',
+              instagramUrl: '@bordervendor',
+              facebookUrl: 'bordervendor',
+              tiktokUrl: '@bordervendor',
+              isActive: true,
+              shippingOriginState: 'Baja California',
               defaultShippingMethodId: defaultShippingMethodId,
               freeShippingThreshold: '1000',
             },
@@ -1032,7 +1057,7 @@ async function main() {
       });
     }
 
-    // Add a specific test vendor for e2e tests
+    // Add specific test vendors for e2e tests with different tax rates
     vendorData.push({
       businessName: "Test Vendor Shop",
       slug: "test-vendor-shop",
@@ -1045,11 +1070,11 @@ async function main() {
       businessHours: "Lun-Vie 9:00-18:00",
       street: "Calle Test 123",
       city: "Ciudad de México",
-      state: "CDMX",
+      state: "Ciudad de México", // 16% IVA (standard rate)
       country: "México",
       postalCode: "01000",
       websiteUrl: "https://testvendor.com",
-      description: "Test vendor for e2e tests",
+      description: "Test vendor for e2e tests - Standard tax rate",
       hasDelivery: true,
       deliveryService: "own",
       instagramUrl: "@testvendor",
@@ -1057,6 +1082,34 @@ async function main() {
       tiktokUrl: "@testvendor",
       isActive: true,
       shippingOriginState: "Ciudad de México",
+      freeShippingThreshold: "1000"
+    });
+
+    // Add second test vendor with border state (8% tax rate)
+    vendorData.push({
+      businessName: "Border Vendor Shop",
+      slug: "border-vendor-shop",
+      contactName: "Border Vendor",
+      email: "bordervendor@luzimarket.shop",
+      passwordHash: defaultPasswordHash, // password123
+      phone: "+52 664 5123 4567",
+      whatsapp: "+52 664 5123 4567",
+      businessPhone: "+52 664 5123 4567",
+      businessHours: "Lun-Vie 9:00-18:00",
+      street: "Av. Revolución 123",
+      city: "Tijuana",
+      state: "Baja California", // 8% IVA (border rate)
+      country: "México",
+      postalCode: "22000",
+      websiteUrl: "https://bordervendor.com",
+      description: "Border test vendor for e2e tests - Border tax rate",
+      hasDelivery: true,
+      deliveryService: "own",
+      instagramUrl: "@bordervendor",
+      facebookUrl: "bordervendor",
+      tiktokUrl: "@bordervendor",
+      isActive: true,
+      shippingOriginState: "Baja California",
       freeShippingThreshold: "1000"
     });
 

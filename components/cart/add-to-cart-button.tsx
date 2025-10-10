@@ -17,15 +17,16 @@ interface AddToCartButtonProps {
     image: string;
     vendorId: string;
     vendorName: string;
+    vendorState?: string | null;
   };
   className?: string;
   showIcon?: boolean;
 }
 
-export function AddToCartButton({ 
-  product, 
+export function AddToCartButton({
+  product,
   className,
-  showIcon = true 
+  showIcon = true
 }: AddToCartButtonProps) {
   const { addToCart, toggleCart, state } = useCart();
   const [isAdded, setIsAdded] = useState(false);
@@ -35,7 +36,7 @@ export function AddToCartButton({
 
   const handleAddToCart = async () => {
     setIsLoading(true);
-    
+
     try {
       // Check current quantity in cart
       const currentCartItem = state.items.find((item: any) => item.id === product.id);
@@ -44,7 +45,7 @@ export function AddToCartButton({
 
       // Check stock availability
       const stockCheck = await checkProductStock(product.id, requestedQuantity);
-      
+
       if (!stockCheck.isAvailable) {
         if (stockCheck.availableStock === 0) {
           toast.error(t('stockValidation.outOfStock'), {
@@ -52,12 +53,12 @@ export function AddToCartButton({
           });
         } else {
           toast.error(t('stockValidation.limitedStock'), {
-            description: stockCheck.availableStock === 1 
+            description: stockCheck.availableStock === 1
               ? t('stockValidation.limitedStockDescriptionSingle', { productName: product.name })
-              : t('stockValidation.limitedStockDescriptionMultiple', { 
-                  count: stockCheck.availableStock, 
-                  productName: product.name 
-                })
+              : t('stockValidation.limitedStockDescriptionMultiple', {
+                count: stockCheck.availableStock,
+                productName: product.name
+              })
           });
         }
         return;
@@ -66,11 +67,11 @@ export function AddToCartButton({
       // Add to cart if stock is available
       addToCart(product);
       setIsAdded(true);
-      
+
       toast.success(t('stockValidation.addedSuccess'), {
         description: t('stockValidation.addedSuccessDescription', { productName: product.name })
       });
-      
+
       // Show the cart
       setTimeout(() => {
         toggleCart();

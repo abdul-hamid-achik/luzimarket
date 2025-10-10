@@ -25,6 +25,7 @@ interface ProductCardProps {
     vendor?: {
       id: string;
       businessName: string;
+      state?: string | null;
     } | null;
   };
   className?: string;
@@ -138,6 +139,7 @@ export function ProductCard({ product, className, onQuickView }: ProductCardProp
                 image: product.images[0] || "/images/links/pia-riverola.webp",
                 vendorId: product.vendor?.id || "",
                 vendorName: product.vendor?.businessName || t('vendor'),
+                vendorState: product.vendor?.state,
               }}
               className={cn(
                 "h-10 text-sm",
