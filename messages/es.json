@@ -1793,6 +1793,7 @@
     "continueShopping": "Continuar Comprando",
     "emailSent": "Se ha enviado un correo de confirmación a tu dirección de email registrada.",
     "orderConfirmation": "Hemos recibido tu pedido y lo estamos preparando para envío.",
+    "orderNumber": "Número de Pedido",
     "sessionId": "ID de sesión",
     "subtitle": "Tu pago ha sido procesado exitosamente",
     "title": "¡Gracias por tu pedido!",

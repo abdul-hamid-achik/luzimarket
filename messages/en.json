@@ -1793,6 +1793,7 @@
     "continueShopping": "Continue Shopping",
     "emailSent": "A confirmation email has been sent to your registered email address.",
     "orderConfirmation": "We've received your order and are preparing it for shipment.",
+    "orderNumber": "Order Number",
     "sessionId": "Session ID",
     "subtitle": "Your payment has been processed successfully",
     "title": "Thank you for your order!",
