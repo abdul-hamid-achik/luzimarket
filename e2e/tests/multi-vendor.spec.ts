@@ -477,7 +477,7 @@ test.describe('Multi-Vendor Orders', () => {
     await page.fill('input[name="email"]', customerEmail);
     await page.fill('input[name="orderNumber"]', cancelOrderId2);
     await page.getByRole('button', { name: /buscar/i }).click();
-    await expect(page.getByText(/pendiente|pending/i)).toBeVisible();
+    await expect(page.getByText(/pendiente|pending/i).first()).toBeVisible();
   });
 
   test('should show combined tracking when all vendors ship', async ({ page }) => {
@@ -574,36 +574,58 @@ test.describe('Multi-Vendor Orders', () => {
   });
 
   test('should calculate taxes per vendor based on their location', async ({ page }) => {
-    // Add products from different vendors
-    await page.goto(routes.products);
-
-    // Add multiple items to see tax calculation
-    for (let i = 0; i < 2; i++) {
-      const vendor1Card = page.getByTestId('product-card').filter({
-        hasText: vendor1Products[0].vendor
-      }).first();
-      await vendor1Card.click();
-      await page.getByRole('button', { name: /agregar al carrito/i }).first().click();
-      await page.keyboard.press('Escape');
-      await page.goto(routes.products);
+    // Skip test if we don't have products from 2 different vendors
+    if (!vendor1Products.length || !vendor2Products.length) {
+      return;
     }
 
+    // Add products from different vendors - EXACT same pattern as working test
+    await page.goto(routes.products);
+    await page.waitForLoadState('networkidle');
+    await page.waitForSelector('[data-testid="product-card"]', { timeout: 10000 });
+
+    // Add product from vendor 1
+    const vendor1Card = page.getByTestId('product-card').filter({
+      hasText: vendor1Products[0].name
+    }).first();
+    await vendor1Card.click();
+    await page.waitForURL('**/productos/**', { timeout: 10000 });
+    await page.getByRole('button', { name: /agregar al carrito/i }).first().click();
+    await page.waitForSelector('[role="dialog"]', { timeout: 10000 });
+
+    // Close cart and go back to products
+    await page.keyboard.press('Escape');
+    await page.locator('[role="dialog"]').first().waitFor({ state: 'hidden', timeout: 10000 }).catch(() => { });
+
+    await page.goto(routes.products);
+    await page.waitForLoadState('networkidle');
+    await page.waitForSelector('[data-testid="product-card"]', { timeout: 10000 });
+
+    // Add product from vendor 2
     const vendor2Card = page.getByTestId('product-card').filter({
       hasText: vendor2Products[0].name
     }).first();
     await vendor2Card.click();
     await page.waitForURL('**/productos/**', { timeout: 10000 });
     await page.getByRole('button', { name: /agregar al carrito/i }).first().click();
+    await page.waitForSelector('[role="dialog"]', { timeout: 10000 });
 
-    // Go to checkout - try link first, then button
-    const checkoutLink4 = page.getByRole('link', { name: /proceder al pago|pagar/i });
-    const checkoutButton4 = page.getByRole('button', { name: /pagar/i });
+    // Verify cart has products from both vendors
+    await expect(page.getByTestId('cart-item')).toHaveCount(2);
 
-    if (await checkoutLink4.isVisible({ timeout: 2000 })) {
-      await checkoutLink4.click();
-    } else if (await checkoutButton4.isVisible({ timeout: 2000 })) {
-      await checkoutButton4.click();
+    // Proceed to checkout - try link first, then button (use same pattern as working test)
+    const checkoutLink = page.getByRole('link', { name: /proceder al pago|pagar/i });
+    const checkoutButton = page.getByRole('button', { name: /pagar/i });
+
+    if (await checkoutLink.isVisible({ timeout: 2000 })) {
+      await checkoutLink.click();
+    } else if (await checkoutButton.isVisible({ timeout: 2000 })) {
+      await checkoutButton.click();
     }
+
+    // Wait for checkout page to load
+    await page.waitForURL('**/pagar', { timeout: 20000 });
+    await page.waitForSelector('input[name="email"]', { timeout: 20000 });
 
     // Fill address to trigger tax calculation
     await page.fill('input[name="email"]', customerEmail);

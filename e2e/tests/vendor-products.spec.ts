@@ -412,12 +412,15 @@ test.describe('Vendor Product Management', () => {
     test('should pause/unpause product', async ({ page }) => {
       await page.goto('/es/vendor/products');
 
-      // Find active product
-      const activeProduct = page.locator('tr, .product-card').filter({ hasText: /Activo|Active/i }).first();
+      // Wait for products to load
+      await page.waitForSelector('table tbody tr', { timeout: 5000 });
+
+      // Find active product row
+      const activeProduct = page.locator('tr').filter({ hasText: /Activo|Active/i }).first();
 
       if (await activeProduct.isVisible()) {
-        // Toggle status
-        const statusToggle = activeProduct.locator('button[role="switch"], input[type="checkbox"]').first();
+        // Find the status toggle button (Eye/EyeOff icon button)
+        const statusToggle = activeProduct.locator('button').filter({ hasText: '' }).last();
 
         if (await statusToggle.isVisible()) {
           await statusToggle.click();
@@ -539,12 +542,18 @@ test.describe('Vendor Product Management', () => {
     test('should bulk update product prices', async ({ page }) => {
       await page.goto('/es/vendor/products');
 
-      // Select multiple products
-      const allCheckboxes = await page.locator('input[type="checkbox"]:not([disabled])').all();
-      const checkboxes = allCheckboxes.slice(0, 3);
+      // Wait for products to load
+      await page.waitForSelector('table tbody tr', { timeout: 5000 });
 
-      for (const checkbox of checkboxes) {
-        await checkbox.click({ force: true });
+      // Select multiple products - click on the table row checkboxes (visible area, not hidden Radix input)
+      const productRows = await page.locator('table tbody tr').all();
+      const rowsToSelect = productRows.slice(0, 3);
+
+      for (const row of rowsToSelect) {
+        // Click the checkbox cell (td) which contains the visible checkbox
+        const checkboxCell = row.locator('td').first();
+        await checkboxCell.click();
+        await page.waitForTimeout(100); // Small delay for state update
       }
 
       // Bulk actions should appear

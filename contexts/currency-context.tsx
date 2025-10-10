@@ -30,7 +30,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
       // Check cache first
       const cached = localStorage.getItem('mxn-usd-rate');
       const cacheTimestamp = localStorage.getItem('mxn-usd-rate-timestamp');
-      
+
       if (cached && cacheTimestamp) {
         const age = Date.now() - parseInt(cacheTimestamp);
         if (age < CACHE_DURATION) {
@@ -42,11 +42,11 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
       // Fetch fresh rate from API
       const response = await fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/mxn.json');
       const data = await response.json();
-      
+
       if (data.mxn && data.mxn.usd) {
         const rate = data.mxn.usd;
         setExchangeRate(rate);
-        
+
         // Cache the result
         localStorage.setItem('mxn-usd-rate', rate.toString());
         localStorage.setItem('mxn-usd-rate-timestamp', Date.now().toString());
@@ -63,7 +63,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     if (saved === 'USD' || saved === 'MXN') {
       setCurrency(saved);
     }
-    
+
     // Fetch exchange rate
     fetchExchangeRate();
   }, []);
@@ -88,19 +88,19 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     return new Intl.NumberFormat(currency === 'MXN' ? 'es-MX' : 'en-US', {
       style: 'currency',
       currency: currency,
-      minimumFractionDigits: 0,
+      minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(converted);
   };
 
   return (
-    <CurrencyContext.Provider 
-      value={{ 
-        currency, 
-        setCurrency: handleSetCurrency, 
+    <CurrencyContext.Provider
+      value={{
+        currency,
+        setCurrency: handleSetCurrency,
         exchangeRate,
         convertPrice,
-        formatPrice 
+        formatPrice
       }}
     >
       {children}
