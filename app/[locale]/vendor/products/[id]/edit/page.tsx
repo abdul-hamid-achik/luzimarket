@@ -52,7 +52,7 @@ export default function EditProductPage() {
   const params = useParams();
   const productId = params.id as string;
   const t = useTranslations("Vendor.products.edit");
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
@@ -158,6 +158,29 @@ export default function EditProductPage() {
     }
   };
 
+  // Show loading state while product data is being fetched
+  if (loadingProduct) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+      </div>
+    );
+  }
+
+  // Show error if product not found
+  if (!product) {
+    return (
+      <div className="max-w-4xl mx-auto text-center py-12">
+        <p className="text-gray-500">{t("productNotFound", { default: "Producto no encontrado" })}</p>
+        <Link href="/vendor/products">
+          <Button variant="outline" className="mt-4">
+            {t("backToProducts")}
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto">
       {/* Header */}
@@ -169,7 +192,7 @@ export default function EditProductPage() {
           <ChevronLeft className="h-4 w-4 mr-1" />
           {t("backToProducts")}
         </Link>
-        
+
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-univers text-gray-900">{t("editProduct")}</h1>
@@ -177,7 +200,7 @@ export default function EditProductPage() {
               {t("updateProductInfo")}
             </p>
           </div>
-          
+
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" size="sm">
@@ -212,7 +235,7 @@ export default function EditProductPage() {
           {/* Basic Information */}
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <h2 className="text-lg font-univers mb-6">{t("basicInfo")}</h2>
-            
+
             <div className="space-y-6">
               <FormField
                 control={form.control}
@@ -302,7 +325,7 @@ export default function EditProductPage() {
           {/* Pricing & Inventory */}
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <h2 className="text-lg font-univers mb-6">{t("priceAndInventory")}</h2>
-            
+
             <div className="grid grid-cols-2 gap-6">
               <FormField
                 control={form.control}
@@ -334,6 +357,7 @@ export default function EditProductPage() {
                     <FormLabel>{t("stock")}</FormLabel>
                     <FormControl>
                       <InputWithValidation
+                        id="stock"
                         type="number"
                         placeholder={t("stockPlaceholder")}
                         {...field}
@@ -374,7 +398,7 @@ export default function EditProductPage() {
           {/* Images */}
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <h2 className="text-lg font-univers mb-6">{t("productImages")}</h2>
-            
+
             <FormField
               control={form.control}
               name="images"

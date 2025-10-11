@@ -346,7 +346,7 @@ export function VendorProductsClient({ products, vendorId }: VendorProductsClien
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-2">
                                                     <Link href={`/vendor/products/${product.id}/edit`}>
-                                                        <Button variant="ghost" size="sm">
+                                                        <Button variant="ghost" size="sm" title="Editar producto" aria-label="Editar">
                                                             <Edit className="h-4 w-4" />
                                                         </Button>
                                                     </Link>
