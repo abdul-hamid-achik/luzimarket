@@ -97,45 +97,14 @@ test.describe('CSRF Protection', () => {
                 failOnStatusCode: false
             });
 
-            // Log the response for debugging
             const status = response.status();
-            const responseText = await response.text();
-            let body = null;
-            try {
-                body = JSON.parse(responseText);
-            } catch (e) {
-                // Not JSON
-            }
-
-            console.log('CSRF test response status:', status);
-            console.log('CSRF test response type:', responseText.startsWith('<!DOCTYPE') ? 'HTML' : 'JSON');
-
-            if (responseText.startsWith('<!DOCTYPE')) {
-                // Extract error message from HTML
-                const titleMatch = responseText.match(/<title>(.*?)<\/title>/);
-                console.log('HTML Error Title:', titleMatch ? titleMatch[1] : 'Unknown');
-
-                // Look for error details in the page
-                const h1Match = responseText.match(/<h1[^>]*>(.*?)<\/h1>/);
-                if (h1Match) {
-                    console.log('Error heading:', h1Match[1].replace(/<[^>]*>/g, ''));
-                }
-
-                // Check for stack trace or error details
-                if (responseText.includes('Error:')) {
-                    const errorIdx = responseText.indexOf('Error:');
-                    console.log('Error snippet:', responseText.substring(errorIdx, errorIdx + 300).replace(/<[^>]*>/g, ' '));
-                }
-            } else if (body) {
-                console.log('JSON Response body:', body);
-            }
 
             // Should have CSRF protection
             // If it's a 403, CSRF is working
             // If it's 400/422, validation caught it  
             // If it's 201/200, request was allowed (origin-based CSRF)
             // Should NOT be 500 (that's a server error we need to fix)
-            expect([200, 201, 400, 403, 422]).toContain(response.status());
+            expect([200, 201, 400, 403, 422]).toContain(status);
         });
 
         test('should protect order update endpoint', async ({ page }) => {
