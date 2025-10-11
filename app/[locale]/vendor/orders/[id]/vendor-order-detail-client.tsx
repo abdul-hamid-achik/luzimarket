@@ -26,6 +26,7 @@ import Image from "next/image";
 import { formatCurrency } from "@/lib/utils";
 import { toast } from "sonner";
 import { OrderStatusUpdateForm } from "@/components/vendor/order-status-update-form";
+import { AddTrackingForm } from "@/components/vendor/add-tracking-form";
 import { printOrder, generateOrderPDF } from "@/lib/utils/print";
 
 interface VendorOrderDetailClientProps {
@@ -259,20 +260,35 @@ export function VendorOrderDetailClient({ order, translations: t }: VendorOrderD
 
           {/* Shipping Actions */}
           {order.order.status !== 'cancelled' && order.order.status !== 'delivered' && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Truck className="h-5 w-5" />
-                  {t.shippingActions}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <OrderStatusUpdateForm
+            <>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Truck className="h-5 w-5" />
+                    {t.shippingActions}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <OrderStatusUpdateForm
+                    orderId={order.order.id}
+                    currentStatus={order.order.status}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Add Tracking Information */}
+              {order.order.status === 'paid' && (
+                <AddTrackingForm
                   orderId={order.order.id}
-                  currentStatus={order.order.status}
+                  orderNumber={order.order.orderNumber}
+                  currentTracking={{
+                    trackingNumber: order.order.trackingNumber,
+                    carrier: order.order.carrier,
+                    trackingUrl: order.order.trackingUrl,
+                  }}
                 />
-              </CardContent>
-            </Card>
+              )}
+            </>
           )}
         </div>
 

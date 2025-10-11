@@ -2226,10 +2226,13 @@
       "analytics": "Estadísticas",
       "dashboard": "Panel",
       "financials": "Finanzas",
+      "inventory": "Inventario",
       "logout": "Cerrar sesión",
       "orders": "Órdenes",
       "payments": "Pagos",
       "products": "Mis Productos",
+      "promotions": "Promociones",
+      "reviews": "Reseñas",
       "settings": "Configuración",
       "title": "LUZIMARKET",
       "vendorPanel": "Panel de Vendedor"

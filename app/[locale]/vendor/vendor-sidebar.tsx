@@ -12,7 +12,10 @@ import {
   DollarSign,
   ChevronLeft,
   ChevronRight,
-  Globe
+  Globe,
+  Warehouse,
+  Star,
+  Ticket
 } from "lucide-react";
 import {
   Sidebar,
@@ -54,9 +57,24 @@ export function VendorSidebar({ userEmail, vendorName }: VendorSidebarProps) {
       icon: Package,
     },
     {
+      title: t("inventory"),
+      href: "/vendor/inventory",
+      icon: Warehouse,
+    },
+    {
       title: t("orders"),
       href: "/vendor/orders",
       icon: ShoppingCart,
+    },
+    {
+      title: t("reviews"),
+      href: "/vendor/reviews",
+      icon: Star,
+    },
+    {
+      title: t("promotions"),
+      href: "/vendor/promotions",
+      icon: Ticket,
     },
     {
       title: t("analytics"),

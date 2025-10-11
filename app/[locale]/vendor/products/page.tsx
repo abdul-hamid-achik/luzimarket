@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { VendorProductsClient } from "@/components/vendor/vendor-products-client";
+import { ProductCSVImport } from "@/components/vendor/product-csv-import";
 
 export default async function VendorProductsPage() {
   const session = await auth();
@@ -25,6 +26,7 @@ export default async function VendorProductsPage() {
       stock: products.stock,
       isActive: products.isActive,
       images: products.images,
+      categoryId: products.categoryId,
       categoryName: categories.name,
     })
     .from(products)
@@ -49,6 +51,9 @@ export default async function VendorProductsPage() {
           </Button>
         </Link>
       </div>
+
+      {/* CSV Import/Export */}
+      <ProductCSVImport vendorId={session.user.id} />
 
       {/* Products table with bulk operations */}
       <VendorProductsClient products={vendorProducts} vendorId={session.user.id} />

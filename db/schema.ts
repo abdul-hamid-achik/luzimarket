@@ -36,6 +36,26 @@ export const vendors = pgTable("vendors", {
     packagingFee?: number;
     handlingTime?: number;
   }>().default({}),
+  // Inventory settings
+  inventorySettings: json("inventory_settings").$type<{
+    lowStockThreshold?: number;
+    enableAutoDeactivate?: boolean;
+    notificationPreferences?: {
+      email?: boolean;
+      lowStock?: boolean;
+      outOfStock?: boolean;
+    };
+  }>().default({}),
+  // Storefront customization
+  bannerImageUrl: text("banner_image_url"),
+  logoUrl: text("logo_url"),
+  brandColors: json("brand_colors").$type<{
+    primary?: string;
+    secondary?: string;
+    accent?: string;
+  }>(),
+  aboutText: text("about_text"),
+  featuredProducts: json("featured_products").$type<string[]>(),
   // Account lockout fields
   failedLoginAttempts: integer("failed_login_attempts").default(0),
   lastFailedLoginAt: timestamp("last_failed_login_at"),
@@ -97,6 +117,11 @@ export const products = pgTable("products", {
   width: integer("width").default(0), // in cm
   height: integer("height").default(0), // in cm
   shippingClass: text("shipping_class").default("standard"), // standard, fragile, oversize, dangerous
+  // SEO fields
+  metaTitle: text("meta_title"),
+  metaDescription: text("meta_description"),
+  metaKeywords: text("meta_keywords"),
+  structuredData: json("structured_data").$type<Record<string, any>>(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => {
@@ -195,7 +220,9 @@ export const orders = pgTable("orders", {
   notes: text("notes"),
   // Tracking information
   trackingNumber: text("tracking_number"),
+  trackingUrl: text("tracking_url"),
   carrier: text("carrier"), // e.g., "fedex", "ups", "dhl", "estafeta"
+  shippedAt: timestamp("shipped_at"),
   estimatedDeliveryDate: timestamp("estimated_delivery_date"),
   actualDeliveryDate: timestamp("actual_delivery_date"),
   trackingHistory: json("tracking_history").$type<Array<{
@@ -228,6 +255,45 @@ export const orderItems = pgTable("order_items", {
   orderIdx: index("order_items_order_idx").on(table.orderId),
   productIdx: index("order_items_product_idx").on(table.productId),
 }));
+
+// Shipping Labels table
+export const shippingLabels = pgTable("shipping_labels", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orderId: uuid("order_id").notNull().references(() => orders.id, { onDelete: "cascade" }),
+  vendorId: uuid("vendor_id").notNull().references(() => vendors.id),
+  labelUrl: text("label_url").notNull(),
+  carrier: text("carrier").notNull(), // fedex, ups, dhl, estafeta, etc.
+  serviceType: text("service_type").notNull(), // standard, express, overnight
+  trackingNumber: text("tracking_number"),
+  labelFormat: text("label_format").default("pdf"), // pdf, zpl, png
+  cost: decimal("cost", { precision: 10, scale: 2 }),
+  weight: integer("weight"), // in grams
+  dimensions: json("dimensions").$type<{
+    length: number;
+    width: number;
+    height: number;
+    unit: string;
+  }>(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  orderIdx: index("shipping_labels_order_idx").on(table.orderId),
+  vendorIdx: index("shipping_labels_vendor_idx").on(table.vendorId),
+  trackingIdx: index("shipping_labels_tracking_idx").on(table.trackingNumber),
+}));
+
+export const shippingLabelsRelations = relations(shippingLabels, ({ one }) => ({
+  order: one(orders, {
+    fields: [shippingLabels.orderId],
+    references: [orders.id],
+  }),
+  vendor: one(vendors, {
+    fields: [shippingLabels.vendorId],
+    references: [vendors.id],
+  }),
+}));
+
+export type ShippingLabel = typeof shippingLabels.$inferSelect;
+export type NewShippingLabel = typeof shippingLabels.$inferInsert;
 
 // Admin users table
 export const adminUsers = pgTable("admin_users", {
@@ -564,7 +630,7 @@ export const reviews = pgTable("reviews", {
   }
 });
 
-export const reviewRelations = relations(reviews, ({ one }) => ({
+export const reviewRelations = relations(reviews, ({ one, many }) => ({
   product: one(products, {
     fields: [reviews.productId],
     references: [products.id],
@@ -577,7 +643,66 @@ export const reviewRelations = relations(reviews, ({ one }) => ({
     fields: [reviews.orderId],
     references: [orders.id],
   }),
+  vendorResponse: one(vendorReviewResponses, {
+    fields: [reviews.id],
+    references: [vendorReviewResponses.reviewId],
+  }),
+  helpfulVotes: many(reviewHelpfulVotes),
 }));
+
+// Vendor Review Responses table
+export const vendorReviewResponses = pgTable("vendor_review_responses", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  reviewId: uuid("review_id").notNull().references(() => reviews.id, { onDelete: "cascade" }).unique(),
+  vendorId: uuid("vendor_id").notNull().references(() => vendors.id, { onDelete: "cascade" }),
+  responseText: text("response_text").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  reviewIdx: index("vendor_review_responses_review_idx").on(table.reviewId),
+  vendorIdx: index("vendor_review_responses_vendor_idx").on(table.vendorId),
+}));
+
+export const vendorReviewResponseRelations = relations(vendorReviewResponses, ({ one }) => ({
+  review: one(reviews, {
+    fields: [vendorReviewResponses.reviewId],
+    references: [reviews.id],
+  }),
+  vendor: one(vendors, {
+    fields: [vendorReviewResponses.vendorId],
+    references: [vendors.id],
+  }),
+}));
+
+export type VendorReviewResponse = typeof vendorReviewResponses.$inferSelect;
+export type NewVendorReviewResponse = typeof vendorReviewResponses.$inferInsert;
+
+// Review Helpful Votes table
+export const reviewHelpfulVotes = pgTable("review_helpful_votes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  reviewId: uuid("review_id").notNull().references(() => reviews.id, { onDelete: "cascade" }),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  voteType: text("vote_type").notNull(), // 'helpful', 'not_helpful'
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  reviewIdx: index("review_helpful_votes_review_idx").on(table.reviewId),
+  userIdx: index("review_helpful_votes_user_idx").on(table.userId),
+  uniqueVote: index("review_helpful_votes_unique_idx").on(table.reviewId, table.userId),
+}));
+
+export const reviewHelpfulVoteRelations = relations(reviewHelpfulVotes, ({ one }) => ({
+  review: one(reviews, {
+    fields: [reviewHelpfulVotes.reviewId],
+    references: [reviews.id],
+  }),
+  user: one(users, {
+    fields: [reviewHelpfulVotes.userId],
+    references: [users.id],
+  }),
+}));
+
+export type ReviewHelpfulVote = typeof reviewHelpfulVotes.$inferSelect;
+export type NewReviewHelpfulVote = typeof reviewHelpfulVotes.$inferInsert;
 
 // Password Reset Tokens table
 export const passwordResetTokens = pgTable("password_reset_tokens", {
@@ -879,13 +1004,17 @@ export const coupons = pgTable("coupons", {
   restrictToProducts: json("restrict_to_products").$type<string[]>(),
   restrictToFirstTimeCustomers: boolean("restrict_to_first_time_customers").default(false),
   // Metadata
-  createdBy: uuid("created_by").references(() => adminUsers.id),
+  createdBy: uuid("created_by").references(() => adminUsers.id), // For admin-created coupons
+  vendorId: uuid("vendor_id").references(() => vendors.id, { onDelete: "cascade" }), // For vendor-created coupons
+  couponScope: text("coupon_scope").notNull().default("platform"), // 'platform' (admin) or 'vendor'
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => ({
   codeIdx: index("coupons_code_idx").on(table.code),
   activeIdx: index("coupons_active_idx").on(table.isActive),
   expiresIdx: index("coupons_expires_idx").on(table.expiresAt),
+  vendorIdx: index("coupons_vendor_idx").on(table.vendorId),
+  scopeIdx: index("coupons_scope_idx").on(table.couponScope),
 }));
 
 // Coupon Usage table
@@ -911,6 +1040,10 @@ export const couponRelations = relations(coupons, ({ many, one }) => ({
     fields: [coupons.createdBy],
     references: [adminUsers.id],
   }),
+  vendor: one(vendors, {
+    fields: [coupons.vendorId],
+    references: [vendors.id],
+  }),
 }));
 
 export const couponUsageRelations = relations(couponUsage, ({ one }) => ({
@@ -932,6 +1065,311 @@ export type Coupon = typeof coupons.$inferSelect;
 export type NewCoupon = typeof coupons.$inferInsert;
 export type CouponUsage = typeof couponUsage.$inferSelect;
 export type NewCouponUsage = typeof couponUsage.$inferInsert;
+
+// Inventory Alerts table
+export const inventoryAlerts = pgTable("inventory_alerts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  vendorId: uuid("vendor_id").notNull().references(() => vendors.id, { onDelete: "cascade" }),
+  productId: uuid("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  alertType: text("alert_type").notNull(), // 'low_stock', 'out_of_stock'
+  threshold: integer("threshold").notNull(),
+  isActive: boolean("is_active").default(true),
+  lastTriggeredAt: timestamp("last_triggered_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  vendorIdx: index("inventory_alerts_vendor_idx").on(table.vendorId),
+  productIdx: index("inventory_alerts_product_idx").on(table.productId),
+  alertTypeIdx: index("inventory_alerts_type_idx").on(table.alertType),
+}));
+
+export const inventoryAlertsRelations = relations(inventoryAlerts, ({ one }) => ({
+  vendor: one(vendors, {
+    fields: [inventoryAlerts.vendorId],
+    references: [vendors.id],
+  }),
+  product: one(products, {
+    fields: [inventoryAlerts.productId],
+    references: [products.id],
+  }),
+}));
+
+export type InventoryAlert = typeof inventoryAlerts.$inferSelect;
+export type NewInventoryAlert = typeof inventoryAlerts.$inferInsert;
+
+// Analytics Snapshots table
+export const analyticsSnapshots = pgTable("analytics_snapshots", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  vendorId: uuid("vendor_id").references(() => vendors.id, { onDelete: "cascade" }),
+  snapshotDate: timestamp("snapshot_date").notNull(),
+  metricsData: json("metrics_data").$type<{
+    revenue: number;
+    orders: number;
+    customers: number;
+    averageOrderValue: number;
+    conversionRate: number;
+    topProducts: Array<{ id: string; name: string; sales: number; revenue: number }>;
+    newCustomers: number;
+    returningCustomers: number;
+  }>().notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  vendorIdx: index("analytics_snapshots_vendor_idx").on(table.vendorId),
+  dateIdx: index("analytics_snapshots_date_idx").on(table.snapshotDate),
+  uniqueSnapshot: index("analytics_snapshots_unique_idx").on(table.vendorId, table.snapshotDate),
+}));
+
+export const analyticsSnapshotsRelations = relations(analyticsSnapshots, ({ one }) => ({
+  vendor: one(vendors, {
+    fields: [analyticsSnapshots.vendorId],
+    references: [vendors.id],
+  }),
+}));
+
+export type AnalyticsSnapshot = typeof analyticsSnapshots.$inferSelect;
+export type NewAnalyticsSnapshot = typeof analyticsSnapshots.$inferInsert;
+
+// Cart Abandonment table
+export const cartAbandonment = pgTable("cart_abandonment", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  sessionId: text("session_id").notNull(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+  userEmail: text("user_email"),
+  productsData: json("products_data").$type<Array<{
+    productId: string;
+    productName: string;
+    quantity: number;
+    price: number;
+  }>>().notNull(),
+  cartTotal: decimal("cart_total", { precision: 10, scale: 2 }).notNull(),
+  recoveredAt: timestamp("recovered_at"),
+  recoveryEmailSent: boolean("recovery_email_sent").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  sessionIdx: index("cart_abandonment_session_idx").on(table.sessionId),
+  userIdx: index("cart_abandonment_user_idx").on(table.userId),
+  emailIdx: index("cart_abandonment_email_idx").on(table.userEmail),
+  recoveredIdx: index("cart_abandonment_recovered_idx").on(table.recoveredAt),
+}));
+
+export const cartAbandonmentRelations = relations(cartAbandonment, ({ one }) => ({
+  user: one(users, {
+    fields: [cartAbandonment.userId],
+    references: [users.id],
+  }),
+}));
+
+export type CartAbandonment = typeof cartAbandonment.$inferSelect;
+export type NewCartAbandonment = typeof cartAbandonment.$inferInsert;
+
+// Conversations table
+export const conversations = pgTable("conversations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  customerId: uuid("customer_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  vendorId: uuid("vendor_id").notNull().references(() => vendors.id, { onDelete: "cascade" }),
+  orderId: uuid("order_id").references(() => orders.id, { onDelete: "set null" }),
+  subject: text("subject").notNull(),
+  status: text("status").notNull().default("open"), // 'open', 'closed'
+  lastMessageAt: timestamp("last_message_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  customerIdx: index("conversations_customer_idx").on(table.customerId),
+  vendorIdx: index("conversations_vendor_idx").on(table.vendorId),
+  statusIdx: index("conversations_status_idx").on(table.status),
+  lastMessageIdx: index("conversations_last_message_idx").on(table.lastMessageAt),
+}));
+
+export const conversationsRelations = relations(conversations, ({ one, many }) => ({
+  customer: one(users, {
+    fields: [conversations.customerId],
+    references: [users.id],
+  }),
+  vendor: one(vendors, {
+    fields: [conversations.vendorId],
+    references: [vendors.id],
+  }),
+  order: one(orders, {
+    fields: [conversations.orderId],
+    references: [orders.id],
+  }),
+  messages: many(messages),
+}));
+
+export type Conversation = typeof conversations.$inferSelect;
+export type NewConversation = typeof conversations.$inferInsert;
+
+// Messages table
+export const messages = pgTable("messages", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  conversationId: uuid("conversation_id").notNull().references(() => conversations.id, { onDelete: "cascade" }),
+  senderId: uuid("sender_id").notNull(),
+  senderType: text("sender_type").notNull(), // 'customer', 'vendor', 'admin'
+  content: text("content").notNull(),
+  attachments: json("attachments").$type<string[]>(),
+  readAt: timestamp("read_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  conversationIdx: index("messages_conversation_idx").on(table.conversationId),
+  senderIdx: index("messages_sender_idx").on(table.senderId),
+  createdAtIdx: index("messages_created_at_idx").on(table.createdAt),
+}));
+
+export const messagesRelations = relations(messages, ({ one }) => ({
+  conversation: one(conversations, {
+    fields: [messages.conversationId],
+    references: [conversations.id],
+  }),
+}));
+
+export type Message = typeof messages.$inferSelect;
+export type NewMessage = typeof messages.$inferInsert;
+
+// Vendor Pages table
+export const vendorPages = pgTable("vendor_pages", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  vendorId: uuid("vendor_id").notNull().references(() => vendors.id, { onDelete: "cascade" }),
+  pageType: text("page_type").notNull(), // 'about', 'policies', 'faq', 'custom'
+  title: text("title").notNull(),
+  slug: text("slug").notNull(),
+  content: text("content").notNull(),
+  isPublished: boolean("is_published").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  vendorIdx: index("vendor_pages_vendor_idx").on(table.vendorId),
+  slugIdx: index("vendor_pages_slug_idx").on(table.slug),
+  uniqueVendorSlug: index("vendor_pages_unique_idx").on(table.vendorId, table.slug),
+}));
+
+export const vendorPagesRelations = relations(vendorPages, ({ one }) => ({
+  vendor: one(vendors, {
+    fields: [vendorPages.vendorId],
+    references: [vendors.id],
+  }),
+}));
+
+export type VendorPage = typeof vendorPages.$inferSelect;
+export type NewVendorPage = typeof vendorPages.$inferInsert;
+
+// Vendor Team Members table
+export const vendorTeamMembers = pgTable("vendor_team_members", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  vendorId: uuid("vendor_id").notNull().references(() => vendors.id, { onDelete: "cascade" }),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  role: text("role").notNull(), // 'owner', 'manager', 'staff'
+  permissions: json("permissions").$type<{
+    manageProducts?: boolean;
+    viewOrders?: boolean;
+    updateOrders?: boolean;
+    viewFinancials?: boolean;
+    manageSettings?: boolean;
+    manageTeam?: boolean;
+  }>().default({}),
+  invitedAt: timestamp("invited_at").defaultNow(),
+  acceptedAt: timestamp("accepted_at"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  vendorIdx: index("vendor_team_vendor_idx").on(table.vendorId),
+  userIdx: index("vendor_team_user_idx").on(table.userId),
+  uniqueMember: index("vendor_team_unique_idx").on(table.vendorId, table.userId),
+}));
+
+export const vendorTeamMembersRelations = relations(vendorTeamMembers, ({ one }) => ({
+  vendor: one(vendors, {
+    fields: [vendorTeamMembers.vendorId],
+    references: [vendors.id],
+  }),
+  user: one(users, {
+    fields: [vendorTeamMembers.userId],
+    references: [users.id],
+  }),
+}));
+
+export type VendorTeamMember = typeof vendorTeamMembers.$inferSelect;
+export type NewVendorTeamMember = typeof vendorTeamMembers.$inferInsert;
+
+// Vendor Invitations table
+export const vendorInvitations = pgTable("vendor_invitations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  vendorId: uuid("vendor_id").notNull().references(() => vendors.id, { onDelete: "cascade" }),
+  email: text("email").notNull(),
+  role: text("role").notNull(), // 'manager', 'staff'
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  acceptedAt: timestamp("accepted_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  vendorIdx: index("vendor_invitations_vendor_idx").on(table.vendorId),
+  tokenIdx: index("vendor_invitations_token_idx").on(table.token),
+  emailIdx: index("vendor_invitations_email_idx").on(table.email),
+}));
+
+export const vendorInvitationsRelations = relations(vendorInvitations, ({ one }) => ({
+  vendor: one(vendors, {
+    fields: [vendorInvitations.vendorId],
+    references: [vendors.id],
+  }),
+}));
+
+export type VendorInvitation = typeof vendorInvitations.$inferSelect;
+export type NewVendorInvitation = typeof vendorInvitations.$inferInsert;
+
+// Return Requests table
+export const returnRequests = pgTable("return_requests", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orderId: uuid("order_id").notNull().references(() => orders.id, { onDelete: "cascade" }),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  vendorId: uuid("vendor_id").notNull().references(() => vendors.id),
+  itemsToReturn: json("items_to_return").$type<Array<{
+    productId: string;
+    productName: string;
+    quantity: number;
+    price: number;
+  }>>().notNull(),
+  reason: text("reason").notNull(),
+  reasonCategory: text("reason_category").notNull(), // 'defective', 'wrong_item', 'not_as_described', 'changed_mind', 'other'
+  description: text("description"),
+  images: json("images").$type<string[]>(),
+  status: text("status").notNull().default("pending"), // 'pending', 'approved', 'rejected', 'completed'
+  refundAmount: decimal("refund_amount", { precision: 10, scale: 2 }).notNull(),
+  restockingFee: decimal("restocking_fee", { precision: 10, scale: 2 }).default("0"),
+  reviewedBy: uuid("reviewed_by").references(() => adminUsers.id),
+  reviewedAt: timestamp("reviewed_at"),
+  rejectionReason: text("rejection_reason"),
+  refundId: text("refund_id"), // Stripe refund ID
+  refundedAt: timestamp("refunded_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  orderIdx: index("return_requests_order_idx").on(table.orderId),
+  userIdx: index("return_requests_user_idx").on(table.userId),
+  vendorIdx: index("return_requests_vendor_idx").on(table.vendorId),
+  statusIdx: index("return_requests_status_idx").on(table.status),
+}));
+
+export const returnRequestsRelations = relations(returnRequests, ({ one }) => ({
+  order: one(orders, {
+    fields: [returnRequests.orderId],
+    references: [orders.id],
+  }),
+  user: one(users, {
+    fields: [returnRequests.userId],
+    references: [users.id],
+  }),
+  vendor: one(vendors, {
+    fields: [returnRequests.vendorId],
+    references: [vendors.id],
+  }),
+  reviewedByAdmin: one(adminUsers, {
+    fields: [returnRequests.reviewedBy],
+    references: [adminUsers.id],
+  }),
+}));
+
+export type ReturnRequest = typeof returnRequests.$inferSelect;
+export type NewReturnRequest = typeof returnRequests.$inferInsert;
 
 // Platform Settings table for admin configuration
 export const platformSettings = pgTable("platform_settings", {

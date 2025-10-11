@@ -4,7 +4,9 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install --include=dev",
   "framework": "nextjs",
-  "regions": ["iad1"],
+  "regions": [
+    "iad1"
+  ],
   "functions": {
     "app/api/webhooks/stripe/route.ts": {
       "maxDuration": 30
@@ -22,6 +24,18 @@
     {
       "path": "/api/cron/clean-sessions",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/inventory-check",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/analytics-snapshot",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/cart-recovery",
+      "schedule": "0 */4 * * *"
     }
   ]
 }

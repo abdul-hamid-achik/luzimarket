@@ -602,3 +602,107 @@ export async function toggleVendorProductStatus(productId: string, vendorId: str
 
   return updatedProduct;
 }
+
+/**
+ * Bulk update product categories
+ */
+export async function bulkUpdateVendorProductCategories(
+  productIds: string[],
+  vendorId: string,
+  categoryId: number
+) {
+  try {
+    // Verify all products belong to vendor
+    const vendorProducts = await db
+      .select({ id: products.id })
+      .from(products)
+      .where(and(
+        inArray(products.id, productIds),
+        eq(products.vendorId, vendorId)
+      ));
+
+    if (vendorProducts.length !== productIds.length) {
+      return { success: false, error: 'Some products do not belong to this vendor' };
+    }
+
+    // Verify category exists
+    const [category] = await db
+      .select()
+      .from(categories)
+      .where(eq(categories.id, categoryId))
+      .limit(1);
+
+    if (!category) {
+      return { success: false, error: 'Category not found' };
+    }
+
+    // Update categories
+    await db
+      .update(products)
+      .set({ categoryId, updatedAt: new Date() })
+      .where(inArray(products.id, productIds));
+
+    return { success: true, message: `${vendorProducts.length} productos actualizados` };
+  } catch (error) {
+    console.error("Error bulk updating categories:", error);
+    return { success: false, error: 'Error al actualizar categorías' };
+  }
+}
+
+/**
+ * Duplicates a product
+ */
+export async function duplicateVendorProduct(productId: string, vendorId: string) {
+  try {
+    // Get the original product
+    const [original] = await db
+      .select()
+      .from(products)
+      .where(and(
+        eq(products.id, productId),
+        eq(products.vendorId, vendorId)
+      ))
+      .limit(1);
+
+    if (!original) {
+      return { success: false, error: 'Product not found or unauthorized' };
+    }
+
+    // Generate new slug
+    const baseSlug = original.slug.replace(/-[a-z0-9]{6}$/, '');
+    const randomSuffix = Math.random().toString(36).substring(2, 8);
+    const newSlug = `${baseSlug}-copy-${randomSuffix}`;
+
+    // Create duplicate
+    const [duplicate] = await db
+      .insert(products)
+      .values({
+        vendorId: original.vendorId,
+        categoryId: original.categoryId,
+        name: `${original.name} (Copia)`,
+        slug: newSlug,
+        description: original.description,
+        price: original.price,
+        images: original.images,
+        tags: original.tags,
+        brand: original.brand,
+        colors: original.colors,
+        sizes: original.sizes,
+        materials: original.materials,
+        features: original.features,
+        isActive: false, // Duplicates start as inactive
+        stock: 0, // Don't copy stock
+        weight: original.weight,
+        length: original.length,
+        width: original.width,
+        height: original.height,
+        shippingClass: original.shippingClass,
+      })
+      .returning();
+
+    return { success: true, product: duplicate };
+  } catch (error) {
+    console.error("Error duplicating product:", error);
+    return { success: false, error: 'Error al duplicar producto' };
+  }
+}

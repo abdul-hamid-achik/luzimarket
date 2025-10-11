@@ -10,7 +10,11 @@ import {
     EyeOff,
     Loader2,
     Trash2,
-    Plus
+    Plus,
+    AlertTriangle,
+    PackageX,
+    Copy,
+    FolderTree
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -27,7 +31,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-import { bulkUpdateVendorProductPrices, bulkDeleteVendorProducts, toggleVendorProductStatus } from "@/lib/actions/products";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { bulkUpdateVendorProductPrices, bulkDeleteVendorProducts, toggleVendorProductStatus, bulkUpdateVendorProductCategories, duplicateVendorProduct } from "@/lib/actions/products";
 
 interface Product {
     id: string;
@@ -36,6 +41,7 @@ interface Product {
     stock: number | null;
     isActive: boolean | null;
     images: unknown;
+    categoryId: number;
     categoryName: string | null;
 }
 
@@ -49,8 +55,13 @@ export function VendorProductsClient({ products, vendorId }: VendorProductsClien
     const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
     const [isLoading, setIsLoading] = useState(false);
     const [showPriceDialog, setShowPriceDialog] = useState(false);
+    const [showCategoryDialog, setShowCategoryDialog] = useState(false);
     const [priceUpdateType, setPriceUpdateType] = useState<'percentage' | 'fixed'>('percentage');
     const [priceValue, setPriceValue] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState<string>('');
+
+    // Get unique categories from products
+    const categories = Array.from(new Set(products.map(p => ({ id: p.categoryId, name: p.categoryName })).filter(c => c.name)));
 
     const handleSelectAll = () => {
         if (selectedProducts.size === products.length) {
@@ -126,6 +137,54 @@ export function VendorProductsClient({ products, vendorId }: VendorProductsClien
         }
     };
 
+    const handleBulkUpdateCategories = async () => {
+        if (!selectedCategory) {
+            toast.error('Selecciona una categoría');
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const result = await bulkUpdateVendorProductCategories(
+                Array.from(selectedProducts),
+                vendorId,
+                parseInt(selectedCategory)
+            );
+
+            if (result.success) {
+                toast.success(result.message || 'Categorías actualizadas');
+                setSelectedProducts(new Set());
+                setShowCategoryDialog(false);
+                setSelectedCategory('');
+                router.refresh();
+            } else {
+                toast.error(result.error || 'Error al actualizar categorías');
+            }
+        } catch (error) {
+            toast.error('Error al actualizar categorías');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleDuplicate = async (productId: string) => {
+        setIsLoading(true);
+        try {
+            const result = await duplicateVendorProduct(productId, vendorId);
+
+            if (result.success) {
+                toast.success('Producto duplicado exitosamente');
+                router.refresh();
+            } else {
+                toast.error(result.error || 'Error al duplicar producto');
+            }
+        } catch (error) {
+            toast.error('Error al duplicar producto');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className="space-y-6">
             {/* Bulk Actions Bar */}
@@ -148,8 +207,16 @@ export function VendorProductsClient({ products, vendorId }: VendorProductsClien
                             onClick={() => setShowPriceDialog(true)}
                             disabled={isLoading}
                         >
-                            {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                             Actualizar precio
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setShowCategoryDialog(true)}
+                            disabled={isLoading}
+                        >
+                            <FolderTree className="h-4 w-4 mr-2" />
+                            Cambiar categoría
                         </Button>
                         <Button
                             size="sm"
@@ -257,9 +324,19 @@ export function VendorProductsClient({ products, vendorId }: VendorProductsClien
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className={`text-sm font-univers ${product.stock && product.stock > 0 ? 'text-gray-900' : 'text-red-600'}`}>
-                                                    {product.stock || 0}
-                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                    {(product.stock || 0) === 0 ? (
+                                                        <PackageX className="h-4 w-4 text-red-600" />
+                                                    ) : (product.stock || 0) <= 10 ? (
+                                                        <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                                                    ) : null}
+                                                    <span className={`text-sm font-univers ${(product.stock || 0) === 0 ? 'text-red-600 font-medium' :
+                                                        (product.stock || 0) <= 10 ? 'text-yellow-600 font-medium' :
+                                                            'text-gray-900'
+                                                        }`}>
+                                                        {product.stock || 0}
+                                                    </span>
+                                                </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <Badge className={product.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}>
@@ -273,6 +350,14 @@ export function VendorProductsClient({ products, vendorId }: VendorProductsClien
                                                             <Edit className="h-4 w-4" />
                                                         </Button>
                                                     </Link>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleDuplicate(product.id)}
+                                                        title="Duplicar producto"
+                                                    >
+                                                        <Copy className="h-4 w-4" />
+                                                    </Button>
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
@@ -343,6 +428,44 @@ export function VendorProductsClient({ products, vendorId }: VendorProductsClien
                             Cancelar
                         </Button>
                         <Button onClick={handleBulkUpdatePrices} disabled={isLoading}>
+                            {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                            Aplicar
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Category Change Dialog */}
+            <Dialog open={showCategoryDialog} onOpenChange={setShowCategoryDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Cambiar categoría de {selectedProducts.size} producto(s)</DialogTitle>
+                        <DialogDescription>
+                            Selecciona la nueva categoría para los productos seleccionados
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <div>
+                            <Label htmlFor="category">Nueva Categoría</Label>
+                            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Selecciona una categoría" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {categories.map((cat) => (
+                                        <SelectItem key={cat.id} value={cat.id.toString()}>
+                                            {cat.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowCategoryDialog(false)}>
+                            Cancelar
+                        </Button>
+                        <Button onClick={handleBulkUpdateCategories} disabled={isLoading}>
                             {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                             Aplicar
                         </Button>
