@@ -239,7 +239,7 @@ Add to your GitHub Actions workflow:
   run: npx playwright install --with-deps
   
 - name: Run Playwright tests
-  run: npm run test:e2e
+  run: npm test
   
 - uses: actions/upload-artifact@v4
   if: ${{ !cancelled() }}

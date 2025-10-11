@@ -106,12 +106,12 @@ export async function logOrderEvent(params: {
  * Log vendor-related events
  */
 export async function logVendorEvent(params: {
-    action: 'approved' | 'rejected' | 'status_changed' | 'stripe_account_created';
+    action: 'approved' | 'rejected' | 'status_changed' | 'stripe_account_created' | 'registered' | 'profile_updated' | 'deactivated';
     vendorId: string;
     vendorEmail: string;
     vendorName: string;
-    adminUserId: string;
-    adminEmail: string;
+    adminUserId?: string;
+    adminEmail?: string;
     details?: Record<string, any>;
     severity?: 'info' | 'warning' | 'error' | 'critical';
 }) {
@@ -121,9 +121,9 @@ export async function logVendorEvent(params: {
         action: `vendor.${params.action}`,
         category: 'vendor',
         severity: params.severity || (params.action === 'rejected' ? 'warning' : 'info'),
-        userId: params.adminUserId,
-        userType: 'admin',
-        userEmail: params.adminEmail,
+        userId: params.adminUserId || params.vendorId,
+        userType: params.adminUserId ? 'admin' : 'vendor',
+        userEmail: params.adminEmail || params.vendorEmail,
         ip: metadata.ip,
         userAgent: metadata.userAgent,
         resourceType: 'vendor',
@@ -140,7 +140,7 @@ export async function logVendorEvent(params: {
  * Log product-related events
  */
 export async function logProductEvent(params: {
-    action: 'created' | 'updated' | 'deleted' | 'status_changed';
+    action: 'created' | 'updated' | 'deleted' | 'status_changed' | 'images_approved';
     productId: string;
     productName: string;
     vendorId: string;

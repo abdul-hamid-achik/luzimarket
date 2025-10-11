@@ -2,21 +2,8 @@ export const runtime = 'nodejs';
 
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { db } from "@/db";
-import { users, vendors, adminUsers } from "@/db/schema";
-import { eq } from "drizzle-orm";
-import bcrypt from "bcryptjs";
+import { changePassword } from "@/lib/services/user-service";
 import { z } from "zod";
-import { logPasswordEvent } from "@/lib/audit-helpers";
-
-const changePasswordSchema = z.object({
-  currentPassword: z.string().min(1),
-  newPassword: z.string().min(8),
-  confirmPassword: z.string(),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
 
 export async function POST(request: Request) {
   try {
@@ -27,82 +14,20 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const validatedData = changePasswordSchema.parse(body);
 
-    // Get the user based on their role
-    let userRecord;
-    let table;
-
-    switch (session.user.role) {
-      case "customer":
-        table = users;
-        [userRecord] = await db
-          .select()
-          .from(users)
-          .where(eq(users.id, session.user.id))
-          .limit(1);
-        break;
-      case "vendor":
-        table = vendors;
-        [userRecord] = await db
-          .select()
-          .from(vendors)
-          .where(eq(vendors.id, session.user.id))
-          .limit(1);
-        break;
-      case "admin":
-        table = adminUsers;
-        [userRecord] = await db
-          .select()
-          .from(adminUsers)
-          .where(eq(adminUsers.id, session.user.id))
-          .limit(1);
-        break;
-      default:
-        return NextResponse.json({ error: "Invalid user role" }, { status: 400 });
-    }
-
-    if (!userRecord) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    // Check if user has a password set
-    if (!userRecord.passwordHash) {
-      return NextResponse.json({ error: "No password set for this account" }, { status: 400 });
-    }
-
-    // Verify current password
-    const isPasswordValid = await bcrypt.compare(
-      validatedData.currentPassword,
-      userRecord.passwordHash
+    // Change password using UserService
+    const result = await changePassword(
+      session.user.id,
+      session.user.role as any,
+      session.user.email!,
+      body.currentPassword,
+      body.newPassword,
+      body.confirmPassword
     );
 
-    if (!isPasswordValid) {
-      return NextResponse.json({ error: "Current password is incorrect" }, { status: 400 });
+    if (!result.success) {
+      return NextResponse.json({ error: result.error }, { status: 400 });
     }
-
-    // Hash new password
-    const hashedPassword = await bcrypt.hash(validatedData.newPassword, 12);
-
-    // Update password
-    await db
-      .update(table)
-      .set({
-        passwordHash: hashedPassword,
-        updatedAt: new Date()
-      })
-      .where(eq(table.id, session.user.id));
-
-    // Log password change event
-    await logPasswordEvent({
-      action: 'password_changed',
-      userId: session.user.id,
-      userEmail: session.user.email!,
-      userType: session.user.role,
-      details: {
-        changedAt: new Date().toISOString(),
-      },
-    });
 
     return NextResponse.json({ success: true });
   } catch (error) {

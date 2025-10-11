@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { orders } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
+import { requestRefund } from "@/lib/services/refund-service";
 
 interface RouteParams {
   params: Promise<{ orderNumber: string }>;
@@ -23,7 +24,7 @@ export async function POST(
       );
     }
 
-    // Find order by orderNumber and email (works for both guests and authenticated users)
+    // Find order by orderNumber and email
     const order = await db
       .select()
       .from(orders)
@@ -42,29 +43,23 @@ export async function POST(
       );
     }
 
-    // Check if order can be cancelled (not already shipped/delivered/cancelled)
-    if (['shipped', 'delivered', 'cancelled', 'refunded'].includes(order[0].status)) {
+    // Request refund using RefundService
+    const result = await requestRefund(
+      order[0].id,
+      reason || "Solicitado por el cliente",
+      order[0].userId || undefined
+    );
+
+    if (!result.success) {
       return NextResponse.json(
-        { error: `No se puede cancelar una orden con estado: ${order[0].status}` },
+        { error: result.error },
         { status: 400 }
       );
     }
 
-    // Request cancellation (manual approval workflow)
-    await db
-      .update(orders)
-      .set({
-        cancellationStatus: "requested",
-        cancellationReason: reason || "Solicitado por el cliente",
-        updatedAt: new Date(),
-      })
-      .where(eq(orders.id, order[0].id));
-
-    // TODO: Send notification to vendor about cancellation request
-
     return NextResponse.json({
       success: true,
-      message: "Solicitud de cancelación enviada al vendedor. Recibirás una notificación cuando sea procesada."
+      message: result.message
     });
 
   } catch (error) {

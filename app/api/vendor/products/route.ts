@@ -1,24 +1,12 @@
+export const runtime = 'nodejs';
+
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { db } from "@/db";
-import { products, categories } from "@/db/schema";
+import { createProduct, getVendorProducts } from "@/lib/services/product-service";
 import { z } from "zod";
-import { nanoid } from "nanoid";
-import { eq } from "drizzle-orm";
-import { createImageModerationRecords } from "@/lib/actions/image-moderation";
-import { logProductEvent } from "@/lib/audit-helpers";
-
-const createProductSchema = z.object({
-  name: z.string().min(3),
-  description: z.string().min(10),
-  price: z.number().positive(),
-  stock: z.number().int().nonnegative(),
-  categoryId: z.number().int(),
-  tags: z.array(z.string()).optional(),
-  images: z.array(z.string()).min(1),
-});
 
 export async function POST(req: NextRequest) {
+  // Comprehensive error boundary
   try {
     const session = await auth();
 
@@ -30,76 +18,25 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const validatedData = createProductSchema.parse(body);
 
-    // Validate that the category exists
-    const [category] = await db
-      .select()
-      .from(categories)
-      .where(eq(categories.id, validatedData.categoryId))
-      .limit(1);
+    // Create product using ProductService
+    const result = await createProduct(
+      session.user.vendor.id,
+      session.user.email!,
+      body
+    );
 
-    if (!category) {
+    if (!result.success) {
       return NextResponse.json(
-        { error: "Categoría no encontrada" },
+        { error: result.error },
         { status: 400 }
       );
     }
 
-    // Generate a slug from the name
-    const slug = validatedData.name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "") +
-      "-" + nanoid(6);
-
-    // Create the product
-    const [newProduct] = await db.insert(products).values({
-      vendorId: session.user.vendor.id,
-      name: validatedData.name,
-      slug,
-      description: validatedData.description,
-      price: validatedData.price.toString(),
-      stock: validatedData.stock,
-      categoryId: validatedData.categoryId,
-      images: validatedData.images,
-      tags: validatedData.tags || [],
-      isActive: true,
-      imagesPendingModeration: validatedData.images.length > 0,
-      imagesApproved: false,
-    }).returning();
-
-    // Create image moderation records if there are images
-    if (validatedData.images.length > 0) {
-      await createImageModerationRecords(
-        newProduct.id,
-        session.user.vendor.id,
-        validatedData.images
-      );
-    }
-
-    // Log product creation
-    await logProductEvent({
-      action: 'created',
-      productId: newProduct.id,
-      productName: newProduct.name,
-      vendorId: session.user.vendor.id,
-      userId: session.user.id,
-      userEmail: session.user.email!,
-      userType: 'vendor',
-      details: {
-        slug: newProduct.slug,
-        categoryId: newProduct.categoryId,
-        price: newProduct.price,
-        stock: newProduct.stock,
-        imageCount: validatedData.images.length,
-        pendingModeration: newProduct.imagesPendingModeration,
-      },
-    });
-
-    return NextResponse.json(newProduct);
+    return NextResponse.json(result.product, { status: 201 });
   } catch (error) {
-    console.error("Error creating product:", error);
+    // Log error for debugging
+    console.error("[API /vendor/products POST] Error:", error);
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -108,8 +45,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Always return JSON, never let Next.js render error page
     return NextResponse.json(
-      { error: "Error al crear el producto" },
+      {
+        error: "Error al crear el producto",
+        details: error instanceof Error ? error.message : String(error)
+      },
       { status: 500 }
     );
   }
@@ -126,15 +67,17 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const vendorProducts = await db.query.products.findMany({
-      where: (products, { eq }) => eq(products.vendorId, session.user.vendor!.id),
-      with: {
-        category: true,
-      },
-      orderBy: (products, { desc }) => desc(products.createdAt),
-    });
+    // Get vendor products using ProductService
+    const result = await getVendorProducts(session.user.vendor.id);
 
-    return NextResponse.json(vendorProducts);
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(result.products);
   } catch (error) {
     console.error("Error fetching products:", error);
     return NextResponse.json(

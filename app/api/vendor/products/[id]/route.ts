@@ -1,22 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { db } from "@/db";
-import { products } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { getProduct, updateProduct, deleteProduct } from "@/lib/services/product-service";
 import { z } from "zod";
-import { createImageModerationRecords } from "@/lib/actions/image-moderation";
-import { logProductEvent } from "@/lib/audit-helpers";
-
-const updateProductSchema = z.object({
-  name: z.string().min(3),
-  description: z.string().min(10),
-  price: z.number().positive(),
-  stock: z.number().int().nonnegative(),
-  categoryId: z.number().int(),
-  tags: z.array(z.string()).optional(),
-  images: z.array(z.string()).min(1),
-  isActive: z.boolean(),
-});
 
 export async function GET(
   req: NextRequest,
@@ -33,24 +18,25 @@ export async function GET(
       );
     }
 
-    const product = await db.query.products.findFirst({
-      where: and(
-        eq(products.id, id),
-        eq(products.vendorId, session.user.vendor.id)
-      ),
-      with: {
-        category: true,
-      },
-    });
+    // Get product using ProductService
+    const result = await getProduct(id);
 
-    if (!product) {
+    if (!result.success || !result.product) {
       return NextResponse.json(
-        { error: "Producto no encontrado" },
+        { error: result.error || "Producto no encontrado" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(product);
+    // Verify ownership
+    if (result.product.vendorId !== session.user.vendor.id) {
+      return NextResponse.json(
+        { error: "No autorizado" },
+        { status: 403 }
+      );
+    }
+
+    return NextResponse.json(result.product);
   } catch (error) {
     console.error("Error fetching product:", error);
     return NextResponse.json(
@@ -76,79 +62,23 @@ export async function PUT(
     }
 
     const body = await req.json();
-    const validatedData = updateProductSchema.parse(body);
 
-    // Verify the product belongs to the vendor
-    const existingProduct = await db.query.products.findFirst({
-      where: and(
-        eq(products.id, id),
-        eq(products.vendorId, session.user.vendor!.id)
-      ),
-    });
+    // Update product using ProductService
+    const result = await updateProduct(
+      id,
+      session.user.vendor.id,
+      session.user.email!,
+      body
+    );
 
-    if (!existingProduct) {
+    if (!result.success) {
       return NextResponse.json(
-        { error: "Producto no encontrado" },
-        { status: 404 }
+        { error: result.error },
+        { status: 400 }
       );
     }
 
-    // Check if images have changed
-    const imagesChanged = JSON.stringify(existingProduct.images) !== JSON.stringify(validatedData.images);
-
-    // Update the product
-    const [updatedProduct] = await db
-      .update(products)
-      .set({
-        name: validatedData.name,
-        description: validatedData.description,
-        price: validatedData.price.toString(),
-        stock: validatedData.stock,
-        categoryId: validatedData.categoryId,
-        images: validatedData.images,
-        tags: validatedData.tags || [],
-        isActive: validatedData.isActive,
-        updatedAt: new Date(),
-        // If images changed, reset approval status
-        ...(imagesChanged && {
-          imagesPendingModeration: validatedData.images.length > 0,
-          imagesApproved: false,
-        }),
-      })
-      .where(
-        and(
-          eq(products.id, id),
-          eq(products.vendorId, session.user.vendor.id)
-        )
-      )
-      .returning();
-
-    // If images changed, create new moderation records
-    if (imagesChanged && validatedData.images.length > 0) {
-      await createImageModerationRecords(
-        id,
-        session.user.vendor.id,
-        validatedData.images
-      );
-    }
-
-    // Log product update
-    await logProductEvent({
-      action: 'updated',
-      productId: id,
-      productName: updatedProduct.name,
-      vendorId: session.user.vendor.id,
-      userId: session.user.id,
-      userEmail: session.user.email!,
-      userType: 'vendor',
-      details: {
-        imagesChanged,
-        statusChanged: existingProduct.isActive !== validatedData.isActive,
-        newStatus: validatedData.isActive ? 'active' : 'inactive',
-      },
-    });
-
-    return NextResponse.json(updatedProduct);
+    return NextResponse.json(result.product);
   } catch (error) {
     console.error("Error updating product:", error);
 
@@ -181,46 +111,19 @@ export async function DELETE(
       );
     }
 
-    // Verify the product belongs to the vendor
-    const existingProduct = await db.query.products.findFirst({
-      where: and(
-        eq(products.id, id),
-        eq(products.vendorId, session.user.vendor!.id)
-      ),
-    });
+    // Delete product using ProductService
+    const result = await deleteProduct(
+      id,
+      session.user.vendor.id,
+      session.user.email!
+    );
 
-    if (!existingProduct) {
+    if (!result.success) {
       return NextResponse.json(
-        { error: "Producto no encontrado" },
+        { error: result.error },
         { status: 404 }
       );
     }
-
-    // Delete the product
-    await db
-      .delete(products)
-      .where(
-        and(
-          eq(products.id, id),
-          eq(products.vendorId, session.user.vendor.id)
-        )
-      );
-
-    // Log product deletion
-    await logProductEvent({
-      action: 'deleted',
-      productId: id,
-      productName: existingProduct.name,
-      vendorId: session.user.vendor.id,
-      userId: session.user.id,
-      userEmail: session.user.email!,
-      userType: 'vendor',
-      details: {
-        slug: existingProduct.slug,
-        categoryId: existingProduct.categoryId,
-        deletedAt: new Date().toISOString(),
-      },
-    });
 
     return NextResponse.json({ success: true });
   } catch (error) {

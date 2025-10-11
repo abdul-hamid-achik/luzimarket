@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { updateOrderStatus, getOrderById, type OrderStatus } from "@/lib/actions/orders";
+import { updateOrderStatusWithNotifications, getOrderById, type OrderStatus } from "@/lib/services/order-service";
 import { auth } from "@/lib/auth";
 import { z } from "zod";
 
@@ -7,6 +7,7 @@ const updateStatusSchema = z.object({
   status: z.enum(["processing", "shipped", "delivered", "cancelled"]),
   notes: z.string().optional(),
   trackingNumber: z.string().optional(),
+  carrier: z.string().optional(),
 });
 
 export async function PATCH(
@@ -24,7 +25,7 @@ export async function PATCH(
 
     const { id: orderId } = await params;
     const body = await request.json();
-    
+
     // Validate request body
     const validatedData = updateStatusSchema.parse(body);
 
@@ -53,17 +54,18 @@ export async function PATCH(
       );
     }
 
-    // Update order status
-    const success = await updateOrderStatus(
+    // Update order status with notifications using OrderService
+    const result = await updateOrderStatusWithNotifications(
       orderId,
       validatedData.status as OrderStatus,
       validatedData.notes,
-      validatedData.trackingNumber
+      validatedData.trackingNumber,
+      validatedData.carrier
     );
 
-    if (!success) {
+    if (!result.success) {
       return NextResponse.json(
-        { error: "Failed to update order status" },
+        { error: result.error || "Failed to update order status" },
         { status: 500 }
       );
     }
@@ -77,7 +79,7 @@ export async function PATCH(
     });
   } catch (error) {
     console.error("Error updating order status:", error);
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request data", details: error.errors },

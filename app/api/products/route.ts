@@ -46,7 +46,7 @@ export async function GET(request: Request) {
             limit,
         });
 
-        return NextResponse.json(result);
+        return NextResponse.json(result, { status: 200 });
     } catch (error: any) {
         console.error("/api/products error:", error);
         // Graceful fallback when DB is unreachable during tests/local dev
@@ -60,7 +60,7 @@ export async function GET(request: Request) {
                 hasNextPage: false,
                 hasPreviousPage: false,
             },
-        });
+        }, { status: 200 });
     }
 }
 

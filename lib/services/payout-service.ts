@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { payouts, vendorBalances, vendors } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { AuditLogger } from "@/lib/middleware/security";
-import { sendEmail } from "@/lib/email";
+import { sendPayoutCompletedEmail, sendPayoutFailedEmail } from "@/lib/services/email-service";
 
 /**
  * Payout Service
@@ -82,42 +82,10 @@ export async function notifyPayoutCompleted(
             return;
         }
 
-        const emailContent = `
-      <h2>💰 Pago Procesado - Luzimarket</h2>
-      <p>Hola ${vendor.businessName},</p>
-      <p>Te informamos que tu pago ha sido procesado exitosamente.</p>
-      
-      <div style="background-color: #d4edda; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #28a745;">
-        <h3>Detalles del pago:</h3>
-        <p><strong>Monto:</strong> $${amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN</p>
-        <p><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-MX', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        })}</p>
-      </div>
-      
-      <p>El dinero debería estar disponible en tu cuenta bancaria en 1-3 días hábiles.</p>
-      
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/vendor/financials" 
-           style="background-color: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-          Ver mis finanzas
-        </a>
-      </div>
-      
-      <hr style="margin: 30px 0; border: none; border-top: 1px solid #e9ecef;">
-      <p style="font-size: 12px; color: #6c757d; text-align: center;">
-        Luzimarket - Plataforma de ventas para artesanos mexicanos 🇲🇽
-      </p>
-    `;
-
-        await sendEmail({
-            to: vendor.email,
-            subject: `Pago procesado - $${amount.toFixed(2)} MXN - Luzimarket`,
-            html: emailContent,
-        });
-
+        await sendPayoutCompletedEmail(
+            { email: vendor.email, businessName: vendor.businessName },
+            amount
+        );
     } catch (error) {
         console.error('Error sending payout notification:', error);
     }
@@ -145,41 +113,11 @@ export async function handlePayoutFailure(
 
         // Send failure notification to vendor
         if (payout.vendor?.email) {
-            const emailContent = `
-        <h2>⚠️ Error en Pago - Luzimarket</h2>
-        <p>Hola ${payout.vendor.businessName},</p>
-        <p>Lamentamos informarte que hubo un problema al procesar tu pago.</p>
-        
-        <div style="background-color: #fff3cd; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffc107;">
-          <h3>Detalles:</h3>
-          <p><strong>Monto afectado:</strong> $${Number(payout.amount).toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN</p>
-          <p><strong>Razón:</strong> ${failureMessage || 'No especificada'}</p>
-        </div>
-        
-        <p><strong>¿Qué hacer ahora?</strong></p>
-        <ul>
-          <li>Verifica que tu información bancaria esté actualizada</li>
-          <li>Contacta a nuestro equipo de soporte si el problema persiste</li>
-          <li>Intentaremos procesar el pago nuevamente en breve</li>
-        </ul>
-        
-        <div style="text-align: center; margin: 30px 0;">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/vendor/settings/payments" 
-             style="background-color: #ffc107; color: black; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-right: 10px;">
-            Actualizar info bancaria
-          </a>
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/contact" 
-             style="background-color: #6c757d; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-            Contactar soporte
-          </a>
-        </div>
-      `;
-
-            await sendEmail({
-                to: payout.vendor.email,
-                subject: '⚠️ Error en tu pago - Luzimarket',
-                html: emailContent,
-            });
+            await sendPayoutFailedEmail(
+                { email: payout.vendor.email, businessName: payout.vendor.businessName },
+                Number(payout.amount),
+                failureMessage || undefined
+            );
         }
 
         // Log payout failure

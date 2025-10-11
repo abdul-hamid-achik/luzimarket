@@ -1,9 +1,6 @@
 export const runtime = 'nodejs';
 import { NextResponse } from "next/server";
-import { db } from "@/db";
-import { users, emailVerificationTokens } from "@/db/schema";
-import { eq, and, gt, isNull } from "drizzle-orm";
-import { logAuthEvent } from "@/lib/audit-helpers";
+import { verifyEmail } from "@/lib/services/auth-service";
 
 export async function GET(request: Request) {
   try {
@@ -16,58 +13,13 @@ export async function GET(request: Request) {
       );
     }
 
-    // Find the verification token
-    const [verificationToken] = await db
-      .select()
-      .from(emailVerificationTokens)
-      .where(
-        and(
-          eq(emailVerificationTokens.token, token),
-          gt(emailVerificationTokens.expiresAt, new Date()),
-          isNull(emailVerificationTokens.usedAt)
-        )
-      )
-      .limit(1);
+    // Verify email using AuthService
+    const result = await verifyEmail(token);
 
-    if (!verificationToken) {
+    if (!result.success) {
       return NextResponse.redirect(
         new URL("/login?error=expired-token", request.url)
       );
-    }
-
-    // Mark token as used
-    await db
-      .update(emailVerificationTokens)
-      .set({ usedAt: new Date() })
-      .where(eq(emailVerificationTokens.id, verificationToken.id));
-
-    // Update user as verified
-    await db
-      .update(users)
-      .set({
-        emailVerified: true,
-        emailVerifiedAt: new Date(),
-      })
-      .where(eq(users.id, verificationToken.userId));
-
-    // Get user details for audit log
-    const [verifiedUser] = await db
-      .select({ email: users.email })
-      .from(users)
-      .where(eq(users.id, verificationToken.userId))
-      .limit(1);
-
-    // Log email verification event
-    if (verifiedUser) {
-      await logAuthEvent({
-        action: 'email_verification',
-        userId: verificationToken.userId,
-        userEmail: verifiedUser.email,
-        userType: 'customer',
-        details: {
-          verifiedAt: new Date().toISOString(),
-        },
-      });
     }
 
     // Redirect to login with success message

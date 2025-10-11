@@ -84,80 +84,107 @@ export async function middleware(request: NextRequest) {
 
   // Handle API routes
   if (pathname.startsWith('/api/')) {
-    const response = NextResponse.next()
+    try {
+      const response = NextResponse.next()
 
-    // Apply security headers
-    applySecurityHeaders(response)
+      // Apply security headers
+      applySecurityHeaders(response)
 
-    // Configure CORS
-    const origin = request.headers.get('origin')
+      // Configure CORS
+      const origin = request.headers.get('origin')
 
-    if (isAllowedOrigin(origin)) {
-      response.headers.set('Access-Control-Allow-Origin', origin || '*')
-      response.headers.set('Access-Control-Allow-Credentials', 'true')
-    } else if (process.env.NODE_ENV === 'development') {
-      // In development, be more permissive but only log warning for non-null origins
-      // Skip warning during tests to reduce noise
-      if (origin !== null) {
-        console.warn(`CORS request from unauthorized origin: ${origin}`)
+      if (isAllowedOrigin(origin)) {
+        response.headers.set('Access-Control-Allow-Origin', origin || '*')
+        response.headers.set('Access-Control-Allow-Credentials', 'true')
+      } else if (process.env.NODE_ENV === 'development') {
+        // In development, be more permissive but only log warning for non-null origins
+        // Skip warning during tests to reduce noise
+        if (origin !== null) {
+          console.warn(`CORS request from unauthorized origin: ${origin}`)
+        }
+
+        response.headers.set('Access-Control-Allow-Origin', origin || '*')
       }
 
-      response.headers.set('Access-Control-Allow-Origin', origin || '*')
-    }
+      response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+      response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-csrf-token')
 
-    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-csrf-token')
-
-    // Handle preflight requests
-    if (request.method === 'OPTIONS') {
-      return new Response(null, { status: 200, headers: response.headers })
-    }
-
-    // Apply rate limiting
-    const rateLimiter = getRateLimiter(pathname)
-    if (rateLimiter) {
-      const { success, limit, remaining, reset, message } = await rateLimiter.check(request)
-
-      // Add rate limit headers
-      response.headers.set('X-RateLimit-Limit', limit.toString())
-      response.headers.set('X-RateLimit-Remaining', remaining.toString())
-      response.headers.set('X-RateLimit-Reset', reset.toISOString())
-
-      if (!success) {
-        return new Response(JSON.stringify({ error: message }), {
-          status: 429,
-          headers: {
-            ...Object.fromEntries(response.headers),
-            'Content-Type': 'application/json',
-            'Retry-After': Math.ceil((reset.getTime() - Date.now()) / 1000).toString(),
-          },
-        })
-      }
-    }
-
-    // Apply CSRF protection
-    const shouldCheckCsrf = !csrfExcludePaths.some(path => pathname.startsWith(path))
-    if (shouldCheckCsrf) {
-      const csrfResult = await checkCsrfProtection(request)
-
-      if (!csrfResult.valid) {
-        return new Response(JSON.stringify({ error: csrfResult.error }), {
-          status: 403,
-          headers: {
-            ...Object.fromEntries(response.headers),
-            'Content-Type': 'application/json',
-          },
-        })
+      // Handle preflight requests
+      if (request.method === 'OPTIONS') {
+        return new Response(null, { status: 200, headers: response.headers })
       }
 
-      // Set new CSRF token if needed
-      if (csrfResult.newToken) {
-        const cookieOptions = getCsrfCookieOptions()
-        response.cookies.set(cookieOptions.name, csrfResult.newToken, cookieOptions)
-      }
-    }
+      // Apply rate limiting
+      const rateLimiter = getRateLimiter(pathname)
+      if (rateLimiter) {
+        const { success, limit, remaining, reset, message } = await rateLimiter.check(request)
 
-    return response
+        // Add rate limit headers
+        response.headers.set('X-RateLimit-Limit', limit.toString())
+        response.headers.set('X-RateLimit-Remaining', remaining.toString())
+        response.headers.set('X-RateLimit-Reset', reset.toISOString())
+
+        if (!success) {
+          return new Response(JSON.stringify({ error: message }), {
+            status: 429,
+            headers: {
+              ...Object.fromEntries(response.headers),
+              'Content-Type': 'application/json',
+              'Retry-After': Math.ceil((reset.getTime() - Date.now()) / 1000).toString(),
+            },
+          })
+        }
+      }
+
+      // Apply CSRF protection
+      const shouldCheckCsrf = !csrfExcludePaths.some(path => pathname.startsWith(path))
+      if (shouldCheckCsrf) {
+        try {
+          const csrfResult = await checkCsrfProtection(request)
+
+          if (!csrfResult.valid) {
+            console.log('[Middleware] CSRF check failed for:', pathname);
+            return new Response(JSON.stringify({ error: csrfResult.error }), {
+              status: 403,
+              headers: {
+                ...Object.fromEntries(response.headers),
+                'Content-Type': 'application/json',
+              },
+            })
+          }
+
+          // Set new CSRF token if needed
+          if (csrfResult.newToken) {
+            const cookieOptions = getCsrfCookieOptions()
+            response.cookies.set(cookieOptions.name, csrfResult.newToken, cookieOptions)
+          }
+        } catch (csrfError) {
+          console.error('[Middleware] CSRF check threw error:', csrfError);
+          // Don't block request if CSRF check fails
+          // Return JSON error instead of letting it throw
+          return new Response(JSON.stringify({ error: 'CSRF check failed' }), {
+            status: 500,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
+        }
+      }
+
+      return response
+    } catch (middlewareError) {
+      console.error('[Middleware] Error handling API route:', pathname, middlewareError);
+      // Return JSON error instead of letting Next.js render HTML error page
+      return new Response(JSON.stringify({
+        error: 'Internal server error in middleware',
+        details: middlewareError instanceof Error ? middlewareError.message : String(middlewareError)
+      }), {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+    }
   }
 
   // Handle __nextjs_original-stack-frames endpoint

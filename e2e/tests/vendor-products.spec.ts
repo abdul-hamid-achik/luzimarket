@@ -595,15 +595,26 @@ test.describe('Vendor Product Management', () => {
 
     test('should bulk delete products', async ({ page }) => {
       await page.goto('/es/vendor/products');
+      await page.waitForLoadState('networkidle');
 
       // Get initial count
       const initialCount = await page.locator('tr:not(:first-child), .product-card').count();
 
-      // Select products
-      const allCheckboxes = await page.locator('input[type="checkbox"]:not([disabled])').all();
-      const checkboxes = allCheckboxes.slice(0, 2);
-      for (const checkbox of checkboxes) {
-        await checkbox.click({ force: true });
+      // Select products - use a more stable selector (visible checkbox labels/buttons)
+      const checkboxContainers = page.locator('[role="checkbox"], input[type="checkbox"]:not([aria-hidden="true"])').first();
+      
+      // Wait for checkboxes to be ready
+      await page.waitForTimeout(500);
+      
+      // Select first two products by clicking their rows or checkbox containers
+      const productRows = await page.locator('tr:has(input[type="checkbox"]), [data-testid="product-row"]').all();
+      const rowsToSelect = productRows.slice(0, Math.min(2, productRows.length));
+      
+      for (const row of rowsToSelect) {
+        const checkbox = row.locator('input[type="checkbox"]').first();
+        await checkbox.waitFor({ state: 'attached', timeout: 2000 });
+        await checkbox.check({ force: true });
+        await page.waitForTimeout(100);
       }
 
       // Bulk delete

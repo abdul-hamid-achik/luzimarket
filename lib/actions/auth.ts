@@ -1,17 +1,17 @@
 "use server";
 
+/**
+ * Auth Actions
+ * These actions now delegate to AuthService for consistency
+ * Kept for backward compatibility with existing components that use server actions
+ */
+
+import { authenticateUser as authenticateUserService } from "@/lib/services/auth-service";
+import { unlockUserAccount as unlockUserAccountService } from "@/lib/services/user-service";
 import { db } from "@/db";
 import { users, vendors, adminUsers } from "@/db/schema";
-import { eq, and, gt } from "drizzle-orm";
-import bcrypt from "bcryptjs";
-import { sendEmail } from "@/lib/email";
-import { getTranslations } from "next-intl/server";
-import { AuditLogger } from "@/lib/middleware/security";
+import { and, gt } from "drizzle-orm";
 import { headers } from "next/headers";
-
-const LOCKOUT_THRESHOLD = 5; // Number of failed attempts before lockout
-const LOCKOUT_WINDOW_MINUTES = 15; // Time window for counting failed attempts
-const LOCKOUT_DURATION_MINUTES = 30; // How long the account remains locked
 
 interface AuthResult {
   success: boolean;
@@ -26,6 +26,9 @@ interface AuthResult {
   remainingAttempts?: number;
 }
 
+/**
+ * Authenticate user - delegates to AuthService
+ */
 export async function authenticateUser(
   email: string,
   password: string,
@@ -33,283 +36,30 @@ export async function authenticateUser(
   locale: string = "es"
 ): Promise<AuthResult> {
   try {
-    let table;
-    switch (userType) {
-      case "customer":
-        table = users;
-        break;
-      case "vendor":
-        table = vendors;
-        break;
-      case "admin":
-        table = adminUsers;
-        break;
-    }
-
-    // Get user with lockout info
-    const [user] = await db
-      .select()
-      .from(table)
-      .where(eq(table.email, email))
-      .limit(1);
-
-    if (!user) {
-      const t = await getTranslations({ locale, namespace: "Auth" });
-      return { success: false, error: t("invalidCredentials") };
-    }
-
-    // Check if account is locked
-    if (user.lockedUntil && new Date(user.lockedUntil) > new Date()) {
-      const t = await getTranslations({ locale, namespace: "Auth" });
-      const minutesRemaining = Math.ceil(
-        (new Date(user.lockedUntil).getTime() - new Date().getTime()) / (1000 * 60)
-      );
-      return {
-        success: false,
-        error: t("accountLocked", { minutes: minutesRemaining }),
-        isLocked: true,
-      };
-    }
-
-    // Check if account is active
-    if (!user.isActive) {
-      const t = await getTranslations({ locale, namespace: "Auth" });
-      return { success: false, error: t("accountInactive") };
-    }
-
-    // Check if email is verified (only for customers)
-    if (userType === "customer" && 'emailVerified' in user && !user.emailVerified) {
-      const t = await getTranslations({ locale, namespace: "Auth" });
-      return { success: false, error: t("emailNotVerified") };
-    }
-
-    // Verify password
-    const isValidPassword = user.passwordHash && await bcrypt.compare(password, user.passwordHash);
-
-    if (!isValidPassword) {
-      // Handle failed login attempt
-      await handleFailedLoginAttempt(email, userType, user, locale);
-
-      const t = await getTranslations({ locale, namespace: "Auth" });
-      const remainingAttempts = Math.max(0, LOCKOUT_THRESHOLD - ((user.failedLoginAttempts || 0) + 1));
-
-      if (remainingAttempts === 0) {
-        return {
-          success: false,
-          error: t("tooManyAttempts"),
-          isLocked: true,
-        };
-      }
-
-      return {
-        success: false,
-        error: t("invalidCredentials"),
-        remainingAttempts,
-      };
-    }
-
-    // Reset failed attempts on successful login
-    await db
-      .update(table)
-      .set({
-        failedLoginAttempts: 0,
-        lastFailedLoginAt: null,
-        lockedUntil: null,
-      })
-      .where(eq(table.email, email));
-
-    // Log successful login
     const headersList = await headers();
-    await AuditLogger.log({
-      action: "login.success",
-      category: "auth",
-      severity: "info",
-      userId: user.id,
-      userType: userType,
-      userEmail: user.email,
-      ip: headersList.get("x-forwarded-for") || headersList.get("x-real-ip") || "unknown",
-      userAgent: headersList.get("user-agent") || undefined,
-      details: {
-        loginMethod: "password",
-        userType: userType,
-      },
-    });
+    const ip = headersList.get("x-forwarded-for") || headersList.get("x-real-ip") || "unknown";
 
-    return {
-      success: true,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: (user as any).name || (user as any).contactName || user.email,
-        role: userType as "customer" | "vendor" | "admin",
-      },
-    };
+    // Delegate to AuthService
+    return await authenticateUserService(email, password, userType, ip);
   } catch (error) {
     console.error("Authentication error:", error);
-    const t = await getTranslations({ locale, namespace: "Auth" });
-    return { success: false, error: t("authenticationFailed") };
+    return { success: false, error: "Error de autenticación" };
   }
 }
 
-async function handleFailedLoginAttempt(
-  email: string,
-  userType: "customer" | "vendor" | "admin",
-  user: any,
-  locale: string = "es"
-) {
-  let table;
-  switch (userType) {
-    case "customer":
-      table = users;
-      break;
-    case "vendor":
-      table = vendors;
-      break;
-    case "admin":
-      table = adminUsers;
-      break;
-  }
-
-  const now = new Date();
-  const windowStart = new Date(now.getTime() - LOCKOUT_WINDOW_MINUTES * 60 * 1000);
-
-  // Check if we need to reset the counter (outside the time window)
-  let failedAttempts = user.failedLoginAttempts || 0;
-  if (!user.lastFailedLoginAt || new Date(user.lastFailedLoginAt) < windowStart) {
-    failedAttempts = 0;
-  }
-
-  failedAttempts++;
-
-  const updateData: any = {
-    failedLoginAttempts: failedAttempts,
-    lastFailedLoginAt: now,
-  };
-
-  // Lock the account if threshold is reached
-  if (failedAttempts >= LOCKOUT_THRESHOLD) {
-    const lockedUntil = new Date(now.getTime() + LOCKOUT_DURATION_MINUTES * 60 * 1000);
-    updateData.lockedUntil = lockedUntil;
-
-    // Send lockout notification email
-    try {
-      await sendAccountLockoutNotification(user.email, user.name || user.contactName || user.email, locale);
-    } catch (error) {
-      console.error("Failed to send lockout notification:", error);
-    }
-  }
-
-  await db
-    .update(table)
-    .set(updateData)
-    .where(eq(table.email, email));
-
-  // Log failed login attempt
-  const headersList = await headers();
-  await AuditLogger.log({
-    action: failedAttempts >= LOCKOUT_THRESHOLD ? "login.locked" : "login.failed",
-    category: "security",
-    severity: failedAttempts >= LOCKOUT_THRESHOLD ? "warning" : "info",
-    userId: user.id,
-    userType: userType,
-    userEmail: user.email,
-    ip: headersList.get("x-forwarded-for") || headersList.get("x-real-ip") || "unknown",
-    userAgent: headersList.get("user-agent") || undefined,
-    details: {
-      failedAttempts: failedAttempts,
-      accountLocked: failedAttempts >= LOCKOUT_THRESHOLD,
-      userType: userType,
-    },
-  });
-}
-
-async function sendAccountLockoutNotification(email: string, name: string, locale: string = "es") {
-  const t = await getTranslations({ locale, namespace: "Auth" });
-  const html = `
-    <div style="font-family: 'Univers', Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <div style="background-color: #000; color: #fff; padding: 20px; text-align: center;">
-        <h1 style="margin: 0; font-size: 28px; letter-spacing: 2px;">LUZIMARKET</h1>
-      </div>
-      
-      <div style="padding: 40px 20px;">
-        <h2 style="font-size: 24px; margin-bottom: 20px; color: #d10000;">${t("accountLockedEmailTitle")}</h2>
-        
-        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-          ${t("accountLockedEmailGreeting", { name })}
-        </p>
-        
-        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-          ${t("accountLockedEmailMessage")}
-        </p>
-        
-        <div style="background-color: #fef2f2; border: 1px solid #fecaca; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
-          <p style="margin: 0; font-size: 16px; line-height: 1.6;">
-            <strong>${t("accountLockedEmailDuration")}</strong>
-          </p>
-        </div>
-        
-        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-          ${t("accountLockedEmailContact")}
-        </p>
-        
-        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-          ${t("accountLockedEmailReset")}
-        </p>
-        
-        <div style="text-align: center; margin: 30px 0;">
-          <a href="${process.env.NEXTAUTH_URL}/forgot-password" style="display: inline-block; background-color: #000; color: #fff; padding: 12px 30px; text-decoration: none; border-radius: 4px; font-weight: 500;">
-            ${t("resetPassword")}
-          </a>
-        </div>
-      </div>
-      
-      <div style="background: linear-gradient(to right, #86efac, #fde047, #5eead4); padding: 20px; text-align: center;">
-        <p style="margin: 0; font-size: 12px;">© ${new Date().getFullYear()} LUZIMARKET</p>
-      </div>
-    </div>
-  `;
-
-  return sendEmail({
-    to: email,
-    subject: t("accountLockedEmailSubject"),
-    html,
-  });
-}
-
+/**
+ * Unlock user account - delegates to UserService
+ */
 export async function unlockUserAccount(
   userId: string,
   userType: "customer" | "vendor" | "admin"
 ): Promise<{ success: boolean; error?: string }> {
-  try {
-    let table;
-    switch (userType) {
-      case "customer":
-        table = users;
-        break;
-      case "vendor":
-        table = vendors;
-        break;
-      case "admin":
-        table = adminUsers;
-        break;
-    }
-
-    await db
-      .update(table)
-      .set({
-        failedLoginAttempts: 0,
-        lastFailedLoginAt: null,
-        lockedUntil: null,
-      })
-      .where(eq(table.id, userId));
-
-    return { success: true };
-  } catch (error) {
-    console.error("Error unlocking account:", error);
-    return { success: false, error: "Failed to unlock account" };
-  }
+  return await unlockUserAccountService(userId, userType);
 }
 
+/**
+ * Get locked accounts - kept as action since it's read-only
+ */
 export async function getLockedAccounts() {
   try {
     const now = new Date();
@@ -375,44 +125,14 @@ export async function getLockedAccounts() {
   }
 }
 
+/**
+ * Lock user account - delegates to UserService
+ */
 export async function lockUserAccount(
   userId: string,
   userType: "customer" | "vendor" | "admin",
   durationMinutes?: number
 ): Promise<{ success: boolean; error?: string }> {
-  try {
-    let table;
-    switch (userType) {
-      case "customer":
-        table = users;
-        break;
-      case "vendor":
-        table = vendors;
-        break;
-      case "admin":
-        table = adminUsers;
-        break;
-    }
-
-    const now = new Date();
-    const minutes = typeof durationMinutes === "number" && durationMinutes > 0
-      ? durationMinutes
-      : LOCKOUT_DURATION_MINUTES;
-
-    const lockedUntil = new Date(now.getTime() + minutes * 60 * 1000);
-
-    await db
-      .update(table)
-      .set({
-        lockedUntil,
-        lastFailedLoginAt: now,
-        failedLoginAttempts: LOCKOUT_THRESHOLD,
-      })
-      .where(eq(table.id, userId));
-
-    return { success: true };
-  } catch (error) {
-    console.error("Error locking account:", error);
-    return { success: false, error: "Failed to lock account" };
-  }
+  const { lockUserAccount: lockUserAccountService } = await import("@/lib/services/user-service");
+  return await lockUserAccountService(userId, userType, durationMinutes);
 }
