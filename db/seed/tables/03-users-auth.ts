@@ -4,6 +4,9 @@ import { sql } from "drizzle-orm";
 import { faker } from "@faker-js/faker";
 import bcrypt from "bcryptjs";
 import { customerSegments } from "../utils/realistic-patterns";
+import { SeedLogger } from "../utils/logger";
+
+const logger = new SeedLogger();
 
 faker.seed(12345);
 
@@ -11,8 +14,8 @@ faker.seed(12345);
  * Seeds users, admin users, and authentication-related tables
  */
 export async function seedUsersAndAuth(database = db, options?: any) {
-  console.log("👥 Creating users and authentication data...");
-  
+  logger.info("Creating users and authentication data", true);
+
   // 1. Create Admin Users
   const hashedAdminPassword = await bcrypt.hash("admin123", 10);
   const adminUsersData = [
@@ -139,8 +142,8 @@ export async function seedUsersAndAuth(database = db, options?: any) {
       email: faker.internet.email(),
       name: faker.person.fullName(),
       passwordHash: userPassword,
-      stripeCustomerId: faker.datatype.boolean({ probability: 0.5 }) 
-        ? `cus_occ_${faker.string.alphanumeric(14)}` 
+      stripeCustomerId: faker.datatype.boolean({ probability: 0.5 })
+        ? `cus_occ_${faker.string.alphanumeric(14)}`
         : null,
       isActive: faker.datatype.boolean({ probability: 0.9 }),
       emailVerified: faker.datatype.boolean({ probability: 0.5 }),
@@ -157,7 +160,7 @@ export async function seedUsersAndAuth(database = db, options?: any) {
 
   // 3. Create Newsletter Subscriptions
   const subscriptionData = [];
-  
+
   // All VIP and loyal users are subscribed
   const vipAndLoyalUsers = users.slice(0, segments.vip + segments.loyal + 2); // +2 for test users
   for (const user of vipAndLoyalUsers) {
@@ -195,7 +198,7 @@ export async function seedUsersAndAuth(database = db, options?: any) {
   // 4. Create some user sessions for active users
   const activeUsers = users.filter(u => u.isActive).slice(0, 30);
   const sessionData = [];
-  
+
   for (const user of activeUsers) {
     sessionData.push({
       userId: user.id,

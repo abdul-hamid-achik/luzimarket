@@ -2,6 +2,9 @@ import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { faker } from "@faker-js/faker";
 import { sql } from "drizzle-orm";
+import { SeedLogger } from "../utils/logger";
+
+const logger = new SeedLogger();
 
 faker.seed(12345);
 
@@ -9,7 +12,7 @@ faker.seed(12345);
  * Seeds moderation and support-related data
  */
 export async function seedModerationAndSupport(database = db, options?: any) {
-  console.log("🛡️  Creating moderation and support data...");
+  logger.info("Creating moderation and support data", true);
 
   const products = await database.query.products.findMany({
     where: (products, { isNotNull, and, gt }) =>
@@ -24,7 +27,7 @@ export async function seedModerationAndSupport(database = db, options?: any) {
   const vendors = await database.select().from(schema.vendors);
 
   if (products.length === 0) {
-    console.log("⚠️  No products with images found for moderation");
+    logger.warn("No products with images found for moderation");
     return { success: true, message: "No moderation data created", data: {} };
   }
 

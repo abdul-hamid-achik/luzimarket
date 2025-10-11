@@ -2,6 +2,9 @@ import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { faker } from "@faker-js/faker";
 import { reviewLikelihood } from "../utils/realistic-patterns";
+import { SeedLogger } from "../utils/logger";
+
+const logger = new SeedLogger();
 
 faker.seed(12345);
 
@@ -65,7 +68,7 @@ const REVIEW_COMMENTS = {
  * Seeds product reviews and ratings
  */
 export async function seedReviewsAndRatings(database = db, options?: any) {
-  console.log("⭐ Creating reviews and ratings...");
+  logger.info("Creating reviews and ratings", true);
 
   const orders = await database.query.orders.findMany({
     where: (orders, { eq }) => eq(orders.status, "delivered"),
@@ -78,7 +81,7 @@ export async function seedReviewsAndRatings(database = db, options?: any) {
   const products = await database.select().from(schema.products);
 
   if (orders.length === 0) {
-    console.log("⚠️  No delivered orders found for reviews");
+    logger.warn("No delivered orders found for reviews");
     return { success: true, message: "No reviews created", data: { reviews: 0 } };
   }
 

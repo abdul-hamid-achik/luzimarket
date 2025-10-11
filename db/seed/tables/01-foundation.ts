@@ -2,6 +2,9 @@ import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { sql } from "drizzle-orm";
 import { initializeShippingData } from "@/lib/actions/shipping";
+import { SeedLogger } from "../utils/logger";
+
+const logger = new SeedLogger();
 
 /**
  * Seeds foundation tables that other tables depend on:
@@ -10,14 +13,14 @@ import { initializeShippingData } from "@/lib/actions/shipping";
  * - Email templates
  */
 export async function seedFoundationTables(database = db, options?: any) {
-  console.log("🏗️  Setting up foundation tables...");
-  
+  logger.info("Setting up foundation tables", true);
+
   // 1. Initialize shipping data first (needed for vendor foreign keys)
   const shippingResult = await initializeShippingData();
   if (shippingResult.success) {
-    console.log(`✅ ${shippingResult.message}`);
+    logger.info(shippingResult.message, true);
   } else {
-    console.log(`⚠️  Shipping data initialization failed: ${shippingResult.error}`);
+    logger.warn(`Shipping data initialization failed: ${shippingResult.error}`);
   }
 
   // 2. Seed Categories
@@ -84,7 +87,7 @@ export async function seedFoundationTables(database = db, options?: any) {
     .insert(schema.categories)
     .values(categories)
     .onConflictDoNothing({ target: schema.categories.slug });
-  
+
   const insertedCategories = await database.select().from(schema.categories);
 
   // 3. Seed Email Templates

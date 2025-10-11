@@ -5,6 +5,9 @@ import { faker } from "@faker-js/faker";
 import bcrypt from "bcryptjs";
 import slugify from "slugify";
 import { powerLawDistribution, realisticPricing } from "../utils/realistic-patterns";
+import { SeedLogger } from "../utils/logger";
+
+const logger = new SeedLogger();
 
 // Set seed for consistency
 faker.seed(12345);
@@ -43,7 +46,7 @@ function generateMxPhone(): string {
  * Seeds vendors and products with realistic distribution
  */
 export async function seedVendorsAndProducts(database = db, options?: any) {
-  console.log("🏪 Creating vendors and products...");
+  logger.info("Creating vendors and products", true);
 
   const categories = await database.select().from(schema.categories);
   const shippingMethods = await database.select().from(schema.shippingMethods);

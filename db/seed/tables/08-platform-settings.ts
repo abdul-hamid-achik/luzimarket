@@ -1,8 +1,11 @@
 import { db } from "../../index";
 import { platformSettings } from "../../schema";
+import { SeedLogger } from "../utils/logger";
+
+const logger = new SeedLogger();
 
 export async function seedPlatformSettings() {
-    console.log("  📋 Seeding platform settings...");
+    logger.info("Seeding platform settings", true);
 
     const defaultSettings = [
         // General Settings
@@ -108,5 +111,5 @@ export async function seedPlatformSettings() {
             .onConflictDoNothing();
     }
 
-    console.log(`  ✓ ${defaultSettings.length} platform settings seeded`);
+    logger.info(`${defaultSettings.length} platform settings seeded`, true);
 }
